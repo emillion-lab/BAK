@@ -1,0 +1,31 @@
+name: Flights Update
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 5 * * *'
+    - cron: '0 10 * * *'
+    - cron: '0 14 * * *'
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch flights
+        run: |
+          curl "http://api.aviationstack.com/v1/flights?access_key=${{ secrets.API_KEY }}&arr_iata=SOF" > flight-cache.json
+
+      - name: Commit
+        run: |
+          git config user.name "bot"
+          git config user.email "bot@github.com"
+          git add flight-cache.json
+          git commit -m "update flights" || echo "no changes"
+          git push
+#test
+
