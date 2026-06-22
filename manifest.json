@@ -1,0 +1,45 @@
+{
+  "name": "BakshishApp — Sofia Taxi Demand",
+  "short_name": "BakshishApp",
+  "description": "Реална карта за търсене на клиенти в София. GPS навигация, бакшиш радар, Карък мод.",
+  "start_url": "/BAK/",
+  "scope": "/BAK/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#070d1a",
+  "theme_color": "#070d1a",
+  "lang": "bg",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": [
+    "navigation",
+    "productivity",
+    "travel"
+  ],
+  "shortcuts": [
+    {
+      "name": "🎩 Бакшиш Радар",
+      "short_name": "Бакшиш",
+      "description": "Отвори Бакшиш Радара",
+      "url": "/BAK/#bakshish"
+    },
+    {
+      "name": "🥉 Карък Мод",
+      "short_name": "Карък",
+      "description": "Бронзов партньор режим",
+      "url": "/BAK/#karyk"
+    }
+  ]
+}
