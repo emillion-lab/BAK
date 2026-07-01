@@ -1498,3 +1498,11 @@ setTimeout(()=>{drawSparkline(currentHour); map.invalidateSize();},300);
 window.addEventListener('resize',()=>{drawSparkline(currentHour); map.invalidateSize();});
 
 }); // end DOMContentLoaded
+
+
+function toggleMapView(){
+  const listView = document.body.classList.toggle('list-view');
+  const btn = document.getElementById('toggle-map-btn');
+  if(btn) btn.textContent = listView ? '🗺️ Карта' : '📋 Списък';
+  if(!listView && window.map) setTimeout(()=>map.invalidateSize(), 100);
+}
