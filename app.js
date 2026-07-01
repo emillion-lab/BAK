@@ -600,7 +600,7 @@ function buildCircles() {
     }
     if (z.type==='karyk') {
       const c=L.circle([z.lat,z.lng],{radius:z.radius,fillOpacity:0,opacity:0,weight:0});
-      c.on('click',()=>z.type==='airport'?showAirportSchedule():showZonePopup(z.id)); c.addTo(map); circleMap[z.id]=c;
+      c.on('click',()=>z.type==='airport'?showAirportSchedule():z.type==='transit'?showTransitPopup(z.id):showZonePopup(z.id)); c.addTo(map); circleMap[z.id]=c;
       return;
     }
     if (z.type==='hospital') {
@@ -613,7 +613,7 @@ function buildCircles() {
       return;
     }
     const c=L.circle([z.lat,z.lng],{radius:z.radius,...getScoreStyle(BASE[z.id]||0.3,z.type)});
-    c.on('click',()=>z.type==='airport'?showAirportSchedule():showZonePopup(z.id)); c.addTo(map); circleMap[z.id]=c;
+    c.on('click',()=>z.type==='airport'?showAirportSchedule():z.type==='transit'?showTransitPopup(z.id):showZonePopup(z.id)); c.addTo(map); circleMap[z.id]=c;
   });
 }
 
@@ -659,6 +659,124 @@ function updateCircles() {
 }
 
 
+// ═══════════════════════════════════════════════
+// BUS SCHEDULE (Plovdiv ↔ Sofia)
+// ═══════════════════════════════════════════════
+let busScheduleData = null;
+
+function loadBusSchedule(){
+  fetch('bus-schedule.json')
+    .then(r=>r.ok?r.json():null)
+    .then(data=>{
+      if(!data) return;
+      busScheduleData = data;
+      console.log('Bus schedule loaded:', data.routes?.length, 'routes');
+    })
+    .catch(e=>console.warn('Bus schedule:', e));
+}
+
+function getNextBuses(routeId, count){
+  if(!busScheduleData) return [];
+  const route = busScheduleData.routes?.find(r=>r.id===routeId);
+  if(!route) return [];
+  const now = new Date();
+  const sofia = new Date(now.getTime() + 3*3600000); // UTC+3
+  const nowMin = sofia.getUTCHours()*60 + sofia.getUTCMinutes();
+  const results = [];
+  for(const dep of route.departures){
+    const [h,m] = dep.split(':').map(Number);
+    const depMin = h*60+m;
+    const diff = depMin - nowMin;
+    if(diff >= -10){ // include buses up to 10min ago
+      const stops = route.stops || [];
+      results.push({
+        dep, depMin, diff, route,
+        stops: stops.map(s=>({
+          name: s.name,
+          arrH: Math.floor((depMin + (s.offset_min||0)) / 60) % 24,
+          arrM: (depMin + (s.offset_min||0)) % 60
+        }))
+      });
+    }
+    if(results.length >= count) break;
+  }
+  return results;
+}
+
+function showTransitPopup(zid){
+  const z = ZONES.find(x=>x.id===zid);
+  if(!z) return;
+
+  const fmt = (h,m) => String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
+
+  let html = '<div style="font-size:14px;max-height:60vh;overflow-y:auto">';
+  html += `<div style="font-weight:800;font-size:15px;margin-bottom:10px;color:var(--cyan)">${z.icon||'🚌'} ${z.name}</div>`;
+
+  // Plovdiv buses arriving at Central Autogara (cab_north)
+  if(zid === 'cab_north'){
+    const next = getNextBuses('plovdiv_sofia', 6);
+    if(next.length){
+      html += '<div style="font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.6px;margin-bottom:8px">🚌 ПЛОВДИВ → СОФИЯ (пристигане)</div>';
+      next.forEach(b=>{
+        const arrStop = b.stops.find(s=>s.name.includes('Централна автогара София'));
+        const arrH = arrStop?.arrH ?? ((b.depMin+120)%1440)%24/60|0;
+        const arrM = arrStop?.arrM ?? (b.depMin+120)%60;
+        const isNow = b.diff>=-5 && b.diff<=130;
+        const bg = isNow?'rgba(239,68,68,.1)':'transparent';
+        const col = b.diff<0?'var(--muted)':b.diff<30?'#ef4444':'var(--amber)';
+        const label = b.diff<0?`тръгнал (пристига ~${fmt(arrH,arrM)})`:
+                      b.diff<60?`след ${b.diff} мин → пристига ${fmt(arrH,arrM)}`:
+                      `тръгва ${b.dep} → пристига ${fmt(arrH,arrM)}`;
+        html += `<div style="padding:6px 8px;border-radius:7px;background:${bg};margin-bottom:3px;display:flex;justify-content:space-between;gap:8px">
+          <span style="font-weight:800;color:var(--text)">${b.dep}</span>
+          <span style="font-size:12px;color:${col};text-align:right">${label}</span>
+        </div>`;
+      });
+      if(!next.length){
+        html += '<div style="color:var(--muted);padding:8px">Няма автобуси в следващите часове</div>';
+      }
+    } else {
+      html += '<div style="color:var(--muted);padding:8px">Зареждане на разписание…</div>';
+    }
+    html += '<div style="font-size:11px;color:var(--muted);margin-top:8px;padding-top:6px;border-top:1px solid var(--border)">Спирки: Пловдив → Ихтиман → Expo Center → София</div>';
+  }
+
+  // Expo Center bus stop
+  if(zid === 'iec' || zid === 'expo2000'){
+    const next = getNextBuses('plovdiv_sofia', 5);
+    const expoStop = next.filter(b=>{
+      const stop = b.stops.find(s=>s.name.includes('Expo'));
+      return stop && b.diff >= -110;
+    }).map(b=>{
+      const stop = b.stops.find(s=>s.name.includes('Expo'));
+      return {...b, expoH: stop?.arrH, expoM: stop?.arrM};
+    });
+
+    if(expoStop.length){
+      html += '<div style="font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.6px;margin-bottom:8px">🚌 Автобус Пловдив–София (Expo спирка)</div>';
+      expoStop.forEach(b=>{
+        const col = b.expoH !== undefined ? 'var(--amber)' : 'var(--muted)';
+        html += `<div style="padding:6px 8px;border-radius:7px;margin-bottom:3px;display:flex;justify-content:space-between">
+          <span>Тръгва ${b.dep} от Пловдив</span>
+          <span style="font-weight:800;color:${col}">Expo ~${fmt(b.expoH??0,b.expoM??0)}</span>
+        </div>`;
+      });
+    }
+  }
+
+  // Generic transit info
+  if(!['cab_north','iec','expo2000'].includes(zid)){
+    html += '<div style="color:var(--muted);padding:8px 0">Зона за транспортен хъб. Очаквайте разписания.</div>';
+  }
+
+  html += '</div>';
+
+  L.popup({maxWidth:360, className:'transit-popup'})
+    .setLatLng([z.lat, z.lng])
+    .setContent(html)
+    .openOn(map);
+}
+
 // ═══ AIRPORT SCHEDULE POPUP ═══
 function showAirportSchedule() {
   const now = new Date();
@@ -687,8 +805,24 @@ function showAirportSchedule() {
   let html='<div style="font-size:14px">';
   html+='<div style="font-weight:800;font-size:15px;margin-bottom:10px;color:var(--cyan)">✈️ Излизане на пасажери — СОФ</div>';
 
-  if(upcoming.length===0 && past.length===0){
-    html+='<div style="color:var(--muted);padding:16px 0;text-align:center">Зареждане… или няма полети в кеша</div>';
+  // Find truly next flights even if none "upcoming" now
+  const allSorted = [...flightDetails].sort((a,b)=>(a.exitFromH*60+a.exitFromM)-(b.exitFromH*60+b.exitFromM));
+  if(upcoming.length===0){
+    const next = allSorted.find(f=>{
+      const fm=f.exitFromH*60+f.exitFromM;
+      const adj=fm<180?fm+1440:fm;
+      const na=nowMin<180?nowMin+1440:nowMin;
+      return adj>na;
+    });
+    if(next){
+      html+=`<div style="background:rgba(2,132,199,.1);border:1px solid var(--cyan);border-radius:10px;padding:14px;text-align:center;margin-bottom:10px">
+        <div style="font-size:13px;color:var(--muted);margin-bottom:4px">Няма излизащи пасажери в момента</div>
+        <div style="font-size:18px;font-weight:900;color:var(--cyan)">Следващ: ${String(next.exitFromH).padStart(2,'0')}:${String(next.exitFromM).padStart(2,'0')}</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:3px">${next.fn} от ${(next.depAirport||'').slice(0,20)} ${next.nonSchengen?'🛂':'🇪🇺'}</div>
+      </div>`;
+    } else if(past.length===0){
+      html+='<div style="color:var(--muted);padding:16px 0;text-align:center">Зареждане на полети…</div>';
+    }
   }
 
   if(upcoming.length){
