@@ -992,7 +992,9 @@ function loadFlights(); loadBuses(){
         const t=new Date(f.arrival.estimated||f.arrival.scheduled);
         const nonEU=(f.departure?.airport||'').toLowerCase().match(/tur|israel|uk/);
         const ready=new Date(t.getTime()+(nonEU?20:10)*60000);
-        flightHours[ready.getHours()]++;
+        // Sofia = EEST = UTC+3 in summer
+        const sofiaH=(ready.getUTCHours()+3)%24;
+        flightHours[sofiaH]++;
       });
       airportStatus='live';
       injectAirportEvents(); updateAirportBadge();
