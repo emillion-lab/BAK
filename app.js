@@ -22,6 +22,7 @@ let deviceHeading     = null;
 let dirHintZid        = null;
 let dirHintSuppressed = false;
 let flightHours       = Array(24).fill(0);
+let flightDetails     = []; // [{from, exitFrom, exitTo, fn, nonSchengen}]
 let airportStatus     = 'offline';
 let demandCurve       = [];
 let alertedEvents     = new Set();
@@ -657,6 +658,73 @@ function updateCircles() {
   });
 }
 
+
+// ═══ AIRPORT SCHEDULE POPUP ═══
+function showAirportSchedule() {
+  const now = new Date();
+  const nowH = (now.getUTCHours()+3)%24;
+  const nowM = now.getUTCMinutes();
+  const nowTotal = nowH*60 + nowM;
+
+  // Sort flights by exit time
+  const sorted = [...flightDetails].sort((a,b)=>{
+    return (a.exitFromH*60+a.exitFromM) - (b.exitFromH*60+b.exitFromM);
+  });
+
+  // Split: upcoming vs past
+  const upcoming = sorted.filter(f => (f.exitToH*60+f.exitToM) >= nowTotal - 10);
+  const past     = sorted.filter(f => (f.exitToH*60+f.exitToM) <  nowTotal - 10);
+
+  const fmt = (h,m) => `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+  const flag = (f) => f.nonSchengen ? '🛂' : '🇪🇺';
+
+  let html = '<div style="font-size:14px;max-height:50vh;overflow-y:auto">';
+  html += '<div style="font-weight:800;font-size:15px;margin-bottom:8px;color:var(--cyan)">✈️ Летище СОФ — Излизане на пасажери</div>';
+
+  if (upcoming.length) {
+    html += '<div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Предстоящи</div>';
+    upcoming.forEach(f => {
+      const isNow = f.exitFromH*60+f.exitFromM <= nowTotal && f.exitToH*60+f.exitToM >= nowTotal;
+      const bg = isNow ? 'rgba(239,68,68,.15)' : 'transparent';
+      const border = isNow ? '1px solid rgba(239,68,68,.4)' : 'none';
+      html += `<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:7px;background:${bg};border:${border};margin-bottom:3px">
+        <span style="font-weight:800;min-width:36px;color:${isNow?'#ef4444':'var(--text)'}">${f.fn}</span>
+        <span style="flex:1;color:var(--muted);font-size:13px">${f.depAirport.slice(0,22)}</span>
+        <span style="white-space:nowrap">${flag(f)}</span>
+        <span style="white-space:nowrap;font-weight:700;color:${isNow?'#ef4444':'var(--amber)'}">
+          ${fmt(f.exitFromH,f.exitFromM)}–${fmt(f.exitToH,f.exitToM)}
+        </span>
+      </div>`;
+    });
+  }
+
+  if (past.length) {
+    html += '<div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin:8px 0 4px">Вече излезли</div>';
+    past.slice(-3).forEach(f => {
+      html += `<div style="display:flex;gap:8px;padding:4px 8px;opacity:.5;font-size:13px">
+        <span style="font-weight:700;min-width:36px">${f.fn}</span>
+        <span style="flex:1;color:var(--muted)">${f.depAirport.slice(0,20)}</span>
+        <span>${flag(f)}</span>
+        <span style="color:var(--muted)">${fmt(f.exitFromH,f.exitFromM)}–${fmt(f.exitToH,f.exitToM)}</span>
+      </div>`;
+    });
+  }
+
+  if (!upcoming.length && !past.length) {
+    html += '<div style="color:var(--muted);padding:12px">Няма данни за полети днес</div>';
+  }
+
+  html += '</div>';
+
+  // Show in popup on map
+  const airportZone = ZONES.find(z=>z.id==='airport');
+  if (airportZone) {
+    L.popup({maxWidth:340, className:'airport-popup'})
+      .setLatLng([airportZone.lat, airportZone.lng])
+      .setContent(html)
+      .openOn(map);
+  }
+}
 function showZonePopup(zid) {
   const z=ZONES.find(x=>x.id===zid); if(!z) return;
   const {scores,activeEvents}=computeScores(currentHour);
@@ -728,6 +796,17 @@ function drawSparkline(h) {
   const x20=((20-MIN_H)/(MAX_H-MIN_H))*W;
   const x21=((21-MIN_H)/(MAX_H-MIN_H))*W;
   ctx.fillStyle='rgba(239,68,68,0.08)'; ctx.fillRect(x20,0,x21-x20,H);
+  // Red bands for airport exit windows
+  if(flightDetails && flightDetails.length) {
+    flightDetails.forEach(f=>{
+      const x1=((f.exitFromH + f.exitFromM/60 - MIN_H)/(MAX_H-MIN_H))*W;
+      const x2=((f.exitToH   + f.exitToM/60   - MIN_H)/(MAX_H-MIN_H))*W;
+      if(x2>0 && x1<W) {
+        ctx.fillStyle='rgba(239,68,68,0.18)';
+        ctx.fillRect(Math.max(0,x1),0,Math.min(W,x2)-Math.max(0,x1),H);
+      }
+    });
+  }
   // Fill
   const grad=ctx.createLinearGradient(0,0,0,H);
   grad.addColorStop(0,'rgba(239,68,68,0.28)');
@@ -989,16 +1068,35 @@ function loadBuses(){
     .then(r=>{if(!r.ok)throw 0;return r.json();})
     .then(data=>{
       const fl=data.data||[]; if(!fl.length) throw 0;
-      flightHours=Array(24).fill(0);
+      flightHours=Array(24).fill(0); flightDetails=[];
       fl.forEach(f=>{
         if(!f.arrival?.scheduled) return;
         const t=new Date(f.arrival.estimated||f.arrival.scheduled);
         const dep=(f.departure?.airport||f.departure?.country_name||'').toLowerCase();
         const nonSchengen=dep.match(/tur|istanbul|sabiha|ankar|israel|ben.gurion|dubai|abu.dhabi|egypt|cairo|morocco|casablanca|london|heathrow|gatwick|stansted|luton|manchester|birmingham|usa|jfk|lax|china|beijing|shanghai|russia|moscow|georgia|tbilisi|armenia|yerevan|jordan|amman|serbia|belgrade|ukraine|kyiv|north.mac/);
-        const ready=new Date(t.getTime()+(nonSchengen?25:15)*60000);
-        // Sofia = EEST = UTC+3 in summer
-        const sofiaH=(ready.getUTCHours()+3)%24;
-        flightHours[sofiaH]++;
+        // Exit window: first passenger at +15/25 min, last at +25/35 min
+        const exitFirst = nonSchengen ? 25 : 15;
+        const exitLast  = nonSchengen ? 35 : 25;
+        const tFirst = new Date(t.getTime() + exitFirst*60000);
+        const tLast  = new Date(t.getTime() + exitLast*60000);
+        const hFirst = (tFirst.getUTCHours()+3)%24;
+        const hLast  = (tLast.getUTCHours()+3)%24;
+        const mFirst = tFirst.getUTCMinutes();
+        const mLast  = tLast.getUTCMinutes();
+        // Spread passengers across exit window (3 slots: start, mid, end)
+        const hMid = (new Date(t.getTime()+(exitFirst+exitLast)/2*60000).getUTCHours()+3)%24;
+        flightHours[hFirst] = (flightHours[hFirst]||0) + 0.3;
+        flightHours[hMid]   = (flightHours[hMid]||0)   + 0.5;
+        flightHours[hLast]  = (flightHours[hLast]||0)  + 0.2;
+        // Store for popup
+        const fn = (f.flight?.iata||'??');
+        const depAirport = f.departure?.airport||dep;
+        flightDetails.push({
+          fn, depAirport, nonSchengen:!!nonSchengen,
+          landH:(t.getUTCHours()+3)%24, landM:t.getUTCMinutes(),
+          exitFromH:hFirst, exitFromM:mFirst,
+          exitToH:hLast,   exitToM:mLast
+        });
       });
       airportStatus='live';
       injectAirportEvents(); updateAirportBadge();
