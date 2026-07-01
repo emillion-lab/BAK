@@ -1,22 +1,26 @@
 {
-  "name": "BakshishApp — Sofia Demand",
-  "short_name": "Bakshish",
+  "name": "BakshishApp — Sofia Taxi Demand",
+  "short_name": "BakshishApp",
   "description": "Реален такси demand за София — карта, летище, автобуси",
   "start_url": "/BAK/",
+  "scope": "/BAK/",
   "display": "standalone",
   "background_color": "#f5f7fa",
   "theme_color": "#0284c7",
-  "orientation": "portrait",
+  "orientation": "portrait-primary",
+  "lang": "bg",
   "icons": [
     {
       "src": "https://emillion-lab.github.io/FishBakshish/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "https://emillion-lab.github.io/FishBakshish/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
