@@ -982,7 +982,7 @@ function updateAirportBadge(){
 }
 
 function loadFlights(){
-  // placeholder
+  loadBuses();
 }
 function loadBuses(){
   fetch('flight-cache.json')
