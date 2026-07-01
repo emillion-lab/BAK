@@ -662,69 +662,82 @@ function updateCircles() {
 // ═══ AIRPORT SCHEDULE POPUP ═══
 function showAirportSchedule() {
   const now = new Date();
-  const nowH = (now.getUTCHours()+3)%24;
-  const nowM = now.getUTCMinutes();
-  const nowTotal = nowH*60 + nowM;
+  const nowMin = ((now.getUTCHours()+3)%24)*60 + now.getUTCMinutes();
 
-  // Sort flights by exit time
-  const sorted = [...flightDetails].sort((a,b)=>{
-    return (a.exitFromH*60+a.exitFromM) - (b.exitFromH*60+b.exitFromM);
+  const fmt = (h,m) => String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
+  const flag = f => f.nonSchengen ? '🛂' : '🇪🇺';
+
+  // Sort all details by exit start time
+  const all = [...flightDetails].sort((a,b)=>{
+    const am = a.exitFromH*60+a.exitFromM;
+    const bm = b.exitFromH*60+b.exitFromM;
+    return am-bm;
   });
 
-  // Split: upcoming vs past
-  const upcoming = sorted.filter(f => (f.exitToH*60+f.exitToM) >= nowTotal - 10);
-  const past     = sorted.filter(f => (f.exitToH*60+f.exitToM) <  nowTotal - 10);
+  const upcoming=[], past=[];
+  all.forEach(f=>{
+    const exitTo = f.exitToH*60+f.exitToM;
+    // Handle midnight crossover
+    const adjusted = exitTo < 180 ? exitTo+1440 : exitTo;
+    const nowAdj   = nowMin < 180 ? nowMin+1440 : nowMin;
+    if(adjusted >= nowAdj-15) upcoming.push(f);
+    else past.push(f);
+  });
 
-  const fmt = (h,m) => `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
-  const flag = (f) => f.nonSchengen ? '🛂' : '🇪🇺';
+  let html='<div style="font-size:14px">';
+  html+='<div style="font-weight:800;font-size:15px;margin-bottom:10px;color:var(--cyan)">✈️ Излизане на пасажери — СОФ</div>';
 
-  let html = '<div style="font-size:14px;max-height:50vh;overflow-y:auto">';
-  html += '<div style="font-weight:800;font-size:15px;margin-bottom:8px;color:var(--cyan)">✈️ Летище СОФ — Излизане на пасажери</div>';
+  if(upcoming.length===0 && past.length===0){
+    html+='<div style="color:var(--muted);padding:16px 0;text-align:center">Зареждане… или няма полети в кеша</div>';
+  }
 
-  if (upcoming.length) {
-    html += '<div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Предстоящи</div>';
-    upcoming.forEach(f => {
-      const isNow = f.exitFromH*60+f.exitFromM <= nowTotal && f.exitToH*60+f.exitToM >= nowTotal;
-      const bg = isNow ? 'rgba(239,68,68,.15)' : 'transparent';
-      const border = isNow ? '1px solid rgba(239,68,68,.4)' : 'none';
-      html += `<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:7px;background:${bg};border:${border};margin-bottom:3px">
-        <span style="font-weight:800;min-width:36px;color:${isNow?'#ef4444':'var(--text)'}">${f.fn}</span>
-        <span style="flex:1;color:var(--muted);font-size:13px">${f.depAirport.slice(0,22)}</span>
-        <span style="white-space:nowrap">${flag(f)}</span>
-        <span style="white-space:nowrap;font-weight:700;color:${isNow?'#ef4444':'var(--amber)'}">
-          ${fmt(f.exitFromH,f.exitFromM)}–${fmt(f.exitToH,f.exitToM)}
-        </span>
+  if(upcoming.length){
+    html+='<div style="font-size:11px;font-weight:800;color:var(--muted);letter-spacing:.8px;margin-bottom:6px">ПРЕДСТОЯЩИ / СЕГА</div>';
+    upcoming.slice(0,12).forEach(f=>{
+      const fromMin = f.exitFromH*60+f.exitFromM;
+      const toMin   = f.exitToH*60+f.exitToM;
+      const nowAdj  = nowMin<180?nowMin+1440:nowMin;
+      const fromAdj = fromMin<180?fromMin+1440:fromMin;
+      const toAdj   = toMin<180?toMin+1440:toMin;
+      const isNow = fromAdj<=nowAdj && toAdj>=nowAdj;
+      const isDone = toAdj < nowAdj;
+      const bg = isNow?'rgba(239,68,68,.15)':'transparent';
+      const brd = isNow?'1px solid rgba(239,68,68,.5)':'1px solid transparent';
+      const col = isNow?'#ef4444': isDone?'var(--muted)':'var(--amber)';
+      html+=`<div style="display:flex;align-items:center;gap:6px;padding:7px 8px;border-radius:8px;background:${bg};border:${brd};margin-bottom:3px">
+        <span style="font-weight:800;font-size:13px;min-width:44px;color:var(--text)">${f.fn}</span>
+        <span style="flex:1;font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(f.depAirport||'').slice(0,22)}</span>
+        <span style="font-size:14px">${flag(f)}</span>
+        <span style="font-weight:800;font-size:13px;color:${col};white-space:nowrap">${fmt(f.exitFromH,f.exitFromM)}–${fmt(f.exitToH,f.exitToM)}</span>
       </div>`;
     });
   }
 
-  if (past.length) {
-    html += '<div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin:8px 0 4px">Вече излезли</div>';
-    past.slice(-3).forEach(f => {
-      html += `<div style="display:flex;gap:8px;padding:4px 8px;opacity:.5;font-size:13px">
-        <span style="font-weight:700;min-width:36px">${f.fn}</span>
-        <span style="flex:1;color:var(--muted)">${f.depAirport.slice(0,20)}</span>
+  if(past.length){
+    const shown = past.slice(-4);
+    html+=`<div style="font-size:11px;font-weight:800;color:var(--muted);letter-spacing:.8px;margin:10px 0 6px">ВЕЧЕ ИЗЛЕЗЛИ (последни ${shown.length})</div>`;
+    shown.forEach(f=>{
+      html+=`<div style="display:flex;align-items:center;gap:6px;padding:5px 8px;opacity:.45;font-size:12px">
+        <span style="min-width:44px;font-weight:700">${f.fn}</span>
+        <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(f.depAirport||'').slice(0,20)}</span>
         <span>${flag(f)}</span>
-        <span style="color:var(--muted)">${fmt(f.exitFromH,f.exitFromM)}–${fmt(f.exitToH,f.exitToM)}</span>
+        <span style="white-space:nowrap">${fmt(f.exitFromH,f.exitFromM)}–${fmt(f.exitToH,f.exitToM)}</span>
       </div>`;
     });
   }
 
-  if (!upcoming.length && !past.length) {
-    html += '<div style="color:var(--muted);padding:12px">Няма данни за полети днес</div>';
-  }
+  html+='<div style="font-size:11px;color:var(--muted);margin-top:10px;padding-top:8px;border-top:1px solid var(--border)">🇪🇺 Шенген +15–25 мин &nbsp;|&nbsp; 🛂 Извън Шенген +25–35 мин</div>';
+  html+='</div>';
 
-  html += '</div>';
-
-  // Show in popup on map
-  const airportZone = ZONES.find(z=>z.id==='airport');
-  if (airportZone) {
-    L.popup({maxWidth:340, className:'airport-popup'})
-      .setLatLng([airportZone.lat, airportZone.lng])
+  const airportZone=ZONES.find(z=>z.id==='airport');
+  if(airportZone){
+    L.popup({maxWidth:360,maxHeight:420,className:'airport-popup'})
+      .setLatLng([airportZone.lat,airportZone.lng])
       .setContent(html)
       .openOn(map);
   }
 }
+
 function showZonePopup(zid) {
   const z=ZONES.find(x=>x.id===zid); if(!z) return;
   const {scores,activeEvents}=computeScores(currentHour);
