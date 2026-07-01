@@ -600,7 +600,7 @@ function buildCircles() {
     }
     if (z.type==='karyk') {
       const c=L.circle([z.lat,z.lng],{radius:z.radius,fillOpacity:0,opacity:0,weight:0});
-      c.on('click',()=>showZonePopup(z.id)); c.addTo(map); circleMap[z.id]=c;
+      c.on('click',()=>z.type==='airport'?showAirportSchedule():showZonePopup(z.id)); c.addTo(map); circleMap[z.id]=c;
       return;
     }
     if (z.type==='hospital') {
@@ -613,7 +613,7 @@ function buildCircles() {
       return;
     }
     const c=L.circle([z.lat,z.lng],{radius:z.radius,...getScoreStyle(BASE[z.id]||0.3,z.type)});
-    c.on('click',()=>showZonePopup(z.id)); c.addTo(map); circleMap[z.id]=c;
+    c.on('click',()=>z.type==='airport'?showAirportSchedule():showZonePopup(z.id)); c.addTo(map); circleMap[z.id]=c;
   });
 }
 
