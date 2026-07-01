@@ -679,6 +679,24 @@ svg.leaflet-image-layer.leaflet-interactive path {
   #zone-sidebar { max-height:30vh; min-height:60px; display:block !important; }
   .sidebar-title { font-size:13px; padding:6px 12px; }
 }
+
+/* LIST VIEW MODE */
+body.list-view #map { display:none !important; }
+body.list-view #zone-sidebar {
+  max-height: calc(100vh - 280px) !important;
+  min-height: 200px !important;
+}
+body.list-view #toggle-map-btn {
+  background: var(--amber) !important;
+  color: #000 !important;
+}
+.zone-item {
+  padding: 10px 14px !important;
+  font-size: 15px !important;
+}
+.zone-item .zone-name { font-weight: 700; font-size: 15px; }
+.zone-item .zone-sub  { font-size: 13px; color: var(--muted); }
+
 </style>
 <style>
 
@@ -1143,7 +1161,13 @@ body.map-fullscreen #next90-btn { display:none; }
 
 <!-- Zone sidebar list -->
 <div id="zone-sidebar">
-  <div class="sidebar-title">▣ Зони по приоритет</div>
+  <div class="sidebar-title" style="display:flex;justify-content:space-between;align-items:center">
+    <span>▣ Зони по приоритет</span>
+    <button id="toggle-map-btn" onclick="toggleMapView()"
+      style="background:var(--cyan);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:12px;font-weight:800;cursor:pointer;flex-shrink:0">
+      📋 Списък
+    </button>
+  </div>
   <div id="zone-list"></div>
 </div>
 
