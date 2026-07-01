@@ -673,6 +673,12 @@ svg.leaflet-image-layer.leaflet-interactive path {
 		}
 	}
 
+/* MOBILE FIX */
+@media (max-width:768px) {
+  #map { height: calc(100dvh - 340px) !important; min-height:220px !important; }
+  #zone-sidebar { max-height:30vh; min-height:60px; display:block !important; }
+  .sidebar-title { font-size:13px; padding:6px 12px; }
+}
 </style>
 <style>
 
@@ -844,10 +850,12 @@ body.map-fullscreen #fs-btn  { bottom:70px; }
 /* ── SIDEBAR zone list ── */
 #zone-sidebar {
   background:var(--surface);
-  border-top:1px solid var(--border);
-  max-height:32vh;
+  border-top:2px solid var(--border);
+  max-height:35vh;
+  min-height:80px;
   overflow-y:auto;
   -webkit-overflow-scrolling:touch;
+  display:block !important;
 }
 .sidebar-title {
   font-family:'Courier New',Courier,monospace;
@@ -935,9 +943,9 @@ body.map-fullscreen #bakshish-btn { display:none; }
   -webkit-overflow-scrolling:touch;
 }
 #karyk-sidebar .sidebar-title {
-  background:#100808;
-  color:#cd7f32;
-  border-bottom:1px solid #3a1a00;
+  background:var(--surface);
+  color:var(--amber);
+  border-bottom:1px solid var(--border);
 }
 .karyk-item {
   display:flex; align-items:center; gap:8px;
@@ -1084,6 +1092,12 @@ body.map-fullscreen #next90-btn { display:none; }
 }
 
 
+/* MOBILE FIX */
+@media (max-width:768px) {
+  #map { height: calc(100dvh - 340px) !important; min-height:220px !important; }
+  #zone-sidebar { max-height:30vh; min-height:60px; display:block !important; }
+  .sidebar-title { font-size:13px; padding:6px 12px; }
+}
 </style>
 </head>
 <body>
