@@ -993,8 +993,9 @@ function loadBuses(){
       fl.forEach(f=>{
         if(!f.arrival?.scheduled) return;
         const t=new Date(f.arrival.estimated||f.arrival.scheduled);
-        const nonEU=(f.departure?.airport||'').toLowerCase().match(/tur|israel|uk/);
-        const ready=new Date(t.getTime()+(nonEU?20:10)*60000);
+        const dep=(f.departure?.airport||f.departure?.country_name||'').toLowerCase();
+        const nonSchengen=dep.match(/tur|istanbul|sabiha|ankar|israel|ben.gurion|dubai|abu.dhabi|egypt|cairo|morocco|casablanca|london|heathrow|gatwick|stansted|luton|manchester|birmingham|usa|jfk|lax|china|beijing|shanghai|russia|moscow|georgia|tbilisi|armenia|yerevan|jordan|amman|serbia|belgrade|ukraine|kyiv|north.mac/);
+        const ready=new Date(t.getTime()+(nonSchengen?25:15)*60000);
         // Sofia = EEST = UTC+3 in summer
         const sofiaH=(ready.getUTCHours()+3)%24;
         flightHours[sofiaH]++;
