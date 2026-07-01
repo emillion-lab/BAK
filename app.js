@@ -981,7 +981,10 @@ function updateAirportBadge(){
   else                              {b.textContent='✈ ОФЛАЙН';  b.style.color='#ef4444';}
 }
 
-function loadFlights(); loadBuses(){
+function loadFlights(){
+  // placeholder
+}
+function loadBuses(){
   fetch('flight-cache.json')
     .then(r=>{if(!r.ok)throw 0;return r.json();})
     .then(data=>{
