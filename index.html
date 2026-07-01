@@ -1212,5 +1212,44 @@ body.map-fullscreen #next90-btn { display:none; }
 </div>
 <script src="leaflet.min.js"></script>
 <script src="app.js?v=20260622"></script>
+
+<!-- PWA Install Banner -->
+<div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">
+  <div style="display:flex;align-items:center;gap:10px">
+    <span style="font-size:24px">🚕</span>
+    <div>
+      <div style="font-size:13px;font-weight:900;color:#fff">Инсталирай BakshishApp</div>
+      <div style="font-size:11px;color:rgba(255,255,255,.8)">Работи офлайн · Бърз достъп</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:7px">
+    <button onclick="document.getElementById('pwa-banner').style.display='none';localStorage.setItem('pwa-bak-no','1')" style="background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);border-radius:7px;padding:6px 11px;font-size:12px;color:#fff;cursor:pointer">Не сега</button>
+    <button id="pwa-bak-btn" style="background:#fff;border:none;border-radius:7px;padding:6px 14px;font-size:13px;font-weight:900;color:#0284c7;cursor:pointer">Инсталирай ↓</button>
+  </div>
+</div>
+<script>
+(function(){
+  if(window.matchMedia('(display-mode:standalone)').matches||localStorage.getItem('pwa-bak-no')) return;
+  let dp=null;
+  window.addEventListener('beforeinstallprompt',function(e){
+    e.preventDefault();dp=e;
+    setTimeout(function(){document.getElementById('pwa-banner').style.display='flex';},2500);
+  });
+  document.getElementById('pwa-bak-btn').addEventListener('click',function(){
+    if(!dp)return;dp.prompt();
+    dp.userChoice.then(function(r){if(r.outcome==='accepted')document.getElementById('pwa-banner').style.display='none';});
+  });
+  const iOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
+  if(iOS&&!window.navigator.standalone){
+    setTimeout(function(){
+      document.getElementById('pwa-banner').style.display='flex';
+      document.getElementById('pwa-bak-btn').textContent='Как?';
+      document.getElementById('pwa-bak-btn').onclick=function(){
+        alert('Safari: Сподели (□↑) → Добави към началния екран → Добави');
+      };
+    },2500);
+  }
+})();
+</script>
 </body>
 </html>
