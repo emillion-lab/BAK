@@ -865,11 +865,12 @@ body.map-fullscreen #fs-btn  { bottom:70px; }
 }
 .zone-item {
   display:flex; align-items:center; gap:8px;
-  padding:7px 12px; border-bottom:1px solid #0e1d30;
+  padding:8px 12px; border-bottom:1px solid var(--border);
   cursor:pointer; transition:background .12s;
+  font-size:14px;
 }
-.zone-item:hover  { background:#111e30; }
-.zone-item.active { background:#0c1f38; border-left:2px solid var(--cyan); }
+.zone-item:hover  { background:rgba(0,0,0,.05); }
+.zone-item.active { background:rgba(2,132,199,.08); border-left:3px solid var(--cyan); }
 .zone-dot   { width:9px; height:9px; border-radius:2px; flex-shrink:0; }
 .zone-name  { font-size:15px; flex:1; line-height:1.4; }
 .zone-sub   { font-size:15px; color:var(--muted); }
