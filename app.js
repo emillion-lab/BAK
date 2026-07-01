@@ -851,13 +851,16 @@ function render(hour) {
         const z=ZONES.find(x=>x.id===zid); if(!z) return '';
         const c=demandColor(score,z.type);
         const sub=(activeEvents[zid]||[])[0]?.name||'';
-        return `<div class="zone-item" onclick="(function(){map.setView([${z.lat},${z.lng}],15);showZonePopup('${zid}')})()">
+        return `<div class="zone-item" onclick="(function(){if(document.body.classList.contains('list-view'))toggleMapView();setTimeout(()=>{map.setView([${z.lat},${z.lng}],'${zid}'==='airport'?14:15);'${zid}'==='airport'?showAirportSchedule():showZonePopup('${zid}');},150);})()">
           <div class="zone-dot" style="background:${c.fill}"></div>
           <div style="flex:1;min-width:0">
             <div class="zone-name">${z.icon} ${z.name}</div>
             ${sub?`<div class="zone-sub">${sub}</div>`:''}
           </div>
-          <div class="zone-score" style="color:${c.fill}">${score.toFixed(1)}</div>
+          <div style="text-align:right">
+            <div class="zone-score" style="color:${c.fill};font-size:16px;font-weight:800">${score.toFixed(1)}</div>
+            <div style="font-size:11px;color:${c.fill}">${c.label}</div>
+          </div>
         </div>`;
       }).join('');
   }
