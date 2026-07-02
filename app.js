@@ -1259,6 +1259,7 @@ function loadBuses(){
           exitToH:hLast,   exitToM:mLast
         });
       });
+      console.log('[SOF] flightDetails populated:', flightDetails.length, 'flights');
       airportStatus='live';
       injectAirportEvents(); updateAirportBadge();
       buildCurve(); buildTicker(); render(currentHour);
