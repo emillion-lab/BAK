@@ -795,26 +795,37 @@ function showAirportSchedule() {
   const upcoming=[], past=[];
   all.forEach(f=>{
     const exitTo = f.exitToH*60+f.exitToM;
-    // Handle midnight crossover
-    const adjusted = exitTo < 180 ? exitTo+1440 : exitTo;
-    const nowAdj   = nowMin < 180 ? nowMin+1440 : nowMin;
-    if(adjusted >= nowAdj-15) upcoming.push(f);
+    const exitFrom = f.exitFromH*60+f.exitFromM;
+    // Handle midnight crossover - treat early morning hours as "next day"
+    const toAdj   = exitTo   < 300 ? exitTo+1440   : exitTo;
+    const fromAdj = exitFrom < 300 ? exitFrom+1440 : exitFrom;
+    const nowAdj  = nowMin   < 300 ? nowMin+1440   : nowMin;
+    // Show as upcoming if exit window ends in future (within last 15 min too)
+    if(toAdj >= nowAdj - 15) upcoming.push(f);
     else past.push(f);
   });
+  // If still nothing upcoming (cache is old/yesterday), show all as reference
+  const cacheIsOld = upcoming.length === 0 && past.length > 0;
 
   let html='<div style="font-size:14px">';
   html+='<div style="font-weight:800;font-size:15px;margin-bottom:10px;color:var(--cyan)">✈️ Излизане на пасажери — СОФ</div>';
 
   // Find truly next flights even if none "upcoming" now
   const allSorted = [...flightDetails].sort((a,b)=>(a.exitFromH*60+a.exitFromM)-(b.exitFromH*60+b.exitFromM));
-  if(upcoming.length===0){
+  if(upcoming.length===0 || cacheIsOld){
     const next = allSorted.find(f=>{
       const fm=f.exitFromH*60+f.exitFromM;
-      const adj=fm<180?fm+1440:fm;
-      const na=nowMin<180?nowMin+1440:nowMin;
+      const adj=fm<300?fm+1440:fm;
+      const na=nowMin<300?nowMin+1440:nowMin;
       return adj>na;
     });
-    if(next){
+    if(cacheIsOld){
+      // Cache is from yesterday - show today's expected pattern
+      html+=`<div style="background:rgba(245,197,24,.1);border:1px solid var(--amber);border-radius:10px;padding:12px;text-align:center;margin-bottom:10px">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:4px">⚠️ Кешът се обновява в 08:00, 13:00, 18:00</div>
+        <div style="font-size:13px;color:var(--amber)">Показват се типичните пристигания</div>
+      </div>`;
+    } else if(next){
       html+=`<div style="background:rgba(2,132,199,.1);border:1px solid var(--cyan);border-radius:10px;padding:14px;text-align:center;margin-bottom:10px">
         <div style="font-size:13px;color:var(--muted);margin-bottom:4px">Няма излизащи пасажери в момента</div>
         <div style="font-size:18px;font-weight:900;color:var(--cyan)">Следващ: ${String(next.exitFromH).padStart(2,'0')}:${String(next.exitFromM).padStart(2,'0')}</div>
