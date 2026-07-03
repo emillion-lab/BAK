@@ -832,7 +832,11 @@ function showAirportSchedule() {
         <div style="font-size:13px;color:var(--muted);margin-top:3px">${next.fn} от ${(next.depAirport||'').slice(0,20)} ${next.nonSchengen?'🛂':'🇪🇺'}</div>
       </div>`;
     } else if(past.length===0){
-      html+='<div style="color:var(--muted);padding:16px 0;text-align:center">Зареждане на полети…</div>';
+      if(airportStatus==='fallback'){
+        html+='<div style="color:#f59e0b;padding:16px 0;text-align:center;font-size:13px">⚠️ Полетни данни временно недостъпни (API)<br><span style="color:var(--muted)">Кривата ползва историческа прогноза</span></div>';
+      } else {
+        html+='<div style="color:var(--muted);padding:16px 0;text-align:center">Зареждане на полети…</div>';
+      }
     }
   }
 
