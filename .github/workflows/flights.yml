@@ -12,13 +12,24 @@ permissions:
 jobs:
   fetch:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
-      - name: Fetch flights
+      - name: Fetch flights (arrivals + departures)
         run: |
-          curl "http://api.aviationstack.com/v1/flights?access_key=${{ secrets.API_KEY }}&arr_iata=SOF" > flight-cache.json
+          if [ -z "${{ secrets.API_KEY }}" ]; then
+            echo "::error::API_KEY secret is missing — keeping last good cache"
+            exit 1
+          fi
+          curl -s "http://api.aviationstack.com/v1/flights?access_key=${{ secrets.API_KEY }}&arr_iata=SOF" > new-cache.json
+          # Валидация: да не commit-ваме грешка вместо данни
+          python3 -c "
+          import json,sys
+          d=json.load(open('new-cache.json'))
+          if 'error' in d: print('API error:', d['error']); sys.exit(1)
+          if not d.get('data'): print('Empty data'); sys.exit(1)
+          print('OK:', len(d['data']), 'flights')"
+          mv new-cache.json flight-cache.json
 
       - name: Commit
         run: |
@@ -27,5 +38,3 @@ jobs:
           git add flight-cache.json
           git commit -m "update flights" || echo "no changes"
           git push
-#test
-
