@@ -833,7 +833,7 @@ function showAirportSchedule() {
       </div>`;
     } else if(past.length===0){
       if(airportStatus==='fallback'){
-        html+='<div style="color:#f59e0b;padding:10px 0;text-align:center;font-size:12px">⚠️ Няма живи полетни данни — прогнозен режим</div>';
+        html+='<div style="color:#f59e0b;padding:10px 0;text-align:center;font-size:12px">⚠️ Няма живи полетни данни — прогнозен режим'+(window.__flErr?('<br><span style="color:#888;font-size:10px;word-break:break-all">debug: '+window.__flErr+'</span>'):'')+'</div>';
       } else {
         html+='<div style="color:var(--muted);padding:16px 0;text-align:center">Зареждане на полети…</div>';
       }
@@ -1268,7 +1268,9 @@ function loadBuses(){
       injectAirportEvents(); updateAirportBadge();
       buildCurve(); buildTicker(); render(currentHour);
     })
-    .catch(()=>{
+    .catch(e=>{
+      window.__flErr = (e && (e.stack||e.message)) ? String(e.stack||e.message).slice(0,160) : ('код '+String(e));
+      console.error('[SOF] flights failed:', e);
       applyFallbackAirport(); updateAirportBadge();
       buildCurve(); buildTicker(); render(currentHour);
     });
