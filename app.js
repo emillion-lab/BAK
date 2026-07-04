@@ -1226,9 +1226,6 @@ function updateAirportBadge(){
 }
 
 function loadFlights(){
-  loadBuses();
-}
-function loadBuses(){
   fetch('flight-cache.json?v='+Date.now())
     .then(r=>{if(!r.ok)throw 0;return r.json();})
     .then(data=>{
@@ -1464,7 +1461,8 @@ function renderBusPanel(){
 }
 
 function addBusZones(){
-  if(!busSchedule || !window.map) return;
+  var M = (typeof map!=='undefined' && map && typeof map.addLayer==='function') ? map : null;
+  if(!busSchedule || !M) return;
   // Add Expo Center bus stop as zone marker
   const expoStop = {lat:42.6543, lng:23.4012, name:'🚌 Expo Center (автобусна спирка)'};
   const icon = L.divIcon({
@@ -1473,7 +1471,7 @@ function addBusZones(){
     iconAnchor:[25,15]
   });
   L.marker([expoStop.lat, expoStop.lng], {icon})
-    .addTo(window.map)
+    .addTo(M)
     .bindPopup(`<b style="color:#0284c7">🚌 Expo Center</b><br><small>Спирка Пловдив↔София</small>`);
 }
 
