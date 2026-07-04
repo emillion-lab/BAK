@@ -1,7 +1,7 @@
 // BakshishApp Service Worker
 // Кешира файловете за офлайн работа
 
-const CACHE_NAME = 'bakshishapp-bak-v1';
+const CACHE_NAME = 'bakshishapp-bak-v2';
 const STATIC_FILES = [
   '/BAK/',
   '/BAK/index.html',
@@ -61,7 +61,7 @@ self.addEventListener('fetch', event => {
 
   // Статични файлове — network first, cache fallback
   event.respondWith(
-    fetch(event.request)
+    fetch(event.request, {cache: 'no-cache'})
       .then(response => {
         // Кешира успешните отговори
         if (response.ok) {
