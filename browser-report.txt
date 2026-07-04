@@ -1,0 +1,6 @@
+STATE: {"badge":"📡 7/33","flErr":null,"appJsSrc":"app.js?v=20260704b"}
+[console] Bus schedule: t.addLayer is not a function
+[console] Bus schedule: t.addLayer is not a function
+[console] Failed to load resource: the server responded with a status of 404 ()
+[console] Failed to load resource: the server responded with a status of 404 ()
+[console] Error while trying to use the following icon from the Manifest: https://emillion-lab.github.io/FishBakshish/icon-192.png (Download error or resource isn't a valid image)
