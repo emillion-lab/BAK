@@ -771,7 +771,7 @@ function showTransitPopup(zid){
 
   html += '</div>';
 
-  L.popup({maxWidth:360, className:'transit-popup'})
+  L.popup({maxWidth:Math.min(340,window.innerWidth-30), className:'transit-popup'})
     .setLatLng([z.lat, z.lng])
     .setContent(html)
     .openOn(map);
@@ -833,7 +833,7 @@ function showAirportSchedule() {
       </div>`;
     } else if(past.length===0){
       if(airportStatus==='fallback'){
-        html+='<div style="color:#f59e0b;padding:16px 0;text-align:center;font-size:13px">⚠️ Полетни данни временно недостъпни (API)<br><span style="color:var(--muted)">Кривата ползва историческа прогноза</span></div>';
+        html+='<div style="color:#f59e0b;padding:10px 0;text-align:center;font-size:12px">⚠️ Няма живи полетни данни — прогнозен режим</div>';
       } else {
         html+='<div style="color:var(--muted);padding:16px 0;text-align:center">Зареждане на полети…</div>';
       }
@@ -880,7 +880,7 @@ function showAirportSchedule() {
 
   const airportZone=ZONES.find(z=>z.id==='airport');
   if(airportZone){
-    L.popup({maxWidth:360,maxHeight:420,className:'airport-popup'})
+    L.popup({maxWidth:Math.min(340,window.innerWidth-30),maxHeight:Math.min(420,window.innerHeight*0.6),className:'airport-popup',autoPan:true})
       .setLatLng([airportZone.lat,airportZone.lng])
       .setContent(html)
       .openOn(map);
@@ -1036,7 +1036,7 @@ function render(hour) {
     kList.innerHTML=ranked.map(({z,ks,ev},i)=>{
       const c=karykColor(ks);
       const reason=ev||(z.type==='karyk'?'Тих квартал':z.type==='residential_lux'?'Луксозен жк':'');
-      return `<div class="karyk-item" onclick="(function(){map.setView([${z.lat},${z.lng}],15);showZonePopup('${z.id}')})()">
+      return `<div class="karyk-item" onclick="(function(){if(document.body.classList.contains('list-view'))toggleMapView();setTimeout(function(){map.invalidateSize();map.setView([${z.lat},${z.lng}],15);showZonePopup('${z.id}');},200);})()">
         <div class="karyk-rank" style="color:${c.fill}">#${i+1}</div>
         <div class="karyk-dot" style="background:${c.fill}"></div>
         <div style="flex:1;min-width:0">
@@ -1229,7 +1229,7 @@ function loadFlights(){
   loadBuses();
 }
 function loadBuses(){
-  fetch('flight-cache.json')
+  fetch('flight-cache.json?v='+Date.now())
     .then(r=>{if(!r.ok)throw 0;return r.json();})
     .then(data=>{
       const fl=data.data||[]; if(!fl.length) throw 0;
@@ -1625,7 +1625,7 @@ function buildBakshishPanel() {
     const reason = BAKSHISH_REASONS[z.type] || '🚖 Потенциален клиент';
     const rainTxt = rain > 1.0 ? ` 🌧×${rain.toFixed(1)}` : '';
     const stars = '⭐'.repeat(Math.min(5, Math.round(bs)));
-    return `<div class="bp-item" onclick="(function(){map.setView([${z.lat},${z.lng}],15);showZonePopup('${z.id}');closeBakshish()})()">
+    return `<div class="bp-item" onclick="(function(){closeBakshish();if(document.body.classList.contains('list-view'))toggleMapView();setTimeout(function(){map.invalidateSize();map.setView([${z.lat},${z.lng}],'${z.id}'==='airport'?14:15);'${z.id}'==='airport'?showAirportSchedule():showZonePopup('${z.id}');},200);})()">
       <div class="bp-rank">#${i+1}</div>
       <div class="bp-dot" style="background:${color};box-shadow:0 0 5px ${color}66"></div>
       <div class="bp-info">
@@ -1638,7 +1638,7 @@ function buildBakshishPanel() {
         <div class="bp-multiplier">demand ${demand.toFixed(1)}</div>
       </div>
     </div>`;
-  }).join('');
+  }).join('') + '<div style="padding:12px 12px 16px;text-align:center"><button onclick="closeBakshish()" style="background:#d4af37;color:#0d0e00;border:none;border-radius:8px;padding:10px 32px;font-weight:800;font-size:14px;cursor:pointer">✕ Затвори</button></div>';
 }
 
 // Rebuild bakshish panel when time changes (via setInterval, not render override)

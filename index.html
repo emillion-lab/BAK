@@ -677,11 +677,15 @@ svg.leaflet-image-layer.leaflet-interactive path {
 @media (max-width:768px) {
   #map { height: calc(100dvh - 340px) !important; min-height:220px !important; }
   #zone-sidebar { max-height:30vh; min-height:60px; display:block !important; }
+  body.karyk-active #zone-sidebar { display:none !important; }
+  body.karyk-active #karyk-sidebar { display:block !important; max-height:30vh; overflow-y:auto; }
   .sidebar-title { font-size:13px; padding:6px 12px; }
 }
 
 /* LIST VIEW MODE */
 body.list-view #map { display:none !important; }
+body.list-view.karyk-active #zone-sidebar { display:none !important; }
+body.list-view.karyk-active #karyk-sidebar { display:block !important; max-height:calc(100vh - 220px); overflow-y:auto; }
 body.list-view #zone-sidebar {
   max-height: calc(100vh - 280px) !important;
   min-height: 200px !important;
@@ -916,6 +920,7 @@ body.map-fullscreen #bakshish-btn { display:none; }
   backdrop-filter:blur(8px);
 }
 #bakshish-panel .bp-header {
+  position:sticky; top:0; background:#0d0e00f8; z-index:5;
   display:flex; align-items:center; gap:10px;
   padding:10px 14px;
   font-family:'Courier New',Courier,monospace;
@@ -1115,6 +1120,8 @@ body.map-fullscreen #next90-btn { display:none; }
 @media (max-width:768px) {
   #map { height: calc(100dvh - 340px) !important; min-height:220px !important; }
   #zone-sidebar { max-height:30vh; min-height:60px; display:block !important; }
+  body.karyk-active #zone-sidebar { display:none !important; }
+  body.karyk-active #karyk-sidebar { display:block !important; max-height:30vh; overflow-y:auto; }
   .sidebar-title { font-size:13px; padding:6px 12px; }
 }
 </style>
