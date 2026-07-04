@@ -1,0 +1,36 @@
+name: Browser Test
+on: workflow_dispatch
+permissions:
+  contents: write
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - run: npm install puppeteer@22 --no-save 2>&1 | tail -1
+      - run: |
+          cat > bt.mjs << 'JS'
+          import puppeteer from 'puppeteer';
+          const b = await puppeteer.launch({args:['--no-sandbox']});
+          const p = await b.newPage();
+          const logs = [];
+          p.on('console', m => logs.push('[console] '+m.text()));
+          p.on('pageerror', e => logs.push('[PAGEERROR] '+(e.stack||e.message)));
+          p.on('requestfailed', r => logs.push('[REQFAIL] '+r.url()+' '+(r.failure()?.errorText||'')));
+          await p.goto('https://emillion-lab.github.io/BAK/?nocache='+Date.now(), {waitUntil:'networkidle2', timeout:45000});
+          await new Promise(r=>setTimeout(r,9000));
+          const state = await p.evaluate(() => ({
+            badge: document.getElementById('airport-badge')?.textContent,
+            flErr: window.__flErr || null,
+            appJsSrc: document.querySelector('script[src*="app.js"]')?.getAttribute('src'),
+          }));
+          console.log('STATE:', JSON.stringify(state));
+          console.log(logs.slice(0,40).join('\n'));
+          await b.close();
+          JS
+          node bt.mjs > browser-report.txt 2>&1 || true
+          git config user.name ci; git config user.email ci@fish.taxi
+          git add browser-report.txt && git commit -m "browser test [skip ci]" || true
+          git push
