@@ -714,31 +714,27 @@ function showTransitPopup(zid){
 
   // Plovdiv buses arriving at Central Autogara (cab_north)
   if(zid === 'cab_north'){
-    const next = getNextBuses('plovdiv_sofia', 6);
-    if(next.length){
-      html += '<div style="font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.6px;margin-bottom:8px">🚌 ПЛОВДИВ → СОФИЯ (пристигане)</div>';
-      next.forEach(b=>{
-        const arrStop = b.stops.find(s=>s.name.includes('Централна автогара София'));
-        const arrH = arrStop?.arrH ?? ((b.depMin+120)%1440)%24/60|0;
-        const arrM = arrStop?.arrM ?? (b.depMin+120)%60;
-        const isNow = b.diff>=-5 && b.diff<=130;
-        const bg = isNow?'rgba(239,68,68,.1)':'transparent';
-        const col = b.diff<0?'var(--muted)':b.diff<30?'#ef4444':'var(--amber)';
-        const label = b.diff<0?`тръгнал (пристига ~${fmt(arrH,arrM)})`:
-                      b.diff<60?`след ${b.diff} мин → пристига ${fmt(arrH,arrM)}`:
-                      `тръгва ${b.dep} → пристига ${fmt(arrH,arrM)}`;
+    const arrivals = getSofiaArrivals(12);
+    if(arrivals.length){
+      html += '<div style="font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.6px;margin-bottom:8px">🚌 ПРИСТИГАЩИ НА ЦЕНТРАЛНА АВТОГАРА</div>';
+      arrivals.forEach(b=>{
+        const untilArr = b.arrMin - b.nowMin; // минути до пристигане
+        const isSoon = untilArr>=-5 && untilArr<=40;
+        const bg = isSoon?'rgba(239,68,68,.1)':'transparent';
+        const col = untilArr<=0?'var(--muted)':untilArr<=40?'#ef4444':untilArr<=90?'var(--amber)':'var(--muted)';
+        const label = untilArr<=0?`пристигнал ~${b.arrTime}`:
+                      untilArr<=90?`~${b.arrTime} · след ${untilArr} мин`:
+                      `~${b.arrTime}`;
+        const origin = b.route.name.replace(' → София','');
         html += `<div style="padding:6px 8px;border-radius:7px;background:${bg};margin-bottom:3px;display:flex;justify-content:space-between;gap:8px">
-          <span style="font-weight:800;color:var(--text)">${b.dep}</span>
-          <span style="font-size:12px;color:${col};text-align:right">${label}</span>
+          <span style="font-weight:800;color:var(--text)">${origin} <span style="font-weight:400;color:var(--muted);font-size:11px">(${b.dep}${b.route.approx?' ≈':''})</span></span>
+          <span style="font-size:12px;color:${col};text-align:right;white-space:nowrap">${label}</span>
         </div>`;
       });
-      if(!next.length){
-        html += '<div style="color:var(--muted);padding:8px">Няма автобуси в следващите часове</div>';
-      }
     } else {
-      html += '<div style="color:var(--muted);padding:8px">Зареждане на разписание…</div>';
+      html += '<div style="color:var(--muted);padding:8px">Няма пристигащи в следващите часове / зареждане…</div>';
     }
-    html += '<div style="font-size:11px;color:var(--muted);margin-top:8px;padding-top:6px;border-top:1px solid var(--border)">Спирки: Пловдив → Ихтиман → Expo Center → София</div>';
+    html += '<div style="font-size:11px;color:var(--muted);margin-top:8px;padding-top:6px;border-top:1px solid var(--border)">≈ разписание по модел на превозвача (Пловдив — точно). Сортирано по час на пристигане.</div>';
   }
 
   // Expo Center bus stop
@@ -1422,6 +1418,32 @@ function getNextBuses(routeId, count=5){
   return results;
 }
 
+// Всички пристигащи на ЦАС от всички маршрути, сортирани по час на пристигане
+function getSofiaArrivals(count){
+  const data = busSchedule || busScheduleData;
+  if(!data) return [];
+  const now = new Date();
+  const nowMin = now.getHours()*60 + now.getMinutes();
+  const fmt2 = mm => String(Math.floor((mm%1440)/60)).padStart(2,'0')+':'+String(mm%60).padStart(2,'0');
+  const out = [];
+  for(const route of (data.routes||[])){
+    if(!route.to || !route.to.includes('Централна автогара София')) continue;
+    const dur = route.duration_min || 120;
+    for(const dep of route.departures){
+      const [h,m] = dep.split(':').map(Number);
+      const depMin = h*60+m;
+      const arrAbs = depMin + dur;
+      let delta = arrAbs - nowMin;
+      if(delta < -15) delta += 1440; // след полунощ / утрешен
+      if(delta <= 360){ // от -15 мин до +6 часа
+        out.push({dep, depMin, route, nowMin, arrMin: nowMin+delta, arrTime: fmt2(arrAbs)});
+      }
+    }
+  }
+  out.sort((a,b)=>a.arrMin-b.arrMin);
+  return out.slice(0, count||10);
+}
+
 function renderBusPanel(){
   // Find or create bus panel in sidebar
   let panel = document.getElementById('bus-panel');
@@ -1434,26 +1456,28 @@ function renderBusPanel(){
     sidebar.appendChild(panel);
   }
 
-  const nextPlov = getNextBuses('plovdiv_sofia', 4);
-  const nextSof  = getNextBuses('sofia_plovdiv', 3);
+  const arrivals = getSofiaArrivals(8);
 
-  let html = '<div style="font-size:14px;font-weight:800;color:var(--cyan);margin-bottom:8px">🚌 Автобуси</div>';
+  let html = '<div style="font-size:14px;font-weight:800;color:var(--cyan);margin-bottom:8px">🚌 Пристигащи на ЦАС</div>';
 
-  if(nextPlov.length){
-    html += '<div style="font-size:12px;color:var(--muted);font-weight:700;margin-bottom:4px">Пловдив → София (пристигане)</div>';
-    for(const b of nextPlov){
-      const urgency = b.diffMin < 0 ? 'color:#ef4444' : b.diffMin < 30 ? 'color:#f59e0b;font-weight:800' : 'color:var(--text)';
-      const label = b.diffMin < 0 ? `тръгнал (пристига ~${b.arr})` :
-                    b.diffMin < 60 ? `след ${b.diffMin} мин → пристига ${b.arr}` :
-                    `${b.dep} → пристига ${b.arr}`;
-      html += `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);font-size:13px">
-        <span>🚌 ${b.dep}</span>
-        <span style="${urgency}">${label}</span>
+  if(arrivals.length){
+    for(const b of arrivals){
+      const until = b.arrMin - b.nowMin;
+      const urgency = until <= 0 ? 'color:#ef4444;font-weight:800' : until < 40 ? 'color:#f59e0b;font-weight:800' : 'color:var(--text)';
+      const origin = (b.route.name||'').replace(' → София','');
+      const label = until <= 0 ? `пристигнал ~${b.arrTime}` :
+                    until < 90 ? `~${b.arrTime} · след ${until} мин` :
+                    `~${b.arrTime}`;
+      html += `<div style="display:flex;justify-content:space-between;gap:8px;padding:4px 0;border-bottom:1px solid var(--border);font-size:13px">
+        <span>🚌 ${origin} <span style="color:var(--muted);font-size:11px">${b.dep}${b.route.approx?' ≈':''}</span></span>
+        <span style="${urgency};white-space:nowrap">${label}</span>
       </div>`;
     }
+  } else {
+    html += '<div style="color:var(--muted);font-size:12px">Няма пристигащи в следващите 6 часа</div>';
   }
 
-  html += '<div style="margin-top:8px;font-size:11px;color:var(--muted)">Expo Center спирка: ~100 мин след тръгване от Пловдив</div>';
+  html += '<div style="margin-top:8px;font-size:11px;color:var(--muted)">≈ разписание по модел на превозвача · Пловдив е точно</div>';
   panel.innerHTML = html;
 
   // Update every minute
@@ -1472,7 +1496,18 @@ function addBusZones(){
   });
   L.marker([expoStop.lat, expoStop.lng], {icon})
     .addTo(M)
-    .bindPopup(`<b style="color:#0284c7">🚌 Expo Center</b><br><small>Спирка Пловдив↔София</small>`);
+    .bindPopup(`<b style="color:#0284c7">🚌 Expo Center</b><br><small>Вход от Тракия: Пловдив · Пазарджик · Ст. Загора · Бургас</small>`);
+  // Коридорни входове — къде влизат междуградските автобуси в София
+  const corridors = [
+    {lat:42.7208, lng:23.4085, short:'🚌 Хемус', pop:'<b style="color:#0284c7">🚌 Ботевградско шосе</b><br><small>Вход от Хемус: Варна · В. Търново · Плевен · Русе</small>'},
+    {lat:42.6520, lng:23.2800, short:'🚌 Струма', pop:'<b style="color:#0284c7">🚌 Бул. България</b><br><small>Вход от Струма: Благоевград · ЮЗ България</small>'},
+  ];
+  corridors.forEach(c=>{
+    const ci = L.divIcon({className:'',
+      html:`<div style="background:#0284c7;color:#fff;border-radius:6px;padding:3px 7px;font-size:12px;font-weight:800;white-space:nowrap;box-shadow:0 2px 6px #0004">${c.short}</div>`,
+      iconAnchor:[25,15]});
+    L.marker([c.lat, c.lng], {icon:ci}).addTo(M).bindPopup(c.pop);
+  });
 }
 
 // ═══════════════════════════════════════════════
