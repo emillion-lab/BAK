@@ -659,50 +659,7 @@ function updateCircles() {
 }
 
 
-// ═══════════════════════════════════════════════
-// BUS SCHEDULE (Plovdiv ↔ Sofia)
-// ═══════════════════════════════════════════════
-let busScheduleData = null;
-
-function loadBusSchedule(){
-  fetch('bus-schedule.json')
-    .then(r=>r.ok?r.json():null)
-    .then(data=>{
-      if(!data) return;
-      busScheduleData = data;
-      console.log('Bus schedule loaded:', data.routes?.length, 'routes');
-    })
-    .catch(e=>console.warn('Bus schedule:', e));
-}
-
-function getNextBuses(routeId, count){
-  if(!busScheduleData) return [];
-  const route = busScheduleData.routes?.find(r=>r.id===routeId);
-  if(!route) return [];
-  const now = new Date();
-  const sofia = new Date(now.getTime() + 3*3600000); // UTC+3
-  const nowMin = sofia.getUTCHours()*60 + sofia.getUTCMinutes();
-  const results = [];
-  for(const dep of route.departures){
-    const [h,m] = dep.split(':').map(Number);
-    const depMin = h*60+m;
-    const diff = depMin - nowMin;
-    if(diff >= -10){ // include buses up to 10min ago
-      const stops = route.stops || [];
-      results.push({
-        dep, depMin, diff, route,
-        stops: stops.map(s=>({
-          name: s.name,
-          arrH: Math.floor((depMin + (s.offset_min||0)) / 60) % 24,
-          arrM: (depMin + (s.offset_min||0)) % 60
-        }))
-      });
-    }
-    if(results.length >= count) break;
-  }
-  return results;
-}
-
+// (дублираната bus система е премахната — виж BUS SCHEDULE по-долу)
 function showTransitPopup(zid){
   const z = ZONES.find(x=>x.id===zid);
   if(!z) return;
@@ -739,22 +696,33 @@ function showTransitPopup(zid){
 
   // Expo Center bus stop
   if(zid === 'iec' || zid === 'expo2000'){
-    const next = getNextBuses('plovdiv_sofia', 5);
-    const expoStop = next.filter(b=>{
-      const stop = b.stops.find(s=>s.name.includes('Expo'));
-      return stop && b.diff >= -110;
-    }).map(b=>{
-      const stop = b.stops.find(s=>s.name.includes('Expo'));
-      return {...b, expoH: stop?.arrH, expoM: stop?.arrM};
-    });
-
-    if(expoStop.length){
-      html += '<div style="font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.6px;margin-bottom:8px">🚌 Автобус Пловдив–София (Expo спирка)</div>';
-      expoStop.forEach(b=>{
-        const col = b.expoH !== undefined ? 'var(--amber)' : 'var(--muted)';
+    // Автобуси по Тракия, минаващи през Expo/Цариградско, по route stops offset
+    const data = busSchedule;
+    const now = new Date();
+    const nowMin = now.getHours()*60 + now.getMinutes();
+    const rows = [];
+    for(const route of (data?.routes||[])){
+      const expo = (route.stops||[]).find(s=>s.name.includes('Expo'));
+      if(!expo || !route.to || !route.to.includes('Централна автогара София')) continue;
+      for(const dep of route.departures){
+        const [h,m] = dep.split(':').map(Number);
+        const atExpo = h*60+m+(expo.offset_min||0);
+        let delta = atExpo - nowMin;
+        if(delta < -10) continue;
+        if(delta > 240) continue;
+        rows.push({route, dep, atExpo, delta});
+      }
+    }
+    rows.sort((a,b)=>a.atExpo-b.atExpo);
+    if(rows.length){
+      html += '<div style="font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.6px;margin-bottom:8px">🚌 Минаващи през Expo/Цариградско</div>';
+      rows.slice(0,6).forEach(b=>{
+        const t = `${String(Math.floor((b.atExpo%1440)/60)).padStart(2,'0')}:${String(b.atExpo%60).padStart(2,'0')}`;
+        const origin = (b.route.name||'').replace(' → София','');
+        const col = b.delta<40?'#ef4444':'var(--amber)';
         html += `<div style="padding:6px 8px;border-radius:7px;margin-bottom:3px;display:flex;justify-content:space-between">
-          <span>Тръгва ${b.dep} от Пловдив</span>
-          <span style="font-weight:800;color:${col}">Expo ~${fmt(b.expoH??0,b.expoM??0)}</span>
+          <span>${origin} <span style="color:var(--muted);font-size:11px">${b.dep}${b.route.approx?' ≈':''}</span></span>
+          <span style="font-weight:800;color:${col}">~${t}</span>
         </div>`;
       });
     }
@@ -1419,8 +1387,37 @@ function getNextBuses(routeId, count=5){
 }
 
 // Всички пристигащи на ЦАС от всички маршрути, сортирани по час на пристигане
+let liveArrivals = null;
+
+async function loadLiveArrivals(){
+  try{
+    const r = await fetch('bus-arrivals.json?v='+Date.now());
+    if(!r.ok) return;
+    const d = await r.json();
+    // валидни само ако са свежи (<100 мин)
+    if(d.updated && (Date.now()-new Date(d.updated).getTime()) < 100*60000){
+      liveArrivals = d;
+    }
+  }catch(e){ /* няма live файл — оставаме на разписание */ }
+}
+
+function getLiveArrivals(count){
+  if(!liveArrivals) return [];
+  const now = new Date();
+  const nowMin = now.getHours()*60 + now.getMinutes();
+  const out = [];
+  for(const a of (liveArrivals.arrivals||[])){
+    const [h,m] = a.time.split(':').map(Number);
+    if(isNaN(h)||isNaN(m)) continue;
+    let delta = h*60+m - nowMin;
+    if(delta < -20) continue;
+    out.push({origin:a.from, operator:a.operator, arrTime:a.time, until:delta, live:true});
+  }
+  return out.slice(0, count||10);
+}
+
 function getSofiaArrivals(count){
-  const data = busSchedule || busScheduleData;
+  const data = busSchedule;
   if(!data) return [];
   const now = new Date();
   const nowMin = now.getHours()*60 + now.getMinutes();
@@ -1456,9 +1453,22 @@ function renderBusPanel(){
     sidebar.appendChild(panel);
   }
 
-  const arrivals = getSofiaArrivals(8);
+  const live = getLiveArrivals(6);
+  const arrivals = getSofiaArrivals(live.length ? 4 : 8);
 
   let html = '<div style="font-size:14px;font-weight:800;color:var(--cyan);margin-bottom:8px">🚌 Пристигащи на ЦАС</div>';
+
+  if(live.length){
+    html += '<div style="font-size:11px;font-weight:800;color:#ef4444;margin-bottom:4px">🔴 LIVE — centralnaavtogara.bg</div>';
+    for(const b of live){
+      const urgency = b.until <= 15 ? 'color:#ef4444;font-weight:800' : 'color:var(--text)';
+      html += `<div style="display:flex;justify-content:space-between;gap:8px;padding:4px 0;border-bottom:1px solid var(--border);font-size:13px">
+        <span>🚌 ${b.origin} <span style="color:var(--muted);font-size:11px">${b.operator||''}</span></span>
+        <span style="${urgency};white-space:nowrap">${b.arrTime}${b.until>=0?' · след '+b.until+' мин':''}</span>
+      </div>`;
+    }
+    html += '<div style="font-size:11px;font-weight:800;color:var(--muted);margin:8px 0 4px">📋 По разписание</div>';
+  }
 
   if(arrivals.length){
     for(const b of arrivals){
@@ -1690,7 +1700,7 @@ buildCurve();
 buildCircles();
 buildTicker();
 render(currentHour);
-loadFlights(); loadBuses();
+loadFlights(); loadBuses(); loadLiveArrivals(); setInterval(loadLiveArrivals, 10*60000);
 loadConfig().then(()=>{ loadWeather(); setInterval(loadWeather,10*60000); });
 checkEventAlerts();
 geocodeZones();     // async — прецизира координатите от OSM
