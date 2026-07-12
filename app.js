@@ -769,7 +769,7 @@ function showAirportSchedule() {
 
   const nowCount = visible.filter(f=>f._state==='now').length;
   if(nowCount){
-    html+=`<div style="background:rgba(249,115,22,.14);border:1px solid #f97316;border-radius:8px;padding:6px 10px;margin-bottom:8px;font-weight:800;color:#f97316;font-size:13px">🟠 В момента излизат: ${nowCount} полет${nowCount===1?'':'а'}</div>`;
+    html+=`<div style="background:rgba(239,68,68,.14);border:1px solid #ef4444;border-radius:8px;padding:6px 10px;margin-bottom:8px;font-weight:800;color:#ef4444;font-size:13px">🔴 В момента излизат: ${nowCount} полет${nowCount===1?'':'а'}</div>`;
   } else {
     const next = visible.find(f=>f._state==='future');
     if(next){
@@ -811,9 +811,9 @@ function showAirportSchedule() {
       }
       const isNow  = f._state==='now';
       const isDone = f._state==='done';
-      const bg  = isNow ? 'rgba(249,115,22,.16)' : 'transparent';
-      const brd = isNow ? '1px solid #f97316'    : '1px solid transparent';
-      const col = isNow ? '#f97316' : isDone ? 'var(--muted)' : 'var(--amber)';
+      const bg  = isNow ? 'rgba(239,68,68,.16)' : 'transparent';
+      const brd = isNow ? '1px solid #ef4444'    : '1px solid transparent';
+      const col = isNow ? '#ef4444' : isDone ? 'var(--muted)' : 'var(--amber)';
       const op  = isDone ? 'opacity:.45;' : '';
       const anchor = (!anchorSet && (isNow || f._state==='future')) ? (anchorSet=true, ' id="fl-now-anchor"') : '';
       html+=`<div${anchor} style="display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:8px;background:${bg};border:${brd};margin-bottom:2px;${op}">
@@ -821,7 +821,7 @@ function showAirportSchedule() {
         ${flTerm==='all'?`<span style="font-size:10px;font-weight:900;color:var(--cyan);border:1px solid var(--border);border-radius:5px;padding:1px 4px">${'Т'+f.term}</span>`:''}
         <span style="flex:1;font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(f.depAirport||'').slice(0,22)}</span>
         <span style="font-size:13px">${flag(f)}</span>
-        ${isNow?'<span style="font-size:10px;font-weight:900;color:#f97316;white-space:nowrap">ИЗЛИЗАТ</span>':''}
+        ${isNow?'<span style="font-size:10px;font-weight:900;color:#ef4444;white-space:nowrap">ИЗЛИЗАТ</span>':''}
         <span style="font-weight:800;font-size:13px;color:${col};white-space:nowrap">${fmt(f.exitFromH,f.exitFromM)}–${fmt(f.exitToH,f.exitToM)}</span>
       </div>`;
     });
@@ -829,7 +829,7 @@ function showAirportSchedule() {
   }
   html+='</div>';
 
-  html+='<div style="font-size:11px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">🇪🇺 Шенген: излизане +10–20 мин &nbsp;|&nbsp; 🛂 Извън Шенген: +15–30 мин &nbsp;|&nbsp; 🟠 = излизат сега</div>';
+  html+='<div style="font-size:11px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">🇪🇺 Шенген: излизане +10–20 мин &nbsp;|&nbsp; 🛂 Извън Шенген: +15–30 мин &nbsp;|&nbsp; 🔴 = излизат сега</div>';
   html+='</div>';
 
   const airportZone=ZONES.find(z=>z.id==='airport');
