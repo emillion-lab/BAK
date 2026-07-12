@@ -791,7 +791,6 @@ function showAirportSchedule() {
   window.__setFlTerm = t => { try{ localStorage.setItem('bak_fl_term', t); }catch(e){} showAirportSchedule(); };
   const cnt = t => visible.filter(f=>f.term===t).length;
   const tabs = [['all','Всички',visible.length],['2','Т2',cnt('2')],['1','Т1',cnt('1')]];
-  if(cnt('?')) tabs.push(['?','Т?',cnt('?')]);
   html+='<div style="display:flex;gap:6px;margin-bottom:8px">';
   tabs.forEach(([id,label,n])=>{
     const on = flTerm===id;
@@ -819,7 +818,7 @@ function showAirportSchedule() {
       const anchor = (!anchorSet && (isNow || f._state==='future')) ? (anchorSet=true, ' id="fl-now-anchor"') : '';
       html+=`<div${anchor} style="display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:8px;background:${bg};border:${brd};margin-bottom:2px;${op}">
         <span style="font-weight:800;font-size:13px;min-width:44px;color:var(--text)">${f.fn}</span>
-        ${flTerm==='all'?`<span style="font-size:10px;font-weight:900;color:var(--cyan);border:1px solid var(--border);border-radius:5px;padding:1px 4px">${f.term==='?'?'Т?':'Т'+f.term}</span>`:''}
+        ${flTerm==='all'?`<span style="font-size:10px;font-weight:900;color:var(--cyan);border:1px solid var(--border);border-radius:5px;padding:1px 4px">${'Т'+f.term}</span>`:''}
         <span style="flex:1;font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(f.depAirport||'').slice(0,22)}</span>
         <span style="font-size:13px">${flag(f)}</span>
         ${isNow?'<span style="font-size:10px;font-weight:900;color:#f97316;white-space:nowrap">ИЗЛИЗАТ</span>':''}
@@ -1192,6 +1191,7 @@ function loadFlights(){
       flightHours=Array(24).fill(0); flightDetails=[];
       fl.forEach(f=>{
         if(!f.arrival?.scheduled) return;
+        if(!f.arrival?.terminal) return; // без терминал = частни/военни/карго — без пътници за такси
         const t=new Date(f.arrival.estimated||f.arrival.scheduled);
         const dep=(f.departure?.airport||f.departure?.country_name||'').toLowerCase();
         const nonSchengen=dep.match(/tur|istanbul|sabiha|ankar|israel|ben.gurion|dubai|abu.dhabi|egypt|cairo|morocco|casablanca|london|heathrow|gatwick|stansted|luton|manchester|birmingham|usa|jfk|lax|china|beijing|shanghai|russia|moscow|georgia|tbilisi|armenia|yerevan|jordan|amman|serbia|belgrade|ukraine|kyiv|north.mac/);
