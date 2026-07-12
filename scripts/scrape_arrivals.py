@@ -56,16 +56,28 @@ def parse_rows(html):
         others = [c for c in cells if time_cell not in c]
         if not others:
             continue
-        # най-дългата не-часова клетка обикновено е направлението; кирилица задължителна
-        origin = max(others, key=len)
-        if not re.search(r"[А-Яа-я]", origin) or len(origin) < 3:
+        # секторът е мястото на слизане — отделно поле, НЕ направление
+        sector = next((c for c in others if re.fullmatch(r"(?:[Сс]ектор\s*)?\d{1,2}", c) or re.match(r"[Сс]ектор", c)), None)
+        rest = [c for c in others if c != sector]
+        # направление: най-дългата кирилска клетка от останалите
+        cyr = [c for c in rest if re.search(r"[А-Яа-я]", c) and len(c) >= 3 and not re.match(r"[Сс]ектор", c)]
+        if not cyr:
             continue
-        operator = next((c for c in others if c != origin and re.search(r"[А-Яа-яA-Za-z]{3}", c)), None)
-        arrivals.append({"time": t, "from": origin[:60], "operator": (operator or "")[:60]})
+        origin = max(cyr, key=len)
+        operator = next((c for c in rest if c != origin and re.search(r"[А-Яа-яA-Za-z]{3}", c)), None)
+        INTL = ("СКОПИЕ","КИШИНЕВ","БЕЛГРАД","НИШ","СОЛУН","ИСТАНБУЛ","ОДРИН","АТИНА","БУКУРЕЩ",
+                "ВИЕНА","ПАРИЖ","БЕРЛИН","МЮНХЕН","ПРАГА","БУДАПЕЩА","ЦЮРИХ","АМСТЕРДАМ","ЛОНДОН",
+                "ОХРИД","БИТОЛЯ","ПРИЩИНА","ТИРАНА","ПОДГОРИЦА","ЗАГРЕБ","ЛЮБЛЯНА","БРАТИСЛАВА","РИМ","МИЛАНО","МАДРИД","БРЮКСЕЛ")
+        intl = any(k in origin.upper() for k in INTL)
+        sec = ""
+        if sector:
+            m = re.search(r"\d{1,2}", sector)
+            sec = m.group(0) if m else ""
+        arrivals.append({"time": t, "from": origin[:60], "sector": sec, "operator": (operator or "")[:60], "intl": intl})
     # дедуп
     seen, out = set(), []
     for a in arrivals:
-        key = (a["time"], a["from"])
+        key = (a["time"], a["from"], a.get("sector",""))
         if key in seen:
             continue
         seen.add(key)
