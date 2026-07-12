@@ -749,20 +749,18 @@ function showAirportSchedule() {
   const fmt = (h,m) => String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
   const flag = f => f.nonSchengen ? '🛂' : '🇪🇺';
 
-  // Всички полети, сортирани по начало на излизане
-  const all = [...flightDetails].sort((a,b)=>(a.exitFromH*60+a.exitFromM)-(b.exitFromH*60+b.exitFromM));
-  const adj = m => m < 300 ? m + 1440 : m;      // ранните часове = "утре"
-  const nowAdj = adj(nowMin);
+  // Всички полети по абсолютно време (кешът носи датата — никакви среднощни трикове)
+  const nowTs = Date.now();
+  const all = [...flightDetails]
+    .filter(f=>f.exitFromTs)
+    .sort((a,b)=>a.exitFromTs-b.exitFromTs);
 
-  // Крие излезли преди >2ч; останалите класифицира
+  // Крие излезли преди >2ч; класифицира останалите
   const visible = [];
   all.forEach(f=>{
-    const fromA = adj(f.exitFromH*60+f.exitFromM);
-    const toA   = adj(f.exitToH*60+f.exitToM);
-    if(toA < nowAdj - 120) return;              // >2ч назад — вън
-    f._state = (nowAdj >= fromA && nowAdj <= toA) ? 'now'
-             : (toA < nowAdj) ? 'done' : 'future';
-    f._fromA = fromA;
+    if(f.exitToTs < nowTs - 120*60000) return;      // >2ч назад — вън
+    f._state = (nowTs >= f.exitFromTs && nowTs <= f.exitToTs) ? 'now'
+             : (f.exitToTs < nowTs) ? 'done' : 'future';
     visible.push(f);
   });
 
@@ -786,7 +784,8 @@ function showAirportSchedule() {
   }
 
   // Скролируем списък: терминали → часове → полети
-  html+='<div style="max-height:52vh;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-right:2px">';
+  html+='<div id="fl-scroll" style="max-height:52vh;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-right:2px">';
+  let anchorSet = false;
   const termOrder = ['2','1','?'].filter(t=>visible.some(f=>f.term===t));
   termOrder.forEach(term=>{
     const grp = visible.filter(f=>f.term===term);
@@ -805,7 +804,8 @@ function showAirportSchedule() {
       const brd = isNow ? '1px solid #f97316'    : '1px solid transparent';
       const col = isNow ? '#f97316' : isDone ? 'var(--muted)' : 'var(--amber)';
       const op  = isDone ? 'opacity:.45;' : '';
-      html+=`<div style="display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:8px;background:${bg};border:${brd};margin-bottom:2px;${op}">
+      const anchor = (!anchorSet && (isNow || f._state==='future')) ? (anchorSet=true, ' id="fl-now-anchor"') : '';
+      html+=`<div${anchor} style="display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:8px;background:${bg};border:${brd};margin-bottom:2px;${op}">
         <span style="font-weight:800;font-size:13px;min-width:44px;color:var(--text)">${f.fn}</span>
         <span style="flex:1;font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(f.depAirport||'').slice(0,22)}</span>
         <span style="font-size:13px">${flag(f)}</span>
@@ -825,6 +825,10 @@ function showAirportSchedule() {
       .setLatLng([airportZone.lat,airportZone.lng])
       .setContent(html)
       .openOn(map);
+    setTimeout(()=>{
+      const box=document.getElementById('fl-scroll'), el=document.getElementById('fl-now-anchor');
+      if(box && el) box.scrollTop = Math.max(0, el.offsetTop - box.offsetTop - 34);
+    }, 120);
   }
 }
 
@@ -1197,6 +1201,7 @@ function loadFlights(){
         flightDetails.push({
           fn, depAirport, nonSchengen:!!nonSchengen,
           term: (f.arrival && f.arrival.terminal) ? String(f.arrival.terminal) : '?',
+          exitFromTs: tFirst.getTime(), exitToTs: tLast.getTime(),
           landH:(t.getUTCHours()+3)%24, landM:t.getUTCMinutes(),
           exitFromH:hFirst, exitFromM:mFirst,
           exitToH:hLast,   exitToM:mLast
