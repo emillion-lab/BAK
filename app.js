@@ -1504,7 +1504,7 @@ function addBusZones(){
   var M = (typeof map!=='undefined' && map && typeof map.addLayer==='function') ? map : null;
   if(!busSchedule || !M) return;
   // Add Expo Center bus stop as zone marker
-  const expoStop = {lat:42.6543, lng:23.4012, name:'🚌 Expo Center (автобусна спирка)'};
+  const expoStop = {lat:42.6497, lng:23.3940, name:'🚌 Expo Center (спирка при метро Цариградско шосе)'};
   const icon = L.divIcon({
     className:'',
     html:`<div style="background:#0284c7;color:#fff;border-radius:6px;padding:3px 7px;font-size:12px;font-weight:800;white-space:nowrap;box-shadow:0 2px 6px #0004">🚌 Expo</div>`,
@@ -1512,7 +1512,7 @@ function addBusZones(){
   });
   L.marker([expoStop.lat, expoStop.lng], {icon})
     .addTo(M)
-    .bindPopup(`<b style="color:#0284c7">🚌 Expo Center</b><br><small>Вход от Тракия: Пловдив · Пазарджик · Ст. Загора · Бургас</small>`);
+    .bindPopup(`<b style="color:#0284c7">🚌 Expo Center / метро Цариградско шосе</b><br><small>Слизане от Тракия: Пловдив · Пазарджик · Ст. Загора · Бургас — спирката е при метростанцията</small>`);
   // Коридорни входове — къде влизат междуградските автобуси в София
   const corridors = [
     {lat:42.7208, lng:23.4085, short:'🚌 Хемус', pop:'<b style="color:#0284c7">🚌 Ботевградско шосе</b><br><small>Вход от Хемус: Варна · В. Търново · Плевен · Русе</small>'},
