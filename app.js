@@ -749,97 +749,74 @@ function showAirportSchedule() {
   const fmt = (h,m) => String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
   const flag = f => f.nonSchengen ? '🛂' : '🇪🇺';
 
-  // Sort all details by exit start time
-  const all = [...flightDetails].sort((a,b)=>{
-    const am = a.exitFromH*60+a.exitFromM;
-    const bm = b.exitFromH*60+b.exitFromM;
-    return am-bm;
-  });
+  // Всички полети, сортирани по начало на излизане
+  const all = [...flightDetails].sort((a,b)=>(a.exitFromH*60+a.exitFromM)-(b.exitFromH*60+b.exitFromM));
+  const adj = m => m < 300 ? m + 1440 : m;      // ранните часове = "утре"
+  const nowAdj = adj(nowMin);
 
-  const upcoming=[], past=[];
+  // Крие излезли преди >2ч; останалите класифицира
+  const visible = [];
   all.forEach(f=>{
-    const exitTo = f.exitToH*60+f.exitToM;
-    const exitFrom = f.exitFromH*60+f.exitFromM;
-    // Handle midnight crossover - treat early morning hours as "next day"
-    const toAdj   = exitTo   < 300 ? exitTo+1440   : exitTo;
-    const fromAdj = exitFrom < 300 ? exitFrom+1440 : exitFrom;
-    const nowAdj  = nowMin   < 300 ? nowMin+1440   : nowMin;
-    // Show as upcoming if exit window ends in future (within last 15 min too)
-    if(toAdj >= nowAdj - 15) upcoming.push(f);
-    else past.push(f);
+    const fromA = adj(f.exitFromH*60+f.exitFromM);
+    const toA   = adj(f.exitToH*60+f.exitToM);
+    if(toA < nowAdj - 120) return;              // >2ч назад — вън
+    f._state = (nowAdj >= fromA && nowAdj <= toA) ? 'now'
+             : (toA < nowAdj) ? 'done' : 'future';
+    f._fromA = fromA;
+    visible.push(f);
   });
-  // If still nothing upcoming (cache is old/yesterday), show all as reference
-  const cacheIsOld = upcoming.length === 0 && past.length > 0;
 
   let html='<div style="font-size:14px">';
-  html+='<div style="font-weight:800;font-size:15px;margin-bottom:10px;color:var(--cyan)">✈️ Излизане на пасажери — СОФ</div>';
+  html+='<div style="font-weight:800;font-size:15px;margin-bottom:8px;color:var(--cyan)">✈️ Излизане на пасажери — СОФ</div>';
 
-  // Find truly next flights even if none "upcoming" now
-  const allSorted = [...flightDetails].sort((a,b)=>(a.exitFromH*60+a.exitFromM)-(b.exitFromH*60+b.exitFromM));
-  if(upcoming.length===0 || cacheIsOld){
-    const next = allSorted.find(f=>{
-      const fm=f.exitFromH*60+f.exitFromM;
-      const adj=fm<300?fm+1440:fm;
-      const na=nowMin<300?nowMin+1440:nowMin;
-      return adj>na;
-    });
-    if(cacheIsOld){
-      // Cache is from yesterday - show today's expected pattern
-      html+=`<div style="background:rgba(245,197,24,.1);border:1px solid var(--amber);border-radius:10px;padding:12px;text-align:center;margin-bottom:10px">
-        <div style="font-size:12px;color:var(--muted);margin-bottom:4px">⚠️ Кешът се обновява в 08:00, 13:00, 18:00</div>
-        <div style="font-size:13px;color:var(--amber)">Показват се типичните пристигания</div>
-      </div>`;
-    } else if(next){
-      html+=`<div style="background:rgba(2,132,199,.1);border:1px solid var(--cyan);border-radius:10px;padding:14px;text-align:center;margin-bottom:10px">
-        <div style="font-size:13px;color:var(--muted);margin-bottom:4px">Няма излизащи пасажери в момента</div>
-        <div style="font-size:18px;font-weight:900;color:var(--cyan)">Следващ: ${String(next.exitFromH).padStart(2,'0')}:${String(next.exitFromM).padStart(2,'0')}</div>
-        <div style="font-size:13px;color:var(--muted);margin-top:3px">${next.fn} от ${(next.depAirport||'').slice(0,20)} ${next.nonSchengen?'🛂':'🇪🇺'}</div>
-      </div>`;
-    } else if(past.length===0){
+  const nowCount = visible.filter(f=>f._state==='now').length;
+  if(nowCount){
+    html+=`<div style="background:rgba(249,115,22,.14);border:1px solid #f97316;border-radius:8px;padding:6px 10px;margin-bottom:8px;font-weight:800;color:#f97316;font-size:13px">🟠 В момента излизат: ${nowCount} полет${nowCount===1?'':'а'}</div>`;
+  } else {
+    const next = visible.find(f=>f._state==='future');
+    if(next){
+      html+=`<div style="background:rgba(2,132,199,.1);border:1px solid var(--cyan);border-radius:8px;padding:6px 10px;margin-bottom:8px;font-size:13px;color:var(--cyan)"><b>Следващ: ${fmt(next.exitFromH,next.exitFromM)}</b> · ${next.fn} от ${(next.depAirport||'').slice(0,18)} ${flag(next)}</div>`;
+    } else if(visible.length===0){
       if(airportStatus==='fallback'){
-        html+='<div style="color:#f59e0b;padding:10px 0;text-align:center;font-size:12px">⚠️ Няма живи полетни данни — прогнозен режим'+(window.__flErr?('<br><span style="color:#888;font-size:10px;word-break:break-all">debug: '+window.__flErr+'</span>'):'')+'</div>';
+        html+='<div style="color:#f59e0b;padding:10px 0;text-align:center;font-size:12px">⚠️ Няма живи полетни данни — прогнозен режим</div>';
       } else {
-        html+='<div style="color:var(--muted);padding:16px 0;text-align:center">Зареждане на полети…</div>';
+        html+='<div style="color:var(--muted);padding:16px 0;text-align:center">Няма повече полети в кеша за днес</div>';
       }
     }
   }
 
-  if(upcoming.length){
-    html+='<div style="font-size:11px;font-weight:800;color:var(--muted);letter-spacing:.8px;margin-bottom:6px">ПРЕДСТОЯЩИ / СЕГА</div>';
-    upcoming.slice(0,12).forEach(f=>{
-      const fromMin = f.exitFromH*60+f.exitFromM;
-      const toMin   = f.exitToH*60+f.exitToM;
-      const nowAdj  = nowMin<180?nowMin+1440:nowMin;
-      const fromAdj = fromMin<180?fromMin+1440:fromMin;
-      const toAdj   = toMin<180?toMin+1440:toMin;
-      const isNow = fromAdj<=nowAdj && toAdj>=nowAdj;
-      const isDone = toAdj < nowAdj;
-      const bg = isNow?'rgba(239,68,68,.15)':'transparent';
-      const brd = isNow?'1px solid rgba(239,68,68,.5)':'1px solid transparent';
-      const col = isNow?'#ef4444': isDone?'var(--muted)':'var(--amber)';
-      html+=`<div style="display:flex;align-items:center;gap:6px;padding:7px 8px;border-radius:8px;background:${bg};border:${brd};margin-bottom:3px">
+  // Скролируем списък: терминали → часове → полети
+  html+='<div style="max-height:52vh;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-right:2px">';
+  const termOrder = ['2','1','?'].filter(t=>visible.some(f=>f.term===t));
+  termOrder.forEach(term=>{
+    const grp = visible.filter(f=>f.term===term);
+    if(!grp.length) return;
+    const tLabel = term==='?' ? 'Терминал —' : 'Терминал '+term;
+    html+=`<div style="position:sticky;top:0;background:var(--surface,#0d1117);z-index:2;font-size:12px;font-weight:900;color:var(--cyan);letter-spacing:.8px;padding:7px 4px 5px;border-bottom:1px solid var(--border)">🛬 ${tLabel} <span style="color:var(--muted);font-weight:700">(${grp.length})</span></div>`;
+    let lastHour = -1;
+    grp.forEach(f=>{
+      if(f.exitFromH !== lastHour){
+        lastHour = f.exitFromH;
+        html+=`<div style="font-size:11px;font-weight:800;color:var(--muted);margin:7px 0 3px;padding-left:4px">— ${String(lastHour).padStart(2,'0')}:00 —</div>`;
+      }
+      const isNow  = f._state==='now';
+      const isDone = f._state==='done';
+      const bg  = isNow ? 'rgba(249,115,22,.16)' : 'transparent';
+      const brd = isNow ? '1px solid #f97316'    : '1px solid transparent';
+      const col = isNow ? '#f97316' : isDone ? 'var(--muted)' : 'var(--amber)';
+      const op  = isDone ? 'opacity:.45;' : '';
+      html+=`<div style="display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:8px;background:${bg};border:${brd};margin-bottom:2px;${op}">
         <span style="font-weight:800;font-size:13px;min-width:44px;color:var(--text)">${f.fn}</span>
         <span style="flex:1;font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(f.depAirport||'').slice(0,22)}</span>
-        <span style="font-size:14px">${flag(f)}</span>
+        <span style="font-size:13px">${flag(f)}</span>
+        ${isNow?'<span style="font-size:10px;font-weight:900;color:#f97316;white-space:nowrap">ИЗЛИЗАТ</span>':''}
         <span style="font-weight:800;font-size:13px;color:${col};white-space:nowrap">${fmt(f.exitFromH,f.exitFromM)}–${fmt(f.exitToH,f.exitToM)}</span>
       </div>`;
     });
-  }
+  });
+  html+='</div>';
 
-  if(past.length){
-    const shown = past.slice(-4);
-    html+=`<div style="font-size:11px;font-weight:800;color:var(--muted);letter-spacing:.8px;margin:10px 0 6px">ВЕЧЕ ИЗЛЕЗЛИ (последни ${shown.length})</div>`;
-    shown.forEach(f=>{
-      html+=`<div style="display:flex;align-items:center;gap:6px;padding:5px 8px;opacity:.45;font-size:12px">
-        <span style="min-width:44px;font-weight:700">${f.fn}</span>
-        <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(f.depAirport||'').slice(0,20)}</span>
-        <span>${flag(f)}</span>
-        <span style="white-space:nowrap">${fmt(f.exitFromH,f.exitFromM)}–${fmt(f.exitToH,f.exitToM)}</span>
-      </div>`;
-    });
-  }
-
-  html+='<div style="font-size:11px;color:var(--muted);margin-top:10px;padding-top:8px;border-top:1px solid var(--border)">🇪🇺 Шенген +15–25 мин &nbsp;|&nbsp; 🛂 Извън Шенген +25–35 мин</div>';
+  html+='<div style="font-size:11px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">🇪🇺 Шенген: излизане +10–20 мин &nbsp;|&nbsp; 🛂 Извън Шенген: +15–30 мин &nbsp;|&nbsp; 🟠 = излизат сега</div>';
   html+='</div>';
 
   const airportZone=ZONES.find(z=>z.id==='airport');
@@ -1200,9 +1177,9 @@ function loadFlights(){
         const t=new Date(f.arrival.estimated||f.arrival.scheduled);
         const dep=(f.departure?.airport||f.departure?.country_name||'').toLowerCase();
         const nonSchengen=dep.match(/tur|istanbul|sabiha|ankar|israel|ben.gurion|dubai|abu.dhabi|egypt|cairo|morocco|casablanca|london|heathrow|gatwick|stansted|luton|manchester|birmingham|usa|jfk|lax|china|beijing|shanghai|russia|moscow|georgia|tbilisi|armenia|yerevan|jordan|amman|serbia|belgrade|ukraine|kyiv|north.mac/);
-        // Exit window: first passenger at +15/25 min, last at +25/35 min
-        const exitFirst = nonSchengen ? 25 : 15;
-        const exitLast  = nonSchengen ? 35 : 25;
+        // Exit window (наблюдения): ЕС/Шенген ~10 мин, извън ~15–20 мин след кацане
+        const exitFirst = nonSchengen ? 15 : 10;
+        const exitLast  = nonSchengen ? 30 : 20;
         const tFirst = new Date(t.getTime() + exitFirst*60000);
         const tLast  = new Date(t.getTime() + exitLast*60000);
         const hFirst = (tFirst.getUTCHours()+3)%24;
@@ -1219,6 +1196,7 @@ function loadFlights(){
         const depAirport = f.departure?.airport||dep;
         flightDetails.push({
           fn, depAirport, nonSchengen:!!nonSchengen,
+          term: (f.arrival && f.arrival.terminal) ? String(f.arrival.terminal) : '?',
           landH:(t.getUTCHours()+3)%24, landM:t.getUTCMinutes(),
           exitFromH:hFirst, exitFromM:mFirst,
           exitToH:hLast,   exitToM:mLast
@@ -1411,7 +1389,7 @@ function getLiveArrivals(count){
     if(isNaN(h)||isNaN(m)) continue;
     let delta = h*60+m - nowMin;
     if(delta < -20) continue;
-    out.push({origin:a.from, operator:a.operator, arrTime:a.time, until:delta, live:true});
+    out.push({origin:a.from, operator:a.operator, sector:a.sector||'', intl:!!a.intl, arrTime:a.time, until:delta, live:true});
   }
   return out.slice(0, count||10);
 }
@@ -1453,20 +1431,29 @@ function renderBusPanel(){
     sidebar.appendChild(panel);
   }
 
-  const live = getLiveArrivals(6);
+  const live = getLiveArrivals(14);
   const arrivals = getSofiaArrivals(live.length ? 4 : 8);
 
   let html = '<div style="font-size:14px;font-weight:800;color:var(--cyan);margin-bottom:8px">🚌 Пристигащи на ЦАС</div>';
 
   if(live.length){
-    html += '<div style="font-size:11px;font-weight:800;color:#ef4444;margin-bottom:4px">🔴 LIVE — centralnaavtogara.bg</div>';
-    for(const b of live){
+    const busRow = b => {
       const urgency = b.until <= 15 ? 'color:#ef4444;font-weight:800' : 'color:var(--text)';
-      html += `<div style="display:flex;justify-content:space-between;gap:8px;padding:4px 0;border-bottom:1px solid var(--border);font-size:13px">
-        <span>🚌 ${b.origin} <span style="color:var(--muted);font-size:11px">${b.operator||''}</span></span>
+      const sec = b.sector ? `<span style="color:#f5c518;font-size:11px;font-weight:800;white-space:nowrap"> → Сектор ${b.sector}</span>` : '';
+      return `<div style="display:flex;justify-content:space-between;gap:8px;padding:4px 0;border-bottom:1px solid var(--border);font-size:13px">
+        <span>${b.intl?'🌍':'🚌'} ${b.origin}${sec} <span style="color:var(--muted);font-size:11px">${b.operator||''}</span></span>
         <span style="${urgency};white-space:nowrap">${b.arrTime}${b.until>=0?' · след '+b.until+' мин':''}</span>
       </div>`;
+    };
+    const dom = live.filter(b=>!b.intl), intl = live.filter(b=>b.intl);
+    html += '<div style="font-size:11px;font-weight:800;color:#ef4444;margin-bottom:4px">🔴 LIVE — centralnaavtogara.bg</div>';
+    html += '<div style="max-height:32vh;overflow-y:auto;-webkit-overflow-scrolling:touch">';
+    for(const b of dom) html += busRow(b);
+    if(intl.length){
+      html += '<div style="font-size:11px;font-weight:800;color:#22c3a6;margin:6px 0 3px">🌍 МЕЖДУНАРОДНИ</div>';
+      for(const b of intl) html += busRow(b);
     }
+    html += '</div>';
     html += '<div style="font-size:11px;font-weight:800;color:var(--muted);margin:8px 0 4px">📋 По разписание</div>';
   }
 
@@ -1479,7 +1466,7 @@ function renderBusPanel(){
                     until < 90 ? `~${b.arrTime} · след ${until} мин` :
                     `~${b.arrTime}`;
       html += `<div style="display:flex;justify-content:space-between;gap:8px;padding:4px 0;border-bottom:1px solid var(--border);font-size:13px">
-        <span>🚌 ${origin} <span style="color:var(--muted);font-size:11px">${b.dep}${b.route.approx?' ≈':''}</span></span>
+        <span>${b.route.intl?'🌍':'🚌'} ${origin} <span style="color:var(--muted);font-size:11px">${b.dep}${b.route.approx?' ≈':''}</span></span>
         <span style="${urgency};white-space:nowrap">${label}</span>
       </div>`;
     }
