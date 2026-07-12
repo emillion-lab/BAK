@@ -784,14 +784,26 @@ function showAirportSchedule() {
   }
 
   // Скролируем списък: терминали → часове → полети
-  html+='<div id="fl-scroll" style="max-height:52vh;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-right:2px">';
+  // ═ Терминал табове (изборът се помни) ═
+  let flTerm = 'all';
+  try{ flTerm = localStorage.getItem('bak_fl_term') || 'all'; }catch(e){}
+  if(flTerm!=='all' && !visible.some(f=>f.term===flTerm)) flTerm='all';
+  window.__setFlTerm = t => { try{ localStorage.setItem('bak_fl_term', t); }catch(e){} showAirportSchedule(); };
+  const cnt = t => visible.filter(f=>f.term===t).length;
+  const tabs = [['all','Всички',visible.length],['2','Т2',cnt('2')],['1','Т1',cnt('1')]];
+  if(cnt('?')) tabs.push(['?','Т?',cnt('?')]);
+  html+='<div style="display:flex;gap:6px;margin-bottom:8px">';
+  tabs.forEach(([id,label,n])=>{
+    const on = flTerm===id;
+    html+=`<button onclick="window.__setFlTerm('${id}')" style="flex:1;padding:7px 4px;border-radius:9px;font-weight:900;font-size:13px;cursor:pointer;border:1px solid ${on?'var(--cyan)':'var(--border)'};background:${on?'rgba(2,132,199,.18)':'transparent'};color:${on?'var(--cyan)':'var(--muted)'}">${label} <span style="font-weight:700;font-size:11px">${n}</span></button>`;
+  });
+  html+='</div>';
+
+  const shownList = flTerm==='all' ? visible : visible.filter(f=>f.term===flTerm);
+  html+='<div id="fl-scroll" style="max-height:48vh;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-right:2px">';
   let anchorSet = false;
-  const termOrder = ['2','1','?'].filter(t=>visible.some(f=>f.term===t));
-  termOrder.forEach(term=>{
-    const grp = visible.filter(f=>f.term===term);
-    if(!grp.length) return;
-    const tLabel = term==='?' ? 'Терминал —' : 'Терминал '+term;
-    html+=`<div style="position:sticky;top:0;background:var(--surface,#0d1117);z-index:2;font-size:12px;font-weight:900;color:var(--cyan);letter-spacing:.8px;padding:7px 4px 5px;border-bottom:1px solid var(--border)">🛬 ${tLabel} <span style="color:var(--muted);font-weight:700">(${grp.length})</span></div>`;
+  {
+    const grp = shownList;
     let lastHour = -1;
     grp.forEach(f=>{
       if(f.exitFromH !== lastHour){
@@ -807,13 +819,15 @@ function showAirportSchedule() {
       const anchor = (!anchorSet && (isNow || f._state==='future')) ? (anchorSet=true, ' id="fl-now-anchor"') : '';
       html+=`<div${anchor} style="display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:8px;background:${bg};border:${brd};margin-bottom:2px;${op}">
         <span style="font-weight:800;font-size:13px;min-width:44px;color:var(--text)">${f.fn}</span>
+        ${flTerm==='all'?`<span style="font-size:10px;font-weight:900;color:var(--cyan);border:1px solid var(--border);border-radius:5px;padding:1px 4px">${f.term==='?'?'Т?':'Т'+f.term}</span>`:''}
         <span style="flex:1;font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(f.depAirport||'').slice(0,22)}</span>
         <span style="font-size:13px">${flag(f)}</span>
         ${isNow?'<span style="font-size:10px;font-weight:900;color:#f97316;white-space:nowrap">ИЗЛИЗАТ</span>':''}
         <span style="font-weight:800;font-size:13px;color:${col};white-space:nowrap">${fmt(f.exitFromH,f.exitFromM)}–${fmt(f.exitToH,f.exitToM)}</span>
       </div>`;
     });
-  });
+    if(!grp.length) html+='<div style="color:var(--muted);text-align:center;padding:14px 0;font-size:13px">Няма полети за този терминал</div>';
+  }
   html+='</div>';
 
   html+='<div style="font-size:11px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">🇪🇺 Шенген: излизане +10–20 мин &nbsp;|&nbsp; 🛂 Извън Шенген: +15–30 мин &nbsp;|&nbsp; 🟠 = излизат сега</div>';
