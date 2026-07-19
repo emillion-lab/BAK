@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-19T21:01:21.001720+03:00",
+  "updated": "2026-07-19T22:14:36.903462+03:00",
   "source": "centralnaavtogara.bg",
   "window_hours": 8,
   "count": 31,
@@ -28,6 +28,13 @@
     {
       "time": "00:00",
       "from": "АХТОПОЛ",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "00:00",
+      "from": "СЛ.БРЯГ",
       "sector": "",
       "operator": "",
       "intl": false
@@ -66,6 +73,20 @@
       "sector": "29",
       "operator": "",
       "intl": false
+    },
+    {
+      "time": "07:00",
+      "from": "РУСЕ",
+      "sector": "9",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "07:00",
+      "from": "СКОПИЕ",
+      "sector": "41",
+      "operator": "",
+      "intl": true
     },
     {
       "time": "07:00",
@@ -141,27 +162,6 @@
       "time": "20:07",
       "from": "---- Изберете Спирка ---- АБЛАНИЦА АЛБЕНА АЛТИМИР АНТОНОВО А",
       "sector": "",
-      "operator": "",
-      "intl": true
-    },
-    {
-      "time": "21:20",
-      "from": "ПЛОВДИВ",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "21:30",
-      "from": "КАВАРНА",
-      "sector": "7",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "22:00",
-      "from": "БУКУРЕЩ",
-      "sector": "9",
       "operator": "",
       "intl": true
     },
