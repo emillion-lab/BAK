@@ -759,7 +759,8 @@ function showAirportSchedule() {
   const visible = [];
   all.forEach(f=>{
     if(f.exitToTs < nowTs - 120*60000) return;      // >2ч назад — вън
-    f._state = (nowTs >= f.exitFromTs && nowTs <= f.exitToTs) ? 'now'
+    const graceTs = f.exitToTs + 15*60000; // грейс: все още може да излизат
+    f._state = (nowTs >= f.exitFromTs && nowTs <= graceTs) ? 'now'
              : (f.exitToTs < nowTs) ? 'done' : 'future';
     visible.push(f);
   });
@@ -817,12 +818,12 @@ function showAirportSchedule() {
       const op  = isDone ? 'opacity:.45;' : '';
       const anchor = (!anchorSet && (isNow || f._state==='future')) ? (anchorSet=true, ' id="fl-now-anchor"') : '';
       html+=`<div${anchor} style="display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:8px;background:${bg};border:${brd};margin-bottom:2px;${op}">
-        <span style="font-weight:800;font-size:13px;min-width:44px;color:var(--text)">${f.fn}</span>
-        ${flTerm==='all'?`<span style="font-size:10px;font-weight:900;color:var(--cyan);border:1px solid var(--border);border-radius:5px;padding:1px 4px">${'Т'+f.term}</span>`:''}
-        <span style="flex:1;font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(f.depAirport||'').slice(0,22)}</span>
+        <span style="font-weight:800;font-size:16px;min-width:48px;color:var(--text)">${f.fn}</span>
+        ${flTerm==='all'?`<span style="font-size:12px;font-weight:900;color:var(--cyan);border:1px solid var(--border);border-radius:5px;padding:1px 5px">${'Т'+f.term}</span>`:''}
+        <span style="flex:1;font-size:14px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(f.depAirport||'').slice(0,22)}</span>
         <span style="font-size:13px">${flag(f)}</span>
-        ${isNow?'<span style="font-size:10px;font-weight:900;color:#ef4444;white-space:nowrap">ИЗЛИЗАТ</span>':''}
-        <span style="font-weight:800;font-size:13px;color:${col};white-space:nowrap">${fmt(f.exitFromH,f.exitFromM)}–${fmt(f.exitToH,f.exitToM)}</span>
+        ${isNow?'<span style="font-size:12px;font-weight:900;color:#ef4444;white-space:nowrap">ИЗЛИЗАТ</span>':''}
+        <span style="font-weight:800;font-size:15px;color:${col};white-space:nowrap">${fmt(f.exitFromH,f.exitFromM)}–${fmt(f.exitToH,f.exitToM)}</span>
       </div>`;
     });
     if(!grp.length) html+='<div style="color:var(--muted);text-align:center;padding:14px 0;font-size:13px">Няма полети за този терминал</div>';
@@ -1196,8 +1197,8 @@ function loadFlights(){
         const dep=(f.departure?.airport||f.departure?.country_name||'').toLowerCase();
         const nonSchengen=dep.match(/tur|istanbul|sabiha|ankar|israel|ben.gurion|dubai|abu.dhabi|egypt|cairo|morocco|casablanca|london|heathrow|gatwick|stansted|luton|manchester|birmingham|usa|jfk|lax|china|beijing|shanghai|russia|moscow|georgia|tbilisi|armenia|yerevan|jordan|amman|serbia|belgrade|ukraine|kyiv|north.mac/);
         // Exit window (наблюдения): ЕС/Шенген ~10 мин, извън ~15–20 мин след кацане
-        const exitFirst = nonSchengen ? 15 : 10;
-        const exitLast  = nonSchengen ? 30 : 20;
+        const exitFirst = nonSchengen ? 10 : 5;
+        const exitLast  = nonSchengen ? 30 : 15;
         const tFirst = new Date(t.getTime() + exitFirst*60000);
         const tLast  = new Date(t.getTime() + exitLast*60000);
         const hFirst = (tFirst.getUTCHours()+3)%24;
