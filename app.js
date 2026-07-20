@@ -830,7 +830,7 @@ function showAirportSchedule() {
   }
   html+='</div>';
 
-  html+='<div style="font-size:11px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">🇪🇺 Шенген: излизане +10–20 мин &nbsp;|&nbsp; 🛂 Извън Шенген: +15–30 мин &nbsp;|&nbsp; 🔴 = излизат сега</div>';
+  html+='<div style="font-size:11px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">🇪🇺 Шенген: +5–15 мин &nbsp;|&nbsp; 🛂 Извън Шенген: +10–30 мин &nbsp;|&nbsp; 🔴 = излизат сега</div>';
   html+='</div>';
 
   const airportZone=ZONES.find(z=>z.id==='airport');
