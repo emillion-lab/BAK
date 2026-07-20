@@ -18,14 +18,15 @@ jobs:
           python3 - <<'PYEOF'
           import re
           src = open('app.js', encoding='utf-8').read()
-          # Заменя целия ред на легендата, устойчиво на &nbsp;
-          pat = re.compile(r"\ud83c\uddea\ud83c\uddfa \u0428\u0435\u043d\u0433\u0435\u043d:.*?\ud83d\udd34 = \u0438\u0437\u043b\u0438\u0437\u0430\u0442 \u0441\u0435\u0433\u0430")
+          old = ("\ud83c\uddea\ud83c\uddfa \u0428\u0435\u043d\u0433\u0435\u043d: \u0438\u0437\u043b\u0438\u0437\u0430\u043d\u0435 +10\u201320 \u043c\u0438\u043d &nbsp;|&nbsp; "
+                 "\ud83d\udec2 \u0418\u0437\u0432\u044a\u043d \u0428\u0435\u043d\u0433\u0435\u043d: +15\u201330 \u043c\u0438\u043d &nbsp;|&nbsp; "
+                 "\ud83d\udd34 = \u0438\u0437\u043b\u0438\u0437\u0430\u0442 \u0441\u0435\u0433\u0430")
           new = ("\ud83c\uddea\ud83c\uddfa \u0428\u0435\u043d\u0433\u0435\u043d: +5\u201315 \u043c\u0438\u043d &nbsp;|&nbsp; "
                  "\ud83d\udec2 \u0418\u0437\u0432\u044a\u043d \u0428\u0435\u043d\u0433\u0435\u043d: +10\u201330 \u043c\u0438\u043d &nbsp;|&nbsp; "
                  "\ud83d\udd34 = \u0438\u0437\u043b\u0438\u0437\u0430\u0442 \u0441\u0435\u0433\u0430")
-          n = len(pat.findall(src))
+          n = src.count(old)
           assert n == 1, 'legend matches: %d' % n
-          src = pat.sub(new, src)
+          src = src.replace(old, new)
           open('app.js', 'w', encoding='utf-8').write(src)
           print('legend fixed')
           idx = open('index.html', encoding='utf-8').read()
@@ -36,4 +37,4 @@ jobs:
         run: |
           git config user.name "ui-bot"; git config user.email "ui-bot@users.noreply.github.com"
           git add app.js index.html
-          git diff --cached --quiet || (git commit -m "flights: legend text matches 5-15/10-30 windows" && git push)
+          git diff --cached --quiet || (git commit -m "flights: legend text now matches 5-15/10-30 windows" && git push)
