@@ -1,40 +1,72 @@
-name: Flights Update
-
+name: flights
 on:
-  workflow_dispatch:
   schedule:
-    - cron: '0 5 * * *'
-    - cron: '0 10 * * *'
-    - cron: '0 14 * * *'
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
 permissions:
   contents: write
 
 jobs:
-  fetch:
+  update:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Fetch flights (arrivals + departures)
+      - name: Fetch arrivals via mvr-proxy (AeroDataBox) and convert to legacy schema
         run: |
-          if [ -z "${{ secrets.API_KEY }}" ]; then
-            echo "::error::API_KEY secret is missing — keeping last good cache"
-            exit 1
-          fi
-          curl -s "http://api.aviationstack.com/v1/flights?access_key=${{ secrets.API_KEY }}&arr_iata=SOF" > new-cache.json
-          # Валидация: да не commit-ваме грешка вместо данни
-          python3 -c "
-          import json,sys
-          d=json.load(open('new-cache.json'))
-          if 'error' in d: print('API error:', d['error']); sys.exit(1)
-          if not d.get('data'): print('Empty data'); sys.exit(1)
-          print('OK:', len(d['data']), 'flights')"
-          mv new-cache.json flight-cache.json
+          curl -s --max-time 40 "https://mvr-proxy.mihov-emil.workers.dev/flights/SOF" -o /tmp/new.json
+          python3 - <<'EOF'
+          import json, re, sys
+          raw = json.load(open('/tmp/new.json'))
+          if not raw.get('ok'):
+              print('worker error:', raw); sys.exit(1)
+          def iso(t):
+              # "2026-07-20 08:05+03:00" -> "2026-07-20T08:05:00+03:00"
+              if not t: return None
+              t = t.strip().replace(' ', 'T', 1)
+              m = re.match(r'^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})(\+\d{2}:\d{2}|Z)?$', t)
+              if m:
+                  return m.group(1) + ':00' + (m.group(2) or '+03:00')
+              return t
+          def status(s):
+              s = (s or '').lower()
+              if 'arriv' in s or 'landed' in s: return 'landed'
+              if 'cancel' in s: return 'cancelled'
+              if 'route' in s or 'approach' in s or 'expected' in s or 'active' in s: return 'active'
+              return 'scheduled'
+          data = []
+          for f in raw.get('arrivals', []):
+              sch = iso(f.get('scheduled'))
+              est = iso(f.get('revised'))
+              num = (f.get('number') or '').replace(' ', '')
+              data.append({
+                  'flight_date': (sch or '')[:10] or None,
+                  'flight_status': status(f.get('status')),
+                  'departure': {
+                      'airport': f.get('from'), 'timezone': None, 'iata': None, 'icao': None,
+                      'terminal': None, 'gate': None, 'delay': None,
+                      'scheduled': None, 'estimated': None, 'actual': None,
+                      'estimated_runway': None, 'actual_runway': None,
+                  },
+                  'arrival': {
+                      'airport': 'Sofia', 'timezone': 'Europe/Sofia', 'iata': 'SOF', 'icao': 'LBSF',
+                      'terminal': None, 'gate': None, 'baggage': None,
+                      'scheduled': sch, 'delay': None, 'estimated': est, 'actual': None,
+                      'estimated_runway': None, 'actual_runway': None,
+                  },
+                  'airline': {'name': f.get('airline'), 'iata': num[:2] or None, 'icao': None},
+                  'flight': {'number': num[2:] or None, 'iata': num or None, 'icao': None, 'codeshared': None},
+              })
+          out = {'pagination': {'limit': 100, 'offset': 0, 'count': len(data), 'total': len(data)},
+                 'data': data}
+          json.dump(out, open('flight-cache.json', 'w'), ensure_ascii=False)
+          print('flights:', len(data))
+          EOF
 
-      - name: Commit
+      - name: Commit if changed
         run: |
-          git config user.name "bot"
-          git config user.email "bot@github.com"
+          git config user.name "flights-bot"
+          git config user.email "flights-bot@users.noreply.github.com"
           git add flight-cache.json
-          git commit -m "update flights" || echo "no changes"
-          git push
+          git diff --cached --quiet || (git commit -m "update flights (AeroDataBox via mvr-proxy)" && git push)
