@@ -25,7 +25,6 @@ jobs:
           if not raw.get('ok'):
               print('worker error:', raw); sys.exit(1)
           def iso(t):
-              # "2026-07-20 08:05+03:00" -> "2026-07-20T08:05:00+03:00"
               if not t: return None
               t = t.strip().replace(' ', 'T', 1)
               m = re.match(r'^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})(\+\d{2}:\d{2}|Z)?$', t)
@@ -43,6 +42,7 @@ jobs:
               sch = iso(f.get('scheduled'))
               est = iso(f.get('revised'))
               num = (f.get('number') or '').replace(' ', '')
+              term = f.get('terminal')
               data.append({
                   'flight_date': (sch or '')[:10] or None,
                   'flight_status': status(f.get('status')),
@@ -54,7 +54,7 @@ jobs:
                   },
                   'arrival': {
                       'airport': 'Sofia', 'timezone': 'Europe/Sofia', 'iata': 'SOF', 'icao': 'LBSF',
-                      'terminal': None, 'gate': None, 'baggage': None,
+                      'terminal': term, 'gate': f.get('gate'), 'baggage': f.get('baggage'),
                       'scheduled': sch, 'delay': None, 'estimated': est, 'actual': None,
                       'estimated_runway': None, 'actual_runway': None,
                   },
@@ -64,7 +64,7 @@ jobs:
           out = {'pagination': {'limit': 100, 'offset': 0, 'count': len(data), 'total': len(data)},
                  'data': data}
           json.dump(out, open('flight-cache.json', 'w'), ensure_ascii=False)
-          print('flights:', len(data))
+          print('flights:', len(data), '| with terminal:', sum(1 for r in data if r['arrival']['terminal']))
           EOF
 
       - name: Commit if changed
@@ -72,4 +72,4 @@ jobs:
           git config user.name "flights-bot"
           git config user.email "flights-bot@users.noreply.github.com"
           git add flight-cache.json
-          git diff --cached --quiet || (git commit -m "update flights (AeroDataBox via mvr-proxy)" && git push)
+          git diff --cached --quiet || (git commit -m "update flights (AeroDataBox via mvr-proxy, with terminal)" && git push)
