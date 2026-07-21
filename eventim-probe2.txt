@@ -1,0 +1,4 @@
+OK  city page :: 200, 498049b | hints: ['api.eventim', '"@type"', 'fanticket']
+    '\n\n\n\n\n<!DOCTYPE html>\n<html lang="bg" dir="ltr">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>Събития в София на eventim.bg</title>\n<meta na'
+ERR public exploration API :: <urlopen error [Errno -2] Name or service not known>
+ERR public search API :: <urlopen error [Errno -2] Name or service not known>
