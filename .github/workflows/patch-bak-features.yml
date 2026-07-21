@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - '.github/workflows/patch-bak-features.yml'
+      - 'patch_features.py'
 
 permissions:
   contents: write
@@ -14,16 +15,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Apply feature patches with report
-        run: |
-          python3 patch_features.py || true
-        continue-on-error: true
-
-      - name: Write patcher
-        run: echo "placeholder"
+      - name: Apply feature patches (self-reporting)
+        run: python3 patch_features.py
 
       - name: Commit
         run: |
           git config user.name "feat-bot"; git config user.email "feat-bot@bak"
-          git add -A
-          git diff --cached --quiet || (git commit -m "BAK features + report" && git push)
+          git add app.js index.html patch-report.txt
+          git diff --cached --quiet || (git commit -m "BAK features: counter, dedupe, pools, rain (+report)" && git push)
