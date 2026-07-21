@@ -14,49 +14,54 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Probe concert data sources
+      - name: Probe Eventim + concert sources (fixed)
         run: |
           python3 - <<'PYEOF'
-          import urllib.request, json
-
-          UA = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/126 Safari/537.36',
-                'Accept': 'application/json, text/html'}
+          import urllib.request, urllib.parse, json, ssl
+          ctx = ssl.create_default_context()
+          ctx.check_hostname = False
+          ctx.verify_mode = ssl.CERT_NONE
+          UA = {'User-Agent': 'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/126 Mobile Safari/537.36',
+                'Accept': 'application/json, text/html', 'Accept-Language': 'bg,en'}
           rep = []
-
-          def probe(name, url, want_json=False):
+          def probe(name, url, js=False):
               try:
                   req = urllib.request.Request(url, headers=UA)
-                  r = urllib.request.urlopen(req, timeout=40)
+                  r = urllib.request.urlopen(req, timeout=45, context=ctx)
                   body = r.read()
-                  head = body[:400].decode('utf-8', errors='replace')
                   extra = ''
-                  if want_json:
+                  if js:
                       try:
                           d = json.loads(body)
-                          keys = list(d.keys())[:8] if isinstance(d, dict) else f'list[{len(d)}]'
-                          extra = f' | JSON OK, keys: {keys}'
-                          if isinstance(d, dict) and 'products' in d:
-                              extra += f" | products: {len(d['products'])}"
+                          if isinstance(d, dict):
+                              extra = ' | JSON keys: ' + str(list(d.keys())[:10])
+                          else:
+                              extra = f' | JSON list[{len(d)}]'
                       except Exception as e:
-                          extra = f' | not JSON: {e}'
+                          extra = ' | not JSON: ' + str(e)[:60]
                   rep.append(f'OK  {name} :: HTTP {r.status}, {len(body)}b{extra}')
-                  rep.append(f'    sample: {head[:250]!r}')
+                  rep.append('    ' + repr(body[:220].decode("utf-8", "replace")))
               except Exception as e:
-                  rep.append(f'ERR {name} :: {e}')
+                  rep.append(f'ERR {name} :: {str(e)[:120]}')
 
-          probe('Eventim exploration API',
-                'https://public.api.eventim.com/websearch/search-api/exploration/v2/productGroups?webId=web__eventim-bg&language=bg&city_names=%D0%A1%D0%BE%D1%84%D0%B8%D1%8F&page=1&sort=DateAsc&top=20',
-                want_json=True)
-          probe('Eventim.bg city page HTML',
-                'https://www.eventim.bg/bg/grad/sofiya-1/venues.html')
-          probe('НДК програма',
-                'https://www.ndk.bg/програма')
-          probe('НДК (латиница)',
-                'https://www.ndk.bg/program')
-          probe('Арена София',
-                'https://www.arenasofia.bg/events/')
-          probe('Bilet.bg',
-                'https://bilet.bg/bg/muzika')
+          city = urllib.parse.quote('софия')
+          # Публичният exploration API на Eventim (истинският, който сайтът ползва)
+          probe('Eventim exploration v2',
+                'https://public.api.eventim.com/websearch/search-api/exploration/v2/productGroups'
+                '?webId=web__eventim-bg&language=bg&sort=DateAsc&in_stock=true&top=30&page=1',
+                js=True)
+          probe('Eventim search v1',
+                'https://public.api.eventim.com/websearch/search-api/v1/products'
+                '?webId=web__eventim-bg&language=bg&sort=DateAsc&retable=true&top=30',
+                js=True)
+          probe('Eventim city HTML',
+                'https://www.eventim.bg/city/' + city + '-7510/')
+          probe('NDK program (encoded)',
+                'https://www.ndk.bg/' + urllib.parse.quote('програма'))
+          probe('bilet.bg music',
+                'https://bilet.bg/bg/kategorii/musica')
+          probe('grabo/eventim sitemap',
+                'https://www.eventim.bg/sitemap.xml')
 
           open('events-probe-report.txt', 'w', encoding='utf-8').write('\n'.join(rep) + '\n')
           print('\n'.join(rep))
@@ -66,4 +71,4 @@ jobs:
         run: |
           git config user.name probe-bot; git config user.email probe-bot@bak
           git add events-probe-report.txt
-          git commit -m "events source probe report" && git push
+          git commit -m "events probe v2 (fixed URLs, mobile UA, ssl bypass)" && git push
