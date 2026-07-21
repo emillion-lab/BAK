@@ -1,0 +1,6 @@
+ERR Eventim exploration API :: <urlopen error [Errno -2] Name or service not known>
+ERR Eventim.bg city page HTML :: The read operation timed out
+ERR НДК програма :: 'ascii' codec can't encode characters in position 5-12: ordinal not in range(128)
+ERR НДК (латиница) :: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1000)>
+ERR Арена София :: <urlopen error [Errno -3] Temporary failure in name resolution>
+ERR Bilet.bg :: HTTP Error 404: Not Found
