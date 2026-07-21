@@ -1,0 +1,120 @@
+name: patch-bak-features
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/patch-bak-features.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Apply feature patches
+        run: |
+          python3 - <<'PYEOF'
+          import re
+          src = open('app.js', encoding='utf-8').read()
+
+          # ── 1) Брояч "Сега излизат: N" над списъка с полети ──
+          anchor = "  const shownList = flTerm==='all' ? visible : visible.filter(f=>f.term===flTerm);"
+          assert src.count(anchor) == 1, 'shownList anchor'
+          counter = anchor + "\n" + (
+            "  const nowCnt = shownList.filter(f=>f._state==='now').length;\n"
+            "  html+=`<div style=\"display:flex;align-items:center;gap:8px;padding:8px 10px;margin-bottom:8px;border-radius:10px;"
+            "background:${nowCnt?'rgba(239,68,68,.18)':'rgba(255,255,255,.04)'};border:1px solid ${nowCnt?'#ef4444':'var(--border)'}\">"
+            "<span style=\"font-size:20px\">\U0001F534</span>"
+            "<span style=\"font-weight:900;font-size:16px;color:${nowCnt?'#ef4444':'var(--muted)'}\">"
+            "${nowCnt?('\u0421\u0435\u0433\u0430 \u0438\u0437\u043b\u0438\u0437\u0430\u0442: '+nowCnt+' \u043f\u043e\u043b\u0435\u0442'+(nowCnt===1?'':'\u0430')):'\u041d\u044f\u043c\u0430 \u0438\u0437\u043b\u0438\u0437\u0430\u0449\u0438 \u0432 \u043c\u043e\u043c\u0435\u043d\u0442\u0430'}</span></div>`;")
+          src = src.replace(anchor, counter)
+
+          # ── 2) Дедупликация Acibadem: маха стария 'tokuda' (зона + висящо събитие) ──
+          dup_zone = '  { id:"tokuda",         name:"Acibadem \u0422\u043e\u043a\u0443\u0434\u0430 (\u0431\u0443\u043b.\u041d.\u0412\u0430\u043f\u0446\u0430\u0440\u043e\u0432 51\u0411)",  icon:"\U0001F3E5", lat:42.6600, lng:23.3230, radius:160, type:"hospital",         wazeName:"Acibadem City Clinic \u0422\u043e\u043a\u0443\u0434\u0430 Sofia" },\n'
+          assert src.count(dup_zone) == 1, 'dup zone'
+          src = src.replace(dup_zone, '')
+          dup_ev = re.search(r'^\s*\{ zone:"tokuda",.*\},\n', src, re.M)
+          assert dup_ev, 'dup event'
+          src = src.replace(dup_ev.group(0), '')
+
+          # ── 3) Летни басейни: зони + следобедно изтичане ──
+          pool_anchor = '  { id:"acibadem_mladost",name:"Acibadem \u041c\u043b\u0430\u0434\u043e\u0441\u0442 (\u0426\u0430\u0440\u0438\u0433\u0440\u0430\u0434\u0441\u043a\u043e \u0448\u043e\u0441\u0435)",   icon:"\U0001F3E5", lat:42.6430, lng:23.3780, radius:160, type:"hospital",         wazeName:"Acibadem City Clinic \u041c\u043b\u0430\u0434\u043e\u0441\u0442 Sofia" },'
+          assert src.count(pool_anchor) == 1, 'pool anchor'
+          pools = pool_anchor + "\n" + (
+            '  { id:"pool_marialuiza", name:"\u0411\u0430\u0441\u0435\u0439\u043d \u041c\u0430\u0440\u0438\u044f \u041b\u0443\u0438\u0437\u0430 (\u0411\u043e\u0440\u0438\u0441\u043e\u0432\u0430 \u0433\u0440.) \u2600\u043b\u044f\u0442\u043e", icon:"\U0001F3CA", lat:42.6789, lng:23.3387, radius:220, type:"leisure", wazeName:"\u0411\u0430\u0441\u0435\u0439\u043d \u041c\u0430\u0440\u0438\u044f \u041b\u0443\u0438\u0437\u0430 \u0421\u043e\u0444\u0438\u044f" },\n'
+            '  { id:"pool_spartak",    name:"\u0411\u0430\u0441\u0435\u0439\u043d \u0421\u043f\u0430\u0440\u0442\u0430\u043a (\u042e\u0436\u0435\u043d \u043f\u0430\u0440\u043a) \u2600\u043b\u044f\u0442\u043e",       icon:"\U0001F3CA", lat:42.6752, lng:23.3196, radius:200, type:"leisure", wazeName:"\u0421\u043f\u043e\u0440\u0442\u0435\u043d \u043a\u043e\u043c\u043f\u043b\u0435\u043a\u0441 \u0421\u043f\u0430\u0440\u0442\u0430\u043a \u0421\u043e\u0444\u0438\u044f" },\n'
+            '  { id:"pool_diana",      name:"\u0411\u0430\u0441\u0435\u0439\u043d\u0438 \u0414\u0438\u0430\u043d\u0430 (\u0414\u0438\u0430\u043d\u0430\u0431\u0430\u0434) \u2600\u043b\u044f\u0442\u043e",            icon:"\U0001F3CA", lat:42.6586, lng:23.3555, radius:220, type:"leisure", wazeName:"\u0411\u0430\u0441\u0435\u0439\u043d \u0414\u0438\u0430\u043d\u0430 \u0421\u043e\u0444\u0438\u044f" },\n'
+            '  { id:"pool_akademika",  name:"\u0411\u0430\u0441\u0435\u0439\u043d \u0410\u043a\u0430\u0434\u0435\u043c\u0438\u043a\u0430 (4-\u0442\u0438 \u043a\u043c) \u2600\u043b\u044f\u0442\u043e",          icon:"\U0001F3CA", lat:42.6668, lng:23.3696, radius:200, type:"leisure", wazeName:"\u0421\u043f\u043e\u0440\u0442\u0435\u043d \u0446\u0435\u043d\u0442\u044a\u0440 \u0410\u043a\u0430\u0434\u0435\u043c\u0438\u043a\u0430 \u0421\u043e\u0444\u0438\u044f" },')
+          src = src.replace(pool_anchor, pools)
+
+          w_anchor = '  acibadem_tokuda:0.8,'
+          assert src.count(w_anchor) == 1, 'weights anchor'
+          src = src.replace(w_anchor, '  pool_marialuiza:0.5, pool_spartak:0.5, pool_diana:0.5, pool_akademika:0.4,\n' + w_anchor)
+
+          ev_anchor = re.search(r'^\s*\{ zone:"acibadem_tokuda",\s*name:"Acibadem \u0422\u043e\u043a\u0443\u0434\u0430 \u2013 \u043f\u0440\u0435\u0433\u043b\u0435\u0434\u0438",.*\},\n', src, re.M)
+          assert ev_anchor, 'events anchor'
+          pool_events = (
+            '  { zone:"pool_marialuiza", name:"\u0411\u0430\u0441\u0435\u0439\u043d \u041c\u0430\u0440\u0438\u044f \u041b\u0443\u0438\u0437\u0430 \u2013 \u043b\u044f\u0442\u043d\u043e \u0438\u0437\u0442\u0438\u0447\u0430\u043d\u0435", endHour:18.5, boost:1.6, repeat:"daily" },\n'
+            '  { zone:"pool_spartak",    name:"\u0411\u0430\u0441\u0435\u0439\u043d \u0421\u043f\u0430\u0440\u0442\u0430\u043a \u2013 \u043b\u044f\u0442\u043d\u043e \u0438\u0437\u0442\u0438\u0447\u0430\u043d\u0435",    endHour:18.5, boost:1.5, repeat:"daily" },\n'
+            '  { zone:"pool_diana",      name:"\u0411\u0430\u0441\u0435\u0439\u043d\u0438 \u0414\u0438\u0430\u043d\u0430 \u2013 \u043b\u044f\u0442\u043d\u043e \u0438\u0437\u0442\u0438\u0447\u0430\u043d\u0435",       endHour:19.0, boost:1.5, repeat:"daily" },\n'
+            '  { zone:"pool_akademika",  name:"\u0411\u0430\u0441\u0435\u0439\u043d \u0410\u043a\u0430\u0434\u0435\u043c\u0438\u043a\u0430 \u2013 \u043b\u044f\u0442\u043d\u043e \u0438\u0437\u0442\u0438\u0447\u0430\u043d\u0435",  endHour:18.0, boost:1.4, repeat:"daily" },\n')
+          src = src.replace(ev_anchor.group(0), pool_events + ev_anchor.group(0))
+
+          # ── 4) Дъжд-аларма (Open-Meteo 15-мин) — само добавен код в края ──
+          rain = '''
+
+// ------ Дъжд-аларма: Open-Meteo 15-мин прогноза (най-важното за таксиметров шофьор) ------
+(function(){
+  async function checkRain(){
+    try{
+      const r=await fetch('https://api.open-meteo.com/v1/forecast?latitude=42.6977&longitude=23.3219&minutely_15=precipitation&forecast_hours=4&timezone=Europe%2FSofia');
+      const d=await r.json();
+      const t=(d.minutely_15&&d.minutely_15.time)||[], p=(d.minutely_15&&d.minutely_15.precipitation)||[];
+      const now=Date.now();
+      let hit=null, stop=null;
+      for(let i=0;i<t.length;i++){
+        const ts=new Date(t[i]).getTime();
+        if(ts<now-15*60000) continue;
+        if(p[i]>=0.1 && !hit) hit={ts:ts};
+        else if(hit && p[i]<0.1){ stop=ts; break; }
+      }
+      let el=document.getElementById('rain-banner');
+      if(!hit){ if(el) el.remove(); return; }
+      const hhmm=x=>new Date(x).toLocaleTimeString('bg',{hour:'2-digit',minute:'2-digit'});
+      const started=hit.ts<=now;
+      const txt=started
+        ? '\\u{1F327}\\uFE0F Вали сега'+(stop?(' до ~'+hhmm(stop)):'')+' — търсенето расте'
+        : '\\u{1F327}\\uFE0F Дъжд около '+hhmm(hit.ts)+(stop?(' до '+hhmm(stop)):'');
+      if(!el){
+        el=document.createElement('div');
+        el.id='rain-banner';
+        el.style.cssText='position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:9999;background:rgba(30,58,138,.92);color:#dbeafe;font-weight:900;font-size:15px;padding:9px 16px;border-radius:12px;border:1px solid #3b82f6;box-shadow:0 4px 14px rgba(0,0,0,.4);pointer-events:none;white-space:nowrap';
+        document.body.appendChild(el);
+      }
+      el.textContent=txt;
+    }catch(e){}
+  }
+  checkRain();
+  setInterval(checkRain, 15*60000);
+})();
+'''
+          src = src + rain
+
+          open('app.js', 'w', encoding='utf-8').write(src)
+          print('all feature patches applied')
+
+          idx = open('index.html', encoding='utf-8').read()
+          idx = re.sub(r'app\\.js\\?v=[0-9a-z]+', 'app.js?v=20260720ui3', idx)
+          open('index.html', 'w', encoding='utf-8').write(idx)
+          print('cache-buster ui3')
+          PYEOF
+          node -c app.js && echo "JS syntax OK"
+
+      - name: Commit
+        run: |
+          git config user.name "feat-bot"; git config user.email "feat-bot@users.noreply.github.com"
+          git add app.js index.html
+          git diff --cached --quiet || (git commit -m "BAK: exiting-now counter, Acibadem dedupe, summer pools, rain nowcast banner" && git push)
