@@ -1,6 +1,8 @@
-ERR Eventim exploration API :: <urlopen error [Errno -2] Name or service not known>
-ERR Eventim.bg city page HTML :: The read operation timed out
-ERR НДК програма :: 'ascii' codec can't encode characters in position 5-12: ordinal not in range(128)
-ERR НДК (латиница) :: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1000)>
-ERR Арена София :: <urlopen error [Errno -3] Temporary failure in name resolution>
-ERR Bilet.bg :: HTTP Error 404: Not Found
+ERR Eventim exploration v2 :: <urlopen error [Errno -2] Name or service not known>
+ERR Eventim search v1 :: <urlopen error [Errno -2] Name or service not known>
+OK  Eventim city HTML :: HTTP 200, 498049b
+    '\n\n\n\n\n<!DOCTYPE html>\n<html lang="bg" dir="ltr">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>Събития в София на eventim.bg</title>\n<meta name="d'
+ERR NDK program (encoded) :: HTTP Error 404: Not Found
+ERR bilet.bg music :: HTTP Error 404: Not Found
+OK  grabo/eventim sitemap :: HTTP 200, 472640b
+    '\n\n\n\n\n<!DOCTYPE html>\n<html lang="bg" dir="ltr">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>Билети за концерти, фестивали, театъ'
