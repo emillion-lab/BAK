@@ -73,7 +73,6 @@ const ZONES = [
   { id:"pirogov",        name:"УМБАЛ Пирогов (бул.Тотлебен 21)",        icon:"🏥", lat:42.6933, lng:23.3177, radius:190, type:"hospital",         wazeName:"УМБАЛСМ Пирогов бул Тотлебен 21 София" },
   { id:"alexand",        name:"Александровска болница",                 icon:"🏥", lat:42.6958, lng:23.3093, radius:190, type:"hospital",         wazeName:"УМБАЛ Александровска болница София" },
   { id:"vma",            name:"ВМА (бул.Св.Георги Софийски 3)",         icon:"🏥", lat:42.6856, lng:23.3192, radius:170, type:"hospital",         wazeName:"ВМА Военномедицинска академия София" },
-  { id:"tokuda",         name:"Acibadem Токуда (бул.Н.Вапцаров 51Б)",  icon:"🏥", lat:42.6600, lng:23.3230, radius:160, type:"hospital",         wazeName:"Acibadem City Clinic Токуда Sofia" },
   { id:"sv_anna",        name:"УМБАЛ Света Анна",                       icon:"🏥", lat:42.6618, lng:23.3732, radius:160, type:"hospital",         wazeName:"УМБАЛ Света Анна Sofia" },
   { id:"sv_ekaterina",   name:"УМБАЛ Света Екатерина",                  icon:"🏥", lat:42.6856, lng:23.3148, radius:160, type:"hospital",         wazeName:"УМБАЛ Света Екатерина Sofia" },
   { id:"acibadem_ortho", name:"Acibadem Ортопедия (Околовръстен 127)", icon:"🏥", lat:42.6355, lng:23.3510, radius:150, type:"hospital",         wazeName:"Acibadem Ортопедия Околовръстен Sofia" },
@@ -127,6 +126,10 @@ const ZONES = [
   { id:"acibadem_tokuda",name:"Acibadem Токуда (бул.Н.Вапцаров 51Б)",  icon:"🏥", lat:42.6600, lng:23.3230, radius:160, type:"hospital",         wazeName:"Acibadem City Clinic Токуда Sofia" },
   { id:"acibadem_cardio",name:"Acibadem Сърдечно-съдов (бул.Н.Вапцаров 53)",icon:"🏥",lat:42.6593,lng:23.3225,radius:140,type:"hospital",       wazeName:"Acibadem City Clinic Сърдечно-съдов Sofia" },
   { id:"acibadem_mladost",name:"Acibadem Младост (Цариградско шосе)",   icon:"🏥", lat:42.6430, lng:23.3780, radius:160, type:"hospital",         wazeName:"Acibadem City Clinic Младост Sofia" },
+  { id:"pool_marialuiza", name:"Басейн Мария Луиза (Борисова гр.) ☀лято", icon:"🏊", lat:42.6789, lng:23.3387, radius:220, type:"leisure", wazeName:"Басейн Мария Луиза София" },
+  { id:"pool_spartak",    name:"Басейн Спартак (Южен парк) ☀лято",        icon:"🏊", lat:42.6752, lng:23.3196, radius:200, type:"leisure", wazeName:"Спортен комплекс Спартак София" },
+  { id:"pool_diana",      name:"Басейни Диана (Дианабад) ☀лято",          icon:"🏊", lat:42.6586, lng:23.3555, radius:220, type:"leisure", wazeName:"Басейн Диана София" },
+  { id:"pool_akademika",  name:"Басейн Академика (4-ти км) ☀лято",        icon:"🏊", lat:42.6668, lng:23.3696, radius:200, type:"leisure", wazeName:"Спортен център Академика София" },
   { id:"sv_ekaterina",   name:"УМБАЛ Света Екатерина",                  icon:"🏥", lat:42.6856, lng:23.3148, radius:160, type:"hospital",         wazeName:"УМБАЛ Света Екатерина Sofia" },
   { id:"lozenets_h",     name:"УБ Лозенец (към СУ)",                    icon:"🏥", lat:42.6748, lng:23.3307, radius:150, type:"hospital",         wazeName:"Университетска болница Лозенец Sofia" },
   { id:"kardiologia",    name:"Национална кардиологична болница",       icon:"🏥", lat:42.6882, lng:23.3262, radius:150, type:"hospital",         wazeName:"Национална кардиологична болница Sofia" },
@@ -156,6 +159,7 @@ const BASE = {
   cinema_city_ml:0.3, cinema_city_ser:0.3, cinema_arena:0.3, cineland:0.3, dom_kinoto:0.2,
   vitosha_bar:0.6, lozenets_rest:0.5, center_bars:0.5,
   pirogov:1.0, alexand:0.9, vma:0.8, tokuda:0.7, sv_anna:0.7,
+  pool_marialuiza:0.5, pool_spartak:0.5, pool_diana:0.5, pool_akademika:0.4,
   acibadem_tokuda:0.8, acibadem_cardio:0.7, acibadem_mladost:0.7, acibadem_ortho:0.6,
   sv_ekaterina:0.7, lozenets_h:0.6, kardiologia:0.6, sv_sofia_h:0.6, isul:0.8,
   unss:0.5, nbu:0.4, tu:0.4, su:0.5, studentski:0.6,
@@ -218,7 +222,6 @@ const EVENTS = [
   { zone:"pirogov",      name:"Пирогов – прегледи",             endHour:9.0,  boost:1.4, repeat:"daily" },
   { zone:"pirogov",      name:"Пирогов – вечерни посещения",    endHour:18.5, boost:1.2, repeat:"daily" },
   { zone:"alexand",      name:"Александровска – прегледи",      endHour:9.0,  boost:1.3, repeat:"daily" },
-  { zone:"tokuda",       name:"Токуда – прегледи",              endHour:9.0,  boost:1.1, repeat:"daily" },
   { zone:"sv_anna",      name:"Св.Анна – прегледи",             endHour:9.0,  boost:1.1, repeat:"daily" },
   { zone:"isul",         name:"ИСУЛ – прегледи",                endHour:9.0,  boost:1.1, repeat:"daily" },
 
@@ -265,6 +268,10 @@ const EVENTS = [
   { zone:"center_bars",  name:"Центъра – след клуб",            endHour:24.0, boost:2.2, repeat:"fri-sat" },
 
   // Допълнителни болници
+  { zone:"pool_marialuiza", name:"Басейн Мария Луиза – лятно изтичане", endHour:18.5, boost:1.6, repeat:"daily" },
+  { zone:"pool_spartak",    name:"Басейн Спартак – лятно изтичане",    endHour:18.5, boost:1.5, repeat:"daily" },
+  { zone:"pool_diana",      name:"Басейни Диана – лятно изтичане",     endHour:19.0, boost:1.5, repeat:"daily" },
+  { zone:"pool_akademika",  name:"Басейн Академика – лятно изтичане",  endHour:18.0, boost:1.4, repeat:"daily" },
   { zone:"acibadem_tokuda",  name:"Acibadem Токуда – прегледи",        endHour:9.0,  boost:1.1, repeat:"daily" },
   { zone:"acibadem_cardio",  name:"Acibadem Сърдечно-съдов – прегледи",endHour:9.0,  boost:1.0, repeat:"daily" },
   { zone:"acibadem_mladost", name:"Acibadem Младост – прегледи",       endHour:9.0,  boost:1.1, repeat:"daily" },
@@ -800,6 +807,14 @@ function showAirportSchedule() {
   html+='</div>';
 
   const shownList = flTerm==='all' ? visible : visible.filter(f=>f.term===flTerm);
+  const nowCnt = shownList.filter(f=>f._state==='now').length;
+  html+='<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;margin-bottom:8px;border-radius:10px;'
+    +'background:'+(nowCnt?'rgba(239,68,68,.18)':'rgba(255,255,255,.04)')+';'
+    +'border:1px solid '+(nowCnt?'#ef4444':'var(--border)')+'">'
+    +'<span style="font-size:20px">🔴</span>'
+    +'<span style="font-weight:900;font-size:16px;color:'+(nowCnt?'#ef4444':'var(--muted)')+'">'
+    +(nowCnt?('Сега излизат: '+nowCnt+' полет'+(nowCnt===1?'':'а')):'Няма излизащи в момента')
+    +'</span></div>';
   html+='<div id="fl-scroll" style="max-height:48vh;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-right:2px">';
   let anchorSet = false;
   {
@@ -1724,3 +1739,39 @@ function toggleMapView(){
   if(btn) btn.textContent = listView ? '🗺️ Карта' : '📋 Списък';
   if(!listView && window.map) setTimeout(()=>map.invalidateSize(), 100);
 }
+
+
+// ------ Дъжд-аларма: Open-Meteo 15-мин прогноза ------
+(function(){
+  async function checkRain(){
+    try{
+      const r=await fetch('https://api.open-meteo.com/v1/forecast?latitude=42.6977&longitude=23.3219&minutely_15=precipitation&forecast_hours=4&timezone=Europe%2FSofia');
+      const d=await r.json();
+      const t=(d.minutely_15&&d.minutely_15.time)||[], p=(d.minutely_15&&d.minutely_15.precipitation)||[];
+      const now=Date.now();
+      let hit=null, stop=null;
+      for(let i=0;i<t.length;i++){
+        const ts=new Date(t[i]).getTime();
+        if(ts<now-15*60000) continue;
+        if(p[i]>=0.1 && !hit) hit={ts:ts};
+        else if(hit && p[i]<0.1){ stop=ts; break; }
+      }
+      let el=document.getElementById('rain-banner');
+      if(!hit){ if(el) el.remove(); return; }
+      const hhmm=function(x){return new Date(x).toLocaleTimeString('bg',{hour:'2-digit',minute:'2-digit'});};
+      const started=hit.ts<=now;
+      const txt=started
+        ? ('🌧️ Вали сега'+(stop?(' до ~'+hhmm(stop)):'')+' — търсенето расте')
+        : ('🌧️ Дъжд около '+hhmm(hit.ts)+(stop?(' до '+hhmm(stop)):''));
+      if(!el){
+        el=document.createElement('div');
+        el.id='rain-banner';
+        el.style.cssText='position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:9999;background:rgba(30,58,138,.92);color:#dbeafe;font-weight:900;font-size:15px;padding:9px 16px;border-radius:12px;border:1px solid #3b82f6;box-shadow:0 4px 14px rgba(0,0,0,.4);pointer-events:none;white-space:nowrap';
+        document.body.appendChild(el);
+      }
+      el.textContent=txt;
+    }catch(e){}
+  }
+  checkRain();
+  setInterval(checkRain, 15*60000);
+})();

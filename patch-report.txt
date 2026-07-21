@@ -1,0 +1,7 @@
+OK   counter
+OK   dedupe tokuda
+OK   pools zones
+OK   pools weights
+OK   pools events
+OK   rain banner
+OK   node --check + записано, cache-bust ui3
