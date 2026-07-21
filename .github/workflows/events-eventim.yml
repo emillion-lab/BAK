@@ -16,27 +16,34 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Scrape Eventim Sofia
+      - name: Scrape Eventim Sofia THROUGH mvr-proxy (retry + cache)
         run: |
           python3 - <<'PYEOF'
-          import urllib.request, urllib.parse, json, re, datetime, ssl, html as H, traceback
+          import urllib.request, urllib.parse, json, re, datetime, html as H, traceback, time
           rep = []
           try:
-              ctx = ssl.create_default_context(); ctx.check_hostname=False; ctx.verify_mode=ssl.CERT_NONE
-              UA = {'User-Agent':'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/126 Mobile Safari/537.36','Accept-Language':'bg'}
-              url = 'https://www.eventim.bg/city/' + urllib.parse.quote('софия') + '-7510/'
-              html = urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=60, context=ctx).read().decode('utf-8','replace')
-              rep.append('HTML: %d байта' % len(html))
+              target = 'https://www.eventim.bg/city/' + urllib.parse.quote('софия') + '-7510/'
+              proxy = 'https://mvr-proxy.mihov-emil.workers.dev/scrape?url=' + urllib.parse.quote(target, safe='')
+              html = None
+              for attempt in range(4):
+                  try:
+                      req = urllib.request.Request(proxy, headers={'User-Agent':'gh-runner'})
+                      html = urllib.request.urlopen(req, timeout=70).read().decode('utf-8','replace')
+                      if len(html) > 2000:
+                          rep.append(f'опит {attempt+1}: OK {len(html)} байта'); break
+                      rep.append(f'опит {attempt+1}: кратко ({len(html)}b), пробвам пак')
+                  except Exception as e:
+                      rep.append(f'опит {attempt+1}: {str(e)[:80]}')
+                  time.sleep(8)
+              if not html or len(html) < 2000:
+                  raise RuntimeError('proxy не върна пълна страница след 4 опита')
 
               events = []
-              ld = re.findall(r'<script[^>]+application/ld\+json[^>]*>(.*?)</script>', html, re.S)
-              rep.append('JSON-LD блокове: %d' % len(ld))
-              for blk in ld:
+              for blk in re.findall(r'<script[^>]+application/ld\+json[^>]*>(.*?)</script>', html, re.S):
                   try: d = json.loads(blk.strip())
                   except Exception: continue
-                  items = d if isinstance(d, list) else [d]
-                  for it in items:
-                      if isinstance(it, dict) and ('startDate' in it or it.get('@type','').endswith('Event')):
+                  for it in (d if isinstance(d, list) else [d]):
+                      if isinstance(it, dict) and ('startDate' in it or str(it.get('@type','')).endswith('Event')):
                           loc = it.get('location') or {}
                           if isinstance(loc, list): loc = loc[0] if loc else {}
                           events.append({
@@ -45,31 +52,25 @@ jobs:
                               'venue': (loc.get('name') if isinstance(loc, dict) else '') or '',
                               'url': it.get('url') or '',
                           })
-
-              # Fallback: имена + дати от вградения JSON на страницата
+              rep.append('JSON-LD събития: %d' % len(events))
               if not events:
                   names = re.findall(r'"(?:productName|headline|name|title)":"([^"\\]{5,70})"', html)
-                  dates = re.findall(r'"(?:startDate|date|eventDate)":"(20\d\d-\d\d-\d\dT?[\d:]*)"', html)
-                  rep.append('fallback: %d имена, %d дати' % (len(names), len(dates)))
-                  rep.append('първи имена: ' + str(names[:8]))
+                  rep.append('fallback имена: %d :: %s' % (len(names), names[:8]))
                   rep.append('script id-та: ' + str(re.findall(r'<script[^>]*id="([^"]+)"', html)[:12]))
 
               seen, out = set(), []
               for e in events:
                   if not e.get('start'): continue
-                  k = (e['t'], e['start'])
+                  k=(e['t'],e['start'])
                   if k in seen: continue
                   seen.add(k); out.append(e)
-
               today = datetime.date.today()
               json.dump({'source':'eventim.bg','date':str(today),'count':len(out),'events':out},
                         open('eventim.json','w',encoding='utf-8'), ensure_ascii=False, indent=1)
-              rep.append('ЗАПИСАНИ събития: %d' % len(out))
-              for e in out[:20]:
-                  rep.append('  %s  %s @ %s' % (e['start'], e['t'], e['venue']))
+              rep.append('ЗАПИСАНИ: %d' % len(out))
+              for e in out[:20]: rep.append('  %s  %s @ %s' % (e['start'], e['t'], e['venue']))
           except Exception as ex:
-              rep.append('EXCEPTION: ' + repr(ex))
-              rep.append(traceback.format_exc()[:800])
+              rep.append('EXCEPTION: '+repr(ex)); rep.append(traceback.format_exc()[:600])
           open('eventim-report.txt','w',encoding='utf-8').write('\n'.join(rep)+'\n')
           print('\n'.join(rep))
           PYEOF
@@ -78,5 +79,5 @@ jobs:
         run: |
           git config user.name eventim-bot; git config user.email eventim-bot@bak
           git add -A
-          git commit -m "eventim scrape + report" || echo "nothing to commit"
-          git push || echo "nothing to push"
+          git commit -m "eventim via proxy + report" || echo "nothing"
+          git push || echo "nothing"
