@@ -19,53 +19,53 @@ jobs:
       - name: Scrape today's Sofia theatre program
         run: |
           python3 - <<'PYEOF'
-          import urllib.request, re, json, datetime
+          import urllib.request, re, json, datetime, html as H
           today = datetime.date.today()
           url = f'https://theatre.art.bg/calendar.php?date={today}&city=20'
           req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
           raw = urllib.request.urlopen(req, timeout=40).read()
-          html = raw.decode('windows-1251', errors='replace')
+          page = H.unescape(raw.decode('windows-1251', errors='replace'))
 
           VENUES = {
-            'Народен театър': (42.6946, 23.3247),
-            'Иван Вазов': (42.6946, 23.3247),
-            'Сатиричен': (42.6975, 23.3289),
-            'Театър 199': (42.6902, 23.3252),
-            'Сълза и смях': (42.6939, 23.3260),
-            'Българска армия': (42.6989, 23.3247),
-            'Зад канала': (42.6923, 23.3457),
-            'Възраждане': (42.7005, 23.3120),
-            'Младежки': (42.6975, 23.3345),
-            'Театър София': (42.6935, 23.3420),
+            'НАРОДЕН ТЕАТЪР': (42.6946, 23.3247),
+            'ИВАН ВАЗОВ': (42.6946, 23.3247),
+            'САТИРИЧЕН': (42.6975, 23.3289),
+            'ТЕАТЪР 199': (42.6902, 23.3252),
+            'СЪЛЗА И СМЯХ': (42.6939, 23.3260),
+            'БЪЛГАРСКА АРМИЯ': (42.6989, 23.3247),
+            'ЗАД КАНАЛА': (42.6923, 23.3457),
+            'ВЪЗРАЖДАНЕ': (42.7005, 23.3120),
+            'МЛАДЕЖКИ': (42.6975, 23.3345),
+            'ТЕАТЪР СОФИЯ': (42.6935, 23.3420),
             'НДК': (42.6852, 23.3190),
-            'Сити Марк': (42.6938, 23.3452),
-            'City Mark': (42.6938, 23.3452),
-            'Théatro': (42.6913, 23.3229),
-            'Theatro': (42.6913, 23.3229),
-            'Открита сцена': (42.6939, 23.3260),
+            'СИТИ МАРК': (42.6938, 23.3452),
+            'CITY MARK': (42.6938, 23.3452),
+            'THEATRO': (42.6913, 23.3229),
+            'ОТКРИТА СЦЕНА': (42.6939, 23.3260),
           }
-          DUR = 110  # типична пиеса ~1:50
-          EARLY = 12  # пристигане 12 мин преди края
+          DUR = 110   # типична пиеса ~1:50
+          EARLY = 12  # цел за пристигане: 12 мин преди края
 
-          text = re.sub(r'<[^>]+>', '|', html)
+          text = re.sub(r'<[^>]+>', '|', page)
           text = re.sub(r'\|+', '|', text)
+          up = text.upper()
           events, seen = [], set()
-          for m in re.finditer(r'(\d{1,2})[.:](\d{2})\s*час', text):
+          for m in re.finditer(r'(\d{1,2})[.:](\d{2})\s*час', text, re.I):
               h, mi = int(m.group(1)), int(m.group(2))
-              ctx = text[max(0, m.start()-260):m.end()+260]
+              lo, hi = max(0, m.start()-300), m.end()+300
+              ctx_up = up[lo:hi]
               venue, coords = None, None
               for k, c in VENUES.items():
-                  if k in ctx:
-                      venue, coords = k, c
+                  if k in ctx_up:
+                      venue, coords = k.title(), c
                       break
               if not venue:
                   continue
-              before = text[max(0, m.start()-260):m.start()]
-              parts = [p.strip() for p in before.split('|') if 3 < len(p.strip()) < 80]
-              title = parts[-1] if parts else '?'
-              if re.match(r'^\d', title) and len(parts) > 1:
-                  title = parts[-2]
-              key = (title, h, mi)
+              before = text[lo:m.start()]
+              parts = [p.strip() for p in before.split('|') if 3 < len(p.strip()) < 80 and 'час' not in p]
+              parts = [p for p in parts if not re.match(r'^[\d\s.:]+$', p)]
+              title = parts[-1].strip() if parts else '?'
+              key = (title.upper(), h, mi)
               if key in seen:
                   continue
               seen.add(key)
@@ -74,7 +74,8 @@ jobs:
               tgt = end - EARLY
               fmt = lambda x: f'{(x//60)%24:02d}:{x%60:02d}'
               events.append({
-                  't': title[:60], 'v': venue,
+                  't': title[:60].title() if title.isupper() else title[:60],
+                  'v': venue,
                   'lat': coords[0], 'lng': coords[1],
                   'start': fmt(start), 'end': fmt(end), 'target': fmt(tgt),
               })
@@ -87,7 +88,8 @@ jobs:
           for e in events:
               rep.append(f"  {e['start']} {e['t']} @ {e['v']} → край ~{e['end']}, цел {e['target']}")
           if not events:
-              rep.append('RAW SAMPLE (за дебъг): ' + repr(text[text.find('час')-300:text.find('час')+100])[:500])
+              i = text.find('час')
+              rep.append('RAW SAMPLE: ' + repr(text[max(0,i-300):i+120])[:500])
           open('events-report.txt', 'w', encoding='utf-8').write('\n'.join(rep) + '\n')
           print('\n'.join(rep))
           PYEOF
