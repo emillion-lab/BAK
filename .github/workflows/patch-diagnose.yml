@@ -1,0 +1,41 @@
+name: patch-diagnose
+on:
+  push:
+    paths:
+      - '.github/workflows/patch-diagnose.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test anchors
+        run: |
+          python3 - <<'PYEOF'
+          import re
+          src = open('app.js', encoding='utf-8').read()
+          rep = []
+          def t(label, cnt): rep.append(f"{label}: {cnt}")
+
+          t('shownList anchor', src.count("  const shownList = flTerm==='all' ? visible : visible.filter(f=>f.term===flTerm);"))
+          m = re.findall(r'^.*id:"tokuda".*$', src, re.M)
+          rep.append('tokuda zone line repr: ' + (repr(m[0][:120]) if m else 'NONE'))
+          m2 = re.findall(r'^.*id:"acibadem_mladost".*$', src, re.M)
+          rep.append('mladost line repr: ' + (repr(m2[0][:120]) if m2 else 'NONE'))
+          t('weights anchor', src.count('  acibadem_tokuda:0.8,'))
+          m3 = re.findall(r'^.*zone:"acibadem_tokuda".*$', src, re.M)
+          rep.append('tokuda events: ' + ' || '.join(repr(x[:100]) for x in m3[:3]))
+          m4 = re.findall(r'^.*zone:"tokuda".*$', src, re.M)
+          rep.append('old tokuda event: ' + (repr(m4[0][:100]) if m4 else 'NONE'))
+          open('patch-diag.txt', 'w', encoding='utf-8').write('\n'.join(rep))
+          print('\n'.join(rep))
+          PYEOF
+      - name: Commit report
+        run: |
+          git config user.name diag; git config user.email diag@bak
+          git add patch-diag.txt
+          git commit -m "diag report [skip]" && git push
