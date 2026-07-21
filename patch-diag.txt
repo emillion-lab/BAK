@@ -1,0 +1,6 @@
+shownList anchor: 1
+tokuda zone line repr: '  { id:"tokuda",         name:"Acibadem Токуда (бул.Н.Вапцаров 51Б)",  icon:"🏥", lat:42.6600, lng:23.3230, radius:160, t'
+mladost line repr: '  { id:"acibadem_mladost",name:"Acibadem Младост (Цариградско шосе)",   icon:"🏥", lat:42.6430, lng:23.3780, radius:160, '
+weights anchor: 1
+tokuda events: '  { zone:"acibadem_tokuda",  name:"Acibadem Токуда – прегледи",        endHour:9.0,  boost:1.1, repe' || '  { zone:"acibadem_tokuda",  name:"Acibadem Токуда – вечерни",         endHour:18.5, boost:1.0, repe'
+old tokuda event: '  { zone:"tokuda",       name:"Токуда – прегледи",              endHour:9.0,  boost:1.1, repeat:"dai'
