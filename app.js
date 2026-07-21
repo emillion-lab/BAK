@@ -373,6 +373,8 @@ function computeScores(hour) {
     });
   }
   if (dz<1) ZONES.forEach(z => { if(z.id!=='airport') scores[z.id]*=(0.7+0.3*dz); });
+  // Летищна вълна: излизащи полети вдигат скора на летището (силно — 10 полета≈3.6)
+  try{ var _ax = window.__airportExiting|0; if(_ax>0 && scores['airport']!==undefined){ scores['airport'] += Math.min(4.0, _ax*0.36); } }catch(e){}
   return {scores, activeEvents};
 }
 
@@ -808,6 +810,7 @@ function showAirportSchedule() {
 
   const shownList = flTerm==='all' ? visible : visible.filter(f=>f.term===flTerm);
   const nowCnt = shownList.filter(f=>f._state==='now').length;
+  try{ window.__airportExiting = visible.filter(f=>f._state==='now').length; }catch(e){}
   html+='<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;margin-bottom:8px;border-radius:10px;'
     +'background:'+(nowCnt?'rgba(239,68,68,.18)':'rgba(255,255,255,.04)')+';'
     +'border:1px solid '+(nowCnt?'#ef4444':'var(--border)')+'">'
@@ -1053,7 +1056,7 @@ function updateDirectionHint(scores) {
   if(userLat===null||dirHintSuppressed) return;
   let best=null,bestW=Infinity;
   ZONES.forEach(z=>{
-    const s=scores[z.id]||0; if(s<1.6) return;
+    const s=scores[z.id]||0; if(s<1.3) return;
     const d=haversine(userLat,userLng,z.lat,z.lng);
     const w=d/(s*s);
     if(w<bestW){bestW=w;best=z;}
@@ -1072,7 +1075,7 @@ function updateDirectionHint(scores) {
   const distTxt=dist<1000?`${Math.round(dist)} м`:`${(dist/1000).toFixed(1)} км`;
   document.getElementById('dh-arrow').textContent=ARROWS[Math.round(relBear/45)%8];
   document.getElementById('dh-name').textContent=`${best.icon} ${best.name}`;
-  document.getElementById('dh-addr').textContent=`${DIRS[Math.round(bear/45)%8]} · ${distTxt}`;
+  document.getElementById('dh-addr').textContent=`\u{1F697} Карай ${DIRS[Math.round(bear/45)%8]} · ${distTxt} · скор ${bs.toFixed(1)}`;
   document.getElementById('dh-score').textContent=bs.toFixed(1);
   document.getElementById('dh-score').style.color=c.fill;
   panel.style.display='block';
