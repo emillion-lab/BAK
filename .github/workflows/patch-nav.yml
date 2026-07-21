@@ -1,0 +1,22 @@
+name: patch-nav
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'patch_nav.py'
+      - '.github/workflows/patch-nav.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 patch_nav.py
+      - name: Commit
+        run: |
+          git config user.name nav-bot; git config user.email nav-bot@bak
+          git add app.js index.html nav-report.txt
+          git diff --cached --quiet || (git commit -m "nav: airport-wave weighting + stronger arrow" && git push)
