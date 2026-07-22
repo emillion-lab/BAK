@@ -1,1 +1,1 @@
-OK Шенген v2 + node --check + cache-bust sg
+OK v3: rain ✕/авто-скриване, панел ✕, чипове 70/112/154 + node --check

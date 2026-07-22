@@ -1852,7 +1852,7 @@ function toggleMapView(){
       });
       layer.addTo(window.map);
       var chip=document.createElement('div');
-      chip.style.cssText='position:fixed;left:8px;bottom:174px;z-index:1500;background:#0c1f2ef0;color:#bae6fd;border:1px solid #38bdf8;border-radius:10px;padding:7px 11px;font-family:sans-serif;font-size:13px;font-weight:900;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.5)';
+      chip.style.cssText='position:fixed;left:8px;bottom:154px;z-index:1500;background:#0c1f2ef0;color:#bae6fd;border:1px solid #38bdf8;border-radius:10px;padding:7px 11px;font-family:sans-serif;font-size:13px;font-weight:900;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.5)';
       chip.textContent='🎫 '+evs.length+' събития';
       chip.onclick=function(){
         alert(evs.map(function(e){
@@ -1881,7 +1881,7 @@ function toggleMapView(){
       if((pp[i]>=50&&p[i]>=0.1)||p[i]>=0.4){ hit={ts:ts,pr:pp[i],mm:p[i]}; break; }
     }
     var chip=document.createElement('div');
-    chip.style.cssText='position:fixed;left:8px;bottom:218px;z-index:1500;border-radius:10px;padding:6px 10px;font-family:sans-serif;font-size:12px;font-weight:900;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.5)';
+    chip.style.cssText='position:fixed;left:8px;bottom:112px;z-index:1500;border-radius:10px;padding:6px 10px;font-family:sans-serif;font-size:12px;font-weight:900;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.5)';
     if(hit){
       var mins=Math.round((hit.ts-now)/60000);
       var when=mins<=0?'сега':(mins<60?('след '+mins+' мин'):('след '+Math.floor(mins/60)+'ч '+(mins%60)+'м'));
@@ -1904,7 +1904,7 @@ function toggleMapView(){
 (function(){
   function hm(d){return d.toLocaleTimeString('bg',{hour:'2-digit',minute:'2-digit'});}
   var chip=document.createElement('div');
-  chip.style.cssText='position:fixed;left:8px;bottom:262px;z-index:1500;background:#0f2818f0;color:#86efac;border:1px solid #22c55e;border-radius:10px;padding:7px 11px;font-family:sans-serif;font-size:13px;font-weight:900;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.5);display:none';
+  chip.style.cssText='position:fixed;left:8px;bottom:70px;z-index:1500;background:#0f2818f0;color:#86efac;border:1px solid #22c55e;border-radius:10px;padding:7px 11px;font-family:sans-serif;font-size:13px;font-weight:900;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.5);display:none';
   document.body.appendChild(chip);
   var panel=document.createElement('div');
   panel.style.cssText='position:fixed;left:8px;right:8px;bottom:80px;max-height:55vh;overflow-y:auto;z-index:2500;background:#0b1220f8;color:#e5e7eb;border:1px solid #334155;border-radius:14px;padding:12px;font-family:sans-serif;font-size:13px;display:none;box-shadow:0 6px 30px rgba(0,0,0,.7)';
@@ -1929,7 +1929,7 @@ function toggleMapView(){
       if(!out.length&&!soon.length){ chip.style.display='none'; panel.style.display='none'; return; }
       chip.style.display='block';
       chip.textContent='🛬 '+(out.length?out.length+' излизат СЕГА':'')+(out.length&&soon.length?' · ':'')+(soon.length?soon.length+' до 1ч':'');
-      var html='<div style=\"font-weight:900;font-size:14px;margin-bottom:8px\">🛬 Изходи Терминал 1/2</div>';
+      var html='<div style=\"font-weight:900;font-size:14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center\"><span>🛬 Изходи Терминал 1/2</span><span style=\"cursor:pointer;padding:2px 10px;font-size:16px;color:#94a3b8\" onclick=\"this.parentElement.parentElement.style.display=&quot;none&quot;\">✕</span></div>';
       out.forEach(function(f){
         html+='<div style=\"background:#14532d80;border-left:3px solid #22c55e;border-radius:6px;padding:6px 8px;margin:5px 0\">'+
           '<b>ИЗЛИЗАТ СЕГА</b> '+(f.ns?'🛂':'🇪🇺')+' · '+f.from+' '+(f.term?('· T'+f.term):'')+'<br>'+
@@ -1945,4 +1945,31 @@ function toggleMapView(){
     }).catch(function(e){});
   }
   refresh(); setInterval(refresh, 60000);
+})();
+
+
+// ------ rain-banner: ✕ бутон + авто-скриване след края на дъжда ------
+// ui-fix-v3 rain-toast-x
+(function(){
+  function tend(txt){
+    var m=/до\s+(\d{1,2}):(\d{2})/.exec(txt||'');
+    if(!m) return null;
+    var d=new Date(); d.setHours(+m[1],+m[2],0,0);
+    return d.getTime();
+  }
+  function tick(){
+    var el=document.getElementById('rain-banner');
+    if(!el) return;
+    var end=tend(el.textContent);
+    if(end && Date.now()>end+10*60000){ el.remove(); return; }
+    if(!el.dataset.rx){
+      el.dataset.rx='1';
+      var x=document.createElement('span');
+      x.textContent=' ✕';
+      x.style.cssText='cursor:pointer;padding:0 4px 0 10px;opacity:.85';
+      x.onclick=function(ev){ev.stopPropagation();el.remove();};
+      el.appendChild(x);
+    }
+  }
+  tick(); setInterval(tick, 30000);
 })();
