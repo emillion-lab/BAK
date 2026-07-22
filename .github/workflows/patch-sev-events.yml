@@ -1,0 +1,23 @@
+name: patch-sev-events
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'patch_sev_events.py'
+      - '.github/workflows/patch-sev-events.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply SEV events patch
+        run: python3 patch_sev_events.py
+      - name: Commit
+        run: |
+          git config user.name ui-bot; git config user.email ui-bot@bak
+          git add app.js index.html sev-events-report.txt
+          git diff --cached --quiet || (git commit -m "SEV events: маркери + чип + demand прозорци" && git push)
