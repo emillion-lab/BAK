@@ -1,0 +1,33 @@
+L1772 [rain-banner] :: position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:9999;background:rgba(30,58,138,.92);color:#dbeafe;font-weight:900;font-size:15px;padding:9px 16px;border-radius:12px;border:1px solid
+
+L1805 [chip] :: position:fixed;left:8px;bottom:130px;z-index:1500;background:#1a1029f0;color:#e9d5ff;border:1px solid #a855f7;border-radius:10px;padding:7px 11px;font-family:sans-serif;font-size:13px;font-weight:900;
+
+L1855 [chip] :: position:fixed;left:8px;bottom:174px;z-index:1500;background:#0c1f2ef0;color:#bae6fd;border:1px solid #38bdf8;border-radius:10px;padding:7px 11px;font-family:sans-serif;font-size:13px;font-weight:900;
+
+L1884 [chip] :: position:fixed;left:8px;bottom:218px;z-index:1500;border-radius:10px;padding:6px 10px;font-family:sans-serif;font-size:12px;font-weight:900;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.5)
+
+L1907 [chip] :: position:fixed;left:8px;bottom:262px;z-index:1500;background:#0f2818f0;color:#86efac;border:1px solid #22c55e;border-radius:10px;padding:7px 11px;font-family:sans-serif;font-size:13px;font-weight:900;
+
+L1910 [panel] :: position:fixed;left:8px;right:8px;bottom:80px;max-height:55vh;overflow-y:auto;z-index:2500;background:#0b1220f8;color:#e5e7eb;border:1px solid #334155;border-radius:14px;padding:12px;font-family:sans-
+
+HTML #nav-panel{ position:fixed;bottom:0;left:0;right:0; background:#0a172af5;border-top:1px solid var(--border); padding:10px 14px;z-index:2000; display:none;flex-direction:column;gap:6px; backdrop-filter:blur(6px); }
+
+HTML #gps-btn{ position:fixed;right:12px;bottom:120px;z-index:1500; width:44px;height:44px;border-radius:50%; background:var(--surface);border:1px solid var(--border); color:var(--cyan);font-size:20px;cursor:pointer; display:flex;align-items:center;justify-content:
+
+HTML #fs-btn{ position:fixed;right:12px;bottom:70px;z-index:1500; width:44px;height:44px;border-radius:50%; background:var(--surface);border:1px solid var(--border); color:var(--text);font-size:18px;cursor:pointer; display:flex;align-items:center;justify-content:ce
+
+HTML #karyk-btn { position:fixed; left:8px; bottom:180px; z-index:1500; writing-mode:vertical-rl; text-orientation:mixed; background:#1a100a; border:2px solid #7c4a1a; color:#cd7f32; font-family:'Courier New',Courier,monospace; font-size:15px; letter-spacing:2px; p
+
+HTML #karyk-banner { display:none; position:fixed; top:0; left:0; right:0; z-index:3000; background:#1a0e04f5; border-bottom:2px solid #cd7f32; padding:8px 14px; font-family:'Courier New',Courier,monospace; font-size:15px; color:#cd7f32; backdrop-filter:blur(6px); 
+
+HTML #direction-hint { display:none; position:fixed; bottom:0; left:0; right:0; background:#070d1af8; border-top:2px solid var(--amber); padding:10px 14px; z-index:1800; font-family:'Courier New',Courier,monospace; }
+
+HTML #bakshish-btn { position:fixed; right:12px; bottom:290px; z-index:1500; width:44px; height:44px; border-radius:50%; background:#1a1200; border:2px solid #d4af37; color:#d4af37; font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:c
+
+HTML #bakshish-panel { display:none; position:fixed; top:0; left:0; right:0; z-index:2600; background:#0d0e00f8; border-bottom:2px solid #d4af37; max-height:75vh; overflow-y:auto; backdrop-filter:blur(8px); }
+
+HTML #next90-panel { display:none; position:fixed; top:0; left:0; right:0; z-index:2500; background:#070d1af8; border-bottom:2px solid var(--cyan); max-height:60vh; overflow-y:auto; backdrop-filter:blur(8px); }
+
+HTML #next90-btn { position:fixed; right:12px; bottom:230px; z-index:1500; width:44px; height:44px; border-radius:50%; background:var(--surface); border:1px solid var(--border); color:var(--amber); font-size:18px; cursor:pointer; display:flex; align-items:center; j
+
+HTML #event-alert { display:none; position:fixed; bottom:0; left:0; right:0; z-index:2800; background:#1a0800f5; border-top:2px solid var(--orange); padding:10px 14px; font-family:'Courier New',Courier,monospace; animation:alert-pulse 2s ease-in-out infinite; }
