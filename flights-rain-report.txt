@@ -1,2 +1,6 @@
-OK (1) map focus при клик от списъка
-OK v5 пълен + node --check + cache-bust v5
+A "const {scores,activeEvents}=computeSco..." x1
+A "const {scores,activeEvents}=computeSco..." x1
+A2 {scores}=computeScores(currentHour) x3
+B filter x1
+B map x1
+OK v6 + node --check + cache-bust v6

@@ -632,7 +632,7 @@ function getScoreStyle(score, type) {
 }
 
 function updateCircles() {
-  const {scores}=computeScores(currentHour);
+  const {scores}=computeScores(currentHour); if(window.__applyLive)window.__applyLive(scores);
   ZONES.forEach(z => {
     const s=scores[z.id]||0;
     if (z.type==='traffic') {
@@ -866,7 +866,7 @@ function showAirportSchedule() {
 
 function showZonePopup(zid) {
   const z=ZONES.find(x=>x.id===zid); if(!z) return;
-  const {scores,activeEvents}=computeScores(currentHour);
+  const {scores,activeEvents}=computeScores(currentHour); if(window.__applyLive)window.__applyLive(scores);
   const s=scores[zid]||0;
   const isTraffic=z.type==='traffic';
   const ti=TRAFFIC_INFO[zid];
@@ -971,7 +971,7 @@ function drawSparkline(h) {
 // RENDER
 // ═══════════════════════════════════════════════
 function render(hour) {
-  const {scores,activeEvents}=computeScores(hour);
+  const {scores,activeEvents}=computeScores(hour); if(window.__applyLive)window.__applyLive(scores);
   const dead=hour>=19.8&&hour<=21.2;
   document.getElementById('tl-dead').style.display=dead?'inline':'none';
   updateCircles();
@@ -1107,7 +1107,7 @@ function startGPS(){
     }
     // Update airport badge to show GPS is active
     document.getElementById('gps-btn').title=`📍 ${userLat.toFixed(4)}, ${userLng.toFixed(4)}`;
-    const {scores}=computeScores(currentHour);
+    const {scores}=computeScores(currentHour); if(window.__applyLive)window.__applyLive(scores);
     updateDirectionHint(scores);
   },()=>{btn.classList.remove('active');},{enableHighAccuracy:true,maximumAge:5000,timeout:15000});
 }
@@ -1149,9 +1149,9 @@ karykBtn.addEventListener('click',()=>{
   document.body.classList.toggle('karyk-active',karykMode);
   document.getElementById('karyk-banner').style.display=karykMode?'block':'none';
   if(karykMode){
-    const {scores}=computeScores(currentHour);
-    const gems=ZONES.filter(z=>z.type==='karyk'||z.type==='residential_lux'||z.type==='residential')
-      .map(z=>({z,ks:computeKarykScore(z.id,scores)})).sort((a,b)=>b.ks-a.ks);
+    const {scores}=computeScores(currentHour); if(window.__applyLive)window.__applyLive(scores);
+    const gems=ZONES.filter(z=>z.type==='karyk'||z.type==='residential_lux'||z.type==='residential'||(window.__liveDemand&&window.__liveDemand.hub&&window.__liveDemand.hub[z.id]!==undefined))
+      .map(z=>({z,ks:(window.__karykLive?window.__karykLive(z,computeKarykScore(z.id,scores),typeof userLat==='number'?userLat:null,typeof userLng==='number'?userLng:null):computeKarykScore(z.id,scores))})).sort((a,b)=>b.ks-a.ks);
     if(gems[0]){
       const c=karykColor(gems[0].ks);
       document.getElementById('karyk-hint').innerHTML=
@@ -2166,4 +2166,105 @@ function toggleMapView(){
     }
     return r;
   };
+})();
+
+
+// ------ bak-v6: жив мост към вътрешния scope ------
+(function(){
+  window.__liveDemand = {hub:{}, boost:{}};
+
+  function num(x){ return typeof x==='number' && isFinite(x) ? x : 0; }
+
+  function pullFlights(){
+    fetch('flight-cache.json?v='+Date.now()).then(function(r){return r.json()}).then(function(d){
+      var now=Date.now(), soon=0;
+      (d.data||[]).forEach(function(f){
+        if(f.flight_status==='cancelled') return;
+        var a=f.arrival||{}, land=a.estimated||a.scheduled;
+        if(!land) return;
+        var lt=new Date(land).getTime(); if(isNaN(lt)) return;
+        var xs=lt+12*60000;                       // начало на изходния прозорец
+        if(xs>now-20*60000 && xs<now+75*60000) soon++;
+      });
+      window.__liveDemand.hub.airport = soon ? Math.min(5, 1.0 + soon*0.6) : 0;
+      window.__liveDemand.flights = soon;
+    }).catch(function(e){});
+  }
+
+  function pullBuses(){
+    fetch('bus-arrivals.json?v='+Date.now()).then(function(r){return r.json()}).then(function(d){
+      var fresh = d.updated && (Date.now()-new Date(d.updated).getTime()) < 100*60000;
+      if(!fresh){ window.__liveDemand.hub.cab_north=0; window.__liveDemand.boost.cab_north=0; return; }
+      var now=new Date(), nowMin=now.getHours()*60+now.getMinutes(), recent=0, soon=0;
+      (d.arrivals||[]).forEach(function(a){
+        var m=/^(\d{1,2}):(\d{2})$/.exec(a.time||''); if(!m) return;
+        var delta=(+m[1])*60+(+m[2])-nowMin;
+        if(delta<=0 && delta>=-15) recent++;
+        else if(delta>0 && delta<=25) soon++;
+      });
+      window.__liveDemand.boost.cab_north = Math.min(2.6, recent*0.85 + soon*0.65);
+      window.__liveDemand.hub.cab_north   = (recent+soon) ? Math.min(4.5, 1.0 + recent*0.9 + soon*0.7) : 0;
+      window.__liveDemand.buses = {recent:recent, soon:soon};
+    }).catch(function(e){});
+  }
+
+  function pullTrains(){
+    fetch('train-arrivals.json?v='+Date.now()).then(function(r){return r.json()}).then(function(d){
+      var fresh = d.updated && (Date.now()-new Date(d.updated).getTime()) < 120*60000;
+      if(!fresh){ window.__liveDemand.hub.cjp=0; window.__liveDemand.boost.cjp=0; return; }
+      var now=new Date(), nowMin=now.getHours()*60+now.getMinutes(), w=0, n=0;
+      (d.arrivals||[]).forEach(function(a){
+        var m=/^(\d{1,2}):(\d{2})$/.exec(a.time||''); if(!m) return;
+        var delta=(+m[1])*60+(+m[2])+num(a.delay)-nowMin;
+        if(delta>=-15 && delta<=30){ w += num(a.weight)||0.5; n++; }
+      });
+      window.__liveDemand.boost.cjp = Math.min(2.4, w*1.05);
+      window.__liveDemand.hub.cjp   = n ? Math.min(4.5, 1.0 + w*1.15) : 0;
+      window.__liveDemand.trains = n;
+    }).catch(function(e){});
+  }
+
+  function pull(){ pullFlights(); pullBuses(); pullTrains(); }
+  pull(); setInterval(pull, 120000);
+
+  // прилага живите boost-ове върху нормалните demand точки
+  window.__applyLive = function(scores){
+    try{
+      var b = window.__liveDemand.boost || {};
+      if(typeof scores.cab_north === 'number' && b.cab_north) scores.cab_north += b.cab_north;
+      if(typeof scores.cjp === 'number' && b.cjp) scores.cjp += b.cjp;
+    }catch(e){}
+  };
+
+  // КЪРК: хъбовете се състезават с кварталите + наказание за разстояние
+  window.__karykLive = function(z, baseKs, ulat, ulng){
+    var ks = num(baseKs);
+    try{
+      var h = (window.__liveDemand.hub||{})[z.id];
+      if(typeof h === 'number' && h > 0) ks = Math.max(ks, h);
+      if(typeof ulat === 'number' && typeof ulng === 'number'){
+        var dx=(z.lat-ulat)*111, dy=(z.lng-ulng)*82;
+        var km=Math.sqrt(dx*dx+dy*dy);
+        if(km > 5) ks -= Math.min(1.3, (km-5)*0.11);   // далече = губиш време на празно
+      }
+    }catch(e){}
+    return ks;
+  };
+
+  // подсказка защо е горещо — в КЪРК банера
+  setInterval(function(){
+    var el=document.getElementById('karyk-hint');
+    if(!el || !document.body.classList.contains('karyk-active')) return;
+    var L=window.__liveDemand||{}, bits=[];
+    if(L.flights) bits.push('✈️ '+L.flights+' изхода');
+    if(L.buses && (L.buses.recent+L.buses.soon)) bits.push('🚌 '+(L.buses.recent+L.buses.soon));
+    if(L.trains) bits.push('🚂 '+L.trains);
+    if(!bits.length) return;
+    if(el.dataset.live === bits.join()) return;
+    el.dataset.live = bits.join();
+    var tag=el.querySelector('.live-tag');
+    if(!tag){ tag=document.createElement('span'); tag.className='live-tag';
+              tag.style.cssText='margin-left:8px;font-size:12px;opacity:.85'; el.appendChild(tag); }
+    tag.textContent='· '+bits.join(' · ');
+  }, 10000);
 })();
