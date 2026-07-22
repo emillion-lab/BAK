@@ -1,0 +1,45 @@
+name: ui-diag
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/ui-diag.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract fixed-positioned elements
+        run: |
+          python3 - <<'EOF'
+          import re
+          src = open('app.js', encoding='utf-8').read()
+          out = []
+          # cssText / style дефиниции с position:fixed + контекст
+          for m in re.finditer(r'position:\s*fixed[^"\'`]{0,220}', src):
+              start = max(0, m.start()-260)
+              ctx = src[start:m.start()]
+              # име: последният identifier/getElementById/клас преди стила
+              ids = re.findall(r"(?:getElementById\(['\"]([\w-]+)|id=['\"]([\w-]+)|var\s+(\w+)\s*=|const\s+(\w+)\s*=|class(?:Name)?\s*=\s*['\"]([\w -]+))", ctx)
+              label = ''
+              if ids:
+                  last = ids[-1]
+                  label = next((x for x in last if x), '')
+              line = src.count('\n', 0, m.start()) + 1
+              out.append(f"L{line} [{label}] :: {m.group(0)[:200]}")
+          # CSS в index.html също
+          idx = open('index.html', encoding='utf-8').read()
+          for m in re.finditer(r'([.#][\w-]+[^{}]{0,60})\{[^}]*position:\s*fixed[^}]*\}', idx):
+              out.append("HTML " + re.sub(r'\s+', ' ', m.group(0))[:260])
+          open('ui-diag.txt', 'w', encoding='utf-8').write('\n\n'.join(out) + '\n')
+          print(f"{len(out)} fixed елемента")
+          EOF
+      - name: Commit
+        run: |
+          git config user.name ui-bot; git config user.email ui-bot@bak
+          git add ui-diag.txt
+          git diff --cached --quiet || (git commit -m "ui diag: fixed елементи" && git push)
