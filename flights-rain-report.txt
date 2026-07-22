@@ -1,6 +1,2 @@
-A "const {scores,activeEvents}=computeSco..." x1
-A "const {scores,activeEvents}=computeSco..." x1
-A2 {scores}=computeScores(currentHour) x3
-B filter x1
-B map x1
-OK v6 + node --check + cache-bust v6
+ZONES изнесени: 89 зони -> debug/zones.json
+OK v7: rain-banner по id+клас+текст+MutationObserver

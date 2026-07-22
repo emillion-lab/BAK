@@ -2268,3 +2268,36 @@ function toggleMapView(){
     tag.textContent='· '+bits.join(' · ');
   }, 10000);
 })();
+
+
+// ------ bak-v7: rain-banner окончателно ------
+// Предишният опит търсеше само #rain-banner. Ако е клас или без id,
+// не го хващаше. Сега: по id, по клас И по текстово съдържание.
+(function(){
+  var RX = /Дъжд\s+около|Дъжд\s+\d{1,2}:\d{2}\s+до/;
+  function kill(){
+    var hits = [];
+    var byId = document.getElementById('rain-banner');
+    if(byId) hits.push(byId);
+    Array.prototype.push.apply(hits, document.querySelectorAll('.rain-banner,#rain-banner,[data-rain]'));
+    // текстов лов: fixed елемент в горната част на екрана с дъждовен текст
+    Array.prototype.slice.call(document.querySelectorAll('div,span,section')).forEach(function(el){
+      if(el.children.length > 2) return;
+      var t = el.textContent || '';
+      if(t.length > 90 || !RX.test(t)) return;
+      var cs = window.getComputedStyle(el);
+      if(cs.position === 'fixed' || cs.position === 'absolute' ||
+         (el.parentElement && window.getComputedStyle(el.parentElement).position === 'fixed')) {
+        hits.push(el);
+      }
+    });
+    hits.forEach(function(el){ try{ el.remove(); }catch(e){ el.style.display='none'; } });
+  }
+  kill();
+  setInterval(kill, 3000);
+  // и при всяка промяна в DOM-а (ако се пресъздава)
+  try{
+    new MutationObserver(function(){ kill(); })
+      .observe(document.body, {childList:true, subtree:true});
+  }catch(e){}
+})();
