@@ -1,0 +1,892 @@
+[
+ {
+  "id": "airport",
+  "name": "Летище София (СОФ)",
+  "icon": "✈️",
+  "lat": 42.695,
+  "lng": 23.4083,
+  "radius": 600,
+  "type": "airport",
+  "wazeName": "Летище София"
+ },
+ {
+  "id": "bpark",
+  "name": "Business Park Sofia",
+  "icon": "🏢",
+  "lat": 42.6292,
+  "lng": 23.3731,
+  "radius": 380,
+  "type": "office",
+  "wazeName": "Business Park Sofia"
+ },
+ {
+  "id": "garitage",
+  "name": "Garitage Park",
+  "icon": "🏢",
+  "lat": 42.6227,
+  "lng": 23.3735,
+  "radius": 320,
+  "type": "office",
+  "wazeName": "Garitage Park Sofia"
+ },
+ {
+  "id": "polygraphia",
+  "name": "Polygraphia Office Center",
+  "icon": "🏢",
+  "lat": 42.67,
+  "lng": 23.382,
+  "radius": 260,
+  "type": "office",
+  "wazeName": "Polygraphia Office Center Sofia"
+ },
+ {
+  "id": "capital_fort",
+  "name": "Capital Fort",
+  "icon": "🏢",
+  "lat": 42.6464,
+  "lng": 23.3958,
+  "radius": 230,
+  "type": "office",
+  "wazeName": "Capital Fort Sofia"
+ },
+ {
+  "id": "megapark",
+  "name": "Megapark / The Mall офиси",
+  "icon": "🏢",
+  "lat": 42.66,
+  "lng": 23.384,
+  "radius": 260,
+  "type": "office",
+  "wazeName": "Megapark Sofia"
+ },
+ {
+  "id": "advance_bc",
+  "name": "Advance Business Center",
+  "icon": "🏢",
+  "lat": 42.629,
+  "lng": 23.372,
+  "radius": 230,
+  "type": "office",
+  "wazeName": "Advance Business Center Sofia"
+ },
+ {
+  "id": "expo2000",
+  "name": "Expo 2000 / Ellipse Center",
+  "icon": "🏢",
+  "lat": 42.6535,
+  "lng": 23.3958,
+  "radius": 280,
+  "type": "office",
+  "wazeName": "Expo 2000 Sofia"
+ },
+ {
+  "id": "iec",
+  "name": "IEC / Интер Експо Център",
+  "icon": "🏢",
+  "lat": 42.671,
+  "lng": 23.402,
+  "radius": 280,
+  "type": "office",
+  "wazeName": "Inter Expo Center Sofia"
+ },
+ {
+  "id": "office_center",
+  "name": "Офис Център (пл.Патриарх Евтимий)",
+  "icon": "🏢",
+  "lat": 42.6883,
+  "lng": 23.3285,
+  "radius": 230,
+  "type": "office",
+  "wazeName": "площад Патриарх Евтимий София"
+ },
+ {
+  "id": "sopharma_bc",
+  "name": "Sopharma Business Towers",
+  "icon": "🏢",
+  "lat": 42.7195,
+  "lng": 23.3142,
+  "radius": 200,
+  "type": "office",
+  "wazeName": "Sopharma Business Towers Sofia"
+ },
+ {
+  "id": "telus",
+  "name": "Telus Tower / пл.Македония",
+  "icon": "🏢",
+  "lat": 42.6947,
+  "lng": 23.3154,
+  "radius": 180,
+  "type": "office",
+  "wazeName": "Telus Tower Sofia"
+ },
+ {
+  "id": "millennium",
+  "name": "Millennium Center (бул.Витоша)",
+  "icon": "🏢",
+  "lat": 42.6822,
+  "lng": 23.3147,
+  "radius": 200,
+  "type": "office",
+  "wazeName": "Millennium Center Sofia"
+ },
+ {
+  "id": "oval",
+  "name": "Oval Business Center (Лозенец)",
+  "icon": "🏢",
+  "lat": 42.664,
+  "lng": 23.334,
+  "radius": 180,
+  "type": "office",
+  "wazeName": "Oval Business Center Sofia"
+ },
+ {
+  "id": "serdika",
+  "name": "Мол Сердика",
+  "icon": "🛍",
+  "lat": 42.6976,
+  "lng": 23.3243,
+  "radius": 240,
+  "type": "mall",
+  "wazeName": "Serdika Center Sofia"
+ },
+ {
+  "id": "paradise",
+  "name": "Paradise Center",
+  "icon": "🛍",
+  "lat": 42.6578,
+  "lng": 23.3144,
+  "radius": 290,
+  "type": "mall",
+  "wazeName": "Paradise Center Sofia"
+ },
+ {
+  "id": "mall_sofia",
+  "name": "Mall of Sofia",
+  "icon": "🛍",
+  "lat": 42.6981,
+  "lng": 23.3086,
+  "radius": 210,
+  "type": "mall",
+  "wazeName": "Mall of Sofia"
+ },
+ {
+  "id": "ring_mall",
+  "name": "Ring Mall / IKEA",
+  "icon": "🛍",
+  "lat": 42.6246,
+  "lng": 23.3519,
+  "radius": 340,
+  "type": "mall",
+  "wazeName": "Ring Mall Sofia"
+ },
+ {
+  "id": "the_mall",
+  "name": "The Mall Sofia",
+  "icon": "🛍",
+  "lat": 42.6605,
+  "lng": 23.3822,
+  "radius": 290,
+  "type": "mall",
+  "wazeName": "The Mall Sofia"
+ },
+ {
+  "id": "bulgaria_mall",
+  "name": "България Мол",
+  "icon": "🛍",
+  "lat": 42.6641,
+  "lng": 23.2885,
+  "radius": 240,
+  "type": "mall",
+  "wazeName": "Bulgaria Mall Sofia"
+ },
+ {
+  "id": "park_center",
+  "name": "Park Center (бул.Черни връх до НДК)",
+  "icon": "🛍",
+  "lat": 42.6869,
+  "lng": 23.3182,
+  "radius": 190,
+  "type": "mall",
+  "wazeName": "Park Center Sofia"
+ },
+ {
+  "id": "hotels_ctr",
+  "name": "Хотели Център (Radisson/Hilton)",
+  "icon": "🏨",
+  "lat": 42.6953,
+  "lng": 23.3242,
+  "radius": 280,
+  "type": "hotel",
+  "wazeName": "Radisson Blu Sofia"
+ },
+ {
+  "id": "hotels_ndk",
+  "name": "Kempinski / InterContinental НДК",
+  "icon": "🏨",
+  "lat": 42.6855,
+  "lng": 23.3188,
+  "radius": 180,
+  "type": "hotel",
+  "wazeName": "Kempinski Hotel Zografski Sofia"
+ },
+ {
+  "id": "hotel_marinela",
+  "name": "Хотел Маринела (бул.Черни връх 100)",
+  "icon": "🏨",
+  "lat": 42.6623,
+  "lng": 23.3175,
+  "radius": 160,
+  "type": "hotel",
+  "wazeName": "Hotel Marinela Sofia"
+ },
+ {
+  "id": "cjp",
+  "name": "Централна ЖП гара",
+  "icon": "🚂",
+  "lat": 42.7121,
+  "lng": 23.321,
+  "radius": 240,
+  "type": "transit",
+  "wazeName": "Централна жп гара София"
+ },
+ {
+  "id": "cab_north",
+  "name": "Централна автогара",
+  "icon": "🚌",
+  "lat": 42.7103,
+  "lng": 23.3233,
+  "radius": 200,
+  "type": "transit",
+  "wazeName": "Централна автогара София"
+ },
+ {
+  "id": "ag_yug",
+  "name": "Автогара Юг (бул.Драган Цанков)",
+  "icon": "🚌",
+  "lat": 42.6784,
+  "lng": 23.3405,
+  "radius": 190,
+  "type": "transit",
+  "wazeName": "Автогара Юг София"
+ },
+ {
+  "id": "ag_pod",
+  "name": "Автогара Подуяне",
+  "icon": "🚌",
+  "lat": 42.7015,
+  "lng": 23.3758,
+  "radius": 190,
+  "type": "transit",
+  "wazeName": "Автогара Подуяне София"
+ },
+ {
+  "id": "arena",
+  "name": "Арена 8888",
+  "icon": "🎸",
+  "lat": 42.6711,
+  "lng": 23.3692,
+  "radius": 290,
+  "type": "venue",
+  "wazeName": "Arena Sofia 8888"
+ },
+ {
+  "id": "ndk",
+  "name": "НДК",
+  "icon": "🎭",
+  "lat": 42.6855,
+  "lng": 23.3188,
+  "radius": 260,
+  "type": "venue",
+  "wazeName": "Национален дворец на културата НДК"
+ },
+ {
+  "id": "borisova",
+  "name": "Борисова градина / Стадион Левски",
+  "icon": "🌳",
+  "lat": 42.6838,
+  "lng": 23.345,
+  "radius": 340,
+  "type": "leisure",
+  "wazeName": "Борисова градина София"
+ },
+ {
+  "id": "nat_theatre",
+  "name": "Народен театър Иван Вазов",
+  "icon": "🎭",
+  "lat": 42.6951,
+  "lng": 23.3297,
+  "radius": 180,
+  "type": "theatre",
+  "wazeName": "Народен театър Иван Вазов София"
+ },
+ {
+  "id": "opera",
+  "name": "Национална опера и балет",
+  "icon": "🎶",
+  "lat": 42.6946,
+  "lng": 23.3229,
+  "radius": 180,
+  "type": "theatre",
+  "wazeName": "Национална опера и балет София"
+ },
+ {
+  "id": "ndk_theatre",
+  "name": "Театри / НДК зона",
+  "icon": "🎭",
+  "lat": 42.6843,
+  "lng": 23.3196,
+  "radius": 200,
+  "type": "theatre",
+  "wazeName": "НДК театри София"
+ },
+ {
+  "id": "pirogov",
+  "name": "УМБАЛ Пирогов (бул.Тотлебен 21)",
+  "icon": "🏥",
+  "lat": 42.6933,
+  "lng": 23.3177,
+  "radius": 190,
+  "type": "hospital",
+  "wazeName": "УМБАЛСМ Пирогов бул Тотлебен 21 София"
+ },
+ {
+  "id": "alexand",
+  "name": "Александровска болница",
+  "icon": "🏥",
+  "lat": 42.6958,
+  "lng": 23.3093,
+  "radius": 190,
+  "type": "hospital",
+  "wazeName": "УМБАЛ Александровска болница София"
+ },
+ {
+  "id": "vma",
+  "name": "ВМА (бул.Св.Георги Софийски 3)",
+  "icon": "🏥",
+  "lat": 42.6856,
+  "lng": 23.3192,
+  "radius": 170,
+  "type": "hospital",
+  "wazeName": "ВМА Военномедицинска академия София"
+ },
+ {
+  "id": "sv_anna",
+  "name": "УМБАЛ Света Анна",
+  "icon": "🏥",
+  "lat": 42.6618,
+  "lng": 23.3732,
+  "radius": 160,
+  "type": "hospital",
+  "wazeName": "УМБАЛ Света Анна Sofia"
+ },
+ {
+  "id": "sv_ekaterina",
+  "name": "УМБАЛ Света Екатерина",
+  "icon": "🏥",
+  "lat": 42.6856,
+  "lng": 23.3148,
+  "radius": 160,
+  "type": "hospital",
+  "wazeName": "УМБАЛ Света Екатерина Sofia"
+ },
+ {
+  "id": "acibadem_ortho",
+  "name": "Acibadem Ортопедия (Околовръстен 127)",
+  "icon": "🏥",
+  "lat": 42.6355,
+  "lng": 23.351,
+  "radius": 150,
+  "type": "hospital",
+  "wazeName": "Acibadem Ортопедия Околовръстен Sofia"
+ },
+ {
+  "id": "isul",
+  "name": "ИСУЛ (ул.Коньовица 65)",
+  "icon": "🏥",
+  "lat": 42.7008,
+  "lng": 23.3445,
+  "radius": 160,
+  "type": "hospital",
+  "wazeName": "ИСУЛ болница Sofia"
+ },
+ {
+  "id": "unss",
+  "name": "УНСС",
+  "icon": "🎓",
+  "lat": 42.6796,
+  "lng": 23.3127,
+  "radius": 240,
+  "type": "university",
+  "wazeName": "УНСС София"
+ },
+ {
+  "id": "nbu",
+  "name": "НБУ (ул.Монтевидео 21)",
+  "icon": "🎓",
+  "lat": 42.658,
+  "lng": 23.2968,
+  "radius": 190,
+  "type": "university",
+  "wazeName": "Нов Български Университет НБУ"
+ },
+ {
+  "id": "tu",
+  "name": "Технически университет",
+  "icon": "🎓",
+  "lat": 42.6569,
+  "lng": 23.3532,
+  "radius": 210,
+  "type": "university",
+  "wazeName": "Технически университет София"
+ },
+ {
+  "id": "su",
+  "name": "Софийски университет",
+  "icon": "🎓",
+  "lat": 42.6943,
+  "lng": 23.3318,
+  "radius": 200,
+  "type": "university",
+  "wazeName": "Софийски университет Св Климент Охридски"
+ },
+ {
+  "id": "studentski",
+  "name": "Студентски град",
+  "icon": "🎓",
+  "lat": 42.6475,
+  "lng": 23.353,
+  "radius": 380,
+  "type": "university",
+  "wazeName": "Студентски град Sofia"
+ },
+ {
+  "id": "simenovo",
+  "name": "Симеоново / Hill Side",
+  "icon": "🌲",
+  "lat": 42.6395,
+  "lng": 23.331,
+  "radius": 380,
+  "type": "residential_lux",
+  "wazeName": "Hill Side Sofia Симеоновско шосе 97"
+ },
+ {
+  "id": "manast",
+  "name": "Манастирски ливади",
+  "icon": "🏘",
+  "lat": 42.6637,
+  "lng": 23.291,
+  "radius": 380,
+  "type": "residential_lux",
+  "wazeName": "Манастирски ливади София"
+ },
+ {
+  "id": "boyana",
+  "name": "Бояна / Драгалевци",
+  "icon": "🌳",
+  "lat": 42.6348,
+  "lng": 23.2889,
+  "radius": 430,
+  "type": "residential_lux",
+  "wazeName": "Бояна квартал София"
+ },
+ {
+  "id": "kambanite",
+  "name": "ЖК Камбаните / Малинова долина",
+  "icon": "⛰️",
+  "lat": 42.6155,
+  "lng": 23.378,
+  "radius": 380,
+  "type": "residential_lux",
+  "wazeName": "ЖК Камбаните Sofia"
+ },
+ {
+  "id": "lyulin",
+  "name": "жк Люлин",
+  "icon": "🏘",
+  "lat": 42.705,
+  "lng": 23.265,
+  "radius": 400,
+  "type": "residential",
+  "wazeName": "жк Люлин Sofia"
+ },
+ {
+  "id": "nadezhda",
+  "name": "жк Надежда",
+  "icon": "🏘",
+  "lat": 42.72,
+  "lng": 23.29,
+  "radius": 350,
+  "type": "residential",
+  "wazeName": "жк Надежда Sofia"
+ },
+ {
+  "id": "ovcha_kupel",
+  "name": "жк Овча купел",
+  "icon": "🏘",
+  "lat": 42.6617,
+  "lng": 23.2878,
+  "radius": 300,
+  "type": "residential",
+  "wazeName": "жк Овча купел Sofia"
+ },
+ {
+  "id": "druzhba",
+  "name": "жк Дружба / Горубляне",
+  "icon": "🏘",
+  "lat": 42.659,
+  "lng": 23.423,
+  "radius": 380,
+  "type": "residential",
+  "wazeName": "жк Дружба Sofia"
+ },
+ {
+  "id": "mladost",
+  "name": "жк Младост 1/2/3",
+  "icon": "🏘",
+  "lat": 42.65,
+  "lng": 23.37,
+  "radius": 350,
+  "type": "residential",
+  "wazeName": "жк Младост Sofia"
+ },
+ {
+  "id": "k_borovo",
+  "name": "жк Борово",
+  "icon": "🥉",
+  "lat": 42.671,
+  "lng": 23.296,
+  "radius": 300,
+  "type": "karyk",
+  "wazeName": "жк Борово Sofia"
+ },
+ {
+  "id": "k_krasno",
+  "name": "жк Красно село",
+  "icon": "🥉",
+  "lat": 42.689,
+  "lng": 23.299,
+  "radius": 300,
+  "type": "karyk",
+  "wazeName": "жк Красно село Sofia"
+ },
+ {
+  "id": "k_pavlovo",
+  "name": "жк Павлово",
+  "icon": "🥉",
+  "lat": 42.677,
+  "lng": 23.282,
+  "radius": 280,
+  "type": "karyk",
+  "wazeName": "жк Павлово Sofia"
+ },
+ {
+  "id": "k_izgrev",
+  "name": "жк Изгрев",
+  "icon": "🥉",
+  "lat": 42.672,
+  "lng": 23.35,
+  "radius": 260,
+  "type": "karyk",
+  "wazeName": "жк Изгрев Sofia"
+ },
+ {
+  "id": "k_geo_milev",
+  "name": "жк Гео Милев",
+  "icon": "🥉",
+  "lat": 42.686,
+  "lng": 23.368,
+  "radius": 260,
+  "type": "karyk",
+  "wazeName": "жк Гео Милев Sofia"
+ },
+ {
+  "id": "k_iztok",
+  "name": "жк Изток (жилищна зона)",
+  "icon": "🥉",
+  "lat": 42.682,
+  "lng": 23.362,
+  "radius": 280,
+  "type": "karyk",
+  "wazeName": "жк Изток Sofia"
+ },
+ {
+  "id": "nat_theatre",
+  "name": "Народен театър Иван Вазов",
+  "icon": "🎭",
+  "lat": 42.6951,
+  "lng": 23.3297,
+  "radius": 180,
+  "type": "theatre",
+  "wazeName": "Народен театър Иван Вазов София"
+ },
+ {
+  "id": "youth_theatre",
+  "name": "Младежки театър (бул.Дондуков 8)",
+  "icon": "🎭",
+  "lat": 42.6985,
+  "lng": 23.3254,
+  "radius": 150,
+  "type": "theatre",
+  "wazeName": "Младежки театър Николай Бинев София"
+ },
+ {
+  "id": "satira",
+  "name": "Театър Сатирикон",
+  "icon": "🎭",
+  "lat": 42.6945,
+  "lng": 23.3285,
+  "radius": 140,
+  "type": "theatre",
+  "wazeName": "Театър Сатирикон София"
+ },
+ {
+  "id": "opera",
+  "name": "Национална опера и балет",
+  "icon": "🎶",
+  "lat": 42.6946,
+  "lng": 23.3229,
+  "radius": 180,
+  "type": "theatre",
+  "wazeName": "Национална опера и балет София"
+ },
+ {
+  "id": "theatre_199",
+  "name": "Театър 199 (бул.Евлоги Георгиев 199)",
+  "icon": "🎭",
+  "lat": 42.6804,
+  "lng": 23.347,
+  "radius": 140,
+  "type": "theatre",
+  "wazeName": "Театър 199 Sofia"
+ },
+ {
+  "id": "cinema_city_ml",
+  "name": "Cinema City Mall of Sofia",
+  "icon": "🎬",
+  "lat": 42.6981,
+  "lng": 23.3086,
+  "radius": 160,
+  "type": "cinema",
+  "wazeName": "Cinema City Mall of Sofia"
+ },
+ {
+  "id": "cinema_city_ser",
+  "name": "Cinema City Сердика",
+  "icon": "🎬",
+  "lat": 42.6976,
+  "lng": 23.3243,
+  "radius": 160,
+  "type": "cinema",
+  "wazeName": "Cinema City Serdika Center Sofia"
+ },
+ {
+  "id": "cinema_arena",
+  "name": "Кино Арена (Ring Mall)",
+  "icon": "🎬",
+  "lat": 42.6246,
+  "lng": 23.3519,
+  "radius": 160,
+  "type": "cinema",
+  "wazeName": "Кино Арена Grand Cinema Ring Mall Sofia"
+ },
+ {
+  "id": "cineland",
+  "name": "Cineland (Paradise Center)",
+  "icon": "🎬",
+  "lat": 42.6578,
+  "lng": 23.3144,
+  "radius": 150,
+  "type": "cinema",
+  "wazeName": "Cineland Paradise Center Sofia"
+ },
+ {
+  "id": "dom_kinoto",
+  "name": "Дом на киното (ул.Екзарх Йосиф 37)",
+  "icon": "🎬",
+  "lat": 42.6978,
+  "lng": 23.3331,
+  "radius": 130,
+  "type": "cinema",
+  "wazeName": "Дом на киното Sofia"
+ },
+ {
+  "id": "vitosha_bar",
+  "name": "Бул.Витоша – ресторанти/барове",
+  "icon": "🍷",
+  "lat": 42.689,
+  "lng": 23.322,
+  "radius": 250,
+  "type": "nightlife",
+  "wazeName": "булевард Витоша ресторанти София"
+ },
+ {
+  "id": "lozenets_rest",
+  "name": "Ресторанти Лозенец (Водна кула)",
+  "icon": "🍽",
+  "lat": 42.6713,
+  "lng": 23.3382,
+  "radius": 220,
+  "type": "nightlife",
+  "wazeName": "ресторанти Лозенец Водна кула София"
+ },
+ {
+  "id": "center_bars",
+  "name": "Барове / клубове Център (ул.Раковски)",
+  "icon": "🍺",
+  "lat": 42.696,
+  "lng": 23.331,
+  "radius": 200,
+  "type": "nightlife",
+  "wazeName": "улица Раковски Sofia"
+ },
+ {
+  "id": "acibadem_tokuda",
+  "name": "Acibadem Токуда (бул.Н.Вапцаров 51Б)",
+  "icon": "🏥",
+  "lat": 42.66,
+  "lng": 23.323,
+  "radius": 160,
+  "type": "hospital",
+  "wazeName": "Acibadem City Clinic Токуда Sofia"
+ },
+ {
+  "id": "acibadem_cardio",
+  "name": "Acibadem Сърдечно-съдов (бул.Н.Вапцаров 53)",
+  "icon": "🏥",
+  "lat": 42.6593,
+  "lng": 23.3225,
+  "radius": 140,
+  "type": "hospital",
+  "wazeName": "Acibadem City Clinic Сърдечно-съдов Sofia"
+ },
+ {
+  "id": "acibadem_mladost",
+  "name": "Acibadem Младост (Цариградско шосе)",
+  "icon": "🏥",
+  "lat": 42.643,
+  "lng": 23.378,
+  "radius": 160,
+  "type": "hospital",
+  "wazeName": "Acibadem City Clinic Младост Sofia"
+ },
+ {
+  "id": "pool_marialuiza",
+  "name": "Басейн Мария Луиза (Борисова гр.) ☀лято",
+  "icon": "🏊",
+  "lat": 42.6789,
+  "lng": 23.3387,
+  "radius": 220,
+  "type": "leisure",
+  "wazeName": "Басейн Мария Луиза София"
+ },
+ {
+  "id": "pool_spartak",
+  "name": "Басейн Спартак (Южен парк) ☀лято",
+  "icon": "🏊",
+  "lat": 42.6752,
+  "lng": 23.3196,
+  "radius": 200,
+  "type": "leisure",
+  "wazeName": "Спортен комплекс Спартак София"
+ },
+ {
+  "id": "pool_diana",
+  "name": "Басейни Диана (Дианабад) ☀лято",
+  "icon": "🏊",
+  "lat": 42.6586,
+  "lng": 23.3555,
+  "radius": 220,
+  "type": "leisure",
+  "wazeName": "Басейн Диана София"
+ },
+ {
+  "id": "pool_akademika",
+  "name": "Басейн Академика (4-ти км) ☀лято",
+  "icon": "🏊",
+  "lat": 42.6668,
+  "lng": 23.3696,
+  "radius": 200,
+  "type": "leisure",
+  "wazeName": "Спортен център Академика София"
+ },
+ {
+  "id": "sv_ekaterina",
+  "name": "УМБАЛ Света Екатерина",
+  "icon": "🏥",
+  "lat": 42.6856,
+  "lng": 23.3148,
+  "radius": 160,
+  "type": "hospital",
+  "wazeName": "УМБАЛ Света Екатерина Sofia"
+ },
+ {
+  "id": "lozenets_h",
+  "name": "УБ Лозенец (към СУ)",
+  "icon": "🏥",
+  "lat": 42.6748,
+  "lng": 23.3307,
+  "radius": 150,
+  "type": "hospital",
+  "wazeName": "Университетска болница Лозенец Sofia"
+ },
+ {
+  "id": "kardiologia",
+  "name": "Национална кардиологична болница",
+  "icon": "🏥",
+  "lat": 42.6882,
+  "lng": 23.3262,
+  "radius": 150,
+  "type": "hospital",
+  "wazeName": "Национална кардиологична болница Sofia"
+ },
+ {
+  "id": "sv_sofia_h",
+  "name": "МБАЛ Св.София (бул.България 104)",
+  "icon": "🏥",
+  "lat": 42.679,
+  "lng": 23.298,
+  "radius": 160,
+  "type": "hospital",
+  "wazeName": "МБАЛ Света София Sofia"
+ },
+ {
+  "id": "jam_orl",
+  "name": "⚠ Задръстване Орлов мост",
+  "icon": "🚦",
+  "lat": 42.6838,
+  "lng": 23.3345,
+  "radius": 150,
+  "type": "traffic",
+  "wazeName": "Орлов мост София"
+ },
+ {
+  "id": "jam_tsar",
+  "name": "⚠ Задръстване Цариградско (Армейски)",
+  "icon": "🚦",
+  "lat": 42.6662,
+  "lng": 23.3795,
+  "radius": 200,
+  "type": "traffic",
+  "wazeName": "Цариградско шосе Армейски Sofia"
+ },
+ {
+  "id": "jam_ndk",
+  "name": "⚠ Задръстване бул.България",
+  "icon": "🚦",
+  "lat": 42.682,
+  "lng": 23.305,
+  "radius": 160,
+  "type": "traffic",
+  "wazeName": "булевард България Sofia"
+ },
+ {
+  "id": "jam_serdika",
+  "name": "⚠ Задръстване Сердика / бул.Сливница",
+  "icon": "🚦",
+  "lat": 42.7012,
+  "lng": 23.3228,
+  "radius": 160,
+  "type": "traffic",
+  "wazeName": "Сердика бул Сливница Sofia"
+ }
+]

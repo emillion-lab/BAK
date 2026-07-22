@@ -1,2 +1,2 @@
 ZONES изнесени: 89 зони -> debug/zones.json
-OK v7: rain-banner по id+клас+текст+MutationObserver
+SKIP v7 вече е приложен
