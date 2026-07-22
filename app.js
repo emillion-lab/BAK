@@ -1900,7 +1900,7 @@ function toggleMapView(){
 })();
 
 // ------ 🛬 Излизат сега: кацане -> изходен прозорец (кацане+15 до +40 мин) ------
-// exit-now-panel
+// exit-now-panel exit-now-v2
 (function(){
   function hm(d){return d.toLocaleTimeString('bg',{hour:'2-digit',minute:'2-digit'});}
   var chip=document.createElement('div');
@@ -1919,9 +1919,9 @@ function toggleMapView(){
         if(!land) return;
         var lt=new Date(land).getTime();
         if(isNaN(lt)) return;
-        var xs=lt+15*60000, xe=lt+40*60000;
+        var NS=/(лондон|london|luton|stansted|manchester|edinburgh|birmingham|bristol|liverpool|glasgow|leeds|дъблин|dublin|истанбул|istanbul|sabiha|анталия|antalya|tel aviv|тел авив|dubai|дубай|abu dhabi|doha|доха|cairo|кайро|hurghada|хургада|sharm|шарм|belgrade|белград|skopje|скопие|chisinau|кишинев|tbilisi|тбилиси|kutaisi|кутаиси|yerevan|ереван|baku|баку|larnaca|ларнака|paphos|пафос|amman|аман|jeddah|riyadh|new york|ню йорк|kuwait|beirut|бейрут|tirana|тирана|podgorica|подгорица|sarajevo|сараево|amman)/i;var nonsch=NS.test((f.departure&&f.departure.airport)||'');var xs=lt+(nonsch?20:10)*60000, xe=lt+(nonsch?50:30)*60000;
         var item={land:lt,xs:xs,xe:xe,from:(f.departure&&f.departure.airport)||'?',
-                  num:(f.flight&&f.flight.iata)||'', term:a.terminal||'', st:f.flight_status};
+                  num:(f.flight&&f.flight.iata)||'', term:a.terminal||'', st:f.flight_status, ns:nonsch};
         if(now>=xs&&now<=xe) out.push(item);
         else if(xs>now&&xs<=now+60*60000) soon.push(item);
       });
@@ -1932,7 +1932,7 @@ function toggleMapView(){
       var html='<div style=\"font-weight:900;font-size:14px;margin-bottom:8px\">🛬 Изходи Терминал 1/2</div>';
       out.forEach(function(f){
         html+='<div style=\"background:#14532d80;border-left:3px solid #22c55e;border-radius:6px;padding:6px 8px;margin:5px 0\">'+
-          '<b>ИЗЛИЗАТ СЕГА</b> · '+f.from+' '+(f.term?('· T'+f.term):'')+'<br>'+
+          '<b>ИЗЛИЗАТ СЕГА</b> '+(f.ns?'🛂':'🇪🇺')+' · '+f.from+' '+(f.term?('· T'+f.term):'')+'<br>'+
           '<span style=\"color:#9ca3af\">Кацна '+hm(new Date(f.land))+'</span> → изход <b>'+hm(new Date(f.xs))+'–'+hm(new Date(f.xe))+'</b> · '+f.num+'</div>';
       });
       soon.forEach(function(f){
@@ -1940,7 +1940,7 @@ function toggleMapView(){
           f.from+' '+(f.term?('· T'+f.term):'')+'<br>'+
           '<span style=\"color:#9ca3af\">Кацане '+hm(new Date(f.land))+(f.st==='landed'?' ✓':'')+'</span> → изход <b>'+hm(new Date(f.xs))+'–'+hm(new Date(f.xe))+'</b> · '+f.num+'</div>';
       });
-      html+='<div style=\"color:#64748b;font-size:11px;margin-top:6px\">Изход = кацане +15–40 мин · опресн. на 60 сек</div>';
+      html+='<div style=\"color:#64748b;font-size:11px;margin-top:6px\">🇪🇺 Шенген: изход +10–30 мин · 🛂 не-Шенген: +20–50 мин · опресн. на 60 сек</div>';
       panel.innerHTML=html;
     }).catch(function(e){});
   }
