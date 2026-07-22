@@ -1,139 +1,122 @@
 # -*- coding: utf-8 -*-
-"""v4.1: fix — липсваща затваряща скоба в HEMUS regex (щеше да гръмне node --check).
-(1) старият rain-banner се маха окончателно (2) rain chip v2 (3) 🚌 коридорни ETA."""
+"""v5: (1) клик от списъка -> скролва картата във фокус (+ invalidateSize)
+       (2) Централна автогара: live скор от реалните пристигания (не е зелена,
+           когато преди 12 мин са слезли хора или след 18 мин идват 2 автобуса)
+       (3) ЖП гара: честен статус вместо тишина"""
 import re, subprocess, shutil
 
 rep = []
 src = open('app.js', encoding='utf-8').read()
 
-if 'bak-v4' in src:
-    rep.append('SKIP v4 вече е приложен')
+if 'bak-v5' in src:
+    rep.append('SKIP v5 вече е приложен')
 else:
-    block = """
+    # --- (1) фокус на картата при клик от списъка ---
+    old = ("setTimeout(()=>{map.setView([${z.lat},${z.lng}],'${zid}'==='airport'?14:15);")
+    new = ("setTimeout(()=>{var _m=document.getElementById('map');"
+           "if(_m&&_m.scrollIntoView)_m.scrollIntoView({behavior:'smooth',block:'center'});"
+           "if(map.invalidateSize)map.invalidateSize();"
+           "map.setView([${z.lat},${z.lng}],'${zid}'==='airport'?14:15);")
+    if src.count(old) != 1:
+        rep.append('FAIL zone-list onclick count=%d' % src.count(old))
+        cand = None
+    else:
+        cand = src.replace(old, new)
+        rep.append('OK (1) map focus при клик от списъка')
 
-// ------ bak-v4 ------
-// (1) старият rain-banner: премахване (ненадеждни данни, дублира прогнозата)
-(function(){
-  function kill(){ var el=document.getElementById('rain-banner'); if(el) el.remove(); }
-  kill(); setInterval(kill, 5000);
-})();
+    if cand:
+        cand += """
 
-// (2) rain chip v2: сегашно състояние + следващ дъжд от един източник (Open-Meteo)
+// ------ bak-v5 ------
+// (2) Централна автогара: реален деманд от пристигащите автобуси
 (function(){
-  Array.prototype.slice.call(document.querySelectorAll('div')).forEach(function(el){
-    var t=el.textContent||'';
-    if((t.indexOf('☔ Дъжд от')===0||t.indexOf('☀️ Без дъжд')===0)&&el.style.position==='fixed') el.remove();
-  });
-  function hm(d){return d.toLocaleTimeString('bg',{hour:'2-digit',minute:'2-digit'});}
-  fetch('https://api.open-meteo.com/v1/forecast?latitude=42.695&longitude=23.406&hourly=precipitation_probability,precipitation&forecast_days=2&timezone=Europe%2FSofia')
-  .then(function(r){return r.json()}).then(function(d){
-    var t=d.hourly.time,p=d.hourly.precipitation,pp=d.hourly.precipitation_probability;
-    var now=Date.now(), idxNow=-1;
-    for(var i=0;i<t.length;i++){
-      var ts=new Date(t[i]+':00+03:00').getTime();
-      if(ts<=now&&now<ts+3600000){ idxNow=i; break; }
-    }
-    var chip=document.createElement('div');
-    chip.style.cssText='position:fixed;left:8px;bottom:112px;z-index:1500;border-radius:10px;padding:6px 10px;font-family:sans-serif;font-size:12px;font-weight:900;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.5)';
-    var rainingNow = idxNow>=0 && p[idxNow]>=0.15;
-    if(rainingNow){
-      var j=idxNow; while(j<t.length&&p[j]>=0.15) j++;
-      var stop=new Date(new Date(t[Math.min(j,t.length-1)]+':00+03:00').getTime());
-      chip.textContent='🌧️ Вали · спира ~'+hm(stop);
-      chip.style.background='#0f2a3af0'; chip.style.color='#7dd3fc'; chip.style.border='1px solid #0ea5e9';
-    } else {
-      var hit=null;
-      for(var i=Math.max(idxNow,0);i<t.length;i++){
-        var ts=new Date(t[i]+':00+03:00').getTime();
-        if(ts>now+12*3600000) break;
-        if(ts>now&&((pp[i]>=50&&p[i]>=0.1)||p[i]>=0.4)){ hit=ts; break; }
-      }
-      if(hit){
-        var mins=Math.round((hit-now)/60000);
-        var when=mins<60?('след '+mins+' мин'):('след '+Math.floor(mins/60)+'ч '+(mins%60)+'м');
-        chip.textContent='☔ Дъжд от '+hm(new Date(hit))+' ('+when+')';
-        var urgent=mins<90;
-        chip.style.background=urgent?'#3a2510f0':'#10233af0';
-        chip.style.color=urgent?'#fbbf24':'#93c5fd';
-        chip.style.border='1px solid '+(urgent?'#f59e0b':'#3b82f6');
-      } else {
-        chip.textContent='☀️ Без дъжд 12ч';
-        chip.style.background='#111827d0'; chip.style.color='#9ca3af'; chip.style.border='1px solid #374151';
-      }
-    }
-    chip.onclick=function(){ chip.style.display='none'; };
-    document.body.appendChild(chip);
-  }).catch(function(e){});
-})();
+  var busState = {recent:0, soon:0, ts:0};
 
-// (3) 🚌 входящи автобуси с ETA на първите спирки по коридор
-(function(){
-  function hm(d){return d.toLocaleTimeString('bg',{hour:'2-digit',minute:'2-digit'});}
-  var HEMUS=/(ВАРНА|ШУМЕН|РУСЕ|РАЗГРАД|ТЪРГОВИЩЕ|ВЕЛИКО ТЪРНОВО|В\\. ?ТЪРНОВО|ГАБРОВО|ПЛЕВЕН|ЛОВЕЧ|СЕВЛИЕВО|БЯЛА|ДОБРИЧ|СИЛИСТРА|БОТЕВГРАД|ПРАВЕЦ)/i;
-  var TRAKIA=/(ПЛОВДИВ|БУРГАС|СТАРА ЗАГОРА|СЛИВЕН|ЯМБОЛ|ХАСКОВО|КЪРДЖАЛИ|ДИМИТРОВГРАД|ПАЗАРДЖИК|АСЕНОВГРАД|НЕСЕБЪР|СЛЪНЧЕВ|ПОМОРИЕ|СОЗОПОЛ|ИСТАНБУЛ|ОДРИН|ЧОРЛУ|АНКАРА|БУРСА)/i;
-  var YUG=/(БЛАГОЕВГРАД|САНДАНСКИ|ПЕТРИЧ|ДУПНИЦА|КЮСТЕНДИЛ|БАНСКО|РАЗЛОГ|ГОЦЕ|СОЛУН|АТИНА|КАВАЛА|ДРАМА|СКОПИЕ|СТРУМИЦА|ОХРИД|БИТОЛЯ)/i;
-  function corridor(from){
-    var f=(from||'').toUpperCase();
-    if(HEMUS.test(f)) return {n:'Хемус',stops:[['Експо/Цариградско',-18],['Ботевградско шосе',-12]]};
-    if(TRAKIA.test(f)) return {n:'Тракия',stops:[['Експо Център',-15],['Цариградско шосе',-10]]};
-    if(YUG.test(f)) return {n:'Юг',stops:[['бул. България',-14],['Хладилника',-9]]};
-    return null;
-  }
-  var chip=document.createElement('div');
-  chip.style.cssText='position:fixed;left:8px;bottom:28px;z-index:1500;border-radius:10px;padding:7px 11px;font-family:sans-serif;font-size:13px;font-weight:900;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.5);display:none';
-  document.body.appendChild(chip);
-  var panel=document.createElement('div');
-  panel.style.cssText='position:fixed;left:8px;right:8px;bottom:80px;max-height:55vh;overflow-y:auto;z-index:2500;background:#0b1220f8;color:#e5e7eb;border:1px solid #334155;border-radius:14px;padding:12px;font-family:sans-serif;font-size:13px;display:none;box-shadow:0 6px 30px rgba(0,0,0,.7)';
-  document.body.appendChild(panel);
-  chip.onclick=function(){ panel.style.display=panel.style.display==='none'?'block':'none'; };
-  function refresh(){
+  function pull(){
     fetch('bus-arrivals.json?v='+Date.now()).then(function(r){return r.json()}).then(function(d){
-      var now=new Date(), list=[];
+      var fresh = d.updated && (Date.now()-new Date(d.updated).getTime()) < 100*60000;
+      if(!fresh){ busState={recent:0,soon:0,ts:Date.now()}; return; }
+      var now=new Date(), nowMin=now.getHours()*60+now.getMinutes();
+      var recent=0, soon=0;
       (d.arrivals||[]).forEach(function(a){
-        var m=/^(\\d{2}):(\\d{2})$/.exec(a.time); if(!m) return;
-        var cas=new Date(); cas.setHours(+m[1],+m[2],0,0);
-        var diff=(cas-now)/60000;
-        if(diff<-25||diff>120) return;
-        list.push({cas:cas,diff:diff,from:a.from,intl:a.intl,cor:corridor(a.from)});
+        var m=/^(\\d{1,2}):(\\d{2})$/.exec(a.time||''); if(!m) return;
+        var delta=(+m[1])*60+(+m[2])-nowMin;
+        if(delta<=0 && delta>=-15) recent++;        // слезли са преди <=15 мин
+        else if(delta>0 && delta<=25) soon++;       // идват до 25 мин
       });
-      list.sort(function(a,b){return a.cas-b.cas});
-      var hot=list.filter(function(x){return x.diff>=-20&&x.diff<=20}).length;
-      if(!list.length){ chip.style.display='none'; panel.style.display='none'; return; }
-      chip.style.display='block';
-      chip.textContent='🚌 '+list.length+' до 2ч'+(hot?' · '+hot+' СЕГА':'');
-      if(hot){ chip.style.background='#3a2510f0'; chip.style.color='#fb923c'; chip.style.border='1px solid #ea580c'; }
-      else { chip.style.background='#10233af0'; chip.style.color='#93c5fd'; chip.style.border='1px solid #3b82f6'; }
-      var html='<div style=\\"font-weight:900;font-size:14px;margin-bottom:8px;display:flex;justify-content:space-between\\"><span>🚌 Входящи автобуси</span><span style=\\"cursor:pointer;padding:2px 10px;color:#94a3b8\\" onclick=\\"this.parentElement.parentElement.style.display=&quot;none&quot;\\">✕</span></div>';
-      list.forEach(function(x){
-        var urgent=x.diff>=-20&&x.diff<=20;
-        var stops='';
-        if(x.cor){
-          stops=x.cor.stops.map(function(s){
-            return s[0]+' ~<b>'+hm(new Date(x.cas.getTime()+s[1]*60000))+'</b>';
-          }).join(' → ')+' → ';
-        }
-        html+='<div style=\\"background:'+(urgent?'#3a251080':'#1e293b80')+';border-left:3px solid '+(urgent?'#ea580c':'#64748b')+';border-radius:6px;padding:6px 8px;margin:5px 0\\">'+
-          (x.intl?'🌍 ':'')+x.from+(x.cor?' <span style=\\"color:#64748b\\">('+x.cor.n+')</span>':'')+'<br>'+
-          '<span style=\\"font-size:12px\\">'+stops+'ЦАС <b>'+hm(x.cas)+'</b></span></div>';
-      });
-      html+='<div style=\\"color:#64748b;font-size:11px;margin-top:6px\\">ETA на спирките = ЦАС час − типичен пробег · оранжево = в прозорец ±20 мин</div>';
-      panel.innerHTML=html;
+      busState={recent:recent, soon:soon, ts:Date.now()};
     }).catch(function(e){});
   }
-  refresh(); setInterval(refresh, 120000);
+  pull(); setInterval(pull, 120000);
+
+  if(typeof computeScores === 'function'){
+    var _origCompute = computeScores;
+    computeScores = function(h){
+      var s = _origCompute(h);
+      try{
+        if(s && typeof s['cab_north'] === 'number'){
+          // всеки току-що слязъл автобус тежи най-много (хората са на място СЕГА)
+          var boost = Math.min(2.6, busState.recent*0.85 + busState.soon*0.65);
+          if(boost>0) s['cab_north'] = s['cab_north'] + boost;
+        }
+      }catch(e){}
+      return s;
+    };
+  }
+
+  // видим маркер защо е горещо — малък надпис в списъка на автогарата
+  setInterval(function(){
+    var items=document.querySelectorAll('#zone-list .zone-item');
+    Array.prototype.slice.call(items).forEach(function(it){
+      var nm=it.querySelector('.zone-name');
+      if(!nm || nm.textContent.indexOf('Централна автогара')<0) return;
+      var sub=it.querySelector('.zone-sub');
+      var txt='';
+      if(busState.recent) txt='🚌 '+busState.recent+' слезли <15 мин';
+      if(busState.soon) txt+=(txt?' · ':'')+busState.soon+' идват <25 мин';
+      if(!txt) return;
+      if(!sub){
+        sub=document.createElement('div');
+        sub.className='zone-sub';
+        nm.parentElement.appendChild(sub);
+      }
+      sub.textContent=txt;
+    });
+  }, 15000);
+})();
+
+// (3) ЖП гара: честен статус, докато няма разписание
+(function(){
+  if(typeof showTransitPopup !== 'function') return;
+  var _origTransit = showTransitPopup;
+  showTransitPopup = function(zid){
+    var r = _origTransit(zid);
+    if(zid==='cjp'){
+      setTimeout(function(){
+        var pops=document.querySelectorAll('.leaflet-popup-content');
+        if(!pops.length) return;
+        var p=pops[pops.length-1];
+        if(p.innerHTML.indexOf('bdz-note')>=0) return;
+        p.innerHTML += '<div class="bdz-note" style="margin-top:8px;padding:7px 9px;border-radius:7px;'+
+          'background:rgba(56,189,248,.08);border-left:3px solid #38bdf8;font-size:12px;color:#94a3b8">'+
+          '🚂 Живо разписание на БДЖ — предстои.<br>Засега: пиковете са ~07:30, 13:00, 18:30, 21:40 '+
+          '(пристигания от Пловдив/Варна/Бургас).</div>';
+      }, 200);
+    }
+    return r;
+  };
 })();
 """
-    cand = src + block
-    open('/tmp/app.c.js', 'w', encoding='utf-8').write(cand)
-    r = subprocess.run(['node', '--check', '/tmp/app.c.js'], capture_output=True, text=True)
-    if r.returncode == 0:
-        shutil.move('/tmp/app.c.js', 'app.js')
-        idx = open('index.html', encoding='utf-8').read()
-        idx = re.sub(r'app\.js\?v=[0-9a-z]+', 'app.js?v=20260722v41', idx)
-        open('index.html', 'w', encoding='utf-8').write(idx)
-        rep.append('OK v4.1: rain-banner маха, rain chip v2, 🚌 коридорни ETA + node --check')
-    else:
-        rep.append('FAIL node --check :: ' + (r.stderr or '')[:400])
+        open('/tmp/app.c.js', 'w', encoding='utf-8').write(cand)
+        r = subprocess.run(['node', '--check', '/tmp/app.c.js'], capture_output=True, text=True)
+        if r.returncode == 0:
+            shutil.move('/tmp/app.c.js', 'app.js')
+            idx = open('index.html', encoding='utf-8').read()
+            idx = re.sub(r'app\.js\?v=[0-9a-z]+', 'app.js?v=20260722v5', idx)
+            open('index.html', 'w', encoding='utf-8').write(idx)
+            rep.append('OK v5 пълен + node --check + cache-bust v5')
+        else:
+            rep.append('FAIL node --check :: ' + (r.stderr or '')[:400])
 
 open('flights-rain-report.txt', 'w', encoding='utf-8').write('\n'.join(rep) + '\n')
 print('\n'.join(rep))
