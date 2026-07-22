@@ -67,15 +67,15 @@ const ZONES = [
   { id:"arena",          name:"Арена 8888",                             icon:"🎸", lat:42.6711, lng:23.3692, radius:290, type:"venue",            wazeName:"Arena Sofia 8888" },
   { id:"ndk",            name:"НДК",                                    icon:"🎭", lat:42.6855, lng:23.3188, radius:260, type:"venue",            wazeName:"Национален дворец на културата НДК" },
   { id:"borisova",       name:"Борисова градина / Стадион Левски",      icon:"🌳", lat:42.6838, lng:23.3450, radius:340, type:"leisure",          wazeName:"Борисова градина София" },
-  { id:"nat_theatre",    name:"Народен театър Иван Вазов",              icon:"🎭", lat:42.6951, lng:23.3297, radius:180, type:"theatre",          wazeName:"Народен театър Иван Вазов София" },
-  { id:"opera",          name:"Национална опера и балет",               icon:"🎶", lat:42.6946, lng:23.3229, radius:180, type:"theatre",          wazeName:"Национална опера и балет София" },
+  { id:"nat_theatre",    name:"Народен театър Иван Вазов",              icon:"🎭", lat:42.6944, lng:23.3261, radius:180, type:"theatre",          wazeName:"Народен театър Иван Вазов София" },
+  { id:"opera",          name:"Национална опера и балет",               icon:"🎶", lat:42.6975, lng:23.3305, radius:180, type:"theatre",          wazeName:"Национална опера и балет София" },
   { id:"ndk_theatre",    name:"Театри / НДК зона",                      icon:"🎭", lat:42.6843, lng:23.3196, radius:200, type:"theatre",          wazeName:"НДК театри София" },
 
   { id:"pirogov",        name:"УМБАЛ Пирогов (бул.Тотлебен 21)",        icon:"🏥", lat:42.6933, lng:23.3177, radius:190, type:"hospital",         wazeName:"УМБАЛСМ Пирогов бул Тотлебен 21 София" },
   { id:"alexand",        name:"Александровска болница",                 icon:"🏥", lat:42.6958, lng:23.3093, radius:190, type:"hospital",         wazeName:"УМБАЛ Александровска болница София" },
   { id:"vma",            name:"ВМА (Георги Софийски 3)",         icon:"🏥", lat:42.6842, lng:23.3045, radius:170, type:"hospital",         wazeName:"ВМА Военномедицинска академия София" },
   { id:"sv_anna",        name:"УМБАЛ Света Анна",                       icon:"🏥", lat:42.6618, lng:23.3732, radius:160, type:"hospital",         wazeName:"УМБАЛ Света Анна Sofia" },
-  { id:"sv_ekaterina",   name:"УМБАЛ Света Екатерина",                  icon:"🏥", lat:42.6856, lng:23.3148, radius:160, type:"hospital",         wazeName:"УМБАЛ Света Екатерина Sofia" },
+  { id:"sv_ekaterina",   name:"УМБАЛ Света Екатерина",                  icon:"🏥", lat:42.6851, lng:23.3125, radius:160, type:"hospital",         wazeName:"УМБАЛ Света Екатерина Sofia" },
   { id:"acibadem_ortho", name:"Acibadem Ортопедия (Околовръстен 127)", icon:"🏥", lat:42.6355, lng:23.3510, radius:150, type:"hospital",         wazeName:"Acibadem Ортопедия Околовръстен Sofia" },
   { id:"isul",           name:"ИСУЛ – Царица Йоанна (Бяло море 8)",                 icon:"🏥", lat:42.7008, lng:23.3391, radius:160, type:"hospital",         wazeName:"ИСУЛ болница Sofia" },
 
@@ -105,10 +105,8 @@ const ZONES = [
   { id:"k_iztok",        name:"жк Изток (жилищна зона)",                icon:"🥉", lat:42.6820, lng:23.3620, radius:280, type:"karyk",            wazeName:"жк Изток Sofia" },
 
   // ── ТЕАТРИ ──
-  { id:"nat_theatre",    name:"Народен театър Иван Вазов",              icon:"🎭", lat:42.6951, lng:23.3297, radius:180, type:"theatre",          wazeName:"Народен театър Иван Вазов София" },
   { id:"youth_theatre",  name:"Младежки театър (бул.Дондуков 8)",       icon:"🎭", lat:42.6978, lng:23.3269, radius:150, type:"theatre",          wazeName:"Младежки театър Николай Бинев София" },
   { id:"satira",         name:"Сатиричен театър Алеко Константинов",                       icon:"🎭", lat:42.6917, lng:23.3263, radius:140, type:"theatre",          wazeName:"Театър Сатирикон София" },
-  { id:"opera",          name:"Национална опера и балет",               icon:"🎶", lat:42.6946, lng:23.3229, radius:180, type:"theatre",          wazeName:"Национална опера и балет София" },
   { id:"theatre_199",    name:"Театър 199 Валентин Стойчев",   icon:"🎭", lat:42.6932, lng:23.3279, radius:140, type:"theatre",          wazeName:"Театър 199 Sofia" },
 
   // ── КИНА ──
@@ -131,7 +129,6 @@ const ZONES = [
   { id:"pool_spartak",    name:"Басейн Спартак (Южен парк) ☀лято",        icon:"🏊", lat:42.6752, lng:23.3196, radius:200, type:"leisure", wazeName:"Спортен комплекс Спартак София" },
   { id:"pool_diana",      name:"Басейни Диана (Дианабад) ☀лято",          icon:"🏊", lat:42.6586, lng:23.3555, radius:220, type:"leisure", wazeName:"Басейн Диана София" },
   { id:"pool_akademika",  name:"Басейн Академика (4-ти км) ☀лято",        icon:"🏊", lat:42.6668, lng:23.3696, radius:200, type:"leisure", wazeName:"Спортен център Академика София" },
-  { id:"sv_ekaterina",   name:"УМБАЛ Света Екатерина",                  icon:"🏥", lat:42.6856, lng:23.3148, radius:160, type:"hospital",         wazeName:"УМБАЛ Света Екатерина Sofia" },
   { id:"lozenets_h",     name:"УБ Лозенец (към СУ)",                    icon:"🏥", lat:42.6644, lng:23.3113, radius:150, type:"hospital",         wazeName:"Университетска болница Лозенец Sofia" },
   { id:"kardiologia",    name:"Национална кардиологична болница",       icon:"🏥", lat:42.7062, lng:23.2874, radius:150, type:"hospital",         wazeName:"Национална кардиологична болница Sofia" },
   { id:"sv_sofia_h",     name:"МБАЛ Св.София (бул.България 104)",       icon:"🏥", lat:42.6599, lng:23.2849, radius:160, type:"hospital",         wazeName:"МБАЛ Света София Sofia" },
