@@ -13,33 +13,51 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Extract fixed-positioned elements
+      - name: Extract zone + list-render structure
         run: |
           python3 - <<'EOF'
           import re
           src = open('app.js', encoding='utf-8').read()
           out = []
-          # cssText / style дефиниции с position:fixed + контекст
-          for m in re.finditer(r'position:\s*fixed[^"\'`]{0,220}', src):
-              start = max(0, m.start()-260)
-              ctx = src[start:m.start()]
-              # име: последният identifier/getElementById/клас преди стила
-              ids = re.findall(r"(?:getElementById\(['\"]([\w-]+)|id=['\"]([\w-]+)|var\s+(\w+)\s*=|const\s+(\w+)\s*=|class(?:Name)?\s*=\s*['\"]([\w -]+))", ctx)
-              label = ''
-              if ids:
-                  last = ids[-1]
-                  label = next((x for x in last if x), '')
-              line = src.count('\n', 0, m.start()) + 1
-              out.append(f"L{line} [{label}] :: {m.group(0)[:200]}")
-          # CSS в index.html също
-          idx = open('index.html', encoding='utf-8').read()
-          for m in re.finditer(r'([.#][\w-]+[^{}]{0,60})\{[^}]*position:\s*fixed[^}]*\}', idx):
-              out.append("HTML " + re.sub(r'\s+', ' ', m.group(0))[:260])
-          open('ui-diag.txt', 'w', encoding='utf-8').write('\n\n'.join(out) + '\n')
-          print(f"{len(out)} fixed елемента")
+
+          def sec(title, body):
+              out.append("=== " + title + " ===\n" + body)
+
+          # 1) дефиниция на зоните (масив с lat/lon)
+          m = re.search(r'(?:const|var|let)\s+(\w*ZONES?\w*)\s*=\s*\[', src, re.I)
+          if m:
+              start = m.start()
+              # първите 2 елемента на масива
+              sec("ZONES дефиниция (L%d)" % (src.count('\n',0,start)+1), src[start:start+900])
+          else:
+              # алтернатива: обект с lat/lon
+              hits = [mm.start() for mm in re.finditer(r'lat\s*:\s*42\.\d+', src)][:3]
+              for h in hits:
+                  sec("lat: 42.x около L%d" % (src.count('\n',0,h)+1), src[max(0,h-400):h+300])
+
+          # 2) рендер на списъка със зони (търсим ЗОНИ ПО ПРИОРИТЕТ / innerHTML на списък)
+          for kw in ['ЗОНИ ПО ПРИОРИТЕТ', 'zone-list', 'zoneList', 'renderZones', 'renderList']:
+              for mm in re.finditer(re.escape(kw), src):
+                  sec("%s около L%d" % (kw, src.count('\n',0,mm.start())+1),
+                      src[max(0,mm.start()-500):mm.start()+900])
+                  break
+
+          # 3) къде се смята демандът за автогарата
+          for kw in ['автогар', 'Автогар', 'АВТОГАР', 'bus-arrivals']:
+              for mm in re.finditer(kw, src):
+                  sec("%s около L%d" % (kw, src.count('\n',0,mm.start())+1),
+                      src[max(0,mm.start()-700):mm.start()+700])
+                  break
+
+          # 4) съществуващ map.setView / flyTo (как се фокусира картата другаде)
+          for mm in list(re.finditer(r'(?:map|window\.map)\.(?:setView|flyTo)\([^)]{0,120}\)', src))[:4]:
+              out.append("SETVIEW L%d :: %s" % (src.count('\n',0,mm.start())+1, mm.group(0)))
+
+          open('ui-diag.txt','w',encoding='utf-8').write("\n\n".join(out)[:14000] + "\n")
+          print("секции:", len(out))
           EOF
       - name: Commit
         run: |
           git config user.name ui-bot; git config user.email ui-bot@bak
           git add ui-diag.txt
-          git diff --cached --quiet || (git commit -m "ui diag: fixed елементи" && git push)
+          git diff --cached --quiet || (git commit -m "ui diag: зони, списък, автогара, setView" && git push)
