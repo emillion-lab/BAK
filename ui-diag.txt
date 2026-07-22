@@ -1,33 +1,142 @@
-L1772 [rain-banner] :: position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:9999;background:rgba(30,58,138,.92);color:#dbeafe;font-weight:900;font-size:15px;padding:9px 16px;border-radius:12px;border:1px solid
+=== ZONES дефиниция (L33) ===
+const ZONES = [
+  { id:"airport",        name:"Летище София (СОФ)",                     icon:"✈️",  lat:42.6950, lng:23.4083, radius:600, type:"airport",          wazeName:"Летище София" },
+  { id:"bpark",          name:"Business Park Sofia",                    icon:"🏢", lat:42.6292, lng:23.3731, radius:380, type:"office",           wazeName:"Business Park Sofia" },
+  { id:"garitage",       name:"Garitage Park",                          icon:"🏢", lat:42.6227, lng:23.3735, radius:320, type:"office",           wazeName:"Garitage Park Sofia" },
+  { id:"polygraphia",    name:"Polygraphia Office Center",              icon:"🏢", lat:42.6700, lng:23.3820, radius:260, type:"office",           wazeName:"Polygraphia Office Center Sofia" },
+  { id:"capital_fort",   name:"Capital Fort",                           icon:"🏢", lat:42.6464, lng:23.3958, radius:230, type:"office",           wazeName:"Capita
 
-L1805 [chip] :: position:fixed;left:8px;bottom:130px;z-index:1500;background:#1a1029f0;color:#e9d5ff;border:1px solid #a855f7;border-radius:10px;padding:7px 11px;font-family:sans-serif;font-size:13px;font-weight:900;
+=== zone-list около L985 ===
+omputeScores(hour);
+  const dead=hour>=19.8&&hour<=21.2;
+  document.getElementById('tl-dead').style.display=dead?'inline':'none';
+  updateCircles();
+  drawSparkline(hour);
+  // Sidebar
+  const sorted=Object.entries(scores).sort((a,b)=>b[1]-a[1]);
+  const top=sorted[0];
+  const tz=ZONES.find(z=>z.id===top[0]);
+  document.getElementById('tl-hint').textContent=
+    dead?'— мъртва зона, почини':`Топ: ${tz?.icon||''} ${tz?.name||top[0]} (${top[1].toFixed(1)})`;
+  const zList=document.getElementById('zone-list');
+  if (zList && !karykMode) {
+    zList.innerHTML=sorted
+      .filter(([zid])=>{ const z=ZONES.find(x=>x.id===zid); return z&&z.type!=='karyk'; })
+      .map(([zid,score])=>{
+        const z=ZONES.find(x=>x.id===zid); if(!z) return '';
+        const c=demandColor(score,z.type);
+        const sub=(activeEvents[zid]||[])[0]?.name||'';
+        return `<div class="zone-item" onclick="(function(){if(document.body.classList.contains('list-view'))toggleMapView();setTimeout(()=>{map.setView([${z.lat},${z.lng}],'${zid}'==='airport'?14:15);'${zid}'==='airport'?showAirportSchedule():showZonePopup('${zid}');},150);})()">
+          <div class="zone-dot" style="background:${c.fill}"></div>
+          <div style="flex:1;min-width:0">
+            <div class="zone-name">${z.icon} ${z.name}</div>
+            ${sub?`<div class="zone-sub">${sub}</div>`:''}
+          </div>
+          <div style="
 
-L1855 [chip] :: position:fixed;left:8px;bottom:174px;z-index:1500;background:#0c1f2ef0;color:#bae6fd;border:1px solid #38bdf8;border-radius:10px;padding:7px 11px;font-family:sans-serif;font-size:13px;font-weight:900;
+=== автогар около L62 ===
+on:"🏨", lat:42.6953, lng:23.3242, radius:280, type:"hotel",            wazeName:"Radisson Blu Sofia" },
+  { id:"hotels_ndk",     name:"Kempinski / InterContinental НДК",       icon:"🏨", lat:42.6855, lng:23.3188, radius:180, type:"hotel",            wazeName:"Kempinski Hotel Zografski Sofia" },
+  { id:"hotel_marinela", name:"Хотел Маринела (бул.Черни връх 100)",    icon:"🏨", lat:42.6623, lng:23.3175, radius:160, type:"hotel",            wazeName:"Hotel Marinela Sofia" },
 
-L1884 [chip] :: position:fixed;left:8px;bottom:218px;z-index:1500;border-radius:10px;padding:6px 10px;font-family:sans-serif;font-size:12px;font-weight:900;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.5)
+  { id:"cjp",            name:"Централна ЖП гара",                      icon:"🚂", lat:42.7121, lng:23.3210, radius:240, type:"transit",          wazeName:"Централна жп гара София" },
+  { id:"cab_north",      name:"Централна автогара",                     icon:"🚌", lat:42.7103, lng:23.3233, radius:200, type:"transit",          wazeName:"Централна автогара София" },
+  { id:"ag_yug",         name:"Автогара Юг (бул.Драган Цанков)",        icon:"🚌", lat:42.6784, lng:23.3405, radius:190, type:"transit",          wazeName:"Автогара Юг София" },
+  { id:"ag_pod",         name:"Автогара Подуяне",                       icon:"🚌", lat:42.7015, lng:23.3758, radius:190, type:"transit",          wazeName:"Автогара Подуяне София" },
 
-L1907 [chip] :: position:fixed;left:8px;bottom:262px;z-index:1500;background:#0f2818f0;color:#86efac;border:1px solid #22c55e;border-radius:10px;padding:7px 11px;font-family:sans-serif;font-size:13px;font-weight:900;
+  { id:"arena",          name:"Арена 8888",                             icon:"🎸", lat:42.6711, lng:23.3692, radius:290, type:"venue",            wazeName:"Arena Sofia 8888" },
+  { id:"ndk",        
 
-L1910 [panel] :: position:fixed;left:8px;right:8px;bottom:80px;max-height:55vh;overflow-y:auto;z-index:2500;background:#0b1220f8;color:#e5e7eb;border:1px solid #334155;border-radius:14px;padding:12px;font-family:sans-
+=== Автогар около L63 ===
+  icon:"🏨", lat:42.6855, lng:23.3188, radius:180, type:"hotel",            wazeName:"Kempinski Hotel Zografski Sofia" },
+  { id:"hotel_marinela", name:"Хотел Маринела (бул.Черни връх 100)",    icon:"🏨", lat:42.6623, lng:23.3175, radius:160, type:"hotel",            wazeName:"Hotel Marinela Sofia" },
 
-HTML #nav-panel{ position:fixed;bottom:0;left:0;right:0; background:#0a172af5;border-top:1px solid var(--border); padding:10px 14px;z-index:2000; display:none;flex-direction:column;gap:6px; backdrop-filter:blur(6px); }
+  { id:"cjp",            name:"Централна ЖП гара",                      icon:"🚂", lat:42.7121, lng:23.3210, radius:240, type:"transit",          wazeName:"Централна жп гара София" },
+  { id:"cab_north",      name:"Централна автогара",                     icon:"🚌", lat:42.7103, lng:23.3233, radius:200, type:"transit",          wazeName:"Централна автогара София" },
+  { id:"ag_yug",         name:"Автогара Юг (бул.Драган Цанков)",        icon:"🚌", lat:42.6784, lng:23.3405, radius:190, type:"transit",          wazeName:"Автогара Юг София" },
+  { id:"ag_pod",         name:"Автогара Подуяне",                       icon:"🚌", lat:42.7015, lng:23.3758, radius:190, type:"transit",          wazeName:"Автогара Подуяне София" },
 
-HTML #gps-btn{ position:fixed;right:12px;bottom:120px;z-index:1500; width:44px;height:44px;border-radius:50%; background:var(--surface);border:1px solid var(--border); color:var(--cyan);font-size:20px;cursor:pointer; display:flex;align-items:center;justify-content:
+  { id:"arena",          name:"Арена 8888",                             icon:"🎸", lat:42.6711, lng:23.3692, radius:290, type:"venue",            wazeName:"Arena Sofia 8888" },
+  { id:"ndk",            name:"НДК",                                    icon:"🎭", lat:42.6855, lng:23.3188, radius:260, type:"venue",            wazeName:"Национален дворец на културата НДК" },
+ 
 
-HTML #fs-btn{ position:fixed;right:12px;bottom:70px;z-index:1500; width:44px;height:44px;border-radius:50%; background:var(--surface);border:1px solid var(--border); color:var(--text);font-size:18px;cursor:pointer; display:flex;align-items:center;justify-content:ce
+=== АВТОГАР около L685 ===
+а — виж BUS SCHEDULE по-долу)
+function showTransitPopup(zid){
+  const z = ZONES.find(x=>x.id===zid);
+  if(!z) return;
 
-HTML #karyk-btn { position:fixed; left:8px; bottom:180px; z-index:1500; writing-mode:vertical-rl; text-orientation:mixed; background:#1a100a; border:2px solid #7c4a1a; color:#cd7f32; font-family:'Courier New',Courier,monospace; font-size:15px; letter-spacing:2px; p
+  const fmt = (h,m) => String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
 
-HTML #karyk-banner { display:none; position:fixed; top:0; left:0; right:0; z-index:3000; background:#1a0e04f5; border-bottom:2px solid #cd7f32; padding:8px 14px; font-family:'Courier New',Courier,monospace; font-size:15px; color:#cd7f32; backdrop-filter:blur(6px); 
+  let html = '<div style="font-size:14px;max-height:60vh;overflow-y:auto">';
+  html += `<div style="font-weight:800;font-size:15px;margin-bottom:10px;color:var(--cyan)">${z.icon||'🚌'} ${z.name}</div>`;
 
-HTML #direction-hint { display:none; position:fixed; bottom:0; left:0; right:0; background:#070d1af8; border-top:2px solid var(--amber); padding:10px 14px; z-index:1800; font-family:'Courier New',Courier,monospace; }
+  // Plovdiv buses arriving at Central Autogara (cab_north)
+  if(zid === 'cab_north'){
+    const arrivals = getSofiaArrivals(12);
+    if(arrivals.length){
+      html += '<div style="font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.6px;margin-bottom:8px">🚌 ПРИСТИГАЩИ НА ЦЕНТРАЛНА АВТОГАРА</div>';
+      arrivals.forEach(b=>{
+        const untilArr = b.arrMin - b.nowMin; // минути до пристигане
+        const isSoon = untilArr>=-5 && untilArr<=40;
+        const bg = isSoon?'rgba(239,68,68,.1)':'transparent';
+        const col = untilArr<=0?'var(--muted)':untilArr<=40?'#ef4444':untilArr<=90?'var(--amber)':'var(--muted)';
+        const label = untilArr<=0?`пристигнал ~${b.arrTime}`:
+                      untilArr<=90?`~${b.arrTime} · след ${untilArr} мин`:
+                      `~${b.arrTime}`;
+        const origin = b.route.name.replace(' → София','');
+        html += `<div style="padding:6px 8px;border-radius:7px;background:${bg};margin-bottom:3px;display:flex;justify-c
 
-HTML #bakshish-btn { position:fixed; right:12px; bottom:290px; z-index:1500; width:44px; height:44px; border-radius:50%; background:#1a1200; border:2px solid #d4af37; color:#d4af37; font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:c
+=== bus-arrivals около L1410 ===
+artures){
+    const [h,m] = dep.split(':').map(Number);
+    const depMin = h*60+m;
+    const diff = depMin - nowMin;
+    if(diff >= -10){ // include buses that left up to 10min ago (may still be picking up)
+      const arrMin = depMin + route.duration_min;
+      results.push({
+        dep, depMin,
+        arr: `${Math.floor(arrMin/60).toString().padStart(2,'0')}:${(arrMin%60).toString().padStart(2,'0')}`,
+        diffMin: diff,
+        route
+      });
+    }
+    if(results.length >= count) break;
+  }
+  return results;
+}
 
-HTML #bakshish-panel { display:none; position:fixed; top:0; left:0; right:0; z-index:2600; background:#0d0e00f8; border-bottom:2px solid #d4af37; max-height:75vh; overflow-y:auto; backdrop-filter:blur(8px); }
+// Всички пристигащи на ЦАС от всички маршрути, сортирани по час на пристигане
+let liveArrivals = null;
 
-HTML #next90-panel { display:none; position:fixed; top:0; left:0; right:0; z-index:2500; background:#070d1af8; border-bottom:2px solid var(--cyan); max-height:60vh; overflow-y:auto; backdrop-filter:blur(8px); }
+async function loadLiveArrivals(){
+  try{
+    const r = await fetch('bus-arrivals.json?v='+Date.now());
+    if(!r.ok) return;
+    const d = await r.json();
+    // валидни само ако са свежи (<100 мин)
+    if(d.updated && (Date.now()-new Date(d.updated).getTime()) < 100*60000){
+      liveArrivals = d;
+    }
+  }catch(e){ /* няма live файл — оставаме на разписание */ }
+}
 
-HTML #next90-btn { position:fixed; right:12px; bottom:230px; z-index:1500; width:44px; height:44px; border-radius:50%; background:var(--surface); border:1px solid var(--border); color:var(--amber); font-size:18px; cursor:pointer; display:flex; align-items:center; j
+function getLiveArrivals(count){
+  if(!liveArrivals) return [];
+  const now = new Date();
+  const nowMin = now.getHours()*60 + now.getMinutes();
+  const out = [];
+  for(const a of (liveArrivals.arrivals||[])){
+    const [h,m] = a.time.split(':').map(Number);
+    if(isNaN(h)||isNaN(m)) continue;
+    let delta = h*60+m - nowMin;
+    if(delta < -20) continue;
+    out.push({origin:a.from, operator:a
 
-HTML #event-alert { display:none; position:fixed; bottom:0; left:0; right:0; z-index:2800; background:#1a0800f5; border-top:2px solid var(--orange); padding:10px 14px; font-family:'Courier New',Courier,monospace; animation:alert-pulse 2s ease-in-out infinite; }
+SETVIEW L993 :: map.setView([${z.lat},${z.lng}],'${zid}'==='airport'?14:15)
+
+SETVIEW L1016 :: map.setView([${z.lat},${z.lng}],15)
+
+SETVIEW L1104 :: map.setView([userLat,userLng],14)
+
+SETVIEW L1698 :: map.setView([${z.lat},${z.lng}],'${z.id}'==='airport'?14:15)
