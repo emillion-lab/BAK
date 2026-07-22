@@ -1,0 +1,262 @@
+--- karykMode L13 ---
+document.addEventListener('DOMContentLoaded', function() {
+
+if (typeof L === 'undefined') {
+  document.getElementById('map').innerHTML =
+    '<div style="color:#ef4444;padding:20px;font-family:monospace">Leaflet не се зареди.</div>';
+  return;
+}
+
+// ═══════════════════════════════════════════════
+// GLOBAL STATE
+// ═══════════════════════════════════════════════
+let currentHour       = 16;
+let karykMode         = false;
+let autoTime          = true;
+let weatherBoost      = 0;
+let userLat           = null;
+let userLng           = null;
+let watchId           = null;
+let userMarker        = null;
+let navTarget         = null;
+let deviceHeading     = null;
+let dirHintZid        = null;
+let dirHintSuppressed = false;
+let flightHours       = Array(24).fill(0);
+let flightDetails     = []; // [{from, exitFrom, exitTo, fn, nonSchengen}]
+let airportStatus     = 'offline';
+let demandCurve       = [];
+let alertedEvents     = new Set();
+
+// ═══════════════════════════════════════════════
+// ZONE DEFINITIONS
+// ═══════════════════════════════════════════════
+const ZONES = [
+  { id:"airport",        name:"Летище София (СОФ)",                     icon:"✈️",  lat:42.6950, lng:23.4083, radius:600, type:"airport",          wazeName:"Летище София" },
+  { id:"bpark",          name:"Business Park Sofia",                    icon:"🏢", lat:42.6292, lng:23.3731, radius:380, type:"office",           w
+
+--- karykMode L651 ---
+howTransitPopup(z.id):showZonePopup(z.id)); c.addTo(map); circleMap[z.id]=c;
+  });
+}
+
+function getScoreStyle(score, type) {
+  const c=demandColor(score,type);
+  return {color:c.stroke, fillColor:c.fill, fillOpacity:c.fillAlpha, weight:1.5, opacity:0.85};
+}
+
+function updateCircles() {
+  const {scores}=computeScores(currentHour);
+  ZONES.forEach(z => {
+    const s=scores[z.id]||0;
+    if (z.type==='traffic') {
+      const info=TRAFFIC_INFO[z.id];
+      const marker=trafficMarkers[z.id];
+      if(marker&&info) marker.setIcon(makeTrafficIcon(info,s>=1.5));
+      return;
+    }
+    if (z.type==='hospital') {
+      const cm=circleMap[z.id];
+      if(cm?._hm) cm._hm.setIcon(makeHospitalIcon(s));
+      cm?.setStyle(getScoreStyle(s,z.type));
+      return;
+    }
+    if (z.type==='karyk') {
+      if (karykMode) {
+        const ks=computeKarykScore(z.id,scores);
+        const kc=karykColor(ks);
+        circleMap[z.id]?.setStyle({color:kc.stroke,fillColor:kc.fill,fillOpacity:ks>=1?0.6:0.1,weight:2,opacity:ks>=1?0.9:0.2});
+      } else {
+        circleMap[z.id]?.setStyle({fillOpacity:0,opacity:0,weight:0});
+      }
+      return;
+    }
+    if (karykMode) {
+      const ks=computeKarykScore(z.id,scores);
+      const kc=karykColor(ks);
+      circleMap[z.id]?.setStyle({color:kc.stroke,fillColor:kc.fill,fillOpacity:Math.max(0.08,0.1+ks*0.08),weight:ks>=3?2:1,opacity:ks>=2?0.8:0.3});
+      return;
+    }
+    circleMap[z.id]?.setStyle(getScoreStyle(s,z.type));
+  });
+}
+
+
+// (дублираната bus система е премахната — виж BUS SCHEDULE по-долу)
+function showTransitPopup(zid){
+  const z = ZONES.find(x=>x.id===zid);
+  if(!z) return;
+
+  const fmt = (h,m) => String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
+
+  let html = '<div style="font-size:14px;max-height:60vh;overflow-y:auto">';
+  html += `<d
+
+--- karykMode L874 ---
+ const airportZone=ZONES.find(z=>z.id==='airport');
+  if(airportZone){
+    L.popup({maxWidth:Math.min(340,window.innerWidth-30),maxHeight:Math.min(420,window.innerHeight*0.6),className:'airport-popup',autoPan:true})
+      .setLatLng([airportZone.lat,airportZone.lng])
+      .setContent(html)
+      .openOn(map);
+    setTimeout(()=>{
+      const box=document.getElementById('fl-scroll'), el=document.getElementById('fl-now-anchor');
+      if(box && el) box.scrollTop = Math.max(0, el.offsetTop - box.offsetTop - 34);
+    }, 120);
+  }
+}
+
+function showZonePopup(zid) {
+  const z=ZONES.find(x=>x.id===zid); if(!z) return;
+  const {scores,activeEvents}=computeScores(currentHour);
+  const s=scores[zid]||0;
+  const isTraffic=z.type==='traffic';
+  const ti=TRAFFIC_INFO[zid];
+  let c, label, evHtml;
+  if (karykMode&&!isTraffic) {
+    const ks=computeKarykScore(zid,scores);
+    c=karykColor(ks); label=`К:${ks.toFixed(1)} ${c.label}`;
+  } else {
+    c=demandColor(s,z.type); label=c.label;
+  }
+  if (isTraffic&&ti) {
+    const active=s>=1.5;
+    const sc=active?'#ef4444':'#22c55e';
+    evHtml=`<div style="background:${active?'#1a0808':'#081a0d'};border:1px solid ${sc};border-radius:5px;padding:5px 8px;margin-bottom:5px;color:${sc};font-size:15px;font-weight:600">${active?'🔴 ЗАДРЪСТЕНО СЕГА':'🟢 В МОМЕНТА СВОБОДНО'}</div>
+      <div style="font-size:15px;color:#a855f7;margin-bottom:3px">🚦 ${ti.jamDir}</div>
+      <div style="font-size:15px;color:#00e5ff;margin-bottom:5px">✅ Свободно: ${ti.freeDir}</div>
+      ${active?`<div style="background:#1a0a2e;border:1px solid #a855f7;border-radius:5px;padding:5px 8px;font-size:15px;color:#d08dff;margin-bottom:4px">💡 Карай ${ti.freeArrow} обратно — стигаш по-бързо!</div>`:''}
+      <div style="font-size:14px;color:#4a6080">⏰ Пик: ${ti.time}</div>`;
+  } 
+
+--- karykMode L986 ---
+x.arc(cx,yOf(demandCurve[Math.min(ci,STEPS)]),4,0,Math.PI*2);
+  ctx.fillStyle='#00e5ff'; ctx.fill();
+}
+
+// ═══════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════
+function render(hour) {
+  const {scores,activeEvents}=computeScores(hour);
+  const dead=hour>=19.8&&hour<=21.2;
+  document.getElementById('tl-dead').style.display=dead?'inline':'none';
+  updateCircles();
+  drawSparkline(hour);
+  // Sidebar
+  const sorted=Object.entries(scores).sort((a,b)=>b[1]-a[1]);
+  const top=sorted[0];
+  const tz=ZONES.find(z=>z.id===top[0]);
+  document.getElementById('tl-hint').textContent=
+    dead?'— мъртва зона, почини':`Топ: ${tz?.icon||''} ${tz?.name||top[0]} (${top[1].toFixed(1)})`;
+  const zList=document.getElementById('zone-list');
+  if (zList && !karykMode) {
+    zList.innerHTML=sorted
+      .filter(([zid])=>{ const z=ZONES.find(x=>x.id===zid); return z&&z.type!=='karyk'; })
+      .map(([zid,score])=>{
+        const z=ZONES.find(x=>x.id===zid); if(!z) return '';
+        const c=demandColor(score,z.type);
+        const sub=(activeEvents[zid]||[])[0]?.name||'';
+        return `<div class="zone-item" onclick="(function(){if(document.body.classList.contains('list-view'))toggleMapView();setTimeout(()=>{var _m=document.getElementById('map');if(_m&&_m.scrollIntoView)_m.scrollIntoView({behavior:'smooth',block:'center'});if(map.invalidateSize)map.invalidateSize();map.setView([${z.lat},${z.lng}],'${zid}'==='airport'?14:15);'${zid}'==='airport'?showAirportSchedule():showZonePopup('${zid}');},150);})()">
+          <div class="zone-dot" style="background:${c.fill}"></div>
+          <div style="flex:1;min-width:0">
+            <div class="zone-name">${z.icon} ${z.name}</div>
+            ${sub?`<div class="zone-sub">${sub}</div>`:''}
+        
+
+--- karykMode L1147 ---
+isplay='none';
+});
+
+// ═══════════════════════════════════════════════
+// FULLSCREEN
+// ═══════════════════════════════════════════════
+let isFullscreen=false;
+document.getElementById('fs-btn').addEventListener('click',()=>{
+  isFullscreen=!isFullscreen;
+  document.body.classList.toggle('map-fullscreen',isFullscreen);
+  document.getElementById('fs-btn').textContent=isFullscreen?'✕':'⛶';
+  setTimeout(()=>{map.invalidateSize();drawSparkline(currentHour);},200);
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&isFullscreen)document.getElementById('fs-btn').click();});
+
+// ═══════════════════════════════════════════════
+// КАРЪК MODE
+// ═══════════════════════════════════════════════
+const karykBtn=document.getElementById('karyk-btn');
+karykBtn.addEventListener('click',()=>{
+  karykMode=!karykMode;
+  karykBtn.classList.toggle('active',karykMode);
+  document.body.classList.toggle('karyk-active',karykMode);
+  document.getElementById('karyk-banner').style.display=karykMode?'block':'none';
+  if(karykMode){
+    const {scores}=computeScores(currentHour);
+    const gems=ZONES.filter(z=>z.type==='karyk'||z.type==='residential_lux'||z.type==='residential')
+      .map(z=>({z,ks:computeKarykScore(z.id,scores)})).sort((a,b)=>b.ks-a.ks);
+    if(gems[0]){
+      const c=karykColor(gems[0].ks);
+      document.getElementById('karyk-hint').innerHTML=
+        `🥉 Иди при <span style="color:${c.fill}">${gems[0].z.icon} ${gems[0].z.name.split('(')[0].trim()}</span> (К:${gems[0].ks.toFixed(1)})`;
+    }
+  }
+  render(currentHour);
+});
+
+// ═══════════════════════════════════════════════
+// TICKER
+// ═══════════════════════════════════════════════
+function buildTicker(){
+  const zMap={}; ZONES.forEach(z=>{zMap[z.id]=z;});
+  const items=EVENTS.filter(dayMatches).sort((a,b)=>a.endHour-b
+
+--- karyk L99 ---
+n:"🏘", lat:42.7200, lng:23.2900, radius:350, type:"residential",      wazeName:"жк Надежда Sofia" },
+  { id:"ovcha_kupel",    name:"жк Овча купел",                          icon:"🏘", lat:42.6617, lng:23.2878, radius:300, type:"residential",      wazeName:"жк Овча купел Sofia" },
+  { id:"druzhba",        name:"жк Дружба / Горубляне",                  icon:"🏘", lat:42.6590, lng:23.4230, radius:380, type:"residential",      wazeName:"жк Дружба Sofia" },
+  { id:"mladost",        name:"жк Младост 1/2/3",                       icon:"🏘", lat:42.6500, lng:23.3700, radius:350, type:"residential",      wazeName:"жк Младост Sofia" },
+
+  // Карък зони — невидими в нормален мод
+  { id:"k_borovo",       name:"жк Борово",                              icon:"🥉", lat:42.6710, lng:23.2960, radius:300, type:"karyk",            wazeName:"жк Борово Sofia" },
+  { id:"k_krasno",       name:"жк Красно село",                         icon:"🥉", lat:42.6890, lng:23.2990, radius:300, type:"karyk",            wazeName:"жк Красно село Sofia" },
+  { id:"k_pavlovo",      name:"жк Павлово",                             icon:"🥉", lat:42.6770, lng:23.2820, radius:280, type:"karyk",            wazeName:"жк Павлово Sofia" },
+  { id:"k_izgrev",       name:"жк Изгрев",                              icon:"🥉", lat:42.6720, lng:23.3500, radius:260, type:"karyk",            wazeName:"жк Изгрев Sofia" },
+  { id:"k_geo_milev",    name:"жк Гео Милев",                           icon:"🥉", lat:42.6860, lng:23.3680, radius:260, type:"karyk",            wazeName:"жк Гео Милев Sofia" },
+  { id:"k_iztok",        name:"жк Изток (жилищна зона)",                icon:"🥉", lat:42.6820, lng:23.3620, radius:280, type:"karyk",            wazeName:"жк Изток Sofia" },
+
+  // ── ТЕАТРИ ──
+  { id:"nat_theatre",    name:"Народен театър Ива
+
+--- karyk L304 ---
+ },
+  { zone:"jam_tsar",   name:"🚦 Задръстване СЛЕДОБЕД – Цариградско",  endHour:18.5, boost:2.5, repeat:"mon-fri" },
+  { zone:"jam_ndk",    name:"🚦 Задръстване СЛЕДОБЕД – бул.България", endHour:18.5, boost:2.0, repeat:"mon-fri" },
+  { zone:"jam_serdika",name:"🚦 Задръстване СЛЕДОБЕД – Сердика",      endHour:18.5, boost:1.8, repeat:"mon-fri" },
+];
+
+// ═══════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════
+function demandColor(score, type) {
+  if (type === 'hospital')
+    return score>=2.0 ? {fill:"#ff2020",fillAlpha:0.75,stroke:"#ff6060",label:"🏥 Активно"}
+         : score>=1.3 ? {fill:"#ef4444",fillAlpha:0.60,stroke:"#ff5555",label:"🏥"}
+         :              {fill:"#991b1b",fillAlpha:0.40,stroke:"#cc3333",label:"🏥"};
+  if (type === 'karyk')
+    return {fill:"#f97316",fillAlpha:0.0,stroke:"transparent",label:"🥉"};
+  if (score>=3.2) return {fill:"#ef4444",fillAlpha:0.55,stroke:"#ff7777",label:"ПИК 🔥"};
+  if (score>=2.4) return {fill:"#f97316",fillAlpha:0.50,stroke:"#ffaa55",label:"Висок ▲"};
+  if (score>=1.6) return {fill:"#f59e0b",fillAlpha:0.45,stroke:"#ffd060",label:"Среден"};
+  if (score>=0.8) return {fill:"#22c55e",fillAlpha:0.35,stroke:"#55ee88",label:"Нормален"};
+  return               {fill:"#1a3050",fillAlpha:0.20,stroke:"#2a4870",label:"Тих"};
+}
+
+function karykColor(ks) {
+  if (ks>=4.0) return {fill:"#ff6b00",stroke:"#ff9040",label:"🔥 Карък ПИК"};
+  if (ks>=3.0) return {fill:"#f97316",stroke:"#ffaa55",label:"▲ Отлично"};
+  if (ks>=2.0) return {fill:"#fbbf24",stroke:"#ffd060",label:"Добро"};
+  if (ks>=1.0) return {fill:"#a3a300",stroke:"#d4d400",label:"Слабо"};
+  return              {fill:"#1a1030",stroke:"#2a2050",label:"Избягвай"};
+}
+
+function fmtHour(h) {
+  return String(Math.floor(h)).padStart(2,'0') + 
