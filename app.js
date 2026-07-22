@@ -41,7 +41,8 @@ const ZONES = [
   { id:"expo2000",       name:"Expo 2000 / Ellipse Center",             icon:"🏢", lat:42.6535, lng:23.3958, radius:280, type:"office",           wazeName:"Expo 2000 Sofia" },
   { id:"iec",            name:"IEC / Интер Експо Център",               icon:"🏢", lat:42.6710, lng:23.4020, radius:280, type:"office",           wazeName:"Inter Expo Center Sofia" },
   { id:"office_center",  name:"Офис Център (пл.Патриарх Евтимий)",     icon:"🏢", lat:42.6883, lng:23.3285, radius:230, type:"office",           wazeName:"площад Патриарх Евтимий София" },
-  { id:"sopharma_bc",    name:"Sopharma Business Towers",               icon:"🏢", lat:42.7195, lng:23.3142, radius:200, type:"office",           wazeName:"Sopharma Business Towers Sofia" },
+  { id:"sopharma_bc",    name:"Sopharma Business Towers (Лъчезар Станчев 5)",               icon:"🏢", lat:42.6661, lng:23.3571, radius:200, type:"office",           wazeName:"Sopharma Business Towers Sofia" },
+  { id:"sopharma_rozhen", name:"Sopharma Trading (бул.Рожен 16)", icon:"🏢", lat:42.7289, lng:23.3133, radius:180, type:"office", wazeName:"Sopharma Trading бул Рожен 16 София" },
   { id:"telus",          name:"Telus Tower / пл.Македония",             icon:"🏢", lat:42.6947, lng:23.3154, radius:180, type:"office",           wazeName:"Telus Tower Sofia" },
   { id:"millennium",     name:"Millennium Center (бул.Витоша)",         icon:"🏢", lat:42.6822, lng:23.3147, radius:200, type:"office",           wazeName:"Millennium Center Sofia" },
   { id:"oval",           name:"Oval Business Center (Лозенец)",         icon:"🏢", lat:42.6640, lng:23.3340, radius:180, type:"office",           wazeName:"Oval Business Center Sofia" },
@@ -72,11 +73,11 @@ const ZONES = [
 
   { id:"pirogov",        name:"УМБАЛ Пирогов (бул.Тотлебен 21)",        icon:"🏥", lat:42.6933, lng:23.3177, radius:190, type:"hospital",         wazeName:"УМБАЛСМ Пирогов бул Тотлебен 21 София" },
   { id:"alexand",        name:"Александровска болница",                 icon:"🏥", lat:42.6958, lng:23.3093, radius:190, type:"hospital",         wazeName:"УМБАЛ Александровска болница София" },
-  { id:"vma",            name:"ВМА (бул.Св.Георги Софийски 3)",         icon:"🏥", lat:42.6856, lng:23.3192, radius:170, type:"hospital",         wazeName:"ВМА Военномедицинска академия София" },
+  { id:"vma",            name:"ВМА (Георги Софийски 3)",         icon:"🏥", lat:42.6842, lng:23.3045, radius:170, type:"hospital",         wazeName:"ВМА Военномедицинска академия София" },
   { id:"sv_anna",        name:"УМБАЛ Света Анна",                       icon:"🏥", lat:42.6618, lng:23.3732, radius:160, type:"hospital",         wazeName:"УМБАЛ Света Анна Sofia" },
   { id:"sv_ekaterina",   name:"УМБАЛ Света Екатерина",                  icon:"🏥", lat:42.6856, lng:23.3148, radius:160, type:"hospital",         wazeName:"УМБАЛ Света Екатерина Sofia" },
   { id:"acibadem_ortho", name:"Acibadem Ортопедия (Околовръстен 127)", icon:"🏥", lat:42.6355, lng:23.3510, radius:150, type:"hospital",         wazeName:"Acibadem Ортопедия Околовръстен Sofia" },
-  { id:"isul",           name:"ИСУЛ (ул.Коньовица 65)",                 icon:"🏥", lat:42.7008, lng:23.3445, radius:160, type:"hospital",         wazeName:"ИСУЛ болница Sofia" },
+  { id:"isul",           name:"ИСУЛ – Царица Йоанна (Бяло море 8)",                 icon:"🏥", lat:42.7008, lng:23.3391, radius:160, type:"hospital",         wazeName:"ИСУЛ болница Sofia" },
 
   { id:"unss",           name:"УНСС",                                   icon:"🎓", lat:42.6796, lng:23.3127, radius:240, type:"university",       wazeName:"УНСС София" },
   { id:"nbu",            name:"НБУ (ул.Монтевидео 21)",                 icon:"🎓", lat:42.6580, lng:23.2968, radius:190, type:"university",       wazeName:"Нов Български Университет НБУ" },
@@ -105,10 +106,10 @@ const ZONES = [
 
   // ── ТЕАТРИ ──
   { id:"nat_theatre",    name:"Народен театър Иван Вазов",              icon:"🎭", lat:42.6951, lng:23.3297, radius:180, type:"theatre",          wazeName:"Народен театър Иван Вазов София" },
-  { id:"youth_theatre",  name:"Младежки театър (бул.Дондуков 8)",       icon:"🎭", lat:42.6985, lng:23.3254, radius:150, type:"theatre",          wazeName:"Младежки театър Николай Бинев София" },
-  { id:"satira",         name:"Театър Сатирикон",                       icon:"🎭", lat:42.6945, lng:23.3285, radius:140, type:"theatre",          wazeName:"Театър Сатирикон София" },
+  { id:"youth_theatre",  name:"Младежки театър (бул.Дондуков 8)",       icon:"🎭", lat:42.6978, lng:23.3269, radius:150, type:"theatre",          wazeName:"Младежки театър Николай Бинев София" },
+  { id:"satira",         name:"Сатиричен театър Алеко Константинов",                       icon:"🎭", lat:42.6917, lng:23.3263, radius:140, type:"theatre",          wazeName:"Театър Сатирикон София" },
   { id:"opera",          name:"Национална опера и балет",               icon:"🎶", lat:42.6946, lng:23.3229, radius:180, type:"theatre",          wazeName:"Национална опера и балет София" },
-  { id:"theatre_199",    name:"Театър 199 (бул.Евлоги Георгиев 199)",   icon:"🎭", lat:42.6804, lng:23.3470, radius:140, type:"theatre",          wazeName:"Театър 199 Sofia" },
+  { id:"theatre_199",    name:"Театър 199 Валентин Стойчев",   icon:"🎭", lat:42.6932, lng:23.3279, radius:140, type:"theatre",          wazeName:"Театър 199 Sofia" },
 
   // ── КИНА ──
   { id:"cinema_city_ml", name:"Cinema City Mall of Sofia",              icon:"🎬", lat:42.6981, lng:23.3086, radius:160, type:"cinema",           wazeName:"Cinema City Mall of Sofia" },
@@ -131,9 +132,9 @@ const ZONES = [
   { id:"pool_diana",      name:"Басейни Диана (Дианабад) ☀лято",          icon:"🏊", lat:42.6586, lng:23.3555, radius:220, type:"leisure", wazeName:"Басейн Диана София" },
   { id:"pool_akademika",  name:"Басейн Академика (4-ти км) ☀лято",        icon:"🏊", lat:42.6668, lng:23.3696, radius:200, type:"leisure", wazeName:"Спортен център Академика София" },
   { id:"sv_ekaterina",   name:"УМБАЛ Света Екатерина",                  icon:"🏥", lat:42.6856, lng:23.3148, radius:160, type:"hospital",         wazeName:"УМБАЛ Света Екатерина Sofia" },
-  { id:"lozenets_h",     name:"УБ Лозенец (към СУ)",                    icon:"🏥", lat:42.6748, lng:23.3307, radius:150, type:"hospital",         wazeName:"Университетска болница Лозенец Sofia" },
-  { id:"kardiologia",    name:"Национална кардиологична болница",       icon:"🏥", lat:42.6882, lng:23.3262, radius:150, type:"hospital",         wazeName:"Национална кардиологична болница Sofia" },
-  { id:"sv_sofia_h",     name:"МБАЛ Св.София (бул.България 104)",       icon:"🏥", lat:42.6790, lng:23.2980, radius:160, type:"hospital",         wazeName:"МБАЛ Света София Sofia" },
+  { id:"lozenets_h",     name:"УБ Лозенец (към СУ)",                    icon:"🏥", lat:42.6644, lng:23.3113, radius:150, type:"hospital",         wazeName:"Университетска болница Лозенец Sofia" },
+  { id:"kardiologia",    name:"Национална кардиологична болница",       icon:"🏥", lat:42.7062, lng:23.2874, radius:150, type:"hospital",         wazeName:"Национална кардиологична болница Sofia" },
+  { id:"sv_sofia_h",     name:"МБАЛ Св.София (бул.България 104)",       icon:"🏥", lat:42.6599, lng:23.2849, radius:160, type:"hospital",         wazeName:"МБАЛ Света София Sofia" },
 
   // ── ЗАДРЪСТВАНИЯ ──
   { id:"jam_orl",        name:"⚠ Задръстване Орлов мост",               icon:"🚦", lat:42.6838, lng:23.3345, radius:150, type:"traffic",          wazeName:"Орлов мост София" },
