@@ -21,10 +21,12 @@ jobs:
         with:
           python-version: '3.12'
       - name: Scrape BDZ live arrivals
+        continue-on-error: true
         run: python scripts/scrape_trains.py
       - name: Commit if changed
+        if: always()
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add train-arrivals.json
+          git add train-arrivals.json debug/ 2>/dev/null || true
           git diff --cached --quiet || (git commit -m "auto: БДЖ пристигащи $(date -u +%H:%M)" && git push)
