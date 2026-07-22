@@ -14,10 +14,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Apply flights+rain patch
+      - name: Apply patch
         run: python3 patch_flights_rain.py
       - name: Commit
         run: |
           git config user.name ui-bot; git config user.email ui-bot@bak
-          git add app.js index.html flights-rain-report.txt
-          git diff --cached --quiet || (git commit -m "☔ дъжд прогноза + 🛬 излизат-сега панел" && git push)
+          git add app.js index.html flights-rain-report.txt debug/ 2>/dev/null || true
+          git diff --cached --quiet || (git commit -m "patch + debug артефакти" && git push)
