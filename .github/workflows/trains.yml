@@ -1,0 +1,30 @@
+name: BDZ Train Arrivals
+on:
+  schedule:
+    - cron: '10,40 3-21 * * *'   # на 30 мин, 06:10–00:40 софийско
+  workflow_dispatch:
+  push:
+    paths:
+      - 'scripts/scrape_trains.py'
+      - '.github/workflows/trains.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Scrape BDZ live arrivals
+        run: python scripts/scrape_trains.py
+      - name: Commit if changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add train-arrivals.json
+          git diff --cached --quiet || (git commit -m "auto: БДЖ пристигащи $(date -u +%H:%M)" && git push)
