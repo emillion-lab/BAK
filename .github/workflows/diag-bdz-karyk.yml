@@ -1,0 +1,81 @@
+name: diag-bdz-karyk
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/diag-bdz-karyk.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Dump BDZ pages + extract KARYK logic
+        run: |
+          mkdir -p debug
+          python3 - <<'EOF'
+          import re, ssl, os
+          from urllib.request import Request, urlopen
+          from urllib.parse import quote
+
+          UA={"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/126 Safari/537.36",
+              "Accept-Language":"bg-BG,bg;q=0.9"}
+          PROXY="https://mvr-proxy.mihov-emil.workers.dev/scrape?url="
+          INSECURE=ssl._create_unverified_context()
+
+          def fetch(u):
+              for tgt,ctx in ((u,None),(u,INSECURE),(PROXY+quote(u,safe=""),None)):
+                  try:
+                      with urlopen(Request(tgt,headers=UA),timeout=30,context=ctx) as r:
+                          b=r.read()
+                      head=b[:3000].decode("ascii","ignore").lower()
+                      if "1251" in head: return b.decode("cp1251","ignore"),"ok"
+                      try: return b.decode("utf-8"),"ok"
+                      except UnicodeDecodeError: return b.decode("cp1251","ignore"),"ok-1251"
+                  except Exception as e:
+                      err=repr(e)
+              return None,err
+
+          PAGES={
+            "bdz_home":"https://razpisanie.bdz.bg/",
+            "bdz_bdzbg":"https://www.bdz.bg/bg",
+            "bdz_station":"https://razpisanie.bdz.bg/site/station",
+            "bdz_search":"https://razpisanie.bdz.bg/site/search",
+          }
+          rep=[]
+          for name,url in PAGES.items():
+              body,st=fetch(url)
+              if body is None:
+                  rep.append(f"{name}: FAIL {st} | {url}"); continue
+              slim=re.sub(r"<script\b.*?</script>","<!--s-->",body,flags=re.S|re.I)
+              slim=re.sub(r"<style\b.*?</style>","<!--c-->",slim,flags=re.S|re.I)
+              open(f"debug/{name}.html","w",encoding="utf-8").write(slim[:70000])
+              # улики за форма/параметри
+              forms=re.findall(r'<form[^>]*>',slim)[:4]
+              inputs=re.findall(r'<(?:input|select)[^>]*name="([^"]+)"[^>]*>',slim)[:20]
+              rep.append(f"{name}: OK raw={len(body)}b | forms={forms} | fields={inputs} | {url}")
+
+          # --- KARYK логика от app.js ---
+          src=open('app.js',encoding='utf-8').read()
+          out=[]
+          seen=set()
+          for kw in ['karykMode','karyk','КЪРК','borovo','Борово']:
+              for mm in re.finditer(re.escape(kw),src):
+                  ln=src.count('\n',0,mm.start())+1
+                  if any(abs(ln-s)<25 for s in seen): continue
+                  seen.add(ln)
+                  out.append(f"--- {kw} L{ln} ---\n"+src[max(0,mm.start()-700):mm.start()+900])
+                  if len(out)>=6: break
+              if len(out)>=6: break
+          open("debug/karyk.txt","w",encoding="utf-8").write("\n\n".join(out)[:16000]+"\n")
+          open("debug/bdz-report.txt","w",encoding="utf-8").write("\n".join(rep)+"\n")
+          print("\n".join(rep))
+          EOF
+      - name: Commit
+        run: |
+          git config user.name diag-bot; git config user.email diag@bak
+          git add debug/
+          git diff --cached --quiet || (git commit -m "diag: BDZ dump + KARYK логика" && git push)
