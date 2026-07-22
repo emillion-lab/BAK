@@ -1,122 +1,173 @@
 # -*- coding: utf-8 -*-
-"""v5: (1) клик от списъка -> скролва картата във фокус (+ invalidateSize)
-       (2) Централна автогара: live скор от реалните пристигания (не е зелена,
-           когато преди 12 мин са слезли хора или след 18 мин идват 2 автобуса)
-       (3) ЖП гара: честен статус вместо тишина"""
+"""v6: (1) FIX на v5 — computeScores връща {scores,activeEvents}; boost-овете
+           се прилагат вътре чрез window.__applyLive
+       (2) КЪРК с реални сигнали: летище (полети), автогара (автобуси), ЖП (влакове)
+           + наказание за разстояние — вече не праща сляпо на Борово
+       (3) влаковете влизат в деманда на Централна ЖП гара"""
 import re, subprocess, shutil
 
 rep = []
 src = open('app.js', encoding='utf-8').read()
 
-if 'bak-v5' in src:
-    rep.append('SKIP v5 вече е приложен')
+if 'bak-v6' in src:
+    rep.append('SKIP v6 вече е приложен')
 else:
-    # --- (1) фокус на картата при клик от списъка ---
-    old = ("setTimeout(()=>{map.setView([${z.lat},${z.lng}],'${zid}'==='airport'?14:15);")
-    new = ("setTimeout(()=>{var _m=document.getElementById('map');"
-           "if(_m&&_m.scrollIntoView)_m.scrollIntoView({behavior:'smooth',block:'center'});"
-           "if(map.invalidateSize)map.invalidateSize();"
-           "map.setView([${z.lat},${z.lng}],'${zid}'==='airport'?14:15);")
-    if src.count(old) != 1:
-        rep.append('FAIL zone-list onclick count=%d' % src.count(old))
-        cand = None
-    else:
-        cand = src.replace(old, new)
-        rep.append('OK (1) map focus при клик от списъка')
+    cand = src
 
-    if cand:
-        cand += """
+    # --- A: закачаме live boost навсякъде, където се четат scores ---
+    pairs = [
+        ("const {scores,activeEvents}=computeScores(hour);",
+         "const {scores,activeEvents}=computeScores(hour); if(window.__applyLive)window.__applyLive(scores);"),
+        ("const {scores,activeEvents}=computeScores(currentHour);",
+         "const {scores,activeEvents}=computeScores(currentHour); if(window.__applyLive)window.__applyLive(scores);"),
+    ]
+    for old, new in pairs:
+        n = cand.count(old)
+        rep.append('A "%s..." x%d' % (old[:38], n))
+        if n:
+            cand = cand.replace(old, new)
 
-// ------ bak-v5 ------
-// (2) Централна автогара: реален деманд от пристигащите автобуси
+    n = cand.count("const {scores}=computeScores(currentHour);")
+    rep.append('A2 {scores}=computeScores(currentHour) x%d' % n)
+    cand = cand.replace("const {scores}=computeScores(currentHour);",
+                        "const {scores}=computeScores(currentHour); if(window.__applyLive)window.__applyLive(scores);")
+
+    # --- B: КЪРК кандидатите включват хъбовете ---
+    old_f = "ZONES.filter(z=>z.type==='karyk'||z.type==='residential_lux'||z.type==='residential')"
+    new_f = ("ZONES.filter(z=>z.type==='karyk'||z.type==='residential_lux'||z.type==='residential'"
+             "||(window.__liveDemand&&window.__liveDemand.hub&&window.__liveDemand.hub[z.id]!==undefined))")
+    nf = cand.count(old_f)
+    rep.append('B filter x%d' % nf)
+    if nf == 1:
+        cand = cand.replace(old_f, new_f)
+
+    old_m = ".map(z=>({z,ks:computeKarykScore(z.id,scores)}))"
+    new_m = (".map(z=>({z,ks:(window.__karykLive?window.__karykLive(z,computeKarykScore(z.id,scores),"
+             "typeof userLat==='number'?userLat:null,typeof userLng==='number'?userLng:null)"
+             ":computeKarykScore(z.id,scores))}))")
+    nm = cand.count(old_m)
+    rep.append('B map x%d' % nm)
+    if nm == 1:
+        cand = cand.replace(old_m, new_m)
+
+    if nf != 1 or nm != 1:
+        rep.append('WARN КЪРК замените не са уникални — пропускам ги')
+        cand = src if (nf > 1 or nm > 1) else cand
+
+    # --- C: живият мост (отвън, чрез window) ---
+    cand += """
+
+// ------ bak-v6: жив мост към вътрешния scope ------
 (function(){
-  var busState = {recent:0, soon:0, ts:0};
+  window.__liveDemand = {hub:{}, boost:{}};
 
-  function pull(){
+  function num(x){ return typeof x==='number' && isFinite(x) ? x : 0; }
+
+  function pullFlights(){
+    fetch('flight-cache.json?v='+Date.now()).then(function(r){return r.json()}).then(function(d){
+      var now=Date.now(), soon=0;
+      (d.data||[]).forEach(function(f){
+        if(f.flight_status==='cancelled') return;
+        var a=f.arrival||{}, land=a.estimated||a.scheduled;
+        if(!land) return;
+        var lt=new Date(land).getTime(); if(isNaN(lt)) return;
+        var xs=lt+12*60000;                       // начало на изходния прозорец
+        if(xs>now-20*60000 && xs<now+75*60000) soon++;
+      });
+      window.__liveDemand.hub.airport = soon ? Math.min(5, 1.0 + soon*0.6) : 0;
+      window.__liveDemand.flights = soon;
+    }).catch(function(e){});
+  }
+
+  function pullBuses(){
     fetch('bus-arrivals.json?v='+Date.now()).then(function(r){return r.json()}).then(function(d){
       var fresh = d.updated && (Date.now()-new Date(d.updated).getTime()) < 100*60000;
-      if(!fresh){ busState={recent:0,soon:0,ts:Date.now()}; return; }
-      var now=new Date(), nowMin=now.getHours()*60+now.getMinutes();
-      var recent=0, soon=0;
+      if(!fresh){ window.__liveDemand.hub.cab_north=0; window.__liveDemand.boost.cab_north=0; return; }
+      var now=new Date(), nowMin=now.getHours()*60+now.getMinutes(), recent=0, soon=0;
       (d.arrivals||[]).forEach(function(a){
         var m=/^(\\d{1,2}):(\\d{2})$/.exec(a.time||''); if(!m) return;
         var delta=(+m[1])*60+(+m[2])-nowMin;
-        if(delta<=0 && delta>=-15) recent++;        // слезли са преди <=15 мин
-        else if(delta>0 && delta<=25) soon++;       // идват до 25 мин
+        if(delta<=0 && delta>=-15) recent++;
+        else if(delta>0 && delta<=25) soon++;
       });
-      busState={recent:recent, soon:soon, ts:Date.now()};
+      window.__liveDemand.boost.cab_north = Math.min(2.6, recent*0.85 + soon*0.65);
+      window.__liveDemand.hub.cab_north   = (recent+soon) ? Math.min(4.5, 1.0 + recent*0.9 + soon*0.7) : 0;
+      window.__liveDemand.buses = {recent:recent, soon:soon};
     }).catch(function(e){});
   }
-  pull(); setInterval(pull, 120000);
 
-  if(typeof computeScores === 'function'){
-    var _origCompute = computeScores;
-    computeScores = function(h){
-      var s = _origCompute(h);
-      try{
-        if(s && typeof s['cab_north'] === 'number'){
-          // всеки току-що слязъл автобус тежи най-много (хората са на място СЕГА)
-          var boost = Math.min(2.6, busState.recent*0.85 + busState.soon*0.65);
-          if(boost>0) s['cab_north'] = s['cab_north'] + boost;
-        }
-      }catch(e){}
-      return s;
-    };
+  function pullTrains(){
+    fetch('train-arrivals.json?v='+Date.now()).then(function(r){return r.json()}).then(function(d){
+      var fresh = d.updated && (Date.now()-new Date(d.updated).getTime()) < 120*60000;
+      if(!fresh){ window.__liveDemand.hub.cjp=0; window.__liveDemand.boost.cjp=0; return; }
+      var now=new Date(), nowMin=now.getHours()*60+now.getMinutes(), w=0, n=0;
+      (d.arrivals||[]).forEach(function(a){
+        var m=/^(\\d{1,2}):(\\d{2})$/.exec(a.time||''); if(!m) return;
+        var delta=(+m[1])*60+(+m[2])+num(a.delay)-nowMin;
+        if(delta>=-15 && delta<=30){ w += num(a.weight)||0.5; n++; }
+      });
+      window.__liveDemand.boost.cjp = Math.min(2.4, w*1.05);
+      window.__liveDemand.hub.cjp   = n ? Math.min(4.5, 1.0 + w*1.15) : 0;
+      window.__liveDemand.trains = n;
+    }).catch(function(e){});
   }
 
-  // видим маркер защо е горещо — малък надпис в списъка на автогарата
-  setInterval(function(){
-    var items=document.querySelectorAll('#zone-list .zone-item');
-    Array.prototype.slice.call(items).forEach(function(it){
-      var nm=it.querySelector('.zone-name');
-      if(!nm || nm.textContent.indexOf('Централна автогара')<0) return;
-      var sub=it.querySelector('.zone-sub');
-      var txt='';
-      if(busState.recent) txt='🚌 '+busState.recent+' слезли <15 мин';
-      if(busState.soon) txt+=(txt?' · ':'')+busState.soon+' идват <25 мин';
-      if(!txt) return;
-      if(!sub){
-        sub=document.createElement('div');
-        sub.className='zone-sub';
-        nm.parentElement.appendChild(sub);
-      }
-      sub.textContent=txt;
-    });
-  }, 15000);
-})();
+  function pull(){ pullFlights(); pullBuses(); pullTrains(); }
+  pull(); setInterval(pull, 120000);
 
-// (3) ЖП гара: честен статус, докато няма разписание
-(function(){
-  if(typeof showTransitPopup !== 'function') return;
-  var _origTransit = showTransitPopup;
-  showTransitPopup = function(zid){
-    var r = _origTransit(zid);
-    if(zid==='cjp'){
-      setTimeout(function(){
-        var pops=document.querySelectorAll('.leaflet-popup-content');
-        if(!pops.length) return;
-        var p=pops[pops.length-1];
-        if(p.innerHTML.indexOf('bdz-note')>=0) return;
-        p.innerHTML += '<div class="bdz-note" style="margin-top:8px;padding:7px 9px;border-radius:7px;'+
-          'background:rgba(56,189,248,.08);border-left:3px solid #38bdf8;font-size:12px;color:#94a3b8">'+
-          '🚂 Живо разписание на БДЖ — предстои.<br>Засега: пиковете са ~07:30, 13:00, 18:30, 21:40 '+
-          '(пристигания от Пловдив/Варна/Бургас).</div>';
-      }, 200);
-    }
-    return r;
+  // прилага живите boost-ове върху нормалните demand точки
+  window.__applyLive = function(scores){
+    try{
+      var b = window.__liveDemand.boost || {};
+      if(typeof scores.cab_north === 'number' && b.cab_north) scores.cab_north += b.cab_north;
+      if(typeof scores.cjp === 'number' && b.cjp) scores.cjp += b.cjp;
+    }catch(e){}
   };
+
+  // КЪРК: хъбовете се състезават с кварталите + наказание за разстояние
+  window.__karykLive = function(z, baseKs, ulat, ulng){
+    var ks = num(baseKs);
+    try{
+      var h = (window.__liveDemand.hub||{})[z.id];
+      if(typeof h === 'number' && h > 0) ks = Math.max(ks, h);
+      if(typeof ulat === 'number' && typeof ulng === 'number'){
+        var dx=(z.lat-ulat)*111, dy=(z.lng-ulng)*82;
+        var km=Math.sqrt(dx*dx+dy*dy);
+        if(km > 5) ks -= Math.min(1.3, (km-5)*0.11);   // далече = губиш време на празно
+      }
+    }catch(e){}
+    return ks;
+  };
+
+  // подсказка защо е горещо — в КЪРК банера
+  setInterval(function(){
+    var el=document.getElementById('karyk-hint');
+    if(!el || !document.body.classList.contains('karyk-active')) return;
+    var L=window.__liveDemand||{}, bits=[];
+    if(L.flights) bits.push('✈️ '+L.flights+' изхода');
+    if(L.buses && (L.buses.recent+L.buses.soon)) bits.push('🚌 '+(L.buses.recent+L.buses.soon));
+    if(L.trains) bits.push('🚂 '+L.trains);
+    if(!bits.length) return;
+    if(el.dataset.live === bits.join()) return;
+    el.dataset.live = bits.join();
+    var tag=el.querySelector('.live-tag');
+    if(!tag){ tag=document.createElement('span'); tag.className='live-tag';
+              tag.style.cssText='margin-left:8px;font-size:12px;opacity:.85'; el.appendChild(tag); }
+    tag.textContent='· '+bits.join(' · ');
+  }, 10000);
 })();
 """
-        open('/tmp/app.c.js', 'w', encoding='utf-8').write(cand)
-        r = subprocess.run(['node', '--check', '/tmp/app.c.js'], capture_output=True, text=True)
-        if r.returncode == 0:
-            shutil.move('/tmp/app.c.js', 'app.js')
-            idx = open('index.html', encoding='utf-8').read()
-            idx = re.sub(r'app\.js\?v=[0-9a-z]+', 'app.js?v=20260722v5', idx)
-            open('index.html', 'w', encoding='utf-8').write(idx)
-            rep.append('OK v5 пълен + node --check + cache-bust v5')
-        else:
-            rep.append('FAIL node --check :: ' + (r.stderr or '')[:400])
+
+    open('/tmp/app.c.js', 'w', encoding='utf-8').write(cand)
+    r = subprocess.run(['node', '--check', '/tmp/app.c.js'], capture_output=True, text=True)
+    if r.returncode == 0:
+        shutil.move('/tmp/app.c.js', 'app.js')
+        idx = open('index.html', encoding='utf-8').read()
+        idx = re.sub(r'app\.js\?v=[0-9a-z]+', 'app.js?v=20260722v6', idx)
+        open('index.html', 'w', encoding='utf-8').write(idx)
+        rep.append('OK v6 + node --check + cache-bust v6')
+    else:
+        rep.append('FAIL node --check :: ' + (r.stderr or '')[:400])
 
 open('flights-rain-report.txt', 'w', encoding='utf-8').write('\n'.join(rep) + '\n')
 print('\n'.join(rep))
