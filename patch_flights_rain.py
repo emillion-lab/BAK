@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
-"""v4: (1) старият rain-banner се маха окончателно (ненадежден — 2 противоречиви прогнози)
-       (2) rain chip v2: 'Вали сега до HH:MM' / 'Дъжд от HH:MM' / 'Без дъжд'
-       (3) 🚌 входящи автобуси: ETA на първите спирки (Експо/Ботевградско/бул.България/Цариградско)
-           по коридор според града, + оранжев чип при автобуси в ±20 мин прозорец."""
+"""v4.1: fix — липсваща затваряща скоба в HEMUS regex (щеше да гръмне node --check).
+(1) старият rain-banner се маха окончателно (2) rain chip v2 (3) 🚌 коридорни ETA."""
 import re, subprocess, shutil
 
 rep = []
@@ -22,7 +20,6 @@ else:
 
 // (2) rain chip v2: сегашно състояние + следващ дъжд от един източник (Open-Meteo)
 (function(){
-  // махни стария ☔/☀️ чип от v1
   Array.prototype.slice.call(document.querySelectorAll('div')).forEach(function(el){
     var t=el.textContent||'';
     if((t.indexOf('☔ Дъжд от')===0||t.indexOf('☀️ Без дъжд')===0)&&el.style.position==='fixed') el.remove();
@@ -72,7 +69,7 @@ else:
 // (3) 🚌 входящи автобуси с ETA на първите спирки по коридор
 (function(){
   function hm(d){return d.toLocaleTimeString('bg',{hour:'2-digit',minute:'2-digit'});}
-  var HEMUS=/(ВАРНА|ШУМЕН|РУСЕ|РАЗГРАД|ТЪРГОВИЩЕ|ВЕЛИКО ТЪРНОВО|В\\. ?ТЪРНОВО|ГАБРОВО|ПЛЕВЕН|ЛОВЕЧ|СЕВЛИЕВО|БЯЛА|ДОБРИЧ|СИЛИСТРА|БОТЕВГРАД|ПРАВЕЦ/i;
+  var HEMUS=/(ВАРНА|ШУМЕН|РУСЕ|РАЗГРАД|ТЪРГОВИЩЕ|ВЕЛИКО ТЪРНОВО|В\\. ?ТЪРНОВО|ГАБРОВО|ПЛЕВЕН|ЛОВЕЧ|СЕВЛИЕВО|БЯЛА|ДОБРИЧ|СИЛИСТРА|БОТЕВГРАД|ПРАВЕЦ)/i;
   var TRAKIA=/(ПЛОВДИВ|БУРГАС|СТАРА ЗАГОРА|СЛИВЕН|ЯМБОЛ|ХАСКОВО|КЪРДЖАЛИ|ДИМИТРОВГРАД|ПАЗАРДЖИК|АСЕНОВГРАД|НЕСЕБЪР|СЛЪНЧЕВ|ПОМОРИЕ|СОЗОПОЛ|ИСТАНБУЛ|ОДРИН|ЧОРЛУ|АНКАРА|БУРСА)/i;
   var YUG=/(БЛАГОЕВГРАД|САНДАНСКИ|ПЕТРИЧ|ДУПНИЦА|КЮСТЕНДИЛ|БАНСКО|РАЗЛОГ|ГОЦЕ|СОЛУН|АТИНА|КАВАЛА|ДРАМА|СКОПИЕ|СТРУМИЦА|ОХРИД|БИТОЛЯ)/i;
   function corridor(from){
@@ -132,9 +129,9 @@ else:
     if r.returncode == 0:
         shutil.move('/tmp/app.c.js', 'app.js')
         idx = open('index.html', encoding='utf-8').read()
-        idx = re.sub(r'app\.js\?v=[0-9a-z]+', 'app.js?v=20260722v4', idx)
+        idx = re.sub(r'app\.js\?v=[0-9a-z]+', 'app.js?v=20260722v41', idx)
         open('index.html', 'w', encoding='utf-8').write(idx)
-        rep.append('OK v4: rain-banner маха, rain chip v2, 🚌 коридорни ETA + node --check')
+        rep.append('OK v4.1: rain-banner маха, rain chip v2, 🚌 коридорни ETA + node --check')
     else:
         rep.append('FAIL node --check :: ' + (r.stderr or '')[:400])
 
