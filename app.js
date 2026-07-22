@@ -32,14 +32,14 @@ let alertedEvents     = new Set();
 // ═══════════════════════════════════════════════
 const ZONES = [
   { id:"airport",        name:"Летище София (СОФ)",                     icon:"✈️",  lat:42.6950, lng:23.4083, radius:600, type:"airport",          wazeName:"Летище София" },
-  { id:"bpark",          name:"Business Park Sofia",                    icon:"🏢", lat:42.6292, lng:23.3731, radius:380, type:"office",           wazeName:"Business Park Sofia" },
+  { id:"bpark",          name:"Business Park Sofia",                    icon:"🏢", lat:42.6269, lng:23.3784, radius:380, type:"office",           wazeName:"Business Park Sofia" },
   { id:"garitage",       name:"Garitage Park",                          icon:"🏢", lat:42.6227, lng:23.3735, radius:320, type:"office",           wazeName:"Garitage Park Sofia" },
   { id:"polygraphia",    name:"Polygraphia Office Center",              icon:"🏢", lat:42.6700, lng:23.3820, radius:260, type:"office",           wazeName:"Polygraphia Office Center Sofia" },
   { id:"capital_fort",   name:"Capital Fort",                           icon:"🏢", lat:42.6464, lng:23.3958, radius:230, type:"office",           wazeName:"Capital Fort Sofia" },
   { id:"megapark",       name:"Megapark / The Mall офиси",              icon:"🏢", lat:42.6600, lng:23.3840, radius:260, type:"office",           wazeName:"Megapark Sofia" },
   { id:"advance_bc",     name:"Advance Business Center",                icon:"🏢", lat:42.6290, lng:23.3720, radius:230, type:"office",           wazeName:"Advance Business Center Sofia" },
   { id:"expo2000",       name:"Expo 2000 / Ellipse Center",             icon:"🏢", lat:42.6535, lng:23.3958, radius:280, type:"office",           wazeName:"Expo 2000 Sofia" },
-  { id:"iec",            name:"IEC / Интер Експо Център",               icon:"🏢", lat:42.6710, lng:23.4020, radius:280, type:"office",           wazeName:"Inter Expo Center Sofia" },
+  { id:"iec",            name:"IEC / Интер Експо Център (Цариградско 147)",               icon:"🏢", lat:42.6491, lng:23.3952, radius:280, type:"office",           wazeName:"Inter Expo Center Sofia" },
   { id:"office_center",  name:"Офис Център (пл.Патриарх Евтимий)",     icon:"🏢", lat:42.6883, lng:23.3285, radius:230, type:"office",           wazeName:"площад Патриарх Евтимий София" },
   { id:"sopharma_bc",    name:"Sopharma Business Towers (Лъчезар Станчев 5)",               icon:"🏢", lat:42.6661, lng:23.3571, radius:200, type:"office",           wazeName:"Sopharma Business Towers Sofia" },
   { id:"sopharma_rozhen", name:"Sopharma Trading (бул.Рожен 16)", icon:"🏢", lat:42.7289, lng:23.3133, radius:180, type:"office", wazeName:"Sopharma Trading бул Рожен 16 София" },
@@ -57,12 +57,12 @@ const ZONES = [
 
   { id:"hotels_ctr",     name:"Хотели Център (Radisson/Hilton)",        icon:"🏨", lat:42.6953, lng:23.3242, radius:280, type:"hotel",            wazeName:"Radisson Blu Sofia" },
   { id:"hotels_ndk",     name:"Kempinski / InterContinental НДК",       icon:"🏨", lat:42.6855, lng:23.3188, radius:180, type:"hotel",            wazeName:"Kempinski Hotel Zografski Sofia" },
-  { id:"hotel_marinela", name:"Хотел Маринела (бул.Черни връх 100)",    icon:"🏨", lat:42.6623, lng:23.3175, radius:160, type:"hotel",            wazeName:"Hotel Marinela Sofia" },
+  { id:"hotel_marinela", name:"Хотел Маринела (Джеймс Баучер 100)",    icon:"🏨", lat:42.6724, lng:23.319, radius:160, type:"hotel",            wazeName:"Hotel Marinela Sofia" },
 
   { id:"cjp",            name:"Централна ЖП гара",                      icon:"🚂", lat:42.7121, lng:23.3210, radius:240, type:"transit",          wazeName:"Централна жп гара София" },
   { id:"cab_north",      name:"Централна автогара",                     icon:"🚌", lat:42.7103, lng:23.3233, radius:200, type:"transit",          wazeName:"Централна автогара София" },
-  { id:"ag_yug",         name:"Автогара Юг (бул.Драган Цанков)",        icon:"🚌", lat:42.6784, lng:23.3405, radius:190, type:"transit",          wazeName:"Автогара Юг София" },
-  { id:"ag_pod",         name:"Автогара Подуяне",                       icon:"🚌", lat:42.7015, lng:23.3758, radius:190, type:"transit",          wazeName:"Автогара Подуяне София" },
+  { id:"ag_yug",         name:"Автогара Юг (бул.Драган Цанков)",        icon:"🚌", lat:42.6689, lng:23.3526, radius:190, type:"transit",          wazeName:"Автогара Юг София" },
+  { id:"ag_pod",         name:"Автогара Подуяне",                       icon:"🚌", lat:42.7034, lng:23.3601, radius:190, type:"transit",          wazeName:"Автогара Подуяне София" },
 
   { id:"arena",          name:"Арена 8888",                             icon:"🎸", lat:42.6711, lng:23.3692, radius:290, type:"venue",            wazeName:"Arena Sofia 8888" },
   { id:"ndk",            name:"НДК",                                    icon:"🎭", lat:42.6855, lng:23.3188, radius:260, type:"venue",            wazeName:"Национален дворец на културата НДК" },
@@ -71,7 +71,7 @@ const ZONES = [
   { id:"opera",          name:"Национална опера и балет",               icon:"🎶", lat:42.6975, lng:23.3305, radius:180, type:"theatre",          wazeName:"Национална опера и балет София" },
   { id:"ndk_theatre",    name:"Театри / НДК зона",                      icon:"🎭", lat:42.6843, lng:23.3196, radius:200, type:"theatre",          wazeName:"НДК театри София" },
 
-  { id:"pirogov",        name:"УМБАЛ Пирогов (бул.Тотлебен 21)",        icon:"🏥", lat:42.6933, lng:23.3177, radius:190, type:"hospital",         wazeName:"УМБАЛСМ Пирогов бул Тотлебен 21 София" },
+  { id:"pirogov",        name:"УМБАЛ Пирогов (бул.Тотлебен 21)",        icon:"🏥", lat:42.6901, lng:23.3072, radius:190, type:"hospital",         wazeName:"УМБАЛСМ Пирогов бул Тотлебен 21 София" },
   { id:"alexand",        name:"Александровска болница",                 icon:"🏥", lat:42.6958, lng:23.3093, radius:190, type:"hospital",         wazeName:"УМБАЛ Александровска болница София" },
   { id:"vma",            name:"ВМА (Георги Софийски 3)",         icon:"🏥", lat:42.6842, lng:23.3045, radius:170, type:"hospital",         wazeName:"ВМА Военномедицинска академия София" },
   { id:"sv_anna",        name:"УМБАЛ Света Анна",                       icon:"🏥", lat:42.6618, lng:23.3732, radius:160, type:"hospital",         wazeName:"УМБАЛ Света Анна Sofia" },
