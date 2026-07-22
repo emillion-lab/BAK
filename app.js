@@ -990,7 +990,7 @@ function render(hour) {
         const z=ZONES.find(x=>x.id===zid); if(!z) return '';
         const c=demandColor(score,z.type);
         const sub=(activeEvents[zid]||[])[0]?.name||'';
-        return `<div class="zone-item" onclick="(function(){if(document.body.classList.contains('list-view'))toggleMapView();setTimeout(()=>{map.setView([${z.lat},${z.lng}],'${zid}'==='airport'?14:15);'${zid}'==='airport'?showAirportSchedule():showZonePopup('${zid}');},150);})()">
+        return `<div class="zone-item" onclick="(function(){if(document.body.classList.contains('list-view'))toggleMapView();setTimeout(()=>{var _m=document.getElementById('map');if(_m&&_m.scrollIntoView)_m.scrollIntoView({behavior:'smooth',block:'center'});if(map.invalidateSize)map.invalidateSize();map.setView([${z.lat},${z.lng}],'${zid}'==='airport'?14:15);'${zid}'==='airport'?showAirportSchedule():showZonePopup('${zid}');},150);})()">
           <div class="zone-dot" style="background:${c.fill}"></div>
           <div style="flex:1;min-width:0">
             <div class="zone-name">${z.icon} ${z.name}</div>
@@ -2085,4 +2085,85 @@ function toggleMapView(){
     }).catch(function(e){});
   }
   refresh(); setInterval(refresh, 120000);
+})();
+
+
+// ------ bak-v5 ------
+// (2) Централна автогара: реален деманд от пристигащите автобуси
+(function(){
+  var busState = {recent:0, soon:0, ts:0};
+
+  function pull(){
+    fetch('bus-arrivals.json?v='+Date.now()).then(function(r){return r.json()}).then(function(d){
+      var fresh = d.updated && (Date.now()-new Date(d.updated).getTime()) < 100*60000;
+      if(!fresh){ busState={recent:0,soon:0,ts:Date.now()}; return; }
+      var now=new Date(), nowMin=now.getHours()*60+now.getMinutes();
+      var recent=0, soon=0;
+      (d.arrivals||[]).forEach(function(a){
+        var m=/^(\d{1,2}):(\d{2})$/.exec(a.time||''); if(!m) return;
+        var delta=(+m[1])*60+(+m[2])-nowMin;
+        if(delta<=0 && delta>=-15) recent++;        // слезли са преди <=15 мин
+        else if(delta>0 && delta<=25) soon++;       // идват до 25 мин
+      });
+      busState={recent:recent, soon:soon, ts:Date.now()};
+    }).catch(function(e){});
+  }
+  pull(); setInterval(pull, 120000);
+
+  if(typeof computeScores === 'function'){
+    var _origCompute = computeScores;
+    computeScores = function(h){
+      var s = _origCompute(h);
+      try{
+        if(s && typeof s['cab_north'] === 'number'){
+          // всеки току-що слязъл автобус тежи най-много (хората са на място СЕГА)
+          var boost = Math.min(2.6, busState.recent*0.85 + busState.soon*0.65);
+          if(boost>0) s['cab_north'] = s['cab_north'] + boost;
+        }
+      }catch(e){}
+      return s;
+    };
+  }
+
+  // видим маркер защо е горещо — малък надпис в списъка на автогарата
+  setInterval(function(){
+    var items=document.querySelectorAll('#zone-list .zone-item');
+    Array.prototype.slice.call(items).forEach(function(it){
+      var nm=it.querySelector('.zone-name');
+      if(!nm || nm.textContent.indexOf('Централна автогара')<0) return;
+      var sub=it.querySelector('.zone-sub');
+      var txt='';
+      if(busState.recent) txt='🚌 '+busState.recent+' слезли <15 мин';
+      if(busState.soon) txt+=(txt?' · ':'')+busState.soon+' идват <25 мин';
+      if(!txt) return;
+      if(!sub){
+        sub=document.createElement('div');
+        sub.className='zone-sub';
+        nm.parentElement.appendChild(sub);
+      }
+      sub.textContent=txt;
+    });
+  }, 15000);
+})();
+
+// (3) ЖП гара: честен статус, докато няма разписание
+(function(){
+  if(typeof showTransitPopup !== 'function') return;
+  var _origTransit = showTransitPopup;
+  showTransitPopup = function(zid){
+    var r = _origTransit(zid);
+    if(zid==='cjp'){
+      setTimeout(function(){
+        var pops=document.querySelectorAll('.leaflet-popup-content');
+        if(!pops.length) return;
+        var p=pops[pops.length-1];
+        if(p.innerHTML.indexOf('bdz-note')>=0) return;
+        p.innerHTML += '<div class="bdz-note" style="margin-top:8px;padding:7px 9px;border-radius:7px;'+
+          'background:rgba(56,189,248,.08);border-left:3px solid #38bdf8;font-size:12px;color:#94a3b8">'+
+          '🚂 Живо разписание на БДЖ — предстои.<br>Засега: пиковете са ~07:30, 13:00, 18:30, 21:40 '+
+          '(пристигания от Пловдив/Варна/Бургас).</div>';
+      }, 200);
+    }
+    return r;
+  };
 })();

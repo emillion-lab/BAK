@@ -1,1 +1,2 @@
-OK v4.1: rain-banner маха, rain chip v2, 🚌 коридорни ETA + node --check
+OK (1) map focus при клик от списъка
+OK v5 пълен + node --check + cache-bust v5
