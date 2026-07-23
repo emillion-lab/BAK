@@ -1,7 +1,5 @@
-OK   ред 414 защитен — липсваща зона вече не събаря приложението
-зони: 93
-събития: 86 · сираци: pool_marialuiza
-  премахнати 1 събития за "pool_marialuiza"
-OK   общо премахнати събития-сираци: 1
-OK   sw.js кеш -> bak-v17
-OK v17 + node --check + cache-bust v17
+OK   изключен стар скенер: document.querySelectorAll('.leaflet-popup-con
+OK   изключен стар скенер: document.querySelectorAll('[data-stop],.stop-
+OK   v18: спирки от разписание + ЖП с реални влакове
+OK   sw.js кеш -> bak-v18
+OK v18 + node --check + cache-bust v18
