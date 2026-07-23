@@ -1,5 +1,9 @@
-index.html вика: closeBakshish, closeDirHint, closeEventAlert, closeNav, closeNext90, getElementById, toggleMapView
-дефинирани: closeBakshish, closeNext90, toggleMapView
-⚠ НЕдефинирани: closeDirHint, closeEventAlert, closeNav, getElementById
-OK   реализирани: closeDirHint, closeEventAlert, closeNav, getElementById (затварят блока, от който е бутонът)
-OK v23 + node --check + cache-bust v23
+OK   махната излишната заглушка getElementById
+OK   borisova -> 42.6748,23.3394 (парк) + НОВА зона vl_stadium 42.6882,23.3346
+     (бяха 1 км една от друга, зоната стоеше по средата)
+OK   demandColor изнесена в window
+OK   нова цветова скала: 8 нива, цвят от 0.35 нагоре
+КЪРК селектори: #karyk-banner, #karyk-btn, #karyk-hint, #karyk-list, #karyk-sidebar, .karyk-dot, .karyk-item, .karyk-name, .karyk-rank, .karyk-score, .karyk-sub
+OK   КЪРК смален до 62%% (двойно по-малко площ)
+зони: 94
+OK v24 + node --check + cache-bust v24

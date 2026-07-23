@@ -26,7 +26,7 @@
     }catch(err){}
     return false;
   }
-  var N = ["closeDirHint", "closeEventAlert", "closeNav", "getElementById"];
+  var N = ["closeDirHint", "closeEventAlert", "closeNav", ];
   N.forEach(function(n){
     if(typeof window[n] === 'function') return;
     window[n] = hideOwner;
@@ -190,7 +190,8 @@ const ZONES = [
 
   { id:"arena",          name:"Арена 8888",                             icon:"🎸", lat:42.6711, lng:23.3692, radius:290, type:"venue",            wazeName:"Arena Sofia 8888" },
   { id:"ndk",            name:"НДК",                                    icon:"🎭", lat:42.6855, lng:23.3188, radius:260, type:"venue",            wazeName:"Национален дворец на културата НДК" },
-  { id:"borisova",       name:"Борисова градина / Нац. стадион В.Левски",      icon:"🌳", lat:42.6838, lng:23.345, radius:340, type:"leisure",          wazeName:"Борисова градина София" },
+  { id:"borisova",       name:"Борисова градина (парк)",      icon:"🌳", lat:42.6748, lng:23.3394, radius:750, type:"leisure",          wazeName:"Борисова градина София" },
+  { id:"vl_stadium", name:"Нац. стадион Васил Левски", icon:"🏟️", lat:42.6882, lng:23.3346, radius:320, type:"leisure", wazeName:"Национален стадион Васил Левски София" },
   { id:"nat_theatre",    name:"Народен театър Иван Вазов",              icon:"🎭", lat:42.6944, lng:23.3261, radius:180, type:"theatre",          wazeName:"Народен театър Иван Вазов София" },
   { id:"opera",          name:"Национална опера и балет",               icon:"🎶", lat:42.6975, lng:23.3305, radius:180, type:"theatre",          wazeName:"Национална опера и балет София" },
   { id:"ndk_theatre",    name:"Театри / НДК зона",                      icon:"🎭", lat:42.6843, lng:23.3196, radius:200, type:"theatre",          wazeName:"НДК театри София" },
@@ -425,7 +426,7 @@ const EVENTS = [
 // ═══════════════════════════════════════════════
 // HELPERS
 // ═══════════════════════════════════════════════
-function demandColor(score, type) {
+window.demandColor = function demandColor(score, type) {
   if (type === 'hospital')
     return score>=2.0 ? {fill:"#ff2020",fillAlpha:0.75,stroke:"#ff6060",label:"🏥 Активно"}
          : score>=1.3 ? {fill:"#ef4444",fillAlpha:0.60,stroke:"#ff5555",label:"🏥"}
@@ -2921,4 +2922,60 @@ function toggleMapView(){
       });
     }catch(e){}
   }, 12000);
+})();
+
+
+// ------ color-scale-v24: цвят още при малък шанс за клиент ------
+(function(){
+  if(typeof window.demandColor !== 'function') return;
+  var orig = window.demandColor;
+
+  // праг -> цвят. Сиво САМО при реално нула.
+  var SCALE = [
+    [0.35, '#8b95a5', 0.10],   // мъртво — бледо сиво, да не прави каша
+    [0.80, '#4aa3c7', 0.20],   // минимален шанс — студено синьо
+    [1.30, '#2fa88a', 0.28],   // има шанс — тюркоаз
+    [1.90, '#4cba52', 0.34],   // приличен — зелено
+    [2.50, '#a3c23a', 0.40],   // добър — жълто-зелено
+    [3.10, '#e0a020', 0.46],   // силен — кехлибар
+    [3.80, '#ef7a1a', 0.54],   // много силен — оранж
+    [99,   '#e33b2e', 0.62]    // пик — червено
+  ];
+
+  function pick(s){
+    for(var i = 0; i < SCALE.length; i++){
+      if(s < SCALE[i][0]) return SCALE[i];
+    }
+    return SCALE[SCALE.length - 1];
+  }
+
+  window.demandColor = function(s, type){
+    var out;
+    try{ out = orig.apply(this, arguments); }catch(e){ out = {}; }
+    try{
+      var num = (typeof s === 'number') ? s : parseFloat(s) || 0;
+      var p = pick(num), col = p[1], op = p[2];
+      if(!out || typeof out !== 'object') out = {};
+      // болниците си пазят собствения червен код
+      if(type === 'hospital') return out;
+      ['fill','color','stroke','border','fillColor','bg'].forEach(function(k){
+        if(k in out) out[k] = col;
+      });
+      if(!('fill' in out)) out.fill = col;
+      ['op','opacity','fillOpacity','alpha'].forEach(function(k){
+        if(k in out && typeof out[k] === 'number') out[k] = op;
+      });
+    }catch(e){}
+    return out;
+  };
+})();
+
+
+// ------ karyk-shrink-v24: КЪРК бутонът да не закрива картата ------
+(function(){
+  try{
+    var st = document.createElement('style');
+    st.textContent = '#karyk-banner, #karyk-btn, #karyk-hint, #karyk-list, #karyk-sidebar, .karyk-dot, .karyk-item, .karyk-name, .karyk-rank, .karyk-score, .karyk-sub{transform:scale(.62)!important;transform-origin:left bottom!important;opacity:.82!important;}';
+    document.head.appendChild(st);
+  }catch(e){}
 })();
