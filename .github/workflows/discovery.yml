@@ -1,0 +1,32 @@
+name: discovery
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'scripts/discovery.py'
+      - '.github/workflows/discovery.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install curl_cffi (TLS impersonation)
+        continue-on-error: true
+        run: pip install --quiet curl_cffi
+      - name: Run discovery
+        continue-on-error: true
+        run: python scripts/discovery.py
+      - name: Commit report
+        if: always()
+        run: |
+          git config user.name discovery-bot; git config user.email disc@bak
+          git add debug/ 2>/dev/null || true
+          git diff --cached --quiet || (git commit -m "discovery report" && git push)
