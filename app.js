@@ -1,3 +1,16 @@
+// inline-fallback-v21 — предпазни заглушки, за да не гърми inline onclick
+(function(){ var N = ["function"];
+  N.forEach(function(n){
+    if(typeof window[n] === 'function') return;
+    window[n] = function(){
+      try{
+        var ids = ['event-alert','eventAlert','event-banner','alert-box'];
+        ids.forEach(function(id){ var e=document.getElementById(id); if(e) e.style.display='none'; });
+      }catch(e){}
+    };
+  });
+})();
+
 // __leafletMap-hook (v20) — прихваща Leaflet картата при създаване
 (function(){
   try{
@@ -2784,7 +2797,7 @@ function toggleMapView(){
       }
       // крайпътни спирки
       if(!html){
-        if(!/Слизане от|Вход от|Експо|Expo|Ботевградско|бул\.? ?[Бб]ългария|Цариградско/i.test(txt)) return;
+        if(!/Слизане от|Вход от/i.test(txt)) return;
         var k = keyOf(txt);
         if(!k) return;
         html = busHTML(k);
