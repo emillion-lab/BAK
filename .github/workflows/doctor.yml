@@ -1,0 +1,29 @@
+name: doctor
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'scripts/doctor.js'
+      - '.github/workflows/doctor.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: node --check (синтаксис)
+        continue-on-error: true
+        run: node --check app.js && echo "SYNTAX OK"
+      - name: Run doctor (рунтайм)
+        continue-on-error: true
+        run: node scripts/doctor.js
+      - name: Commit report
+        if: always()
+        run: |
+          git config user.name doctor-bot; git config user.email doc@bak
+          git add debug/ 2>/dev/null || true
+          git diff --cached --quiet || (git commit -m "doctor report" && git push)
