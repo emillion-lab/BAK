@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-"""v28: (1) МАХА дублирането — приложението вече има свой списък с пристигащи
-           на ЦАС (с международните вътре), моят от v26 беше излишен
-       (2) popup-ите се ограничават по височина и се скролват — вече не заемат
-           целия екран и се вижда и горе, и долу
-       (3) НОВА зона: международни автобуси, отделно кръгче до ЦАС
+"""v29: (1) международната зона отива ПРЕД Централна гара, където реално са
+           Международна автогара 'Сердика' (42.7105,23.3225) и FlixBus (42.7112,23.3222)
+       (2) поправка на моя гаф от v19 — текстът за Подуяне беше генеричен за
+           ВСИЧКИ транспортни зони
+       (3) списък с международните автобуси в popup-а на зоната
 """
 import re, subprocess, shutil, os
 
@@ -11,61 +11,56 @@ rep = []
 src = open('app.js', encoding='utf-8').read()
 cand = src
 
-# ── (1) изключваме моя дублиращ блок от v26 ──
-old_guard = "if(!/Централна автогара/i.test(txt)) return;"
-new_guard = ("if(!/Централна автогара/i.test(txt)) return;\n"
-             "      // приложението вече си има списък с пристигащи -> не дублираме\n"
-             "      if(/по час на пристигане|модел на превозвача|Пристигащи на ЦАС/i.test(txt)) return;")
-if cand.count(old_guard) == 1:
-    cand = cand.replace(old_guard, new_guard)
-    rep.append('OK   v26 вече не дублира собствения списък на приложението')
+# ── (1) преместване и преименуване ──
+m = re.search(r'\{\s*id:"cas_intl"[^}]*\}', cand)
+if m:
+    obj = m.group(0)
+    new = obj
+    new = re.sub(r'lat:[\d.]+\s*,\s*lng:[\d.]+', 'lat:42.7108, lng:23.3224', new)
+    new = re.sub(r'name:"[^"]*"', 'name:"🌍 Междунар. автогара Сердика / FlixBus"', new)
+    new = re.sub(r'radius:\d+', 'radius:150', new)
+    new = re.sub(r'wazeName:"[^"]*"', 'wazeName:"Международна автогара Сердика София"', new)
+    cand = cand.replace(obj, new, 1)
+    rep.append('OK   cas_intl -> 42.7108,23.3224 (пред Централна гара, беше ~200 м назад)')
 else:
-    rep.append('SKIP guard за ЦАС (намерени %d)' % cand.count(old_guard))
+    rep.append('SKIP cas_intl не е намерена')
 
-# ── (2) popup: ограничена височина + скрол ──
-if 'popup-scroll-v28' not in cand:
-    css = ("/*popup-scroll-v28*/"
-           ".leaflet-popup-content{max-height:52vh!important;overflow-y:auto!important;"
-           "overflow-x:hidden!important;-webkit-overflow-scrolling:touch;}"
-           ".leaflet-popup-content::-webkit-scrollbar{width:5px}"
-           ".leaflet-popup-content::-webkit-scrollbar-thumb{background:rgba(120,140,170,.55);border-radius:3px}"
-           ".leaflet-popup-content-wrapper{max-height:56vh!important;}")
+# ── (2) връщаме генеричния текст ──
+bad = "Транспортен хъб. Няма публично разписание — севернo/източно направление."
+if bad in cand:
+    n = cand.count(bad)
+    cand = cand.replace(bad, "Транспортен хъб.")
+    rep.append('OK   генеричният текст върнат (беше специфичен за Подуяне на %d места)' % n)
+else:
+    rep.append('SKIP генеричният текст не е намерен')
+
+# ── (3) списък с международни в popup-а ──
+if 'intl-list-v29' in cand:
+    rep.append('SKIP списъкът вече е добавен')
+else:
     cand += """
 
-// ------ popup-scroll-v28: popup-ите да не заемат целия екран ------
-(function(){
-  try{
-    var st = document.createElement('style');
-    st.textContent = %s;
-    document.head.appendChild(st);
-  }catch(e){}
-})();
-""" % repr(css).replace('"', "'")
-    rep.append('OK   popup-ите: макс. 52%% височина + скрол')
-
-# ── (3) нова зона за международните автобуси ──
-if 'cas_intl' in cand:
-    rep.append('SKIP зоната cas_intl вече съществува')
-else:
-    m = re.search(r'\{\s*id:"cab_north"[^}]*\}', cand)
-    if m:
-        obj = m.group(0)
-        ztype = (re.search(r'type:"([^"]+)"', obj) or [None, 'transit'])[1]
-        newz = ('{ id:"cas_intl", name:"🌍 Международни автобуси (ЦАС, сектори 36–41)", '
-                'icon:"🌍", lat:42.7110, lng:23.3247, radius:170, type:"%s", '
-                'wazeName:"Централна автогара София международни линии" }' % ztype)
-        cand = cand.replace(obj, obj + ',\n  ' + newz, 1)
-        rep.append('OK   нова зона cas_intl 42.7110,23.3247 (до ЦАС, отделно кръгче)')
-    else:
-        rep.append('SKIP cab_north не е намерена — не мога да закача новата зона')
-
-# ── деманд за новата зона: само от международните линии ──
-if 'cas-intl-score-v28' not in cand:
-    cand += """
-
-// ------ cas-intl-score-v28: скор на международната зона ------
+// ------ intl-list-v29: международни автобуси + бележка за Подуяне ------
 (function(){
   var SCHED = null, LIVE = [];
+  var FLAG = {
+    'скопие':'🇲🇰','ниш':'🇷🇸','белград':'🇷🇸','солун':'🇬🇷','атина':'🇬🇷',
+    'букурещ':'🇷🇴','истанбул':'🇹🇷','одрин':'🇹🇷','киев':'🇺🇦','кишинев':'🇲🇩',
+    'виена':'🇦🇹','мюнхен':'🇩🇪','берлин':'🇩🇪','прага':'🇨🇿','будапеща':'🇭🇺',
+    'загреб':'🇭🇷','любляна':'🇸🇮','тирана':'🇦🇱','подгорица':'🇲🇪','сараево':'🇧🇦'
+  };
+  function flagFor(n){
+    n = (n||'').toLowerCase();
+    for(var k in FLAG){ if(n.indexOf(k) >= 0) return FLAG[k]; }
+    return '🌍';
+  }
+  function hm(d){ return d.toLocaleTimeString('bg',{hour:'2-digit',minute:'2-digit'}); }
+  function whenTxt(m){
+    if(m <= 0) return 'сега';
+    if(m < 60) return 'след ' + m + 'м';
+    return 'след ' + Math.floor(m/60) + 'ч ' + (m%60) + 'м';
+  }
+
   fetch('bus-schedule.json?v='+Date.now()).then(function(r){return r.json()})
     .then(function(d){ SCHED = d; }).catch(function(){});
   function pullLive(){
@@ -76,14 +71,15 @@ if 'cas-intl-score-v28' not in cand:
   }
   pullLive(); setInterval(pullLive, 180000);
 
-  function intlNow(){
-    var now = new Date(), nowMin = now.getHours()*60 + now.getMinutes();
-    var recent = 0, soon = 0, names = [];
+  function intlList(){
+    var out = [], now = Date.now();
     LIVE.forEach(function(a){
       var m = /^(\\d{1,2}):(\\d{2})$/.exec(a.time||''); if(!m) return;
-      var d = (+m[1])*60 + (+m[2]) - nowMin;
-      if(d <= 0 && d >= -25){ recent++; names.push(a.from); }
-      else if(d > 0 && d <= 40){ soon++; names.push(a.from); }
+      var t = new Date(); t.setHours(+m[1], +m[2], 0, 0);
+      if(t.getTime() < now-3*3600000) t.setDate(t.getDate()+1);
+      var d = (t-now)/60000;
+      if(d < -30 || d > 360) return;
+      out.push({t:t, name:a.from, live:true, sector:a.sector||''});
     });
     if(SCHED && SCHED.routes){
       SCHED.routes.forEach(function(rt){
@@ -91,52 +87,95 @@ if 'cas-intl-score-v28' not in cand:
         var dur = rt.duration_min || 0;
         (rt.departures||[]).forEach(function(dep){
           var m = /^(\\d{1,2}):(\\d{2})$/.exec(dep); if(!m) return;
-          var t = (+m[1])*60 + (+m[2]) + dur;
-          var d = t - nowMin;
-          if(d < -180) d += 1440;
+          var t = new Date(); t.setHours(+m[1], +m[2], 0, 0);
+          t = new Date(t.getTime() + dur*60000);
+          if(t.getTime() < now-3*3600000) t = new Date(t.getTime()+864e5);
+          var d = (t-now)/60000;
+          if(d < -30 || d > 360) return;
           var nm = (rt.name||'').replace(/\\s*→.*/,'');
-          if(d <= 0 && d >= -25){ recent++; names.push(nm); }
-          else if(d > 0 && d <= 40){ soon++; names.push(nm); }
+          var dup = out.some(function(o){
+            return o.live && Math.abs((o.t-t)/60000) < 40
+                && o.name.toUpperCase().slice(0,4) === nm.toUpperCase().slice(0,4);
+          });
+          if(!dup) out.push({t:t, name:nm, approx:true});
         });
       });
     }
-    return {recent:recent, soon:soon, names:names.slice(0,3)};
+    out.sort(function(a,b){ return a.t-b.t; });
+    return out.slice(0, 7);
   }
 
-  var prev = window.__applyLive;
-  window.__applyLive = function(scores){
-    try{ if(prev) prev(scores); }catch(e){}
+  function intlHTML(){
+    var list = intlList();
+    if(!list.length){
+      return '<div style="margin-top:7px;padding:6px 8px;border-radius:6px;'
+           + 'background:rgba(148,163,184,.12);border-left:3px solid #94a3b8;'
+           + 'font-size:12px;color:#64748b">🌍 Няма международни в следващите 6ч</div>';
+    }
+    var first = Math.round((list[0].t-Date.now())/60000);
+    var urgent = first <= 30;
+    var rows = list.map(function(x){
+      return '<div style="margin:3px 0">' + flagFor(x.name) + ' <b>' + hm(x.t) + '</b> · ' + x.name
+           + (x.approx ? ' <span style="opacity:.5">≈</span>' : '')
+           + (x.live ? ' <span style="color:#22c55e">●</span>' : '')
+           + (x.sector ? ' <span style="opacity:.6">сек.' + x.sector + '</span>' : '')
+           + ' <span style="opacity:.65">(' + whenTxt(Math.round((x.t-Date.now())/60000)) + ')</span></div>';
+    }).join('');
+    return '<div style="margin-top:7px;padding:7px 9px;border-radius:7px;background:'
+         + (urgent ? 'rgba(234,88,12,.14)' : 'rgba(56,189,248,.10)')
+         + ';border-left:3px solid ' + (urgent ? '#ea580c' : '#38bdf8') + ';font-size:12px">'
+         + '<b>🌍 Международни пристигания</b>' + rows
+         + '<div style="opacity:.55;font-size:11px;margin-top:5px">Дълъг път + багаж = почти сигурен курс<br>'
+         + '● живо от ЦАС · ≈ по разписание на превозвача</div></div>';
+  }
+
+  function enrich(el){
     try{
-      if(typeof scores.cas_intl !== 'number') return;
-      var c = intlNow();
-      // международните носят багаж и почти винаги взимат такси
-      var s = c.recent*1.5 + c.soon*0.9;
-      scores.cas_intl = s > 0 ? Math.min(5, 0.6 + s) : 0.3;
-      window.__intlInfo = c;
+      if(!el || (el.dataset && el.dataset.intl29)) return;
+      var txt = el.textContent || '';
+      if(/Междунар|Сердика \\/ FlixBus|FlixBus/i.test(txt)){
+        if(el.dataset) el.dataset.intl29 = '1';
+        el.insertAdjacentHTML('beforeend', intlHTML());
+        return;
+      }
+      if(/Автогара Подуяне/i.test(txt)){
+        if(el.dataset) el.dataset.intl29 = '1';
+        el.insertAdjacentHTML('beforeend',
+          '<div style="margin-top:7px;padding:6px 8px;border-radius:6px;'
+          + 'background:rgba(148,163,184,.12);border-left:3px solid #94a3b8;'
+          + 'font-size:12px;color:#64748b">🚌 Северно/източно направление.<br>'
+          + 'Няма публично разписание.</div>');
+      }
     }catch(e){}
-  };
+  }
+  function scan(){
+    try{
+      document.querySelectorAll('.leaflet-popup-content').forEach(enrich);
+      document.querySelectorAll('.zone-detail').forEach(enrich);
+    }catch(e){}
+  }
+  scan(); setInterval(scan, 4000);
+  try{ new MutationObserver(scan).observe(document.body, {childList:true, subtree:true}); }catch(e){}
 })();
 """
-    rep.append('OK   скор на международната зона (само intl линии, тежест x1.5)')
+    rep.append('OK   списък с международни в popup-а + отделна бележка за Подуяне')
 
 open('/tmp/app.c.js', 'w', encoding='utf-8').write(cand)
 r = subprocess.run(['node', '--check', '/tmp/app.c.js'], capture_output=True, text=True)
 if r.returncode == 0:
     shutil.move('/tmp/app.c.js', 'app.js')
-    ids = re.findall(r'\{\s*id:"([^"]+)"\s*,\s*name:', cand)
-    rep.append('зони: %d' % len(ids))
     idxh = open('index.html', encoding='utf-8').read()
-    idxh = re.sub(r'app\.js\?v=[0-9a-z]+', 'app.js?v=20260723v28', idxh)
+    idxh = re.sub(r'app\.js\?v=[0-9a-z]+', 'app.js?v=20260723v29', idxh)
     open('index.html', 'w', encoding='utf-8').write(idxh)
     try:
         sw = open('sw.js', encoding='utf-8').read()
         sw2, k = re.subn(r"(CACHE[_A-Z]*\s*=\s*['\"])([^'\"]+)(['\"])",
-                         lambda mm: mm.group(1) + 'bak-v28' + mm.group(3), sw, count=1)
+                         lambda mm: mm.group(1) + 'bak-v29' + mm.group(3), sw, count=1)
         if k:
             open('sw.js', 'w', encoding='utf-8').write(sw2)
     except FileNotFoundError:
         pass
-    rep.append('OK v28 + node --check + cache-bust v28')
+    rep.append('OK v29 + node --check + cache-bust v29')
 else:
     rep.append('FAIL node --check :: ' + (r.stderr or '')[:400])
 
