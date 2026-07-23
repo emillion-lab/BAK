@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-"""v18: (1) СПИРКИТЕ вече смятат часовете от bus-schedule.json (разписание,
-           не зависи от живия скрейпър) + живите данни от ЦАС като потвърждение
-       (2) ЖП гара показва РЕАЛНИТЕ влакове от train-arrivals.json
-       (3) честен статус за Автогара Подуяне
+"""v19: (1) летищната точка — беше 720 м северно от терминалите
+       (2) Централна автогара смята деманд от РАЗПИСАНИЕТО, не от стария скрейпър
+       (3) Подуяне — маха обещанието за разписание
+       (4) дъмп на кода за кръговете и посоката (за следващата поправка)
 """
 import re, subprocess, shutil, os
 
@@ -10,213 +10,134 @@ rep = []
 src = open('app.js', encoding='utf-8').read()
 cand = src
 
-# ── изключваме стария v12 скенер (заменя се от v18) ───────────
-for old in ("document.querySelectorAll('.leaflet-popup-content').forEach(enrich);",
-            "document.querySelectorAll('[data-stop],.stop-card,.zone-detail').forEach(enrich);"):
-    if cand.count(old) == 1:
-        cand = cand.replace(old, "/* v12 изключен от v18 */")
-        rep.append('OK   изключен стар скенер: %s' % old[:45])
-    else:
-        rep.append('SKIP стар скенер (%d): %s' % (cand.count(old), old[:45]))
+# ── (1) летище: между Т1 (42.6889,23.4031) и Т2 (42.6880,23.4134) ──
+pat = re.compile(r'(\{\s*id:"airport"[^}]*?lat:)([\d.]+)(\s*,\s*lng:)([\d.]+)')
+m = pat.search(cand)
+if m:
+    old_lat, old_lng = float(m.group(2)), float(m.group(4))
+    cand = pat.sub(lambda x: x.group(1) + '42.6885' + x.group(3) + '23.4082', cand, count=1)
+    d = ((42.6885 - old_lat) * 111000) ** 2 + ((23.4082 - old_lng) * 82000) ** 2
+    rep.append('OK   airport %.4f,%.4f -> 42.6885,23.4082 (беше на %d м, вече е между Т1 и Т2)'
+               % (old_lat, old_lng, int(d ** 0.5)))
+else:
+    rep.append('SKIP airport зоната не е намерена')
 
-if 'stop-eta-v18' in cand:
-    rep.append('SKIP v18 вече е приложен')
+# ── (3) Подуяне: без обещания ──
+for old, new in [
+    ("Зона за транспортен хъб. Очаквайте разписания.",
+     "Транспортен хъб. Няма публично разписание — севернo/източно направление."),
+    ("Очаквайте разписания.", "Няма публично разписание."),
+]:
+    if old in cand:
+        cand = cand.replace(old, new)
+        rep.append('OK   махнато обещание: "%s"' % old[:40])
+        break
+
+# ── (2) автогара от разписанието ──
+if 'cas-sched-v19' in cand:
+    rep.append('SKIP v19 автогара вече е добавена')
 else:
     cand += """
 
-// ------ stop-eta-v18: часове от РАЗПИСАНИЕ + живи данни като бонус ------
+// ------ cas-sched-v19: Централна автогара смята деманд от РАЗПИСАНИЕТО ------
 (function(){
-  var SCHED = null, BUS = [], TRAINS = null;
-
-  function hm(d){ return d.toLocaleTimeString('bg',{hour:'2-digit',minute:'2-digit'}); }
-  function mins(d){ return Math.round((d.getTime()-Date.now())/60000); }
-  function whenTxt(m){
-    if(m <= 0) return 'сега';
-    if(m < 60) return 'след '+m+'м';
-    return 'след '+Math.floor(m/60)+'ч '+(m%60)+'м';
-  }
-
-  // ── коя спирка е (от текста на popup-а и от името в разписанието) ──
-  function keyOf(t){
-    t = t || '';
-    if(/expo|цариградско/i.test(t)) return 'expo';
-    if(/ботевградско/i.test(t)) return 'botev';
-    if(/бул\\.? ?[Бб]ългария|струма|околовръстен/i.test(t)) return 'bulgaria';
-    return null;
-  }
-  var LABEL = { expo:'Експо / Цариградско', botev:'Ботевградско шосе', bulgaria:'бул. България' };
-
+  var SCHED = null;
   fetch('bus-schedule.json?v='+Date.now()).then(function(r){return r.json()})
     .then(function(d){ SCHED = d; }).catch(function(){});
 
-  function pullLive(){
-    fetch('bus-arrivals.json?v='+Date.now()).then(function(r){return r.json()}).then(function(d){
-      var fresh = d.updated && (Date.now()-new Date(d.updated).getTime()) < 4*3600000;
-      BUS = [];
-      if(!fresh) return;
-      (d.arrivals||[]).forEach(function(a){
-        var m=/^(\\d{1,2}):(\\d{2})$/.exec(a.time||''); if(!m) return;
-        var t=new Date(); t.setHours(+m[1],+m[2],0,0);
-        if(t.getTime() < Date.now()-3*3600000) t.setDate(t.getDate()+1);
-        BUS.push({t:t, from:a.from, intl:a.intl});
-      });
-    }).catch(function(){});
-  }
-  function pullTrains(){
-    fetch('train-arrivals.json?v='+Date.now()).then(function(r){return r.json()})
-      .then(function(d){ TRAINS = d; }).catch(function(){});
-  }
-  pullLive(); pullTrains();
-  setInterval(function(){ pullLive(); pullTrains(); }, 180000);
-
-  // ── пристигания на дадена спирка по разписание ──
-  function fromSchedule(key){
-    if(!SCHED || !SCHED.routes) return [];
-    var out = [], now = Date.now();
+  // пристигания на ЦАС по разписание в прозорец [-20, +30] мин
+  function casNow(){
+    if(!SCHED || !SCHED.routes) return {recent:0, soon:0, names:[]};
+    var now = Date.now(), recent = 0, soon = 0, names = [];
     SCHED.routes.forEach(function(rt){
-      if(!/София/i.test(rt.to || '')) return;           // само входящи
-      (rt.stops || []).forEach(function(st){
-        if(keyOf(st.name) !== key) return;
-        (rt.departures || []).forEach(function(dep){
-          var m = /^(\\d{1,2}):(\\d{2})$/.exec(dep); if(!m) return;
-          var t = new Date(); t.setHours(+m[1], +m[2], 0, 0);
-          t = new Date(t.getTime() + (st.offset_min||0)*60000);
-          if(t.getTime() < now - 10*60000) t = new Date(t.getTime() + 864e5);
-          if(t.getTime() > now + 5*3600000) return;
-          out.push({ t:t, name:(rt.name||'').replace(/\\s*→.*/,''), approx:!!rt.approx });
-        });
+      if(!/София/i.test(rt.to || '')) return;
+      var dur = rt.duration_min || 0;
+      (rt.departures || []).forEach(function(dep){
+        var m = /^(\\d{1,2}):(\\d{2})$/.exec(dep); if(!m) return;
+        var t = new Date(); t.setHours(+m[1], +m[2], 0, 0);
+        t = new Date(t.getTime() + dur*60000);
+        var diff = (t.getTime() - now) / 60000;
+        if(diff < -180) diff += 1440;          // за вчерашни нощни курсове
+        if(diff <= 0 && diff >= -20){ recent++; names.push((rt.name||'').replace(/\\s*→.*/,'')); }
+        else if(diff > 0 && diff <= 30){ soon++; names.push((rt.name||'').replace(/\\s*→.*/,'')); }
       });
     });
-    out.sort(function(a,b){ return a.t - b.t; });
-    return out.slice(0, 5);
+    return {recent:recent, soon:soon, names:names.slice(0,4)};
   }
 
-  function busHTML(key){
-    var list = fromSchedule(key);
-    if(!list.length){
-      return '<div style="margin-top:7px;padding:6px 8px;border-radius:6px;'
-           + 'background:rgba(148,163,184,.12);border-left:3px solid #94a3b8;'
-           + 'font-size:12px;color:#64748b">🚌 Няма курсове в следващите 5ч</div>';
-    }
-    var first = mins(list[0].t), urgent = first <= 20;
-    var rows = list.map(function(x){
-      var m = mins(x.t);
-      // има ли живо потвърждение от ЦАС (пристига ~15-20 мин след спирката)
-      var conf = BUS.some(function(b){
-        return Math.abs((b.t.getTime() - x.t.getTime())/60000 - 18) < 14;
+  var prev = window.__applyLive;
+  window.__applyLive = function(scores){
+    try{ if(prev) prev(scores); }catch(e){}
+    try{
+      var c = casNow();
+      if(typeof scores.cab_north === 'number' && (c.recent || c.soon)){
+        // слезлите преди малко тежат най-много — те са на място СЕГА
+        var boost = Math.min(3.0, c.recent*0.9 + c.soon*0.55);
+        scores.cab_north = Math.max(scores.cab_north, 1.0 + boost);
+        window.__casInfo = c;
+      }
+    }catch(e){}
+  };
+
+  // подсказка в списъка защо гори
+  setInterval(function(){
+    try{
+      var c = window.__casInfo; if(!c) return;
+      var items = document.querySelectorAll('#zone-list .zone-item, .zone-item');
+      Array.prototype.slice.call(items).forEach(function(it){
+        var nm = it.querySelector('.zone-name') || it;
+        if((nm.textContent||'').indexOf('Централна автогара') < 0) return;
+        if(it.dataset && it.dataset.cas === (c.recent+'/'+c.soon)) return;
+        if(it.dataset) it.dataset.cas = c.recent+'/'+c.soon;
+        var sub = it.querySelector('.cas-sub');
+        if(!sub){
+          sub = document.createElement('div');
+          sub.className = 'cas-sub';
+          sub.style.cssText = 'font-size:11px;opacity:.75;margin-top:2px';
+          nm.parentElement.appendChild(sub);
+        }
+        var bits = [];
+        if(c.recent) bits.push('🚌 ' + c.recent + ' слезли <20м');
+        if(c.soon) bits.push(c.soon + ' идват <30м');
+        sub.textContent = bits.join(' · ') + (c.names.length ? ' (' + c.names.join(', ') + ')' : '');
       });
-      return '<div style="margin:2px 0"><b>' + hm(x.t) + '</b> · ' + x.name
-           + (x.approx ? ' <span style="opacity:.55">≈</span>' : '')
-           + (conf ? ' <span style="color:#22c55e">●</span>' : '')
-           + ' <span style="opacity:.65">(' + whenTxt(m) + ')</span></div>';
-    }).join('');
-    return '<div style="margin-top:7px;padding:7px 9px;border-radius:7px;background:'
-         + (urgent ? 'rgba(234,88,12,.14)' : 'rgba(56,189,248,.10)')
-         + ';border-left:3px solid ' + (urgent ? '#ea580c' : '#38bdf8') + ';font-size:12px">'
-         + '<b>🚌 Слизане на ' + LABEL[key] + '</b>' + rows
-         + '<div style="opacity:.55;font-size:11px;margin-top:4px">по разписание · ≈ ориентировъчно'
-         + (BUS.length ? ' · <span style="color:#22c55e">●</span> потвърдено от ЦАС' : '') + '</div></div>';
-  }
-
-  function trainHTML(){
-    if(!TRAINS || !TRAINS.arrivals || !TRAINS.arrivals.length){
-      return '<div style="margin-top:7px;padding:6px 8px;border-radius:6px;'
-           + 'background:rgba(148,163,184,.12);border-left:3px solid #94a3b8;'
-           + 'font-size:12px;color:#64748b">🚂 Няма данни от БДЖ в момента</div>';
-    }
-    var now = Date.now(), list = [];
-    TRAINS.arrivals.forEach(function(a){
-      var m = /^(\\d{1,2}):(\\d{2})$/.exec(a.time||''); if(!m) return;
-      var t = new Date(); t.setHours(+m[1], +m[2], 0, 0);
-      t = new Date(t.getTime() + (a.delay||0)*60000);
-      if(t.getTime() < now - 20*60000) t = new Date(t.getTime() + 864e5);
-      if(t.getTime() > now + 5*3600000) return;
-      list.push({ t:t, from:a.from, train:a.train, delay:a.delay||0, tier:a.tier });
-    });
-    list.sort(function(a,b){ return a.t - b.t; });
-    list = list.slice(0, 5);
-    if(!list.length){
-      return '<div style="margin-top:7px;padding:6px 8px;border-radius:6px;'
-           + 'background:rgba(148,163,184,.12);border-left:3px solid #94a3b8;'
-           + 'font-size:12px;color:#64748b">🚂 Няма влакове в следващите 5ч</div>';
-    }
-    var far = list.filter(function(x){ return x.tier === 'far'; }).length;
-    var urgent = mins(list[0].t) <= 20 && list[0].tier === 'far';
-    var rows = list.map(function(x){
-      var ic = x.tier === 'far' ? '🧳' : (x.tier === 'near' ? '·' : '•');
-      return '<div style="margin:2px 0">' + ic + ' <b>' + hm(x.t) + '</b> · ' + x.from
-           + ' <span style="opacity:.6">' + x.train + '</span>'
-           + (x.delay ? ' <span style="color:#f59e0b">+' + x.delay + 'м</span>' : '')
-           + ' <span style="opacity:.65">(' + whenTxt(mins(x.t)) + ')</span></div>';
-    }).join('');
-    return '<div style="margin-top:7px;padding:7px 9px;border-radius:7px;background:'
-         + (urgent ? 'rgba(234,88,12,.14)' : 'rgba(56,189,248,.10)')
-         + ';border-left:3px solid ' + (urgent ? '#ea580c' : '#38bdf8') + ';font-size:12px">'
-         + '<b>🚂 Пристигащи влакове</b>' + rows
-         + '<div style="opacity:.55;font-size:11px;margin-top:4px">🧳 = далечен (багаж) · '
-         + far + ' от ' + list.length + ' са далечни</div></div>';
-  }
-
-  function enrich(el){
-    try{
-      if(!el || (el.dataset && el.dataset.eta18)) return;
-      var txt = el.textContent || '';
-      var html = null;
-
-      // ЖП гара
-      if(/[Жж][Пп] гара|Централна ЖП|железопът/i.test(txt) || el.querySelector('.bdz-note')){
-        html = trainHTML();
-        var old = el.querySelector('.bdz-note');
-        if(old) old.remove();
-      }
-      // крайпътни спирки
-      if(!html){
-        if(!/Слизане от|Вход от|Експо|Expo|Ботевградско|бул\\.? ?[Бб]ългария|Цариградско/i.test(txt)) return;
-        var k = keyOf(txt);
-        if(!k) return;
-        html = busHTML(k);
-      }
-      if(el.dataset) el.dataset.eta18 = '1';
-      // махаме стария блок от v12, ако е останал
-      var prev = el.querySelector('[data-eta12]');
-      if(prev) prev.remove();
-      el.insertAdjacentHTML('beforeend', html);
     }catch(e){}
-  }
-
-  function scan(){
-    try{
-      document.querySelectorAll('.leaflet-popup-content').forEach(enrich);
-      document.querySelectorAll('[data-stop],.stop-card,.zone-detail').forEach(enrich);
-    }catch(e){}
-  }
-  scan();
-  setInterval(scan, 4000);
-  try{ new MutationObserver(scan).observe(document.body, {childList:true, subtree:true}); }catch(e){}
+  }, 12000);
 })();
 """
-    rep.append('OK   v18: спирки от разписание + ЖП с реални влакове')
+    rep.append('OK   Централна автогара: деманд от разписанието + подсказка в списъка')
+
+# ── (4) диагностика за кръговете и посоката ──
+os.makedirs('debug', exist_ok=True)
+diag = []
+for kw in ['circleMap', 'L.circle', 'fillOpacity', 'direction-hint', 'КЪМ ЛЕТИЩЕТО', 'Карай']:
+    idx2 = cand.find(kw)
+    if idx2 < 0:
+        diag.append('--- %s: НЕ Е НАМЕРЕН ---' % kw)
+        continue
+    ln = cand.count('\n', 0, idx2) + 1
+    diag.append('--- %s (ред %d) ---\n%s' % (kw, ln, cand[max(0, idx2-500):idx2+700]))
+open('debug/ui-diag2.txt', 'w', encoding='utf-8').write('\n\n'.join(diag)[:14000] + '\n')
+rep.append('OK   дъмп за кръгове/посока -> debug/ui-diag2.txt')
 
 open('/tmp/app.c.js', 'w', encoding='utf-8').write(cand)
 r = subprocess.run(['node', '--check', '/tmp/app.c.js'], capture_output=True, text=True)
 if r.returncode == 0:
     shutil.move('/tmp/app.c.js', 'app.js')
     idx = open('index.html', encoding='utf-8').read()
-    idx = re.sub(r'app\.js\?v=[0-9a-z]+', 'app.js?v=20260723v18', idx)
+    idx = re.sub(r'app\.js\?v=[0-9a-z]+', 'app.js?v=20260723v19', idx)
     open('index.html', 'w', encoding='utf-8').write(idx)
     try:
         sw = open('sw.js', encoding='utf-8').read()
         sw2, k = re.subn(r"(CACHE[_A-Z]*\s*=\s*['\"])([^'\"]+)(['\"])",
-                         lambda m: m.group(1) + 'bak-v18' + m.group(3), sw, count=1)
+                         lambda mm: mm.group(1) + 'bak-v19' + mm.group(3), sw, count=1)
         if k:
             open('sw.js', 'w', encoding='utf-8').write(sw2)
-            rep.append('OK   sw.js кеш -> bak-v18')
     except FileNotFoundError:
         pass
-    rep.append('OK v18 + node --check + cache-bust v18')
+    rep.append('OK v19 + node --check + cache-bust v19')
 else:
     rep.append('FAIL node --check :: ' + (r.stderr or '')[:400])
 
-os.makedirs('debug', exist_ok=True)
 open('flights-rain-report.txt', 'w', encoding='utf-8').write('\n'.join(rep) + '\n')
 print('\n'.join(rep))
