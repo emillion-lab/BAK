@@ -3292,3 +3292,88 @@ function toggleMapView(){
   scan(); setInterval(scan, 4000);
   try{ new MutationObserver(scan).observe(document.body, {childList:true, subtree:true}); }catch(e){}
 })();
+
+
+// ------ ticker-future-v30: само предстоящи точки (напред ~5ч) ------
+(function(){
+  var HORIZON_H = 5;      // колко часа напред показваме
+  var GRACE_MIN = 10;     // толкова минути след часа още се брои за "сега"
+
+  function nowMin(){ var d = new Date(); return d.getHours()*60 + d.getMinutes(); }
+
+  function ahead(hhmm){
+    var m = /^(\d{1,2}):(\d{2})$/.exec(hhmm);
+    if(!m) return null;
+    var t = (+m[1])*60 + (+m[2]);
+    var d = t - nowMin();
+    if(d < -180) d += 1440;          // явно е за утре
+    return d;
+  }
+
+  function keep(seg){
+    var times = seg.match(/\b\d{1,2}:\d{2}\b/g);
+    if(!times || !times.length) return true;      // без час — оставяме
+    for(var i = 0; i < times.length; i++){
+      var a = ahead(times[i]);
+      if(a === null) continue;
+      if(a >= -GRACE_MIN && a <= HORIZON_H*60) return true;
+    }
+    return false;
+  }
+
+  function findTicker(){
+    var best = null, bestLen = 0;
+    var sel = ['#ticker','.ticker','#event-ticker','.event-ticker','#marquee','.marquee',
+               '#scroll-text','.scroll-text','#event-strip','.event-strip'];
+    for(var i = 0; i < sel.length; i++){
+      var el = document.querySelector(sel[i]);
+      if(el && (el.textContent||'').length > bestLen){ best = el; bestLen = el.textContent.length; }
+    }
+    if(best) return best;
+    var all = document.querySelectorAll('div,span,p');
+    for(var j = 0; j < all.length; j++){
+      var e = all[j], t = e.textContent || '';
+      if(t.length < 40 || t.length > 3000) continue;
+      if(e.children.length > 3) continue;
+      var dots = (t.match(/·/g)||[]).length, tm = (t.match(/\b\d{1,2}:\d{2}\b/g)||[]).length;
+      if(dots >= 2 && tm >= 2 && t.length > bestLen){ best = e; bestLen = t.length; }
+    }
+    return best;
+  }
+
+  function clean(){
+    try{
+      var el = findTicker();
+      if(!el) return;
+      var raw = el.dataset.tickerRaw;
+      if(!raw){
+        raw = el.textContent || '';
+        if(raw.length < 30) return;
+        el.dataset.tickerRaw = raw;
+      }
+      var parts = raw.split(/\s*·\s*/).filter(function(s){ return s.trim().length; });
+      if(parts.length < 2) return;
+      var kept = parts.filter(keep);
+      if(!kept.length) kept = ['— няма събития в следващите ' + HORIZON_H + 'ч —'];
+      var out = kept.join('  ·  ');
+      if(el.textContent.trim() !== out.trim()) el.textContent = out;
+    }catch(e){}
+  }
+
+  clean();
+  setInterval(clean, 60000);
+  try{
+    var mo = new MutationObserver(function(muts){
+      for(var i = 0; i < muts.length; i++){
+        var t = muts[i].target;
+        if(t && t.dataset && t.dataset.tickerRaw && t.textContent &&
+           t.textContent.indexOf('·') >= 0 &&
+           t.textContent.length > (t.dataset.tickerRaw.length * 0.9)){
+          t.dataset.tickerRaw = t.textContent;
+        }
+      }
+      clean();
+    });
+    mo.observe(document.body, {childList:true, subtree:true, characterData:true});
+  }catch(e){}
+})();

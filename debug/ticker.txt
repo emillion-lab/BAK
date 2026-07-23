@@ -1,0 +1,109 @@
+--- ticker (ред 1304) ---
+════════════════════════════
+function buildTicker(){
+  const zMap={}; ZONES.forEach(z=>{zMap[z.id]=z;});
+  const items=EVENTS.filter(dayMatches).sort((a,b)=>a.endHour-b.endHour).map(ev=>{
+    const z=zMap[ev.zone]; if(!z) return '';
+    return `<span class="tick-item"><span class="ev-time">${fmtHour(ev.endHour)}</span> ${ev.name} <span class="ev-loc">@ ${z.name.split('(')[0].trim()}</span> <span style="color:#0f2040"> ·· </span></span>`;
+  }).filter(Boolean);
+  const el=document.getElementById('ticker');
+  el.innerHTML=items.join('')+items.join('');
+  el.style.animation='none'; el.offsetHeight; el.style.animation='';
+}
+
+// ═══════════════════════════════════════════════
+// FLIGHT-CACHE.JSON
+// ═══════════════════════════════════════════════
+function injectAirportEvents(){
+  const keep=EVENTS.filter(e=>!e._fromFlight);
+  for(let h=0;h<24;h++){
+    const c=flightHours[h]; if(!c) continue;
+    keep.push({zone:'airport',name:`✈ ${c} рейса ~${String(h).padStart(2,'0')}:00`,
+      endHour:h+0.25,boost:Math.min(3.8,c*0.42),repeat:'daily',_fromFlight:true});
+  }
+  EVENTS.length=0; keep.forEach(e=>EVENTS.push(e));
+}
+
+function applyFallbackAirport(){
+  airportStatus='fallback';
+  [[6,2],[7,4],[8,5],[9,5],[10,4],[11,4],[12,3],[13,4],[14,3],[15,4],[16,6],
+   [17,5],[18,7],[19,8],[20,6],[21,5
+
+--- Ticker (ред 1377) ---
+f.arrival && f.arrival.terminal) ? String(f.arrival.terminal) : '?',
+          exitFromTs: tFirst.getTime(), exitToTs: tLast.getTime(),
+          landH:(t.getUTCHours()+3)%24, landM:t.getUTCMinutes(),
+          exitFromH:hFirst, exitFromM:mFirst,
+          exitToH:hLast,   exitToM:mLast
+        });
+      });
+      console.log('[SOF] flightDetails populated:', flightDetails.length, 'flights');
+      airportStatus='live';
+      injectAirportEvents(); updateAirportBadge();
+      buildCurve(); buildTicker(); render(currentHour);
+    })
+    .catch(e=>{
+      window.__flErr = (e && (e.stack||e.message)) ? String(e.stack||e.message).slice(0,160) : ('код '+String(e));
+      console.error('[SOF] flights failed:', e);
+      applyFallbackAirport(); updateAirportBadge();
+      buildCurve(); buildTicker(); render(currentHour);
+    });
+}
+
+// ═══════════════════════════════════════════════
+// WEATHER
+// ═══════════════════════════════════════════════
+let OWM_KEY = '';
+
+async function loadConfig(){
+  try {
+    const r = await fetch('config.json');
+    const d = await r.json();
+    OWM_KEY = d.owm_key || '';
+  } catch(e) {}
+}
+
+async function loadWeather(){
+  const bar=document.getElementById('weather-bar');
+  if(!OWM_KEY){
+    bar.style.display='flex';
+    document.getElementById('wb-desc').textC
+
+--- Ticker (ред 1857) ---
+inter">✕ Затвори</button></div>';
+}
+
+// Rebuild bakshish panel when time changes (via setInterval, not render override)
+setInterval(()=>{ if(bakshishOpen) buildBakshishPanel(); }, 60000);
+
+
+const nowH=new Date().getHours()+new Date().getMinutes()/60;
+currentHour=Math.min(24,Math.max(6,Math.round(nowH*2)/2));
+slider.value=currentHour;
+document.getElementById('time-display').textContent=fmtHour(currentHour);
+
+applyFallbackAirport(); // зарежда веднага с fallback
+buildCurve();
+buildCircles();
+buildTicker();
+render(currentHour);
+loadFlights(); loadBuses(); loadLiveArrivals(); setInterval(loadLiveArrivals, 10*60000);
+loadConfig().then(()=>{ loadWeather(); setInterval(loadWeather,10*60000); });
+checkEventAlerts();
+geocodeZones();     // async — прецизира координатите от OSM
+
+setTimeout(()=>{drawSparkline(currentHour); map.invalidateSize();},300);
+window.addEventListener('resize',()=>{drawSparkline(currentHour); map.invalidateSize();});
+
+}); // end DOMContentLoaded
+
+
+function toggleMapView(){
+  const listView = document.body.classList.toggle('list-view');
+  const btn = document.getElementById('toggle-map-btn');
+  if(btn) btn.textContent = listView ? '🗺️ Карта' : '📋 Списък';
+  if(!listView && window.map) setTimeout(()=>map.invalidateSize(), 100);
+}
+
+
+// ------ Дъжд-аларма: Open-Meteo 15-
