@@ -185,6 +185,7 @@ const ZONES = [
 
   { id:"cjp",            name:"Централна ЖП гара",                      icon:"🚂", lat:42.7121, lng:23.3210, radius:240, type:"transit",          wazeName:"Централна жп гара София" },
   { id:"cab_north",      name:"Централна автогара",                     icon:"🚌", lat:42.7103, lng:23.3233, radius:200, type:"transit",          wazeName:"Централна автогара София" },
+  { id:"cas_intl", name:"🌍 Международни автобуси (ЦАС, сектори 36–41)", icon:"🌍", lat:42.7110, lng:23.3247, radius:170, type:"transit", wazeName:"Централна автогара София международни линии" },
   { id:"ag_yug",         name:"Автогара Юг (бул.Драган Цанков)",        icon:"🚌", lat:42.6689, lng:23.3526, radius:190, type:"transit",          wazeName:"Автогара Юг София" },
   { id:"ag_pod",         name:"Автогара Подуяне",                       icon:"🚌", lat:42.7034, lng:23.3601, radius:190, type:"transit",          wazeName:"Автогара Подуяне София" },
 
@@ -3091,6 +3092,8 @@ function toggleMapView(){
       if(!el || (el.dataset && el.dataset.cas26)) return;
       var txt = el.textContent || '';
       if(!/Централна автогара/i.test(txt)) return;
+      // приложението вече си има списък с пристигащи -> не дублираме
+      if(/по час на пристигане|модел на превозвача|Пристигащи на ЦАС/i.test(txt)) return;
       if(/Слизане от|Вход от/i.test(txt)) return;   // това е спирка, не автогарата
       if(el.dataset) el.dataset.cas26 = '1';
       el.insertAdjacentHTML('beforeend', casHTML());
@@ -3104,4 +3107,69 @@ function toggleMapView(){
   }
   scan(); setInterval(scan, 4000);
   try{ new MutationObserver(scan).observe(document.body, {childList:true, subtree:true}); }catch(e){}
+})();
+
+
+// ------ popup-scroll-v28: popup-ите да не заемат целия екран ------
+(function(){
+  try{
+    var st = document.createElement('style');
+    st.textContent = '/*popup-scroll-v28*/.leaflet-popup-content{max-height:52vh!important;overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch;}.leaflet-popup-content::-webkit-scrollbar{width:5px}.leaflet-popup-content::-webkit-scrollbar-thumb{background:rgba(120,140,170,.55);border-radius:3px}.leaflet-popup-content-wrapper{max-height:56vh!important;}';
+    document.head.appendChild(st);
+  }catch(e){}
+})();
+
+
+// ------ cas-intl-score-v28: скор на международната зона ------
+(function(){
+  var SCHED = null, LIVE = [];
+  fetch('bus-schedule.json?v='+Date.now()).then(function(r){return r.json()})
+    .then(function(d){ SCHED = d; }).catch(function(){});
+  function pullLive(){
+    fetch('bus-arrivals.json?v='+Date.now()).then(function(r){return r.json()}).then(function(d){
+      var fresh = d.updated && (Date.now()-new Date(d.updated).getTime()) < 4*3600000;
+      LIVE = fresh ? (d.arrivals||[]).filter(function(a){ return a.intl; }) : [];
+    }).catch(function(){});
+  }
+  pullLive(); setInterval(pullLive, 180000);
+
+  function intlNow(){
+    var now = new Date(), nowMin = now.getHours()*60 + now.getMinutes();
+    var recent = 0, soon = 0, names = [];
+    LIVE.forEach(function(a){
+      var m = /^(\d{1,2}):(\d{2})$/.exec(a.time||''); if(!m) return;
+      var d = (+m[1])*60 + (+m[2]) - nowMin;
+      if(d <= 0 && d >= -25){ recent++; names.push(a.from); }
+      else if(d > 0 && d <= 40){ soon++; names.push(a.from); }
+    });
+    if(SCHED && SCHED.routes){
+      SCHED.routes.forEach(function(rt){
+        if(!rt.intl) return;
+        var dur = rt.duration_min || 0;
+        (rt.departures||[]).forEach(function(dep){
+          var m = /^(\d{1,2}):(\d{2})$/.exec(dep); if(!m) return;
+          var t = (+m[1])*60 + (+m[2]) + dur;
+          var d = t - nowMin;
+          if(d < -180) d += 1440;
+          var nm = (rt.name||'').replace(/\s*→.*/,'');
+          if(d <= 0 && d >= -25){ recent++; names.push(nm); }
+          else if(d > 0 && d <= 40){ soon++; names.push(nm); }
+        });
+      });
+    }
+    return {recent:recent, soon:soon, names:names.slice(0,3)};
+  }
+
+  var prev = window.__applyLive;
+  window.__applyLive = function(scores){
+    try{ if(prev) prev(scores); }catch(e){}
+    try{
+      if(typeof scores.cas_intl !== 'number') return;
+      var c = intlNow();
+      // международните носят багаж и почти винаги взимат такси
+      var s = c.recent*1.5 + c.soon*0.9;
+      scores.cas_intl = s > 0 ? Math.min(5, 0.6 + s) : 0.3;
+      window.__intlInfo = c;
+    }catch(e){}
+  };
 })();
