@@ -1,3 +1,49 @@
+// bak-rescue-v16 — ловец на грешки (вмъкнат НАЙ-ОТГОРЕ)
+(function(){
+  var shown = 0;
+  function show(msg, extra){
+    if (shown >= 3) return;
+    shown++;
+    try{
+      var d = document.createElement('div');
+      d.style.cssText = 'position:fixed;left:0;right:0;top:0;z-index:99999;'
+        + 'background:#7f1d1d;color:#fff;font:12px/1.35 monospace;padding:8px 30px 8px 10px;'
+        + 'white-space:pre-wrap;word-break:break-word;box-shadow:0 2px 8px rgba(0,0,0,.6)';
+      d.textContent = '⚠ ' + msg + (extra ? ('\n' + extra) : '');
+      var x = document.createElement('span');
+      x.textContent = '✕';
+      x.style.cssText = 'position:absolute;right:8px;top:6px;cursor:pointer;font-size:16px';
+      x.onclick = function(){ d.remove(); };
+      d.appendChild(x);
+      (document.body || document.documentElement).appendChild(d);
+    }catch(e){}
+  }
+  window.addEventListener('error', function(ev){
+    var f = (ev.filename||'').split('/').pop();
+    show((ev.message||'грешка'), f + ':' + ev.lineno + ':' + ev.colno);
+  });
+  window.addEventListener('unhandledrejection', function(ev){
+    var r = ev.reason;
+    show('Promise: ' + ((r && (r.message||r)) || 'отхвърлен'), '');
+  });
+  // защита: грешка в един DOMContentLoaded хендлър да не спира другите
+  var origAdd = document.addEventListener.bind(document);
+  document.addEventListener = function(ev, fn, opt){
+    if (ev === 'DOMContentLoaded' && typeof fn === 'function'){
+      var wrapped = function(e){
+        try { return fn.call(this, e); }
+        catch(err){
+          show('DOMContentLoaded: ' + (err && err.message),
+               ((err && err.stack)||'').split('\n')[1] || '');
+          throw err;
+        }
+      };
+      return origAdd(ev, wrapped, opt);
+    }
+    return origAdd(ev, fn, opt);
+  };
+})();
+
 document.addEventListener('DOMContentLoaded', function() {
 
 if (typeof L === 'undefined') {
