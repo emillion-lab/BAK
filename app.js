@@ -319,7 +319,7 @@ const EVENTS = [
   { zone:"center_bars",  name:"Центъра – след клуб",            endHour:24.0, boost:2.2, repeat:"fri-sat" },
 
   // Допълнителни болници
-  { zone:"pool_marialuiza", name:"Басейн Мария Луиза – лятно изтичане", endHour:18.5, boost:1.6, repeat:"daily" },
+  
   { zone:"pool_spartak",    name:"Басейн Спартак – лятно изтичане",    endHour:18.5, boost:1.5, repeat:"daily" },
   { zone:"pool_diana",      name:"Басейни Диана – лятно изтичане",     endHour:19.0, boost:1.5, repeat:"daily" },
   { zone:"pool_akademika",  name:"Басейн Академика – лятно изтичане",  endHour:18.0, boost:1.4, repeat:"daily" },
@@ -411,7 +411,7 @@ function computeScores(hour) {
     else if (diff>0 && diff<=1.5) f = 1 - diff/1.5;
     if (f>0.05) {
       scores[ev.zone] = (scores[ev.zone]||0) + ev.boost*f*dz;
-      activeEvents[ev.zone].push({name:ev.name, f});
+      (activeEvents[ev.zone] = activeEvents[ev.zone] || []).push({name:ev.name, f});
     }
   }
   // Weather boost
