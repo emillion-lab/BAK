@@ -1,7 +1,15 @@
-❌ ДУПКИ В МАСИВА: , ] в края
+✓ няма празни елементи
   зонови обекта: 93
-✓ всички зони с пълни полета
+✓ няма дубликати
+✓ всички координати в София
 ✓ top-level изпълнение мина
-регистрирани DOMContentLoaded хендлъри: 1
-❌ ГРЕШКА В DOMContentLoaded #1: TypeError: canvas.getContext is not a function
-       at eval (eval at <anonymous> (/home/runner/work/BAK/BAK/scripts/doctor.js:107:3), <anonymous>:924:18) ⏎     at /home/runner/work/BAK/BAK/scripts/doctor.js:120:5 ⏎     at Array.forEach (<anonymous>) ⏎     at Object.<anonymous> (/home/runner/work/BAK/BAK/scripts/doctor.js:118:13)
+DOMContentLoaded хендлъри: 1
+❌ DOMContentLoaded #1: TypeError: Cannot read properties of null (reading 'addEventListener')
+   at eval (eval at <anonymous> (/home/runner/work/BAK/BAK/scripts/doctor.js:133:3), <anonymous>:1132:69)
+   at /home/runner/work/BAK/BAK/scripts/doctor.js:142:9
+   at Array.forEach (<anonymous>)
+       1130: document.getElementById('direction-hint').querySelector('.dh-close').addEventListener('click',()=>{
+       1131:   dirHintSuppressed=true;
+   >>> 1132:   document.getElementById('direction-hint').style.display='none';
+       1133: });
+       1134: 
