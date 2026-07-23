@@ -259,6 +259,8 @@ const ZONES = [
   { id:"pool_silvercity", name:"Басейн Silver City (Хладилника) ☀до 22ч", icon:"🏊", lat:42.6558, lng:23.3131, radius:180, type:"leisure", wazeName:"Silver City басейн София" },
   { id:"pool_sportpalace", name:"Sport Palace Pool (В.Левски 75) 🏠целогодишен", icon:"🏊", lat:42.6903, lng:23.3312, radius:160, type:"leisure", wazeName:"Sport Palace Pool София" },
   { id:"pool_hearts", name:"Hearts in Love Pool Club ☀лято", icon:"🏊", lat:42.6271, lng:23.4238, radius:200, type:"leisure", wazeName:"Hearts in Love Pool Club София" },
+  { id:"pool_korali", name:"Басейн Корали (Панчарево) ☀лято", icon:"🏊", lat:42.6027, lng:23.4039, radius:200, type:"leisure", wazeName:"Korali Pool Самоковско шосе 211 Панчарево" },
+  { id:"pool_infinity", name:"Infinity SPA (Панчарево)", icon:"🏊", lat:42.6019, lng:23.4035, radius:180, type:"leisure", wazeName:"Infinity SPA Самоковско шосе 211 Панчарево" },
   { id:"pool_spartak",    name:"Басейн Спартак (бул.Арсеналски 4) ☀лято",        icon:"🏊", lat:42.675, lng:23.3132, radius:200, type:"leisure", wazeName:"Спортен комплекс Спартак София" },
   { id:"pool_diana",      name:"Басейни Диана (Дианабад) ☀лято",          icon:"🏊", lat:42.6657, lng:23.3458, radius:220, type:"leisure", wazeName:"Басейн Диана София" },
   { id:"pool_akademika",  name:"Басейн Академика (4-ти км) ☀лято",        icon:"🏊", lat:42.6756, lng:23.366, radius:200, type:"leisure", wazeName:"Спортен център Академика София" },
@@ -268,9 +270,9 @@ const ZONES = [
 
   // ── ЗАДРЪСТВАНИЯ ──
   { id:"jam_orl",        name:"⚠ Задръстване Орлов мост",               icon:"🚦", lat:42.6906, lng:23.3374, radius:150, type:"traffic",          wazeName:"Орлов мост София" },
-  { id:"jam_tsar",       name:"⚠ Задръстване Цариградско (Армейски)",   icon:"🚦", lat:42.6662, lng:23.3795, radius:200, type:"traffic",          wazeName:"Цариградско шосе Армейски Sofia" },
-  { id:"jam_ndk",        name:"⚠ Задръстване бул.България",             icon:"🚦", lat:42.6820, lng:23.3050, radius:160, type:"traffic",          wazeName:"булевард България Sofia" },
-  { id:"jam_serdika",    name:"⚠ Задръстване Сердика / бул.Сливница",   icon:"🚦", lat:42.7012, lng:23.3228, radius:160, type:"traffic",          wazeName:"Сердика бул Сливница Sofia" },
+  { id:"jam_tsar",       name:"⚠ Задръстване Цариградско (при хотел Плиска)",   icon:"🚦", lat:42.6752, lng:23.3587, radius:200, type:"traffic",          wazeName:"Цариградско шосе Армейски Sofia" },
+  { id:"jam_ndk",        name:"⚠ Задръстване бул.България (НДК → Мол България)",             icon:"🚦", lat:42.6745, lng:23.3028, radius:160, type:"traffic",          wazeName:"булевард България Sofia" },
+  { id:"jam_serdika",    name:"⚠ Задръстване бул.Сливница (при Лъвов мост)",   icon:"🚦", lat:42.7049, lng:23.3239, radius:160, type:"traffic",          wazeName:"Сердика бул Сливница Sofia" },
 ];
 
 // ═══════════════════════════════════════════════
@@ -2554,6 +2556,8 @@ function toggleMapView(){
     pool_thebeach:    [9,   22,   9,   23.7, 0],
     pool_silvercity:  [7,   22,   7,   22,   0],
     pool_hearts:      [10,  18,   9,   19,   0],
+    pool_korali:      [9,   19,   9,   19,   0],
+    pool_infinity:    [9,   20,   9,   20,   1],
     pool_sportpalace: [6.5, 19.5, 8,   17,   1]   // ЗАКРИТ — при дъжд печели
   };
 
@@ -3376,4 +3380,60 @@ function toggleMapView(){
     });
     mo.observe(document.body, {childList:true, subtree:true, characterData:true});
   }catch(e){}
+})();
+
+
+// ------ jam-status-v31: "ЗАДРЪСТЕНО СЕГА" само ако наистина е пиков час ------
+(function(){
+  function inPeak(txt){
+    // чете реда "⏰ Пик: 07:30–09:30 делнични" от самия popup
+    var m = txt.match(/Пик:\s*([\d:–\-\s и]+)/);
+    if(!m) return null;
+    var now = new Date();
+    var wknd = (now.getDay() === 0 || now.getDay() === 6);
+    if(/делнич/i.test(txt) && wknd) return false;      // само в делник
+    var cur = now.getHours()*60 + now.getMinutes();
+    var ranges = m[1].match(/(\d{1,2}):(\d{2})\s*[–\-]\s*(\d{1,2}):(\d{2})/g) || [];
+    if(!ranges.length) return null;
+    for(var i = 0; i < ranges.length; i++){
+      var p = ranges[i].match(/(\d{1,2}):(\d{2})\s*[–\-]\s*(\d{1,2}):(\d{2})/);
+      var a = (+p[1])*60 + (+p[2]), b = (+p[3])*60 + (+p[4]);
+      if(cur >= a && cur <= b) return true;
+    }
+    return false;
+  }
+
+  function fix(el){
+    try{
+      if(!el || (el.dataset && el.dataset.jam31)) return;
+      var txt = el.textContent || '';
+      if(txt.indexOf('Пик:') < 0) return;
+      if(!/ЗАДРЪСТЕНО СЕГА|В МОМЕНТА СВОБОДНО/.test(txt)) return;
+      var peak = inPeak(txt);
+      if(peak === null) return;
+      if(el.dataset) el.dataset.jam31 = '1';
+      var html = el.innerHTML;
+      if(!peak){
+        // извън пиков час: статусът става зелен, а съветът за обратна посока пада
+        html = html.replace(/🔴\s*ЗАДРЪСТЕНО СЕГА/g, '🟢 СВОБОДНО (извън пиков час)');
+        html = html.replace(/<div[^>]*>💡[^<]*<\/div>/g, '');
+      } else {
+        html = html.replace(/🟢\s*В МОМЕНТА СВОБОДНО/g, '🔴 ЗАДРЪСТЕНО СЕГА');
+        html = html.replace(/💡\s*Карай\s*([←→↔↑↓])\s*обратно\s*—\s*стигаш по-бързо!/g,
+                            '💡 Насрещното платно $1 е свободно');
+      }
+      // отсечка, не точка
+      if(html.indexOf('отсечка') < 0){
+        html = html.replace(/(⏰\s*Пик:)/,
+          '<div style="font-size:11px;color:#64748b;margin:3px 0">'
+          + '📍 Маркерът е ориентир за цялата отсечка, не точно място</div>$1');
+      }
+      el.innerHTML = html;
+    }catch(e){}
+  }
+  function scan(){
+    try{ document.querySelectorAll('.leaflet-popup-content').forEach(fix); }catch(e){}
+  }
+  scan(); setInterval(scan, 3000);
+  try{ new MutationObserver(scan).observe(document.body, {childList:true, subtree:true}); }catch(e){}
 })();
