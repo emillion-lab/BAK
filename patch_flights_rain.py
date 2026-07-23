@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-"""v19: (1) летищната точка — беше 720 м северно от терминалите
-       (2) Централна автогара смята деманд от РАЗПИСАНИЕТО, не от стария скрейпър
-       (3) Подуяне — маха обещанието за разписание
-       (4) дъмп на кода за кръговете и посоката (за следващата поправка)
+"""v20: ПОПРАВКА на фокуса от списъка.
+Причина: <div id="map"> прави глобално `map` = DOM елементът, а Leaflet
+картата е локална в DOMContentLoaded. Inline onclick вижда div-а -> setView гърми.
+Решение: прихващаме L.map() при създаване и пазим инстанцията в window.__leafletMap,
+после inline хендлърът вика window.__focusZone().
 """
 import re, subprocess, shutil, os
 
@@ -10,134 +11,87 @@ rep = []
 src = open('app.js', encoding='utf-8').read()
 cand = src
 
-# ── (1) летище: между Т1 (42.6889,23.4031) и Т2 (42.6880,23.4134) ──
-pat = re.compile(r'(\{\s*id:"airport"[^}]*?lat:)([\d.]+)(\s*,\s*lng:)([\d.]+)')
-m = pat.search(cand)
-if m:
-    old_lat, old_lng = float(m.group(2)), float(m.group(4))
-    cand = pat.sub(lambda x: x.group(1) + '42.6885' + x.group(3) + '23.4082', cand, count=1)
-    d = ((42.6885 - old_lat) * 111000) ** 2 + ((23.4082 - old_lng) * 82000) ** 2
-    rep.append('OK   airport %.4f,%.4f -> 42.6885,23.4082 (беше на %d м, вече е между Т1 и Т2)'
-               % (old_lat, old_lng, int(d ** 0.5)))
+# ── 1) кука върху L.map (най-отгоре, преди приложението да си направи картата) ──
+if '__leafletMap-hook' in cand:
+    rep.append('SKIP куката вече е сложена')
 else:
-    rep.append('SKIP airport зоната не е намерена')
-
-# ── (3) Подуяне: без обещания ──
-for old, new in [
-    ("Зона за транспортен хъб. Очаквайте разписания.",
-     "Транспортен хъб. Няма публично разписание — севернo/източно направление."),
-    ("Очаквайте разписания.", "Няма публично разписание."),
-]:
-    if old in cand:
-        cand = cand.replace(old, new)
-        rep.append('OK   махнато обещание: "%s"' % old[:40])
-        break
-
-# ── (2) автогара от разписанието ──
-if 'cas-sched-v19' in cand:
-    rep.append('SKIP v19 автогара вече е добавена')
-else:
-    cand += """
-
-// ------ cas-sched-v19: Централна автогара смята деманд от РАЗПИСАНИЕТО ------
+    hook = """// __leafletMap-hook (v20) — прихваща Leaflet картата при създаване
 (function(){
-  var SCHED = null;
-  fetch('bus-schedule.json?v='+Date.now()).then(function(r){return r.json()})
-    .then(function(d){ SCHED = d; }).catch(function(){});
-
-  // пристигания на ЦАС по разписание в прозорец [-20, +30] мин
-  function casNow(){
-    if(!SCHED || !SCHED.routes) return {recent:0, soon:0, names:[]};
-    var now = Date.now(), recent = 0, soon = 0, names = [];
-    SCHED.routes.forEach(function(rt){
-      if(!/София/i.test(rt.to || '')) return;
-      var dur = rt.duration_min || 0;
-      (rt.departures || []).forEach(function(dep){
-        var m = /^(\\d{1,2}):(\\d{2})$/.exec(dep); if(!m) return;
-        var t = new Date(); t.setHours(+m[1], +m[2], 0, 0);
-        t = new Date(t.getTime() + dur*60000);
-        var diff = (t.getTime() - now) / 60000;
-        if(diff < -180) diff += 1440;          // за вчерашни нощни курсове
-        if(diff <= 0 && diff >= -20){ recent++; names.push((rt.name||'').replace(/\\s*→.*/,'')); }
-        else if(diff > 0 && diff <= 30){ soon++; names.push((rt.name||'').replace(/\\s*→.*/,'')); }
-      });
-    });
-    return {recent:recent, soon:soon, names:names.slice(0,4)};
-  }
-
-  var prev = window.__applyLive;
-  window.__applyLive = function(scores){
-    try{ if(prev) prev(scores); }catch(e){}
+  try{
+    if(window.L && typeof L.map === 'function'){
+      var _origMap = L.map;
+      L.map = function(){
+        var m = _origMap.apply(this, arguments);
+        try{ window.__leafletMap = m; }catch(e){}
+        return m;
+      };
+      for(var k in _origMap){ try{ L.map[k] = _origMap[k]; }catch(e){} }
+    }
+  }catch(e){}
+  // фокусиране на зона от списъка — вика се от inline onclick
+  window.__focusZone = function(lat, lng, zoom){
     try{
-      var c = casNow();
-      if(typeof scores.cab_north === 'number' && (c.recent || c.soon)){
-        // слезлите преди малко тежат най-много — те са на място СЕГА
-        var boost = Math.min(3.0, c.recent*0.9 + c.soon*0.55);
-        scores.cab_north = Math.max(scores.cab_north, 1.0 + boost);
-        window.__casInfo = c;
-      }
+      var el = document.getElementById('map');
+      if(el && el.scrollIntoView) el.scrollIntoView({behavior:'smooth', block:'center'});
+      var m = window.__leafletMap;
+      if(!m || typeof m.setView !== 'function') return;
+      setTimeout(function(){
+        try{
+          if(typeof m.invalidateSize === 'function') m.invalidateSize();
+          m.setView([lat, lng], zoom || 15);
+        }catch(e){}
+      }, 220);
     }catch(e){}
   };
-
-  // подсказка в списъка защо гори
-  setInterval(function(){
-    try{
-      var c = window.__casInfo; if(!c) return;
-      var items = document.querySelectorAll('#zone-list .zone-item, .zone-item');
-      Array.prototype.slice.call(items).forEach(function(it){
-        var nm = it.querySelector('.zone-name') || it;
-        if((nm.textContent||'').indexOf('Централна автогара') < 0) return;
-        if(it.dataset && it.dataset.cas === (c.recent+'/'+c.soon)) return;
-        if(it.dataset) it.dataset.cas = c.recent+'/'+c.soon;
-        var sub = it.querySelector('.cas-sub');
-        if(!sub){
-          sub = document.createElement('div');
-          sub.className = 'cas-sub';
-          sub.style.cssText = 'font-size:11px;opacity:.75;margin-top:2px';
-          nm.parentElement.appendChild(sub);
-        }
-        var bits = [];
-        if(c.recent) bits.push('🚌 ' + c.recent + ' слезли <20м');
-        if(c.soon) bits.push(c.soon + ' идват <30м');
-        sub.textContent = bits.join(' · ') + (c.names.length ? ' (' + c.names.join(', ') + ')' : '');
-      });
-    }catch(e){}
-  }, 12000);
 })();
-"""
-    rep.append('OK   Централна автогара: деманд от разписанието + подсказка в списъка')
 
-# ── (4) диагностика за кръговете и посоката ──
-os.makedirs('debug', exist_ok=True)
-diag = []
-for kw in ['circleMap', 'L.circle', 'fillOpacity', 'direction-hint', 'КЪМ ЛЕТИЩЕТО', 'Карай']:
-    idx2 = cand.find(kw)
-    if idx2 < 0:
-        diag.append('--- %s: НЕ Е НАМЕРЕН ---' % kw)
-        continue
-    ln = cand.count('\n', 0, idx2) + 1
-    diag.append('--- %s (ред %d) ---\n%s' % (kw, ln, cand[max(0, idx2-500):idx2+700]))
-open('debug/ui-diag2.txt', 'w', encoding='utf-8').write('\n\n'.join(diag)[:14000] + '\n')
-rep.append('OK   дъмп за кръгове/посока -> debug/ui-diag2.txt')
+"""
+    cand = hook + cand
+    rep.append('OK   кука върху L.map + window.__focusZone')
+
+# ── 2) inline хендлърът вече вика __focusZone ──
+old = ("setTimeout(()=>{var _m=document.getElementById('map');"
+       "if(_m&&_m.scrollIntoView)_m.scrollIntoView({behavior:'smooth',block:'center'});"
+       "if(map.invalidateSize)map.invalidateSize();"
+       "map.setView([${z.lat},${z.lng}],'${zid}'==='airport'?14:15);")
+new = "setTimeout(()=>{window.__focusZone(${z.lat},${z.lng},'${zid}'==='airport'?14:15);"
+n = cand.count(old)
+if n == 1:
+    cand = cand.replace(old, new)
+    rep.append('OK   inline фокус -> window.__focusZone')
+else:
+    rep.append('SKIP inline фокус (намерени %d) — търся общо' % n)
+    # резервен вариант: всяко map.setView/invalidateSize в темплейт низ
+    n2 = len(re.findall(r'map\.setView\(\[\$\{z\.lat\}', cand))
+    if n2:
+        cand = re.sub(r'if\(map\.invalidateSize\)map\.invalidateSize\(\);', '', cand)
+        cand = re.sub(r'map\.setView\(\[\$\{z\.lat\},\$\{z\.lng\}\]',
+                      'window.__focusZone(${z.lat},${z.lng}', cand)
+        rep.append('OK   заменени %d общи map.setView в темплейт' % n2)
+
+# ── 3) всяко останало голо map.setView/ invalidateSize в inline низове ──
+leftover = len(re.findall(r'(?<!__leafletMap\.)(?<!m\.)\bmap\.(setView|invalidateSize|flyTo)\(', cand))
+rep.append('остатъчни голи map.* обръщения: %d' % leftover)
 
 open('/tmp/app.c.js', 'w', encoding='utf-8').write(cand)
 r = subprocess.run(['node', '--check', '/tmp/app.c.js'], capture_output=True, text=True)
 if r.returncode == 0:
     shutil.move('/tmp/app.c.js', 'app.js')
     idx = open('index.html', encoding='utf-8').read()
-    idx = re.sub(r'app\.js\?v=[0-9a-z]+', 'app.js?v=20260723v19', idx)
+    idx = re.sub(r'app\.js\?v=[0-9a-z]+', 'app.js?v=20260723v20', idx)
     open('index.html', 'w', encoding='utf-8').write(idx)
     try:
         sw = open('sw.js', encoding='utf-8').read()
         sw2, k = re.subn(r"(CACHE[_A-Z]*\s*=\s*['\"])([^'\"]+)(['\"])",
-                         lambda mm: mm.group(1) + 'bak-v19' + mm.group(3), sw, count=1)
+                         lambda mm: mm.group(1) + 'bak-v20' + mm.group(3), sw, count=1)
         if k:
             open('sw.js', 'w', encoding='utf-8').write(sw2)
     except FileNotFoundError:
         pass
-    rep.append('OK v19 + node --check + cache-bust v19')
+    rep.append('OK v20 + node --check + cache-bust v20')
 else:
     rep.append('FAIL node --check :: ' + (r.stderr or '')[:400])
 
+os.makedirs('debug', exist_ok=True)
 open('flights-rain-report.txt', 'w', encoding='utf-8').write('\n'.join(rep) + '\n')
 print('\n'.join(rep))
