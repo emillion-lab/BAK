@@ -1,3 +1,5 @@
-OK   pool_thebeach + 42.7361, 23.3144  (Военна рампа, отваря до 22:00)
-зони: 90
-OK v13 + node --check + cache-bust v13
+OK   pool_silvercity    + 42.6558, 23.3131  (работи 7:00–22:00 всеки ден)
+OK   pool_sportpalace   + 42.6903, 23.3312  (закрит, работи и зимата)
+OK   pool_hearts        + 42.6271, 23.4238  (извън града, уикенд дестинация)
+басейни общо: 10 · зони: 93
+OK v14 + node --check + cache-bust v14
