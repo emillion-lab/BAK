@@ -1,0 +1,72 @@
+--- closeDirHint (index.html ред 1211) ---
+arrow to nearest worthy zone) -->
+<div id="direction-hint">
+  <div class="dh-row">
+    <div class="dh-arrow" id="dh-arrow">➡️</div>
+    <div class="dh-info">
+      <div class="dh-name"  id="dh-name">—</div>
+      <div class="dh-addr"  id="dh-addr">—</div>
+      <div class="dh-dist"  id="dh-dist">—</div>
+    </div>
+    <div class="dh-score" id="dh-score">—</div>
+    <span class="dh-close" onclick="closeDirHint()">✕</span>
+  </div>
+</div>
+<button id="next90-btn" title="Следващи 90 минути">⏱</button>
+<button id="gps-btn" title="GPS локация">📍</button>
+<butt
+
+--- closeEventAlert (index.html ред 1197) ---
+v>
+</div>
+
+<!-- Event Alert -->
+<div id="event-alert">
+  <div class="ea-row">
+    <div class="ea-icon" id="ea-icon">🎸</div>
+    <div class="ea-info">
+      <div class="ea-title" id="ea-title">—</div>
+      <div class="ea-sub"   id="ea-sub">—</div>
+      <div class="ea-dist"  id="ea-dist"></div>
+    </div>
+    <button class="ea-waze" id="ea-waze">🚗 Waze</button>
+    <span class="ea-close" onclick="closeEventAlert()">✕</span>
+  </div>
+</div>
+
+<!-- Direction hint (auto arrow to nearest worthy zone) -->
+<div id="direction-hint">
+  <div class="dh-row">
+    <d
+
+--- closeNav (index.html ред 1258) ---
+en карта">⛶</button>
+
+</div>
+
+<!-- Navigation bottom sheet -->
+<div id="nav-panel">
+  <div class="nav-row">
+    <div>
+      <div class="nav-title">🧭 НАВИГАЦИЯ КЪМ</div>
+      <div class="nav-target" id="nav-target">—</div>
+      <div class="nav-distance" id="nav-dist">—</div>
+    </div>
+    <div class="nav-score" id="nav-score" style="margin-left:12px">—</div>
+    <span class="nav-close" onclick="closeNav()">✕</span>
+  </div>
+  <div class="nav-row">
+    <div id="nav-compass" style="font-size:32px">⬆️</div>
+    <div class="nav-hint" id="nav-hint">Изчакван
+
+--- getElementById (index.html ред 1278) ---
+ -3px 15px #0003">
+  <div style="display:flex;align-items:center;gap:10px">
+    <span style="font-size:24px">🚕</span>
+    <div>
+      <div style="font-size:13px;font-weight:900;color:#fff">Инсталирай BakshishApp</div>
+      <div style="font-size:11px;color:rgba(255,255,255,.8)">Работи офлайн · Бърз достъп</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:7px">
+    <button onclick="document.getElementById('pwa-banner').style.display='none';localStorage.setItem('pwa-bak-no','1')" style="background:rgba(255,255,255,.2);border:1px solid rgba(255,255,2

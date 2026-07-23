@@ -1,5 +1,5 @@
-closeEventAlert: 0 срещания -> debug/closeEventAlert.txt
-кандидати от inline: closeBakshish, startNav
-OK   изнесени: няма
-вече бяха в window: closeBakshish, startNav
-OK v22 + node --check + cache-bust v22
+index.html вика: closeBakshish, closeDirHint, closeEventAlert, closeNav, closeNext90, getElementById, toggleMapView
+дефинирани: closeBakshish, closeNext90, toggleMapView
+⚠ НЕдефинирани: closeDirHint, closeEventAlert, closeNav, getElementById
+OK   реализирани: closeDirHint, closeEventAlert, closeNav, getElementById (затварят блока, от който е бутонът)
+OK v23 + node --check + cache-bust v23

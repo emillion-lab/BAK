@@ -1,3 +1,38 @@
+// inline-closer-v23 — работещи реализации за inline хендлъри от index.html
+(function(){
+  function hideOwner(){
+    try{
+      var ev = window.event;
+      var t = ev && (ev.target || ev.srcElement);
+      if(t){
+        var n = t;
+        for(var i = 0; i < 7 && n; i++){
+          n = n.parentElement;
+          if(!n) break;
+          var cls = (n.className || '').toString();
+          if(n.id || /alert|event|banner|toast|popup|hint|modal|box/i.test(cls)){
+            n.style.display = 'none';
+            return true;
+          }
+        }
+        if(t.parentElement){ t.parentElement.style.display = 'none'; return true; }
+      }
+      var ids = ['event-alert','eventAlert','event-banner','alert-box',
+                 'bakshish-box','direction-hint','karyk-banner','rain-banner'];
+      for(var k = 0; k < ids.length; k++){
+        var e = document.getElementById(ids[k]);
+        if(e && e.offsetParent !== null){ e.style.display = 'none'; return true; }
+      }
+    }catch(err){}
+    return false;
+  }
+  var N = ["closeDirHint", "closeEventAlert", "closeNav", "getElementById"];
+  N.forEach(function(n){
+    if(typeof window[n] === 'function') return;
+    window[n] = hideOwner;
+  });
+})();
+
 // inline-fallback-v21 — предпазни заглушки, за да не гърми inline onclick
 (function(){ var N = ["function"];
   N.forEach(function(n){
