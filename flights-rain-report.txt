@@ -1,6 +1,5 @@
-OK   спирките искат "Слизане от"/"Вход от" — Полиграфия е изключена
-функции, викани от inline: closeBakshish, function, startNav
-OK   изнесени в window: няма
-⚠ не намерени като декларация: function
-OK   предпазни заглушки за: function
-OK v21 + node --check + cache-bust v21
+closeEventAlert: 0 срещания -> debug/closeEventAlert.txt
+кандидати от inline: closeBakshish, startNav
+OK   изнесени: няма
+вече бяха в window: closeBakshish, startNav
+OK v22 + node --check + cache-bust v22
