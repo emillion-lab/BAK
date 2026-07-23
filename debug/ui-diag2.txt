@@ -1,0 +1,167 @@
+--- circleMap (ред 570) ---
+loat(d[0].lon)};
+    }catch(e){}
+    badge.textContent=`📡 ${++i}/${missing.length}`;
+    await new Promise(r=>setTimeout(r,1100));
+  }
+  try{localStorage.setItem(CACHE_KEY,JSON.stringify({ts:Date.now(),coords:cache}));}catch(e){}
+  badge.textContent=orig;
+  applyGeoCache(cache,zMap);
+}
+
+function applyGeoCache(cache,zMap){
+  let n=0;
+  for(const[id,coords]of Object.entries(cache)){
+    if(zMap[id]&&coords){zMap[id].lat=coords.lat;zMap[id].lng=coords.lng;n++;}
+  }
+  if(n>0){
+    ZONES.forEach(z=>{circleMap[z.id]?.setLatLng?.([z.lat,z.lng]);});
+    Object.values(hospitalMarkers).forEach(({marker,circle},id)=>{
+      const z=ZONES.find(x=>x.id===id); if(!z) return;
+      marker?.setLatLng([z.lat,z.lng]); circle?.setLatLng([z.lat,z.lng]);
+    });
+    render(currentHour);
+  }
+}
+
+// ═══════════════════════════════════════════════
+// NEXT 90 MINUTES PANEL
+// ═══════════════════════════════════════════════
+let next90Open=false;
+document.getElementById('next90-btn')?.addEventListener('click',()=>{
+  next90Open=!next90Open;
+  document.getElementById('next90-btn').classList.toggle('active',next90Open);
+  const panel=document.getElementById('next90-panel');
+  if(next90Open){buildNext90();panel.
+
+--- L.circle (ред 662) ---
+};border-radius:2px"></div>
+    </div>`,
+    iconSize:[sz,sz], iconAnchor:[sz/2,sz/2],
+  });
+}
+
+function buildCircles() {
+  ZONES.forEach(z => {
+    if (z.type==='traffic') {
+      const info=TRAFFIC_INFO[z.id];
+      if(info){
+        const m=L.marker([z.lat,z.lng],{icon:makeTrafficIcon(info,false),zIndexOffset:600}).addTo(map);
+        m.on('click',()=>showZonePopup(z.id));
+        trafficMarkers[z.id]=m; circleMap[z.id]=m;
+      }
+      return;
+    }
+    if (z.type==='karyk') {
+      const c=L.circle([z.lat,z.lng],{radius:z.radius,fillOpacity:0,opacity:0,weight:0});
+      c.on('click',()=>z.type==='airport'?showAirportSchedule():z.type==='transit'?showTransitPopup(z.id):showZonePopup(z.id)); c.addTo(map); circleMap[z.id]=c;
+      return;
+    }
+    if (z.type==='hospital') {
+      const hm=L.marker([z.lat,z.lng],{icon:makeHospitalIcon(BASE[z.id]||0.5),zIndexOffset:400}).addTo(map);
+      hm.on('click',()=>showZonePopup(z.id));
+      const hc=L.circle([z.lat,z.lng],{radius:z.radius,color:'#991b1b',fillColor:'#991b1b',fillOpacity:0.12,weight:1}).addTo(map);
+      hc.on('click',()=>showZonePopup(z.id));
+      hospitalMarkers[z.id]={marker:hm,circle:hc};
+      circleMap[z.id]={setSty
+
+--- fillOpacity (ред 662) ---
+
+    iconSize:[sz,sz], iconAnchor:[sz/2,sz/2],
+  });
+}
+
+function buildCircles() {
+  ZONES.forEach(z => {
+    if (z.type==='traffic') {
+      const info=TRAFFIC_INFO[z.id];
+      if(info){
+        const m=L.marker([z.lat,z.lng],{icon:makeTrafficIcon(info,false),zIndexOffset:600}).addTo(map);
+        m.on('click',()=>showZonePopup(z.id));
+        trafficMarkers[z.id]=m; circleMap[z.id]=m;
+      }
+      return;
+    }
+    if (z.type==='karyk') {
+      const c=L.circle([z.lat,z.lng],{radius:z.radius,fillOpacity:0,opacity:0,weight:0});
+      c.on('click',()=>z.type==='airport'?showAirportSchedule():z.type==='transit'?showTransitPopup(z.id):showZonePopup(z.id)); c.addTo(map); circleMap[z.id]=c;
+      return;
+    }
+    if (z.type==='hospital') {
+      const hm=L.marker([z.lat,z.lng],{icon:makeHospitalIcon(BASE[z.id]||0.5),zIndexOffset:400}).addTo(map);
+      hm.on('click',()=>showZonePopup(z.id));
+      const hc=L.circle([z.lat,z.lng],{radius:z.radius,color:'#991b1b',fillColor:'#991b1b',fillOpacity:0.12,weight:1}).addTo(map);
+      hc.on('click',()=>showZonePopup(z.id));
+      hospitalMarkers[z.id]={marker:hm,circle:hc};
+      circleMap[z.id]={setStyle:(o)=>hc.setStyle({fillColor:o.fillCol
+
+--- direction-hint (ред 1115) ---
+',e=>{deviceHeading=e.alpha;},true);
+  window.addEventListener('deviceorientation',e=>{if(e.webkitCompassHeading)deviceHeading=e.webkitCompassHeading;},true);
+}
+
+function updateDirectionHint(scores) {
+  if(userLat===null||dirHintSuppressed) return;
+  let best=null,bestW=Infinity;
+  ZONES.forEach(z=>{
+    const s=scores[z.id]||0; if(s<1.3) return;
+    const d=haversine(userLat,userLng,z.lat,z.lng);
+    const w=d/(s*s);
+    if(w<bestW){bestW=w;best=z;}
+  });
+  const panel=document.getElementById('direction-hint');
+  if(!best){panel.style.display='none';return;}
+  if(best.id===dirHintZid&&panel.style.display!=='none') return;
+  dirHintZid=best.id;
+  const {scores:sc}=computeScores(currentHour);
+  const bs=sc[best.id]||0;
+  const dist=haversine(userLat,userLng,best.lat,best.lng);
+  const bear=bearing(userLat,userLng,best.lat,best.lng);
+  let relBear=bear;
+  if(deviceHeading!==null) relBear=(bear-deviceHeading+360)%360;
+  const c=demandColor(bs,best.type);
+  const distTxt=dist<1000?`${Math.round(dist)} м`:`${(dist/1000).toFixed(1)} км`;
+  document.getElementById('dh-arrow').textContent=ARROWS[Math.round(relBear/45)%8];
+  document.getElementById('dh-name').textContent=`${best.icon} ${bes
+
+--- КЪМ ЛЕТИЩЕТО (ред 459) ---
+rt:-1.5, transit:-0.6,
+  };
+  let ks = demand + (typeBonus[z.type]||0);
+  if (demand<1.0) ks += 0.8;
+  return Math.max(0, Math.min(5, ks));
+}
+
+// ═══════════════════════════════════════════════
+// TRAFFIC JAM INFO
+// ═══════════════════════════════════════════════
+const TRAFFIC_INFO = {
+  jam_orl:    { jamDir:'← КЪМ ЦЕНТЪРА', freeDir:'→ НАВЪН', freeArrow:'→',
+                tip:'Задръстено КЪМ ЦЕНТЪРА. Ти върви → НАВЪН (свободно!)', time:'07:30–09:30 и 17:00–19:00' },
+  jam_tsar:   { jamDir:'→ КЪМ ЛЕТИЩЕТО', freeDir:'← КЪМ ЦЕНТЪРА', freeArrow:'←',
+                tip:'Задръстено → КЪМ ЛЕТИЩЕТО. Ти върви ← КЪМ ЦЕНТЪРА (свободно!)', time:'07:00–09:00 и 17:00–19:30' },
+  jam_ndk:    { jamDir:'↑↓ ДВЕ ПОСОКИ', freeDir:'↔ СТРАНИЧНИ УЛ.', freeArrow:'↔',
+                tip:'Задръстено по бул.България. Използвай странични улици!', time:'17:00–19:30 делнични' },
+  jam_serdika:{ jamDir:'← КЪМ ЗАПАДА', freeDir:'→ КЪМ ИЗТОКА', freeArrow:'→',
+                tip:'Задръстено ← КЪМ ЗАПАДА. Ти върви → КЪМ ИЗТОКА (свободно!)', time:'07:30–09:30 делнични' },
+};
+
+const trafficMarkers={};
+function makeTrafficIcon(info,active){
+  const op=active?'1':'0.35', sz=active?14:10;
+  const glow=active?`0 0 8p
+
+--- Карай (ред 937) ---
+sc};border-radius:5px;padding:5px 8px;margin-bottom:5px;color:${sc};font-size:15px;font-weight:600">${active?'🔴 ЗАДРЪСТЕНО СЕГА':'🟢 В МОМЕНТА СВОБОДНО'}</div>
+      <div style="font-size:15px;color:#a855f7;margin-bottom:3px">🚦 ${ti.jamDir}</div>
+      <div style="font-size:15px;color:#00e5ff;margin-bottom:5px">✅ Свободно: ${ti.freeDir}</div>
+      ${active?`<div style="background:#1a0a2e;border:1px solid #a855f7;border-radius:5px;padding:5px 8px;font-size:15px;color:#d08dff;margin-bottom:4px">💡 Карай ${ti.freeArrow} обратно — стигаш по-бързо!</div>`:''}
+      <div style="font-size:14px;color:#4a6080">⏰ Пик: ${ti.time}</div>`;
+  } else {
+    const evs=(activeEvents[zid]||[]).slice(0,3);
+    evHtml=evs.length?evs.map(e=>`<div>• ${e.name}</div>`).join(''):'<div style="color:#4a6080">Базово търсене</div>';
+  }
+  const pct=Math.min(100,(s/4.5)*100);
+  L.popup({maxWidth:240}).setLatLng([z.lat,z.lng]).setContent(`
+    <div style="font-family:'Share Tech Mono',monospace;font-size:16px;color:#00e5ff;margin-bottom:5px">${z.icon} ${z.name}</div>
+    <div style="font-size:18px;font-weight:bold;color:${c.fill};margin-bottom:4px">${s.toFixed(1)} <span style="font-size:15px">${label}</span></div>

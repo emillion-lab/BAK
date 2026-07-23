@@ -1,5 +1,5 @@
-OK   изключен стар скенер: document.querySelectorAll('.leaflet-popup-con
-OK   изключен стар скенер: document.querySelectorAll('[data-stop],.stop-
-OK   v18: спирки от разписание + ЖП с реални влакове
-OK   sw.js кеш -> bak-v18
-OK v18 + node --check + cache-bust v18
+OK   airport 42.6950,23.4083 -> 42.6885,23.4082 (беше на 721 м, вече е между Т1 и Т2)
+OK   махнато обещание: "Зона за транспортен хъб. Очаквайте разпи"
+OK   Централна автогара: деманд от разписанието + подсказка в списъка
+OK   дъмп за кръгове/посока -> debug/ui-diag2.txt
+OK v19 + node --check + cache-bust v19

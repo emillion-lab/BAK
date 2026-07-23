@@ -77,7 +77,7 @@ let alertedEvents     = new Set();
 // ZONE DEFINITIONS
 // ═══════════════════════════════════════════════
 const ZONES = [
-  { id:"airport",        name:"Летище София (СОФ)",                     icon:"✈️",  lat:42.6950, lng:23.4083, radius:600, type:"airport",          wazeName:"Летище София" },
+  { id:"airport",        name:"Летище София (СОФ)",                     icon:"✈️",  lat:42.6885, lng:23.4082, radius:600, type:"airport",          wazeName:"Летище София" },
   { id:"bpark",          name:"Business Park Sofia",                    icon:"🏢", lat:42.6269, lng:23.3784, radius:380, type:"office",           wazeName:"Business Park Sofia" },
   { id:"garitage",       name:"Garitage Park",                          icon:"🏢", lat:42.6227, lng:23.3735, radius:320, type:"office",           wazeName:"Garitage Park Sofia" },
   { id:"polygraphia",    name:"Polygraphia Office Center (Цариградско 47)",              icon:"🏢", lat:42.6874, lng:23.344, radius:260, type:"office",           wazeName:"Polygraphia Office Center Sofia" },
@@ -790,7 +790,7 @@ function showTransitPopup(zid){
 
   // Generic transit info
   if(!['cab_north','iec','expo2000'].includes(zid)){
-    html += '<div style="color:var(--muted);padding:8px 0">Зона за транспортен хъб. Очаквайте разписания.</div>';
+    html += '<div style="color:var(--muted);padding:8px 0">Транспортен хъб. Няма публично разписание — севернo/източно направление.</div>';
   }
 
   html += '</div>';
@@ -2776,4 +2776,71 @@ function toggleMapView(){
   scan();
   setInterval(scan, 4000);
   try{ new MutationObserver(scan).observe(document.body, {childList:true, subtree:true}); }catch(e){}
+})();
+
+
+// ------ cas-sched-v19: Централна автогара смята деманд от РАЗПИСАНИЕТО ------
+(function(){
+  var SCHED = null;
+  fetch('bus-schedule.json?v='+Date.now()).then(function(r){return r.json()})
+    .then(function(d){ SCHED = d; }).catch(function(){});
+
+  // пристигания на ЦАС по разписание в прозорец [-20, +30] мин
+  function casNow(){
+    if(!SCHED || !SCHED.routes) return {recent:0, soon:0, names:[]};
+    var now = Date.now(), recent = 0, soon = 0, names = [];
+    SCHED.routes.forEach(function(rt){
+      if(!/София/i.test(rt.to || '')) return;
+      var dur = rt.duration_min || 0;
+      (rt.departures || []).forEach(function(dep){
+        var m = /^(\d{1,2}):(\d{2})$/.exec(dep); if(!m) return;
+        var t = new Date(); t.setHours(+m[1], +m[2], 0, 0);
+        t = new Date(t.getTime() + dur*60000);
+        var diff = (t.getTime() - now) / 60000;
+        if(diff < -180) diff += 1440;          // за вчерашни нощни курсове
+        if(diff <= 0 && diff >= -20){ recent++; names.push((rt.name||'').replace(/\s*→.*/,'')); }
+        else if(diff > 0 && diff <= 30){ soon++; names.push((rt.name||'').replace(/\s*→.*/,'')); }
+      });
+    });
+    return {recent:recent, soon:soon, names:names.slice(0,4)};
+  }
+
+  var prev = window.__applyLive;
+  window.__applyLive = function(scores){
+    try{ if(prev) prev(scores); }catch(e){}
+    try{
+      var c = casNow();
+      if(typeof scores.cab_north === 'number' && (c.recent || c.soon)){
+        // слезлите преди малко тежат най-много — те са на място СЕГА
+        var boost = Math.min(3.0, c.recent*0.9 + c.soon*0.55);
+        scores.cab_north = Math.max(scores.cab_north, 1.0 + boost);
+        window.__casInfo = c;
+      }
+    }catch(e){}
+  };
+
+  // подсказка в списъка защо гори
+  setInterval(function(){
+    try{
+      var c = window.__casInfo; if(!c) return;
+      var items = document.querySelectorAll('#zone-list .zone-item, .zone-item');
+      Array.prototype.slice.call(items).forEach(function(it){
+        var nm = it.querySelector('.zone-name') || it;
+        if((nm.textContent||'').indexOf('Централна автогара') < 0) return;
+        if(it.dataset && it.dataset.cas === (c.recent+'/'+c.soon)) return;
+        if(it.dataset) it.dataset.cas = c.recent+'/'+c.soon;
+        var sub = it.querySelector('.cas-sub');
+        if(!sub){
+          sub = document.createElement('div');
+          sub.className = 'cas-sub';
+          sub.style.cssText = 'font-size:11px;opacity:.75;margin-top:2px';
+          nm.parentElement.appendChild(sub);
+        }
+        var bits = [];
+        if(c.recent) bits.push('🚌 ' + c.recent + ' слезли <20м');
+        if(c.soon) bits.push(c.soon + ' идват <30м');
+        sub.textContent = bits.join(' · ') + (c.names.length ? ' (' + c.names.join(', ') + ')' : '');
+      });
+    }catch(e){}
+  }, 12000);
 })();
