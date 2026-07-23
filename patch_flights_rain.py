@@ -1,92 +1,102 @@
 # -*- coding: utf-8 -*-
-"""v22: намира ВСИЧКИ функции, викани от inline атрибути (без значение как са
-цитирани), и ги изнася в window. Плюс дъмп на контекста на closeEventAlert."""
+"""v23: одит на inline хендлърите в index.html.
+closeEventAlert я няма никъде в app.js -> вика се от HTML, но не е дефинирана.
+Намираме ВСИЧКИ такива и им даваме работеща реализация (затваря съответния блок).
+"""
 import re, subprocess, shutil, os
 
 rep = []
-src = open('app.js', encoding='utf-8').read()
-cand = src
-
-# ── дъмп: къде се среща closeEventAlert ──
+app = open('app.js', encoding='utf-8').read()
+idx = open('index.html', encoding='utf-8').read()
 os.makedirs('debug', exist_ok=True)
+
+# ── 1) кои функции вика index.html ──
+called = set()
+for m in re.finditer(r'\bon(?:click|change|input|submit|mouseover|touchstart|focus|blur)\s*=\s*["\']([^"\']{0,120})["\']', idx):
+    body = m.group(1)
+    for c in re.finditer(r'([A-Za-z_$][\w$]*)\s*\(', body):
+        called.add(c.group(1))
+called -= {'function', 'return', 'this', 'event', 'alert', 'confirm', 'if', 'setTimeout'}
+rep.append('index.html вика: %s' % (', '.join(sorted(called)) or 'няма'))
+
+# ── 2) кои от тях реално съществуват ──
+defined, undefined_ = [], []
+for n in sorted(called):
+    has = (re.search(r'(?<![\w.$])function\s+%s\s*\(' % re.escape(n), app)
+           or re.search(r'window\.%s\s*=' % re.escape(n), app)
+           or re.search(r'(?<![\w.$])(?:const|let|var)\s+%s\s*=' % re.escape(n), app)
+           or re.search(r'(?<![\w.$])function\s+%s\s*\(' % re.escape(n), idx))
+    (defined if has else undefined_).append(n)
+rep.append('дефинирани: %s' % (', '.join(defined) or 'няма'))
+rep.append('⚠ НЕдефинирани: %s' % (', '.join(undefined_) or 'няма'))
+
+# ── 3) контекст на липсващите, за да знаем какво затварят ──
 ctx = []
-for m in re.finditer(r'closeEventAlert', cand):
-    ln = cand.count('\n', 0, m.start()) + 1
-    ctx.append('--- ред %d ---\n%s' % (ln, cand[max(0, m.start()-260):m.start()+200]))
-open('debug/closeEventAlert.txt', 'w', encoding='utf-8').write(
-    ('\n\n'.join(ctx) or 'НЯМА ТАКЪВ ИДЕНТИФИКАТОР') + '\n')
-rep.append('closeEventAlert: %d срещания -> debug/closeEventAlert.txt' % len(ctx))
+for n in undefined_:
+    for m in re.finditer(re.escape(n), idx):
+        ln = idx.count('\n', 0, m.start()) + 1
+        ctx.append('--- %s (index.html ред %d) ---\n%s' % (n, ln, idx[max(0, m.start()-400):m.start()+160]))
+        break
+open('debug/undefined-inline.txt', 'w', encoding='utf-8').write(
+    ('\n\n'.join(ctx) or 'няма липсващи') + '\n')
 
-# ── широк детектор: on<нещо> ... ИМЕ( ──
-names = set()
-for m in re.finditer(r'\bon(?:click|change|input|submit|mouseover|mouseout|touchstart|focus|blur)\b[^A-Za-z0-9_]{0,12}([A-Za-z_$][\w$]*)\s*\(', cand):
-    names.add(m.group(1))
-names -= {'function', 'return', 'this', 'event', 'e', 'ev', 'window', 'document',
-          'alert', 'confirm', 'setTimeout', 'if', 'for', 'while'}
-rep.append('кандидати от inline: %s' % (', '.join(sorted(names)) or 'няма'))
+# ── 4) универсална реализация: затваря блока, от който е бутонът ──
+if undefined_ and 'inline-closer-v23' not in app:
+    names = repr(undefined_).replace("'", '"')
+    closer = """// inline-closer-v23 — работещи реализации за inline хендлъри от index.html
+(function(){
+  function hideOwner(){
+    try{
+      var ev = window.event;
+      var t = ev && (ev.target || ev.srcElement);
+      if(t){
+        var n = t;
+        for(var i = 0; i < 7 && n; i++){
+          n = n.parentElement;
+          if(!n) break;
+          var cls = (n.className || '').toString();
+          if(n.id || /alert|event|banner|toast|popup|hint|modal|box/i.test(cls)){
+            n.style.display = 'none';
+            return true;
+          }
+        }
+        if(t.parentElement){ t.parentElement.style.display = 'none'; return true; }
+      }
+      var ids = ['event-alert','eventAlert','event-banner','alert-box',
+                 'bakshish-box','direction-hint','karyk-banner','rain-banner'];
+      for(var k = 0; k < ids.length; k++){
+        var e = document.getElementById(ids[k]);
+        if(e && e.offsetParent !== null){ e.style.display = 'none'; return true; }
+      }
+    }catch(err){}
+    return false;
+  }
+  var N = __NAMES__;
+  N.forEach(function(n){
+    if(typeof window[n] === 'function') return;
+    window[n] = hideOwner;
+  });
+})();
 
-exported, already, notfound = [], [], []
-for name in sorted(names):
-    if re.search(r'window\.%s\s*=' % re.escape(name), cand):
-        already.append(name)
-        continue
-    decl = re.compile(r'(?<![\w.$])function\s+%s\s*\(' % re.escape(name))
-    hits = len(decl.findall(cand))
-    if hits == 1:
-        cand = decl.sub('window.%s = function %s(' % (name, name), cand, count=1)
-        exported.append(name)
-        continue
-    # вариант: const/let/var ИМЕ = function|(...)=>
-    vdecl = re.compile(r'(?<![\w.$])(?:const|let|var)\s+%s\s*=' % re.escape(name))
-    vhits = len(vdecl.findall(cand))
-    if vhits == 1:
-        cand = vdecl.sub('window.%s = ' % name, cand, count=1)
-        exported.append(name + '(var)')
-        continue
-    notfound.append('%s(fn=%d,var=%d)' % (name, hits, vhits))
+""".replace('__NAMES__', names)
+    app = closer + app
+    rep.append('OK   реализирани: %s (затварят блока, от който е бутонът)' % ', '.join(undefined_))
 
-rep.append('OK   изнесени: %s' % (', '.join(exported) or 'няма'))
-if already:
-    rep.append('вече бяха в window: %s' % ', '.join(already))
-if notfound:
-    rep.append('⚠ ненамерени: %s' % ', '.join(notfound))
-
-# ── предпазна мрежа: заглушки, които просто скриват съответния елемент ──
-stub_names = [n.split('(')[0] for n in notfound]
-if stub_names and 'inline-stub-v22' not in cand:
-    fb = ("// inline-stub-v22 — предпазни заглушки за inline onclick\n"
-          "(function(){ var N = %s;\n"
-          "  N.forEach(function(n){\n"
-          "    if(typeof window[n] === 'function') return;\n"
-          "    window[n] = function(){\n"
-          "      try{\n"
-          "        ['event-alert','eventAlert','event-banner','alert-box','bakshish-box',\n"
-          "         'direction-hint','karyk-banner'].forEach(function(id){\n"
-          "          var e = document.getElementById(id); if(e) e.style.display = 'none';\n"
-          "        });\n"
-          "      }catch(err){}\n"
-          "    };\n"
-          "  });\n"
-          "})();\n\n" % repr(stub_names).replace("'", '"'))
-    cand = fb + cand
-    rep.append('OK   заглушки за: %s' % ', '.join(stub_names))
-
-open('/tmp/app.c.js', 'w', encoding='utf-8').write(cand)
+open('/tmp/app.c.js', 'w', encoding='utf-8').write(app)
 r = subprocess.run(['node', '--check', '/tmp/app.c.js'], capture_output=True, text=True)
 if r.returncode == 0:
     shutil.move('/tmp/app.c.js', 'app.js')
-    idx = open('index.html', encoding='utf-8').read()
-    idx = re.sub(r'app\.js\?v=[0-9a-z]+', 'app.js?v=20260723v22', idx)
+    idx = re.sub(r'app\.js\?v=[0-9a-z]+', 'app.js?v=20260723v23', idx)
     open('index.html', 'w', encoding='utf-8').write(idx)
     try:
         sw = open('sw.js', encoding='utf-8').read()
         sw2, k = re.subn(r"(CACHE[_A-Z]*\s*=\s*['\"])([^'\"]+)(['\"])",
-                         lambda mm: mm.group(1) + 'bak-v22' + mm.group(3), sw, count=1)
+                         lambda mm: mm.group(1) + 'bak-v23' + mm.group(3), sw, count=1)
         if k:
             open('sw.js', 'w', encoding='utf-8').write(sw2)
     except FileNotFoundError:
         pass
-    rep.append('OK v22 + node --check + cache-bust v22')
+    rep.append('OK v23 + node --check + cache-bust v23')
 else:
     rep.append('FAIL node --check :: ' + (r.stderr or '')[:400])
 
