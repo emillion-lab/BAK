@@ -1,0 +1,19 @@
+--- ред 346 ---
+            endHour:21.5, boost:2.5, repeat:"fri-sat" },
+  { zone:"nat_theatre",  name:"Народен театър – спектакъл",     endHour:21.5, boost:2.5, repeat:"tue-sat" },
+  { zone:"opera",        name:"Опера / Балет – край",           endHour:22.0, boost:2.5, repeat:"tue-sun" },
+
+  // Транзит
+  { zone:"cjp",          name:"Влак София–Варна",               endHour:18.5, boost:2.2, repeat:"daily" },
+  { zone:"cjp",          name:"Влак Sofia–Пловдив",             endHour:20.0, boost:1.8, repeat:"daily" },
+  { zone:"ag_yug",       name:"Автобуси от Пловдив",     
+
+--- ред 347 ---
+ектакъл",     endHour:21.5, boost:2.5, repeat:"tue-sat" },
+  { zone:"opera",        name:"Опера / Балет – край",           endHour:22.0, boost:2.5, repeat:"tue-sun" },
+
+  // Транзит
+  { zone:"cjp",          name:"Влак София–Варна",               endHour:18.5, boost:2.2, repeat:"daily" },
+  { zone:"cjp",          name:"Влак Sofia–Пловдив",             endHour:20.0, boost:1.8, repeat:"daily" },
+  { zone:"ag_yug",       name:"Автобуси от Пловдив",            endHour:19.5, boost:2.0, repeat:"daily" },
+  { zone:"ag_yug",       name:"Нощни автобуси",          
