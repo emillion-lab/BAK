@@ -1,3 +1,33 @@
+// __leafletMap-hook (v20) — прихваща Leaflet картата при създаване
+(function(){
+  try{
+    if(window.L && typeof L.map === 'function'){
+      var _origMap = L.map;
+      L.map = function(){
+        var m = _origMap.apply(this, arguments);
+        try{ window.__leafletMap = m; }catch(e){}
+        return m;
+      };
+      for(var k in _origMap){ try{ L.map[k] = _origMap[k]; }catch(e){} }
+    }
+  }catch(e){}
+  // фокусиране на зона от списъка — вика се от inline onclick
+  window.__focusZone = function(lat, lng, zoom){
+    try{
+      var el = document.getElementById('map');
+      if(el && el.scrollIntoView) el.scrollIntoView({behavior:'smooth', block:'center'});
+      var m = window.__leafletMap;
+      if(!m || typeof m.setView !== 'function') return;
+      setTimeout(function(){
+        try{
+          if(typeof m.invalidateSize === 'function') m.invalidateSize();
+          m.setView([lat, lng], zoom || 15);
+        }catch(e){}
+      }, 220);
+    }catch(e){}
+  };
+})();
+
 // bak-rescue-v16 — ловец на грешки (вмъкнат НАЙ-ОТГОРЕ)
 (function(){
   var shown = 0;
@@ -1041,7 +1071,7 @@ function render(hour) {
         const z=ZONES.find(x=>x.id===zid); if(!z) return '';
         const c=demandColor(score,z.type);
         const sub=(activeEvents[zid]||[])[0]?.name||'';
-        return `<div class="zone-item" onclick="(function(){if(document.body.classList.contains('list-view'))toggleMapView();setTimeout(()=>{var _m=document.getElementById('map');if(_m&&_m.scrollIntoView)_m.scrollIntoView({behavior:'smooth',block:'center'});if(map.invalidateSize)map.invalidateSize();map.setView([${z.lat},${z.lng}],'${zid}'==='airport'?14:15);'${zid}'==='airport'?showAirportSchedule():showZonePopup('${zid}');},150);})()">
+        return `<div class="zone-item" onclick="(function(){if(document.body.classList.contains('list-view'))toggleMapView();setTimeout(()=>{window.__focusZone(${z.lat},${z.lng},'${zid}'==='airport'?14:15);'${zid}'==='airport'?showAirportSchedule():showZonePopup('${zid}');},150);})()">
           <div class="zone-dot" style="background:${c.fill}"></div>
           <div style="flex:1;min-width:0">
             <div class="zone-name">${z.icon} ${z.name}</div>
