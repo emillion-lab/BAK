@@ -185,7 +185,7 @@ const ZONES = [
 
   { id:"cjp",            name:"Централна ЖП гара",                      icon:"🚂", lat:42.7121, lng:23.3210, radius:240, type:"transit",          wazeName:"Централна жп гара София" },
   { id:"cab_north",      name:"Централна автогара",                     icon:"🚌", lat:42.7103, lng:23.3233, radius:200, type:"transit",          wazeName:"Централна автогара София" },
-  { id:"cas_intl", name:"🌍 Международни автобуси (ЦАС, сектори 36–41)", icon:"🌍", lat:42.7110, lng:23.3247, radius:170, type:"transit", wazeName:"Централна автогара София международни линии" },
+  { id:"cas_intl", name:"🌍 Междунар. автогара Сердика / FlixBus", icon:"🌍", lat:42.7108, lng:23.3224, radius:150, type:"transit", wazeName:"Международна автогара Сердика София" },
   { id:"ag_yug",         name:"Автогара Юг (бул.Драган Цанков)",        icon:"🚌", lat:42.6689, lng:23.3526, radius:190, type:"transit",          wazeName:"Автогара Юг София" },
   { id:"ag_pod",         name:"Автогара Подуяне",                       icon:"🚌", lat:42.7034, lng:23.3601, radius:190, type:"transit",          wazeName:"Автогара Подуяне София" },
 
@@ -870,7 +870,7 @@ function showTransitPopup(zid){
 
   // Generic transit info
   if(!['cab_north','iec','expo2000'].includes(zid)){
-    html += '<div style="color:var(--muted);padding:8px 0">Транспортен хъб. Няма публично разписание — севернo/източно направление.</div>';
+    html += '<div style="color:var(--muted);padding:8px 0">Транспортен хъб.</div>';
   }
 
   html += '</div>';
@@ -3172,4 +3172,123 @@ function toggleMapView(){
       window.__intlInfo = c;
     }catch(e){}
   };
+})();
+
+
+// ------ intl-list-v29: международни автобуси + бележка за Подуяне ------
+(function(){
+  var SCHED = null, LIVE = [];
+  var FLAG = {
+    'скопие':'🇲🇰','ниш':'🇷🇸','белград':'🇷🇸','солун':'🇬🇷','атина':'🇬🇷',
+    'букурещ':'🇷🇴','истанбул':'🇹🇷','одрин':'🇹🇷','киев':'🇺🇦','кишинев':'🇲🇩',
+    'виена':'🇦🇹','мюнхен':'🇩🇪','берлин':'🇩🇪','прага':'🇨🇿','будапеща':'🇭🇺',
+    'загреб':'🇭🇷','любляна':'🇸🇮','тирана':'🇦🇱','подгорица':'🇲🇪','сараево':'🇧🇦'
+  };
+  function flagFor(n){
+    n = (n||'').toLowerCase();
+    for(var k in FLAG){ if(n.indexOf(k) >= 0) return FLAG[k]; }
+    return '🌍';
+  }
+  function hm(d){ return d.toLocaleTimeString('bg',{hour:'2-digit',minute:'2-digit'}); }
+  function whenTxt(m){
+    if(m <= 0) return 'сега';
+    if(m < 60) return 'след ' + m + 'м';
+    return 'след ' + Math.floor(m/60) + 'ч ' + (m%60) + 'м';
+  }
+
+  fetch('bus-schedule.json?v='+Date.now()).then(function(r){return r.json()})
+    .then(function(d){ SCHED = d; }).catch(function(){});
+  function pullLive(){
+    fetch('bus-arrivals.json?v='+Date.now()).then(function(r){return r.json()}).then(function(d){
+      var fresh = d.updated && (Date.now()-new Date(d.updated).getTime()) < 4*3600000;
+      LIVE = fresh ? (d.arrivals||[]).filter(function(a){ return a.intl; }) : [];
+    }).catch(function(){});
+  }
+  pullLive(); setInterval(pullLive, 180000);
+
+  function intlList(){
+    var out = [], now = Date.now();
+    LIVE.forEach(function(a){
+      var m = /^(\d{1,2}):(\d{2})$/.exec(a.time||''); if(!m) return;
+      var t = new Date(); t.setHours(+m[1], +m[2], 0, 0);
+      if(t.getTime() < now-3*3600000) t.setDate(t.getDate()+1);
+      var d = (t-now)/60000;
+      if(d < -30 || d > 360) return;
+      out.push({t:t, name:a.from, live:true, sector:a.sector||''});
+    });
+    if(SCHED && SCHED.routes){
+      SCHED.routes.forEach(function(rt){
+        if(!rt.intl) return;
+        var dur = rt.duration_min || 0;
+        (rt.departures||[]).forEach(function(dep){
+          var m = /^(\d{1,2}):(\d{2})$/.exec(dep); if(!m) return;
+          var t = new Date(); t.setHours(+m[1], +m[2], 0, 0);
+          t = new Date(t.getTime() + dur*60000);
+          if(t.getTime() < now-3*3600000) t = new Date(t.getTime()+864e5);
+          var d = (t-now)/60000;
+          if(d < -30 || d > 360) return;
+          var nm = (rt.name||'').replace(/\s*→.*/,'');
+          var dup = out.some(function(o){
+            return o.live && Math.abs((o.t-t)/60000) < 40
+                && o.name.toUpperCase().slice(0,4) === nm.toUpperCase().slice(0,4);
+          });
+          if(!dup) out.push({t:t, name:nm, approx:true});
+        });
+      });
+    }
+    out.sort(function(a,b){ return a.t-b.t; });
+    return out.slice(0, 7);
+  }
+
+  function intlHTML(){
+    var list = intlList();
+    if(!list.length){
+      return '<div style="margin-top:7px;padding:6px 8px;border-radius:6px;'
+           + 'background:rgba(148,163,184,.12);border-left:3px solid #94a3b8;'
+           + 'font-size:12px;color:#64748b">🌍 Няма международни в следващите 6ч</div>';
+    }
+    var first = Math.round((list[0].t-Date.now())/60000);
+    var urgent = first <= 30;
+    var rows = list.map(function(x){
+      return '<div style="margin:3px 0">' + flagFor(x.name) + ' <b>' + hm(x.t) + '</b> · ' + x.name
+           + (x.approx ? ' <span style="opacity:.5">≈</span>' : '')
+           + (x.live ? ' <span style="color:#22c55e">●</span>' : '')
+           + (x.sector ? ' <span style="opacity:.6">сек.' + x.sector + '</span>' : '')
+           + ' <span style="opacity:.65">(' + whenTxt(Math.round((x.t-Date.now())/60000)) + ')</span></div>';
+    }).join('');
+    return '<div style="margin-top:7px;padding:7px 9px;border-radius:7px;background:'
+         + (urgent ? 'rgba(234,88,12,.14)' : 'rgba(56,189,248,.10)')
+         + ';border-left:3px solid ' + (urgent ? '#ea580c' : '#38bdf8') + ';font-size:12px">'
+         + '<b>🌍 Международни пристигания</b>' + rows
+         + '<div style="opacity:.55;font-size:11px;margin-top:5px">Дълъг път + багаж = почти сигурен курс<br>'
+         + '● живо от ЦАС · ≈ по разписание на превозвача</div></div>';
+  }
+
+  function enrich(el){
+    try{
+      if(!el || (el.dataset && el.dataset.intl29)) return;
+      var txt = el.textContent || '';
+      if(/Междунар|Сердика \/ FlixBus|FlixBus/i.test(txt)){
+        if(el.dataset) el.dataset.intl29 = '1';
+        el.insertAdjacentHTML('beforeend', intlHTML());
+        return;
+      }
+      if(/Автогара Подуяне/i.test(txt)){
+        if(el.dataset) el.dataset.intl29 = '1';
+        el.insertAdjacentHTML('beforeend',
+          '<div style="margin-top:7px;padding:6px 8px;border-radius:6px;'
+          + 'background:rgba(148,163,184,.12);border-left:3px solid #94a3b8;'
+          + 'font-size:12px;color:#64748b">🚌 Северно/източно направление.<br>'
+          + 'Няма публично разписание.</div>');
+      }
+    }catch(e){}
+  }
+  function scan(){
+    try{
+      document.querySelectorAll('.leaflet-popup-content').forEach(enrich);
+      document.querySelectorAll('.zone-detail').forEach(enrich);
+    }catch(e){}
+  }
+  scan(); setInterval(scan, 4000);
+  try{ new MutationObserver(scan).observe(document.body, {childList:true, subtree:true}); }catch(e){}
 })();
