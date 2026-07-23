@@ -1,15 +1,98 @@
-✓ няма празни елементи
-  зонови обекта: 93
-✓ няма дубликати
-✓ всички координати в София
-✓ top-level изпълнение мина
-DOMContentLoaded хендлъри: 1
-❌ DOMContentLoaded #1: TypeError: Cannot read properties of null (reading 'addEventListener')
-   at eval (eval at <anonymous> (/home/runner/work/BAK/BAK/scripts/doctor.js:133:3), <anonymous>:1132:69)
-   at /home/runner/work/BAK/BAK/scripts/doctor.js:142:9
-   at Array.forEach (<anonymous>)
-       1130: document.getElementById('direction-hint').querySelector('.dh-close').addEventListener('click',()=>{
-       1131:   dirHintSuppressed=true;
-   >>> 1132:   document.getElementById('direction-hint').style.display='none';
-       1133: });
-       1134: 
+=== app.js редове 400–430 ===
+400: }
+401: 
+402: function computeScores(hour) {
+403:   const scores={}, activeEvents={};
+404:   ZONES.forEach(z => { scores[z.id]=BASE[z.id]||0.3; activeEvents[z.id]=[]; });
+405:   const dz = deadZoneFactor(hour);
+406:   for (const ev of EVENTS) {
+407:     if (!dayMatches(ev)) continue;
+408:     const diff = hour - ev.endHour;
+409:     let f = 0;
+410:     if (diff>=-0.75 && diff<=0)   f = (diff+0.75)/0.75;
+411:     else if (diff>0 && diff<=1.5) f = 1 - diff/1.5;
+412:     if (f>0.05) {
+413:       scores[ev.zone] = (scores[ev.zone]||0) + ev.boost*f*dz;
+414:       activeEvents[ev.zone].push({name:ev.name, f});
+415:     }
+416:   }
+417:   // Weather boost
+418:   if (weatherBoost>0) {
+419:     ZONES.forEach(z => {
+420:       if (['residential','residential_lux','hospital','karyk'].includes(z.type))
+421:         scores[z.id] += weatherBoost*0.6;
+422:       else if (['mall','hotel'].includes(z.type))
+423:         scores[z.id] += weatherBoost*0.3;
+424:     });
+425:   }
+426:   if (dz<1) ZONES.forEach(z => { if(z.id!=='airport') scores[z.id]*=(0.7+0.3*dz); });
+427:   // Летищна вълна: излизащи полети вдигат скора на летището (силно — 10 полета≈3.6)
+428:   try{ var _ax = window.__airportExiting|0; if(_ax>0 && scores['airport']!==undefined){ scores['airport'] += Math.min(4.0, _ax*0.36); } }catch(e){}
+429:   return {scores, activeEvents};
+430: }
+
+=== computeScores ===
+започва на ред 402
+дължина: 1196 знака
+
+--- .push обръщения ---
+  ред ~414: activeEvents[ev.zone].push(
+
+--- обекти/карти в computeScores (първи 1500 знака) ---
+function computeScores(hour) {
+  const scores={}, activeEvents={};
+  ZONES.forEach(z => { scores[z.id]=BASE[z.id]||0.3; activeEvents[z.id]=[]; });
+  const dz = deadZoneFactor(hour);
+  for (const ev of EVENTS) {
+    if (!dayMatches(ev)) continue;
+    const diff = hour - ev.endHour;
+    let f = 0;
+    if (diff>=-0.75 && diff<=0)   f = (diff+0.75)/0.75;
+    else if (diff>0 && diff<=1.5) f = 1 - diff/1.5;
+    if (f>0.05) {
+      scores[ev.zone] = (scores[ev.zone]||0) + ev.boost*f*dz;
+      activeEvents[ev.zone].push({name:ev.name, f});
+    }
+  }
+  // Weather boost
+  if (weatherBoost>0) {
+    ZONES.forEach(z => {
+      if (['residential','residential_lux','hospital','karyk'].includes(z.type))
+        scores[z.id] += weatherBoost*0.6;
+      else if (['mall','hotel'].includes(z.type))
+        scores[z.id] += weatherBoost*0.3;
+    });
+  }
+  if (dz<1) ZONES.forEach(z => { if(z.id!=='airport') scores[z.id]*=(0.7+0.3*dz); });
+  // Летищна вълна: излизащи полети вдигат скора на летището (силно — 10 полета≈3.6)
+  try{ var _ax = window.__airportExiting|0; if(_ax>0 && scores['airport']!==undefined){ scores['airport'] += Math.min(4.0, _ax*0.36); } }catch(e){}
+  return {scores, activeEvents};
+}
+
+=== типове ===
+типове в ZONES: airport, cinema, hospital, hotel, karyk, leisure, mall, nightlife, office, residential, residential_lux, theatre, traffic, transit, university, venue
+  airport: 1 зони  [airport]
+  cinema: 5 зони  [cinema_city_ml, cinema_city_ser, cinema_arena, cineland]
+  hospital: 13 зони  [pirogov, alexand, vma, sv_anna]
+  hotel: 3 зони  [hotels_ctr, hotels_ndk, hotel_marinela]
+  karyk: 6 зони  [k_borovo, k_krasno, k_pavlovo, k_izgrev]
+  leisure: 11 зони  [borisova, pool_madara, pool_vazrazhdane, pool_varadero]
+  mall: 7 зони  [serdika, paradise, mall_sofia, ring_mall]
+  nightlife: 3 зони  [vitosha_bar, lozenets_rest, center_bars]
+  office: 14 зони  [bpark, garitage, polygraphia, capital_fort]
+  residential: 5 зони  [lyulin, nadezhda, ovcha_kupel, druzhba]
+  residential_lux: 4 зони  [simenovo, manast, boyana, kambanite]
+  theatre: 6 зони  [nat_theatre, opera, ndk_theatre, youth_theatre]
+  traffic: 4 зони  [jam_orl, jam_tsar, jam_ndk, jam_serdika]
+  transit: 4 зони  [cjp, cab_north, ag_yug, ag_pod]
+  university: 5 зони  [unss, nbu, tu, su]
+  venue: 2 зони  [arena, ndk]
+
+--- места, където типът се ползва като ключ ---
+  ред 448: typeBonus[z.type]
+  ред 506: typeBonus[z.type]
+  ред 1682: weights[z.type]
+  ред 1746: BAKSHISH_REASONS[z.type]
+  ред 441: typeBonus покрива 13/16 типа  ❌ ЛИПСВАТ: cinema, nightlife, traffic
+  ред 499: typeBonus покрива 16/16 типа  ✓ пълен
+  ред 1657: BAKSHISH_REASONS покрива 11/16 типа  ❌ ЛИПСВАТ: venue, leisure, residential, cinema, traffic
