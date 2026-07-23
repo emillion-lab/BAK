@@ -1,7 +1,3 @@
-OK   pool_marialuiza ПРЕМАХНАТ (комплексът е съборен/изоставен)
-OK   pool_madara        + 42.6873, 23.3114  (нов, сверен)
-OK   pool_vazrazhdane   + 42.6953, 23.3055  (нов, сверен)
-OK   pool_varadero      + 42.7124, 23.3820  (нов, сверен)
-OK   часове на спирките (popup ETA по коридор)
-зони: 89
-OK v12 + node --check + cache-bust v12
+OK   pool_thebeach + 42.7361, 23.3144  (Военна рампа, отваря до 22:00)
+зони: 90
+OK v13 + node --check + cache-bust v13

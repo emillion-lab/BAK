@@ -129,6 +129,7 @@ const ZONES = [
   { id:"pool_madara", name:"Басейн Мадара (НСА) ☀лято", icon:"🏊", lat:42.6873, lng:23.3114, radius:180, type:"leisure", wazeName:"Плувен басейн Мадара София" },
   { id:"pool_vazrazhdane", name:"Аква парк Възраждане ☀лято", icon:"🏊", lat:42.6953, lng:23.3055, radius:200, type:"leisure", wazeName:"Аква парк Възраждане София" },
   { id:"pool_varadero", name:"Комплекс Варадеро ☀лято", icon:"🏊", lat:42.7124, lng:23.382, radius:220, type:"leisure", wazeName:"Варадеро басейни София" },
+  { id:"pool_thebeach", name:"Басейн The Beach (бул.Рожен 25Е) ☀лято", icon:"🏊", lat:42.7361, lng:23.3144, radius:200, type:"leisure", wazeName:"Pool The Beach бул Рожен 25Е София" },
   { id:"pool_spartak",    name:"Басейн Спартак (бул.Арсеналски 4) ☀лято",        icon:"🏊", lat:42.675, lng:23.3132, radius:200, type:"leisure", wazeName:"Спортен комплекс Спартак София" },
   { id:"pool_diana",      name:"Басейни Диана (Дианабад) ☀лято",          icon:"🏊", lat:42.6657, lng:23.3458, radius:220, type:"leisure", wazeName:"Басейн Диана София" },
   { id:"pool_akademika",  name:"Басейн Академика (4-ти км) ☀лято",        icon:"🏊", lat:42.6756, lng:23.366, radius:200, type:"leisure", wazeName:"Спортен център Академика София" },
