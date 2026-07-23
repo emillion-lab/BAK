@@ -1,94 +1,174 @@
 # -*- coding: utf-8 -*-
-"""v11: ПЪЛЕН ОДИТ НА КООРДИНАТИТЕ — втора и трета вълна.
-Всяка стойност е сверена с Google Places, не по памет.
-22 поправки + 2 подвеждащи имена + 1 несъществуващ обект."""
+"""v12: (1) маха несъществуващия басейн Мария Луиза
+       (2) добавя 3 РАБОТЕЩИ басейна (сверени: Мадара, Възраждане, Варадеро)
+       (3) 🚌 ЧАСОВЕ НА СПИРКИТЕ — инжектира ETA направо в popup-ите на
+           крайпътните спирки (Експо/Цариградско, Ботевградско, бул.България),
+           вместо да ги крие в отделния панел."""
 import re, subprocess, shutil, os
 
 rep = []
 src = open('app.js', encoding='utf-8').read()
-
-# (id, lat, lng, ново име или None, отклонение)
-FIXES = [
-    # --- катастрофални (>2 км) ---
-    ("unss",             42.6513, 23.3490, None, "4.32 км — беше при НДК вместо в Студентски град"),
-    ("nbu",              42.6782, 23.2527, None, "4.26 км"),
-    ("polygraphia",      42.6874, 23.3440, "Polygraphia Office Center (Цариградско 47)", "3.66 км"),
-    ("acibadem_ortho",   42.6400, 23.3181, None, "2.74 км"),
-    ("serdika",          42.6918, 23.3532, "Мол Сердика (бул.Ситняково 48)", "2.46 км"),
-    ("cinema_city_ser",  42.6918, 23.3532, None, "2.46 км (следва мола)"),
-    ("acibadem_cardio",  42.6387, 23.3174, "Acibadem Сърдечно-съдов (Окол.път/Драгалевци)", "2.32 км"),
-    # --- сериозни (1–2 км) ---
-    ("acibadem_mladost", 42.6553, 23.3857, None, "1.51 км"),
-    ("acibadem_tokuda",  42.6650, 23.3252, "Acibadem Токуда (Н.Вапцаров 51Б)", "583 м"),
-    ("alexand",          42.6854, 23.3114, None, "1.16 км"),
-    ("pool_diana",       42.6657, 23.3458, None, "1.12 км"),
-    ("pool_akademika",   42.6756, 23.3660, None, "1.02 км"),
-    # --- средни (300 м – 1 км) ---
-    ("park_center",      42.6788, 23.3208, "Park Center (бул.Арсеналски 2)", "920 м"),
-    ("expo2000",         42.6458, 23.3972, "Ellipse Center (Цариградско шосе)", "862 м — Expo 2000 е друга сграда"),
-    ("dom_kinoto",       42.7003, 23.3240, None, "793 м"),
-    ("jam_orl",          42.6906, 23.3374, None, "788 м"),
-    ("pool_spartak",     42.6750, 23.3132, "Басейн Спартак (бул.Арсеналски 4) ☀лято", "523 м"),
-    ("megapark",         42.6610, 23.3800, None, "345 м"),
-    # --- фини (<300 м) ---
-    ("su",               42.6936, 23.3349, None, "270 м"),
-    ("advance_bc",       42.6294, 23.3747, None, "224 м"),
-    ("tu",               42.6570, 23.3554, None, "180 м"),
-    ("sv_anna",          42.6605, 23.3734, None, "141 м"),
-    # --- само име (координатите са верни) ---
-    ("borisova",         42.6838, 23.3450, "Борисова градина / Нац. стадион В.Левски",
-     "името подвеждаше към Герena — стадион Г.Аспарухов е на 3 км"),
-]
-
-VERIFIED_OK = ["cjp", "cab_north", "ndk", "telus", "paradise", "mall_sofia",
-               "ring_mall", "the_mall", "bulgaria_mall", "hotels_ctr"]
-UNVERIFIED = ["oval", "hotels_ndk", "office_center", "studentski",
-              "vitosha_bar", "center_bars", "lozenets_rest",
-              "k_* и жк зони (площни, центърът е по дефиниция приблизителен)"]
-
 cand = src
-for zid, lat, lng, newname, note in FIXES:
-    pat = re.compile(r'(\{\s*id:"%s"\s*,\s*name:")([^"]*)("[^}]*?lat:)([\d.]+)(\s*,\s*lng:)([\d.]+)'
-                     % re.escape(zid))
-    hits = pat.findall(cand)
-    if len(hits) != 1:
-        rep.append('SKIP %-17s (намерени %d)' % (zid, len(hits)))
-        continue
 
-    def sub(m):
-        name = newname if newname else m.group(2)
-        return '%s%s%s%s%s%s' % (m.group(1), name, m.group(3), lat, m.group(5), lng)
-
-    cand = pat.sub(sub, cand, count=1)
-    rep.append('OK   %-17s -> %.4f, %.4f   (%s)' % (zid, lat, lng, note))
-
-# --- несъществуващ обект: басейн Мария Луиза е СЪБОРЕН/изоставен ---
-pat_ml = re.compile(r'(\{\s*id:"pool_marialuiza"\s*,\s*name:")([^"]*)(")')
+# ---------- (1) премахване на несъществуващия обект ----------
+pat_ml = re.compile(r'\s*\{\s*id:"pool_marialuiza".*?\}\s*,?', re.S)
 if pat_ml.search(cand):
-    cand = pat_ml.sub(lambda m: m.group(1) + '⛔ Мария Луиза (закрит басейн)' + m.group(3), cand, count=1)
-    rep.append('FLAG pool_marialuiza -> басейнът е ПЕРМАНЕНТНО ЗАТВОРЕН (изоставен комплекс)')
-    rep.append('     -> преименуван; кажи ако да го махна изцяло от зоните')
+    cand = pat_ml.sub('\n  ', cand, count=1)
+    rep.append('OK   pool_marialuiza ПРЕМАХНАТ (комплексът е съборен/изоставен)')
+else:
+    rep.append('SKIP pool_marialuiza не е намерен')
 
-ids = re.findall(r'\{\s*id:"([^"]+)"\s*,\s*name:', cand)
-dups = sorted({i for i in ids if ids.count(i) > 1})
-rep.append('')
-rep.append('проверени и ВЕРНИ (непипнати): %s' % ', '.join(VERIFIED_OK))
-rep.append('НЕПРОВЕРИМИ (няма надежден източник): %s' % ', '.join(UNVERIFIED))
-rep.append('зони: %d · дубликати: %s' % (len(ids), ', '.join(dups) if dups else 'няма'))
-rep.append('ОДИТИРАНИ ОБЩО: 51 от %d зони' % len(ids))
+# ---------- (2) нови, проверени басейни ----------
+NEW_POOLS = [
+    ('pool_madara', 'Басейн Мадара (НСА) ☀лято', 42.6873, 23.3114, 180,
+     'Плувен басейн Мадара София'),
+    ('pool_vazrazhdane', 'Аква парк Възраждане ☀лято', 42.6953, 23.3055, 200,
+     'Аква парк Възраждане София'),
+    ('pool_varadero', 'Комплекс Варадеро ☀лято', 42.7124, 23.3820, 220,
+     'Варадеро басейни София'),
+]
+anchor = '{ id:"pool_spartak",'
+if cand.count(anchor) == 1:
+    block = ''
+    for zid, name, lat, lng, rad, waze in NEW_POOLS:
+        if zid in cand:
+            rep.append('SKIP %s вече съществува' % zid)
+            continue
+        block += ('{ id:"%s", name:"%s", icon:"🏊", lat:%s, lng:%s, radius:%d, '
+                  'type:"leisure", wazeName:"%s" },\n  ' % (zid, name, lat, lng, rad, waze))
+        rep.append('OK   %-18s + %.4f, %.4f  (нов, сверен)' % (zid, lat, lng))
+    cand = cand.replace(anchor, block + anchor, 1)
+else:
+    rep.append('SKIP нови басейни (котва pool_spartak x%d)' % cand.count(anchor))
+
+# ---------- (3) часове на спирките ----------
+if 'stop-eta-v12' in cand:
+    rep.append('SKIP часове на спирките вече са добавени')
+else:
+    cand += """
+
+// ------ stop-eta-v12: ЧАСОВЕ на крайпътните спирки ------
+// Инжектира ETA направо в popup-а на спирката, вместо в отделен панел.
+(function(){
+  var BUS = {list:[], ts:0};
+  var HEMUS=/(ВАРНА|ШУМЕН|РУСЕ|РАЗГРАД|ТЪРГОВИЩЕ|ТЪРНОВО|ГАБРОВО|ПЛЕВЕН|ЛОВЕЧ|СЕВЛИЕВО|БЯЛА|ДОБРИЧ|СИЛИСТРА|БОТЕВГРАД|ПРАВЕЦ)/i;
+  var TRAKIA=/(ПЛОВДИВ|БУРГАС|СТАРА ЗАГОРА|СТ\\. ?ЗАГОРА|СЛИВЕН|ЯМБОЛ|ХАСКОВО|КЪРДЖАЛИ|ДИМИТРОВГРАД|ПАЗАРДЖИК|АСЕНОВГРАД|НЕСЕБЪР|СЛЪНЧЕВ|ПОМОРИЕ|СОЗОПОЛ|ИСТАНБУЛ|ОДРИН|ЧОРЛУ|АНКАРА|БУРСА)/i;
+  var YUG=/(БЛАГОЕВГРАД|САНДАНСКИ|ПЕТРИЧ|ДУПНИЦА|КЮСТЕНДИЛ|БАНСКО|РАЗЛОГ|ГОЦЕ|СОЛУН|АТИНА|КАВАЛА|ДРАМА|СКОПИЕ|СТРУМИЦА|ОХРИД|БИТОЛЯ)/i;
+
+  function corr(from){
+    var f=(from||'').toUpperCase();
+    if(HEMUS.test(f)) return 'хемус';
+    if(TRAKIA.test(f)) return 'тракия';
+    if(YUG.test(f)) return 'юг';
+    return null;
+  }
+  function hm(d){return d.toLocaleTimeString('bg',{hour:'2-digit',minute:'2-digit'});}
+
+  function pull(){
+    fetch('bus-arrivals.json?v='+Date.now()).then(function(r){return r.json()}).then(function(d){
+      var fresh = d.updated && (Date.now()-new Date(d.updated).getTime()) < 150*60000;
+      var out=[];
+      if(fresh){
+        (d.arrivals||[]).forEach(function(a){
+          var m=/^(\\d{1,2}):(\\d{2})$/.exec(a.time||''); if(!m) return;
+          var cas=new Date(); cas.setHours(+m[1],+m[2],0,0);
+          // ако часът е минал с повече от 3ч, значи е за утре
+          if(cas.getTime() < Date.now()-3*3600000) cas.setDate(cas.getDate()+1);
+          out.push({cas:cas, from:a.from, c:corr(a.from), intl:a.intl});
+        });
+      }
+      out.sort(function(a,b){return a.cas-b.cas});
+      BUS={list:out, ts:Date.now()};
+    }).catch(function(e){});
+  }
+  pull(); setInterval(pull, 180000);
+
+  // коя спирка е и колко минути ПРЕДИ ЦАС минава автобусът оттам
+  function stopInfo(txt){
+    var t=(txt||'');
+    if(/[Ee]xpo|Експо|метро Цариградско|Цариградско шосе/i.test(t)) return {n:'Експо/Цариградско', off:15};
+    if(/Ботевградско/i.test(t)) return {n:'Ботевградско шосе', off:12};
+    if(/бул\\.? ?България|Хладилника/i.test(t)) return {n:'бул. България', off:14};
+    return null;
+  }
+  // кой коридор се обслужва — от самия текст на popup-а
+  function stopCorr(txt){
+    var t=(txt||'');
+    if(/Тракия/i.test(t)) return 'тракия';
+    if(/Хемус/i.test(t)) return 'хемус';
+    if(/Юг|Струма/i.test(t)) return 'юг';
+    return null;
+  }
+
+  function enrich(el){
+    try{
+      if(!el || el.dataset && el.dataset.eta) return;
+      var txt = el.textContent || '';
+      if(!/Слизане от|Експо|Ботевградско|бул\\.? ?България|Цариградско/i.test(txt)) return;
+      var si = stopInfo(txt); if(!si) return;
+      var sc = stopCorr(txt);
+      var now = Date.now();
+      var hits = BUS.list.filter(function(b){
+        if(sc && b.c !== sc) return false;
+        if(!sc && !b.c) return false;
+        var pass = b.cas.getTime() - si.off*60000;   // минава през спирката
+        return pass > now-12*60000 && pass < now+150*60000;
+      }).slice(0,4);
+
+      var html;
+      if(!BUS.list.length){
+        html = '<div style="margin-top:7px;padding:6px 8px;border-radius:6px;background:rgba(148,163,184,.12);'
+             + 'border-left:3px solid #94a3b8;font-size:12px;color:#64748b">🚌 Няма пресни данни от ЦАС</div>';
+      } else if(!hits.length){
+        html = '<div style="margin-top:7px;padding:6px 8px;border-radius:6px;background:rgba(148,163,184,.12);'
+             + 'border-left:3px solid #94a3b8;font-size:12px;color:#64748b">🚌 Няма автобуси в следващите 2.5ч</div>';
+      } else {
+        var soon = hits[0].cas.getTime()-si.off*60000;
+        var mins = Math.round((soon-now)/60000);
+        var urgent = mins <= 20;
+        var rows = hits.map(function(b){
+          var pass = new Date(b.cas.getTime()-si.off*60000);
+          var m = Math.round((pass.getTime()-now)/60000);
+          var when = m<=0 ? 'сега' : ('след '+m+'м');
+          return '<div style="margin:2px 0"><b>'+hm(pass)+'</b> · '+(b.intl?'🌍 ':'')+b.from
+               + ' <span style="opacity:.65">('+when+' · ЦАС '+hm(b.cas)+')</span></div>';
+        }).join('');
+        html = '<div style="margin-top:7px;padding:7px 9px;border-radius:7px;background:'
+             + (urgent?'rgba(234,88,12,.14)':'rgba(56,189,248,.10)')
+             + ';border-left:3px solid '+(urgent?'#ea580c':'#38bdf8')+';font-size:12px">'
+             + '<b style="font-size:12px">🚌 Слизане на '+si.n+'</b>'+rows+'</div>';
+      }
+      if(el.dataset) el.dataset.eta='1';
+      el.insertAdjacentHTML('beforeend', html);
+    }catch(e){}
+  }
+
+  function scan(){
+    document.querySelectorAll('.leaflet-popup-content').forEach(enrich);
+    document.querySelectorAll('[data-stop],.stop-card,.zone-detail').forEach(enrich);
+  }
+  scan();
+  setInterval(scan, 4000);
+  try{ new MutationObserver(function(){ scan(); })
+        .observe(document.body,{childList:true,subtree:true}); }catch(e){}
+})();
+"""
+    rep.append('OK   часове на спирките (popup ETA по коридор)')
 
 open('/tmp/app.c.js', 'w', encoding='utf-8').write(cand)
 r = subprocess.run(['node', '--check', '/tmp/app.c.js'], capture_output=True, text=True)
 if r.returncode == 0:
     shutil.move('/tmp/app.c.js', 'app.js')
     idx = open('index.html', encoding='utf-8').read()
-    idx = re.sub(r'app\.js\?v=[0-9a-z]+', 'app.js?v=20260723v11', idx)
+    idx = re.sub(r'app\.js\?v=[0-9a-z]+', 'app.js?v=20260723v12', idx)
     open('index.html', 'w', encoding='utf-8').write(idx)
-    rep.append('OK v11 + node --check + cache-bust v11')
+    ids = re.findall(r'\{\s*id:"([^"]+)"\s*,\s*name:', cand)
+    rep.append('зони: %d' % len(ids))
+    rep.append('OK v12 + node --check + cache-bust v12')
 else:
     rep.append('FAIL node --check :: ' + (r.stderr or '')[:400])
 
 os.makedirs('debug', exist_ok=True)
-open('debug/coords-audit-full.txt', 'w', encoding='utf-8').write('\n'.join(rep) + '\n')
+open('debug/v12-report.txt', 'w', encoding='utf-8').write('\n'.join(rep) + '\n')
 open('flights-rain-report.txt', 'w', encoding='utf-8').write('\n'.join(rep) + '\n')
 print('\n'.join(rep))
