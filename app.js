@@ -125,7 +125,10 @@ const ZONES = [
   { id:"acibadem_tokuda",name:"Acibadem Токуда (Н.Вапцаров 51Б)",  icon:"🏥", lat:42.665, lng:23.3252, radius:160, type:"hospital",         wazeName:"Acibadem City Clinic Токуда Sofia" },
   { id:"acibadem_cardio",name:"Acibadem Сърдечно-съдов (Окол.път/Драгалевци)",icon:"🏥",lat:42.6387,lng:23.3174,radius:140,type:"hospital",       wazeName:"Acibadem City Clinic Сърдечно-съдов Sofia" },
   { id:"acibadem_mladost",name:"Acibadem Младост (Цариградско шосе)",   icon:"🏥", lat:42.6553, lng:23.3857, radius:160, type:"hospital",         wazeName:"Acibadem City Clinic Младост Sofia" },
-  { id:"pool_marialuiza", name:"⛔ Мария Луиза (закрит басейн)", icon:"🏊", lat:42.6789, lng:23.3387, radius:220, type:"leisure", wazeName:"Басейн Мария Луиза София" },
+  
+  { id:"pool_madara", name:"Басейн Мадара (НСА) ☀лято", icon:"🏊", lat:42.6873, lng:23.3114, radius:180, type:"leisure", wazeName:"Плувен басейн Мадара София" },
+  { id:"pool_vazrazhdane", name:"Аква парк Възраждане ☀лято", icon:"🏊", lat:42.6953, lng:23.3055, radius:200, type:"leisure", wazeName:"Аква парк Възраждане София" },
+  { id:"pool_varadero", name:"Комплекс Варадеро ☀лято", icon:"🏊", lat:42.7124, lng:23.382, radius:220, type:"leisure", wazeName:"Варадеро басейни София" },
   { id:"pool_spartak",    name:"Басейн Спартак (бул.Арсеналски 4) ☀лято",        icon:"🏊", lat:42.675, lng:23.3132, radius:200, type:"leisure", wazeName:"Спортен комплекс Спартак София" },
   { id:"pool_diana",      name:"Басейни Диана (Дианабад) ☀лято",          icon:"🏊", lat:42.6657, lng:23.3458, radius:220, type:"leisure", wazeName:"Басейн Диана София" },
   { id:"pool_akademika",  name:"Басейн Академика (4-ти км) ☀лято",        icon:"🏊", lat:42.6756, lng:23.366, radius:200, type:"leisure", wazeName:"Спортен център Академика София" },
@@ -2298,4 +2301,111 @@ function toggleMapView(){
     new MutationObserver(function(){ kill(); })
       .observe(document.body, {childList:true, subtree:true});
   }catch(e){}
+})();
+
+
+// ------ stop-eta-v12: ЧАСОВЕ на крайпътните спирки ------
+// Инжектира ETA направо в popup-а на спирката, вместо в отделен панел.
+(function(){
+  var BUS = {list:[], ts:0};
+  var HEMUS=/(ВАРНА|ШУМЕН|РУСЕ|РАЗГРАД|ТЪРГОВИЩЕ|ТЪРНОВО|ГАБРОВО|ПЛЕВЕН|ЛОВЕЧ|СЕВЛИЕВО|БЯЛА|ДОБРИЧ|СИЛИСТРА|БОТЕВГРАД|ПРАВЕЦ)/i;
+  var TRAKIA=/(ПЛОВДИВ|БУРГАС|СТАРА ЗАГОРА|СТ\. ?ЗАГОРА|СЛИВЕН|ЯМБОЛ|ХАСКОВО|КЪРДЖАЛИ|ДИМИТРОВГРАД|ПАЗАРДЖИК|АСЕНОВГРАД|НЕСЕБЪР|СЛЪНЧЕВ|ПОМОРИЕ|СОЗОПОЛ|ИСТАНБУЛ|ОДРИН|ЧОРЛУ|АНКАРА|БУРСА)/i;
+  var YUG=/(БЛАГОЕВГРАД|САНДАНСКИ|ПЕТРИЧ|ДУПНИЦА|КЮСТЕНДИЛ|БАНСКО|РАЗЛОГ|ГОЦЕ|СОЛУН|АТИНА|КАВАЛА|ДРАМА|СКОПИЕ|СТРУМИЦА|ОХРИД|БИТОЛЯ)/i;
+
+  function corr(from){
+    var f=(from||'').toUpperCase();
+    if(HEMUS.test(f)) return 'хемус';
+    if(TRAKIA.test(f)) return 'тракия';
+    if(YUG.test(f)) return 'юг';
+    return null;
+  }
+  function hm(d){return d.toLocaleTimeString('bg',{hour:'2-digit',minute:'2-digit'});}
+
+  function pull(){
+    fetch('bus-arrivals.json?v='+Date.now()).then(function(r){return r.json()}).then(function(d){
+      var fresh = d.updated && (Date.now()-new Date(d.updated).getTime()) < 150*60000;
+      var out=[];
+      if(fresh){
+        (d.arrivals||[]).forEach(function(a){
+          var m=/^(\d{1,2}):(\d{2})$/.exec(a.time||''); if(!m) return;
+          var cas=new Date(); cas.setHours(+m[1],+m[2],0,0);
+          // ако часът е минал с повече от 3ч, значи е за утре
+          if(cas.getTime() < Date.now()-3*3600000) cas.setDate(cas.getDate()+1);
+          out.push({cas:cas, from:a.from, c:corr(a.from), intl:a.intl});
+        });
+      }
+      out.sort(function(a,b){return a.cas-b.cas});
+      BUS={list:out, ts:Date.now()};
+    }).catch(function(e){});
+  }
+  pull(); setInterval(pull, 180000);
+
+  // коя спирка е и колко минути ПРЕДИ ЦАС минава автобусът оттам
+  function stopInfo(txt){
+    var t=(txt||'');
+    if(/[Ee]xpo|Експо|метро Цариградско|Цариградско шосе/i.test(t)) return {n:'Експо/Цариградско', off:15};
+    if(/Ботевградско/i.test(t)) return {n:'Ботевградско шосе', off:12};
+    if(/бул\.? ?България|Хладилника/i.test(t)) return {n:'бул. България', off:14};
+    return null;
+  }
+  // кой коридор се обслужва — от самия текст на popup-а
+  function stopCorr(txt){
+    var t=(txt||'');
+    if(/Тракия/i.test(t)) return 'тракия';
+    if(/Хемус/i.test(t)) return 'хемус';
+    if(/Юг|Струма/i.test(t)) return 'юг';
+    return null;
+  }
+
+  function enrich(el){
+    try{
+      if(!el || el.dataset && el.dataset.eta) return;
+      var txt = el.textContent || '';
+      if(!/Слизане от|Експо|Ботевградско|бул\.? ?България|Цариградско/i.test(txt)) return;
+      var si = stopInfo(txt); if(!si) return;
+      var sc = stopCorr(txt);
+      var now = Date.now();
+      var hits = BUS.list.filter(function(b){
+        if(sc && b.c !== sc) return false;
+        if(!sc && !b.c) return false;
+        var pass = b.cas.getTime() - si.off*60000;   // минава през спирката
+        return pass > now-12*60000 && pass < now+150*60000;
+      }).slice(0,4);
+
+      var html;
+      if(!BUS.list.length){
+        html = '<div style="margin-top:7px;padding:6px 8px;border-radius:6px;background:rgba(148,163,184,.12);'
+             + 'border-left:3px solid #94a3b8;font-size:12px;color:#64748b">🚌 Няма пресни данни от ЦАС</div>';
+      } else if(!hits.length){
+        html = '<div style="margin-top:7px;padding:6px 8px;border-radius:6px;background:rgba(148,163,184,.12);'
+             + 'border-left:3px solid #94a3b8;font-size:12px;color:#64748b">🚌 Няма автобуси в следващите 2.5ч</div>';
+      } else {
+        var soon = hits[0].cas.getTime()-si.off*60000;
+        var mins = Math.round((soon-now)/60000);
+        var urgent = mins <= 20;
+        var rows = hits.map(function(b){
+          var pass = new Date(b.cas.getTime()-si.off*60000);
+          var m = Math.round((pass.getTime()-now)/60000);
+          var when = m<=0 ? 'сега' : ('след '+m+'м');
+          return '<div style="margin:2px 0"><b>'+hm(pass)+'</b> · '+(b.intl?'🌍 ':'')+b.from
+               + ' <span style="opacity:.65">('+when+' · ЦАС '+hm(b.cas)+')</span></div>';
+        }).join('');
+        html = '<div style="margin-top:7px;padding:7px 9px;border-radius:7px;background:'
+             + (urgent?'rgba(234,88,12,.14)':'rgba(56,189,248,.10)')
+             + ';border-left:3px solid '+(urgent?'#ea580c':'#38bdf8')+';font-size:12px">'
+             + '<b style="font-size:12px">🚌 Слизане на '+si.n+'</b>'+rows+'</div>';
+      }
+      if(el.dataset) el.dataset.eta='1';
+      el.insertAdjacentHTML('beforeend', html);
+    }catch(e){}
+  }
+
+  function scan(){
+    document.querySelectorAll('.leaflet-popup-content').forEach(enrich);
+    document.querySelectorAll('[data-stop],.stop-card,.zone-detail').forEach(enrich);
+  }
+  scan();
+  setInterval(scan, 4000);
+  try{ new MutationObserver(function(){ scan(); })
+        .observe(document.body,{childList:true,subtree:true}); }catch(e){}
 })();
