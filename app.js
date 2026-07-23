@@ -2975,7 +2975,7 @@ function toggleMapView(){
 (function(){
   try{
     var st = document.createElement('style');
-    st.textContent = '#karyk-banner, #karyk-btn, #karyk-hint, #karyk-list, #karyk-sidebar, .karyk-dot, .karyk-item, .karyk-name, .karyk-rank, .karyk-score, .karyk-sub{transform:scale(.62)!important;transform-origin:left bottom!important;opacity:.82!important;}';
+    st.textContent = '#karyk-banner,#karyk-btn{transform:scale(.6)!important;transform-origin:left bottom!important;opacity:.85!important}#karyk-list,#karyk-sidebar,.karyk-item,.karyk-name,.karyk-score,.karyk-rank,.karyk-sub,.karyk-dot,#karyk-hint{transform:none!important;opacity:1!important}';
     document.head.appendChild(st);
   }catch(e){}
 })();
