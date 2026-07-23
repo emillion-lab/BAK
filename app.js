@@ -343,8 +343,8 @@ const EVENTS = [
   { zone:"opera",        name:"Опера / Балет – край",           endHour:22.0, boost:2.5, repeat:"tue-sun" },
 
   // Транзит
-  { zone:"cjp",          name:"Влак София–Варна",               endHour:18.5, boost:2.2, repeat:"daily" },
-  { zone:"cjp",          name:"Влак Sofia–Пловдив",             endHour:20.0, boost:1.8, repeat:"daily" },
+  { zone:"cjp",          name:"Влак Варна→София",               endHour:18.5, boost:2.2, repeat:"daily" },
+  { zone:"cjp",          name:"Влак Пловдив→София",             endHour:20.0, boost:1.8, repeat:"daily" },
   { zone:"ag_yug",       name:"Автобуси от Пловдив",            endHour:19.5, boost:2.0, repeat:"daily" },
   { zone:"ag_yug",       name:"Нощни автобуси",                 endHour:22.0, boost:1.5, repeat:"daily" },
 
