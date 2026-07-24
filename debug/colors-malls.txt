@@ -1,0 +1,149 @@
+--- function demandColor (ред 432) ---
+5, boost:2.5, repeat:"mon-fri" },
+  { zone:"jam_ndk",    name:"🚦 Задръстване СЛЕДОБЕД – бул.България", endHour:18.5, boost:2.0, repeat:"mon-fri" },
+  { zone:"jam_serdika",name:"🚦 Задръстване СЛЕДОБЕД – Сердика",      endHour:18.5, boost:1.8, repeat:"mon-fri" },
+];
+
+// ═══════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════
+window.demandColor = function demandColor(score, type) {
+  if (type === 'hospital')
+    return score>=2.0 ? {fill:"#ff2020",fillAlpha:0.75,stroke:"#ff6060",label:"🏥 Активно"}
+         : score>=1.3 ? {fill:"#ef4444",fillAlpha:0.60,stroke:"#ff5555",label:"🏥"}
+         :              {fill:"#991b1b",fillAlpha:0.40,stroke:"#cc3333",label:"🏥"};
+  if (type === 'karyk')
+    return {fill:"#f97316",fillAlpha:0.0,stroke:"transparent",label:"🥉"};
+  if (score>=3.2) return {fill:"#ef4444",fillAlpha:0.55,stroke:"#ff7777",label:"ПИК 🔥"};
+  if (score>=2.4) return {fill:"#f97316",fillAlpha:0.50,stroke:"#ffaa55",label:"Висок ▲"};
+  if (score>=1.6) return {fill:"#f59e0b",fillAlpha:0.45,stroke:"#ffd060",label:"Среден"};
+  if (score>=0.8) return {fill:"#22c55e",fillAlpha:0.35,stroke:"#55ee88",label:"Нормален"};
+  return               {fill:"#1a3050",fillAlpha:0.20,stroke:"#2a4870",label:"Тих"};
+}
+
+function karykColor(ks) {
+  if (ks>=4.0) return {fill:"#ff6b00",stroke:"#ff9040",label:"🔥 Карък ПИК"};
+  if (ks>=3.0) return {fill:"#f97316",stroke:"#ffaa55",label:"▲ Отлично"};
+  if (ks>=2.0) return {fill:"#fbbf24",stroke:"#ffd060",label:"Добро"};
+  if (ks>=1.0) return {fill:"#a3a300",stroke:"#d4d400",label:"Слабо"};
+  return              {fill:"#1a1030",stroke:"#2a2050",label:"Избягвай"};
+}
+
+function fmtHour(h) {
+  return String(Math.floor(h)).padStart(2,'0') + ':' + (h%1===0.5?'30':'00');
+}
+
+const TODAY    = new Date();
+co
+
+--- demandColor (ред 432) ---
+,  endHour:18.5, boost:2.5, repeat:"mon-fri" },
+  { zone:"jam_ndk",    name:"🚦 Задръстване СЛЕДОБЕД – бул.България", endHour:18.5, boost:2.0, repeat:"mon-fri" },
+  { zone:"jam_serdika",name:"🚦 Задръстване СЛЕДОБЕД – Сердика",      endHour:18.5, boost:1.8, repeat:"mon-fri" },
+];
+
+// ═══════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════
+window.demandColor = function demandColor(score, type) {
+  if (type === 'hospital')
+    return score>=2.0 ? {fill:"#ff2020",fillAlpha:0.75,stroke:"#ff6060",label:"🏥 Активно"}
+         : score>=1.3 ? {fill:"#ef4444",fillAlpha:0.60,stroke:"#ff5555",label:"🏥"}
+         :              {fill:"#991b1b",fillAlpha:0.40,stroke:"#cc3333",label:"🏥"};
+  if (type === 'karyk')
+    return {fill:"#f97316",fillAlpha:0.0,stroke:"transparent",label:"🥉"};
+  if (score>=3.2) return {fill:"#ef4444",fillAlpha:0.55,stroke:"#ff7777",label:"ПИК 🔥"};
+  if (score>=2.4) return {fill:"#f97316",fillAlpha:0.50,stroke:"#ffaa55",label:"Висок ▲"};
+  if (score>=1.6) return {fill:"#f59e0b",fillAlpha:0.45,stroke:"#ffd060",label:"Среден"};
+  if (score>=0.8) return {fill:"#22c55e",fillAlpha:0.35,stroke:"#55ee88",label:"Нормален"};
+  return               {fill:"#1a3050",fillAlpha:0.20,stroke:"#2a4870",label:"Тих"};
+}
+
+function karykColor(ks) {
+  if (ks>=4.0) return {fill:"#ff6b00",stroke:"#ff9040",label:"🔥 Карък ПИК"};
+  if (ks>=3.0) return {fill:"#f97316",stroke:"#ffaa55",label:"▲ Отлично"};
+  if (ks>=2.0) return {fill:"#fbbf24",stroke:"#ffd060",label:"Добро"};
+  if (ks>=1.0) return {fill:"#a3a300",stroke:"#d4d400",label:"Слабо"};
+  return              {fill:"#1a1030",stroke:"#2a2050",label:"Избягвай"};
+}
+
+function fmtHour(h) {
+  return String(Math.floor(h)).padStart(2,'0') + ':' + (h%1===0.5?'30':'00');
+}
+
+const TODAY    = 
+
+--- mall (ред 174) ---
+200, type:"office",           wazeName:"Millennium Center Sofia" },
+  { id:"oval",           name:"Oval Business Center (Лозенец)",         icon:"🏢", lat:42.6640, lng:23.3340, radius:180, type:"office",           wazeName:"Oval Business Center Sofia" },
+
+  { id:"serdika",        name:"Мол Сердика (бул.Ситняково 48)",                            icon:"🛍", lat:42.6918, lng:23.3532, radius:240, type:"mall",             wazeName:"Serdika Center Sofia" },
+  { id:"paradise",       name:"Paradise Center",                        icon:"🛍", lat:42.6578, lng:23.3144, radius:290, type:"mall",             wazeName:"Paradise Center Sofia" },
+  { id:"mall_sofia",     name:"Mall of Sofia",                          icon:"🛍", lat:42.6981, lng:23.3086, radius:210, type:"mall",             wazeName:"Mall of Sofia" },
+  { id:"ring_mall",      name:"Ring Mall / IKEA",                       icon:"🛍", lat:42.6246, lng:23.3519, radius:340, type:"mall",             wazeName:"Ring Mall Sofia" },
+  { id:"the_mall",       name:"The Mall Sofia",                         icon:"🛍", lat:42.6605, lng:23.3822, radius:290, type:"mall",             wazeName:"The Mall Sofia" },
+  { id:"bulgaria_mall",  name:"България Мол",                           icon:"🛍", lat:42.6641, lng:23.2885, radius:240, type:"mall",             wazeName:"Bulgaria Mall Sofia" },
+  { id:"park_center",    name:"Park Center (бул.Арсеналски 2)",    icon:"🛍", lat:42.6788, lng:23.3208, radius:190, type:"mall",             wazeName:"Park Center Sofia" },
+
+  { id:"hotels_ctr",     name:"Хотели Център (Radisson/Hilton)",        icon:"🏨", lat:42.6953, lng:23.3242, radius:280, type:"hotel",            wazeName:"Radisson Blu Sofia" },
+  { id:"hotels_ndk",     name:"Kempinski / InterContinental НДК",       icon:"🏨", lat:42.6855, lng:23.3188, radiu
+
+--- studentski (ред 212) ---
+" },
+  { id:"tu",             name:"Технически университет",                 icon:"🎓", lat:42.657, lng:23.3554, radius:210, type:"university",       wazeName:"Технически университет София" },
+  { id:"su",             name:"Софийски университет",                   icon:"🎓", lat:42.6936, lng:23.3349, radius:200, type:"university",       wazeName:"Софийски университет Св Климент Охридски" },
+  { id:"studentski",     name:"Студентски град",                        icon:"🎓", lat:42.6475, lng:23.3530, radius:380, type:"university",       wazeName:"Студентски град Sofia" },
+
+  { id:"simenovo",       name:"Симеоново / Hill Side",                  icon:"🌲", lat:42.6395, lng:23.3310, radius:380, type:"residential_lux",  wazeName:"Hill Side Sofia Симеоновско шосе 97" },
+  { id:"manast",         name:"Манастирски ливади",                     icon:"🏘", lat:42.6637, lng:23.2910, radius:380, type:"residential_lux",  wazeName:"Манастирски ливади София" },
+  { id:"boyana",         name:"Бояна / Драгалевци",                     icon:"🌳", lat:42.6348, lng:23.2889, radius:430, type:"residential_lux",  wazeName:"Бояна квартал София" },
+  { id:"kambanite",      name:"ЖК Камбаните / Малинова долина",         icon:"⛰️",  lat:42.6155, lng:23.3780, radius:380, type:"residential_lux",  wazeName:"ЖК Камбаните Sofia" },
+
+  { id:"lyulin",         name:"жк Люлин",                               icon:"🏘", lat:42.7050, lng:23.2650, radius:400, type:"residential",      wazeName:"жк Люлин Sofia" },
+  { id:"nadezhda",       name:"жк Надежда",                             icon:"🏘", lat:42.7200, lng:23.2900, radius:350, type:"residential",      wazeName:"жк Надежда Sofia" },
+  { id:"ovcha_kupel",    name:"жк Овча купел",                          icon:"🏘", lat:42.6617, lng:23.2878, radius:300, type:"residential
+
+--- typeBonus (ред 523) ---
+x>0 && scores['airport']!==undefined){ scores['airport'] += Math.min(4.0, _ax*0.36); } }catch(e){}
+  return {scores, activeEvents};
+}
+
+function totalDemand(hour) {
+  const {scores}=computeScores(hour);
+  return Object.values(scores).reduce((a,b)=>a+b,0);
+}
+
+function computeKarykScore(zid, scores) {
+  const z = ZONES.find(x=>x.id===zid);
+  if (!z) return 0;
+  const demand = scores[zid]||0;
+  const typeBonus = {
+    karyk:1.8, residential_lux:1.2, residential:1.0,
+    hospital:0.8, leisure:0.5,
+    university:-0.3, theatre:-0.2, venue:-0.2,
+    office:-0.5, mall:-0.8, hotel:-0.8,
+    airport:-1.5, transit:-0.6,
+  };
+  let ks = demand + (typeBonus[z.type]||0);
+  if (demand<1.0) ks += 0.8;
+  return Math.max(0, Math.min(5, ks));
+}
+
+// ═══════════════════════════════════════════════
+// TRAFFIC JAM INFO
+// ═══════════════════════════════════════════════
+const TRAFFIC_INFO = {
+  jam_orl:    { jamDir:'← КЪМ ЦЕНТЪРА', freeDir:'→ НАВЪН', freeArrow:'→',
+                tip:'Задръстено КЪМ ЦЕНТЪРА. Ти върви → НАВЪН (свободно!)', time:'07:30–09:30 и 17:00–19:00' },
+  jam_tsar:   { jamDir:'→ КЪМ ЛЕТИЩЕТО', freeDir:'← КЪМ ЦЕНТЪРА', freeArrow:'←',
+                tip:'Задръстено → КЪМ ЛЕТИЩЕТО. Ти върви ← КЪМ ЦЕНТЪРА (свободно!)', time:'07:00–09:00 и 17:00–19:30' },
+  jam_ndk:    { jamDir:'↑↓ ДВЕ ПОСОКИ', freeDir:'↔ СТРАНИЧНИ УЛ.', freeArrow:'↔',
+                tip:'Задръстено по бул.България. Използвай странични улици!', time:'17:00–19:30 делнични' },
+  jam_serdika:{ jamDir:'← КЪМ ЗАПАДА', freeDir:'→ КЪМ ИЗТОКА', freeArrow:'→',
+                tip:'Задръстено ← КЪМ ЗАПАДА. Ти върви → КЪМ ИЗТОКА (свободно!)', time:'07:30–09:30 делнични' },
+};
+
+const trafficMarkers={};
+function makeTrafficIcon(info,active){
+  const op=active?'1':'0.35', sz=active?14:10;
+  const glow=active?`0 0 8px #a85
