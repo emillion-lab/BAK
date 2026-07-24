@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
-"""v37: одит на кварталите — всички сверени с Google Places.
-Овча купел, Изток, Изгрев, Борово, Борисова, НДК дубликат, Младост разделен.
-НЕ пипам Павлово и Oval — не намерих надежден източник."""
+"""v38: (1) Борово, Павлово, Младост 1 по линковете на Емил + Младост 4
+       (2) Oval Business Center — премахнат, обектът не съществува
+       (3) точката на бул.България отива на проверено място върху булеварда
+       (4) старите лилави точки за трафика се махат (линиите ги заместиха)
+"""
 import re, subprocess, shutil, os
 
 rep = []
@@ -14,90 +16,90 @@ def move(zid, lat, lng, newname=None, note=''):
                      % re.escape(zid))
     m = pat.search(cand)
     if not m:
-        rep.append('SKIP %-14s не е намерена' % zid)
+        rep.append('SKIP %-12s не е намерена' % zid)
         return
     ol, og = float(m.group(4)), float(m.group(6))
     d = int((((lat-ol)*111000)**2 + ((lng-og)*82000)**2) ** 0.5)
     nm = newname if newname else m.group(2)
     cand = pat.sub(lambda x: x.group(1)+nm+x.group(3)+str(lat)+x.group(5)+str(lng), cand, count=1)
-    rep.append('OK   %-14s -> %.4f,%.4f  (беше на %d м) %s' % (zid, lat, lng, d, note))
+    rep.append('OK   %-12s -> %.4f,%.4f  (беше на %d м) %s' % (zid, lat, lng, d, note))
 
-# ── кварталите ──
-move('ovcha_kupel', 42.6900, 23.2541, None, 'беше в Манастирски ливади')
-move('k_izgrev',    42.6705, 23.3487, None, '')
-move('k_iztok',     42.6702, 23.3649, None, 'беше в Гео Милев')
-move('k_borovo',    42.6692, 23.2797, None, 'беше в Стрелбище')
-move('borisova',    42.6805, 23.3420, 'Борисова градина (към Цариградско)', 'преместена на север')
+# (1) по линковете
+move('k_borovo', 42.6687, 23.2897, None, 'по линка на Емил')
+move('k_pavlovo', 42.6678, 23.2658, None, 'трамвайна спирка кв.Павлово')
+move('mladost',  42.6542, 23.3719, 'жк Младост 1', 'метростанция Младост 1')
 
-# ── Младост: 1/2/3 в една зона -> три отделни ──
-m = re.search(r'\{\s*id:"mladost"[^}]*\}', cand)
-if m:
-    obj = m.group(0)
-    ztype = (re.search(r'type:"([^"]+)"', obj) or [None, 'residential'])[1]
-    rad = (re.search(r'radius:(\d+)', obj) or [None, '350'])[1]
-    m1 = re.sub(r'lat:[\d.]+\s*,\s*lng:[\d.]+', 'lat:42.6498, lng:23.3722', obj)
-    m1 = re.sub(r'name:"[^"]*"', 'name:"жк Младост 1"', m1)
-    m1 = re.sub(r'radius:\d+', 'radius:300', m1)
-    m1 = re.sub(r'wazeName:"[^"]*"', 'wazeName:"жк Младост 1 София"', m1)
-    m2 = ('{ id:"mladost2", name:"жк Младост 2", icon:"🏘", lat:42.6422, lng:23.3689, '
-          'radius:300, type:"%s", wazeName:"жк Младост 2 София" }' % ztype)
-    m3 = ('{ id:"mladost3", name:"жк Младост 3", icon:"🏘", lat:42.6421, lng:23.3808, '
-          'radius:300, type:"%s", wazeName:"жк Младост 3 София" }' % ztype)
-    cand = cand.replace(obj, m1 + ',\n  ' + m2 + ',\n  ' + m3, 1)
-    rep.append('OK   Младост разделен на 1 (42.6498,23.3722), 2 (42.6422,23.3689), 3 (42.6421,23.3808)')
-    rep.append('     ⚠ Младост 1 е по метростанцията — потвърди дали е добре')
-else:
-    rep.append('SKIP зоната mladost не е намерена')
-
-# ── двойното НДК: hotels_ndk стои върху самото НДК ──
-mh = re.search(r'\{\s*id:"hotels_ndk"[^}]*\}', cand)
-mn = re.search(r'\{\s*id:"ndk"[^}]*lat:([\d.]+)\s*,\s*lng:([\d.]+)', cand)
-if mh and mn:
-    hlat = float(re.search(r'lat:([\d.]+)', mh.group(0)).group(1))
-    hlng = float(re.search(r'lng:([\d.]+)', mh.group(0)).group(1))
-    nlat, nlng = float(mn.group(1)), float(mn.group(2))
-    dist = int((((hlat-nlat)*111000)**2 + ((hlng-nlng)*82000)**2) ** 0.5)
-    if dist < 150:
-        move('hotels_ndk', 42.6829, 23.3195, 'Хотел Hilton (бул.България 1)',
-             'беше върху НДК (%d м) — Kempinski вече е Маринела' % dist)
+# Младост 4
+if 'mladost4' not in cand:
+    anchor = '{ id:"mladost2",'
+    if cand.count(anchor) == 1:
+        z = ('{ id:"mladost4", name:"жк Младост 4", icon:"🏘", lat:42.6285, lng:23.3793, '
+             'radius:320, type:"residential", wazeName:"жк Младост 4 София" },\n  ')
+        cand = cand.replace(anchor, z + anchor, 1)
+        rep.append('OK   mladost4     + 42.6285, 23.3793 (по линка)')
     else:
-        rep.append('SKIP hotels_ndk е на %d м от НДК — не е дубликат' % dist)
+        rep.append('SKIP котва mladost2 x%d' % cand.count(anchor))
 
-# ── Автогара Юг: работно време в popup-а ──
-if 'ag-yug-v37' not in cand:
+# (2) Oval не съществува
+pat_oval = re.compile(r'\s*\{\s*id:"oval".*?\}\s*,?', re.S)
+if pat_oval.search(cand):
+    cand = pat_oval.sub('\n  ', cand, count=1)
+    rep.append('OK   oval ПРЕМАХНАТ (обектът не съществува)')
+    # и събитията-сираци към него
+    ev = re.compile(r'\s*\{[^{}]*zone:\s*"oval"[^{}]*\}\s*,?')
+    n = len(ev.findall(cand))
+    if n:
+        cand = ev.sub('\n  ', cand)
+        rep.append('OK   премахнати %d събития към oval' % n)
+
+# (3) бул. България — точка ВЪРХУ булеварда (при Мол България, сверено)
+move('jam_ndk', 42.6655, 23.2895,
+     '⚠ Задръстване бул.България (при Мол България)',
+     'беше в преките до Петко Тодоров')
+
+# (4) старите точки за трафика
+if 'kill-jam-markers-v38' not in cand:
     cand += """
 
-// ------ ag-yug-v37: работно време на Автогара Юг ------
+// ------ kill-jam-markers-v38: махаме старите точки, линиите ги заместиха ------
 (function(){
-  function enrich(el){
+  var PTS = [
+    [42.6906, 23.3374], [42.6752, 23.3587], [42.6655, 23.2895], [42.7049, 23.3239]
+  ];
+  function near(a, b){
+    var dx = (a[0]-b[0])*111000, dy = (a[1]-b[1])*82000;
+    return Math.sqrt(dx*dx + dy*dy) < 120;
+  }
+  function sweep(){
     try{
-      if(!el || (el.dataset && el.dataset.agyug)) return;
-      var t = el.textContent || '';
-      if(!/Автогара Юг/i.test(t)) return;
-      if(el.dataset) el.dataset.agyug = '1';
-      var now = new Date(), h = now.getHours() + now.getMinutes()/60;
-      var open = (h >= 7.5 && h <= 18.5);
-      el.insertAdjacentHTML('beforeend',
-        '<div style="margin-top:7px;padding:6px 8px;border-radius:6px;'
-        + 'background:rgba(56,189,248,.10);border-left:3px solid #38bdf8;font-size:12px">'
-        + '<b>🚌 Автогара Юг</b><br>'
-        + 'Работи <b>07:30–18:30</b> · ' + (open ? '<span style="color:#22c55e">отворена</span>'
-                                                 : '<span style="color:#94a3b8">затворена</span>')
-        + '<br><span style="opacity:.7">Направление Самоков · Боровец · Рила<br>'
-        + 'Няма публично разписание · плащане в брой</span></div>');
+      var map = window.__leafletMap;
+      if(!map) return;
+      var kill = [];
+      map.eachLayer(function(l){
+        if(!l || typeof l.getLatLng !== 'function') return;
+        if(typeof l.getRadius === 'function') return;      // кръговете остават
+        if(l.__isTrafficLine) return;
+        var ll = l.getLatLng();
+        if(!ll) return;
+        for(var i = 0; i < PTS.length; i++){
+          if(near([ll.lat, ll.lng], PTS[i])){
+            // пазим надписите (те са с iconSize 0)
+            var ic = l.options && l.options.icon;
+            var sz = ic && ic.options && ic.options.iconSize;
+            if(sz && sz[0] === 0 && sz[1] === 0) return;
+            kill.push(l);
+            return;
+          }
+        }
+      });
+      kill.forEach(function(l){ try{ map.removeLayer(l); }catch(e){} });
     }catch(e){}
   }
-  function scan(){ try{ document.querySelectorAll('.leaflet-popup-content').forEach(enrich); }catch(e){} }
-  scan(); setInterval(scan, 4000);
-  try{ new MutationObserver(scan).observe(document.body, {childList:true, subtree:true}); }catch(e){}
+  sweep();
+  setInterval(sweep, 4000);
 })();
 """
-    rep.append('OK   Автогара Юг: работно време 07:30–18:30 + направления')
-
-rep.append('')
-rep.append('⚠ НЕ пипнах (няма надежден източник — прати линк):')
-rep.append('   · Павлово — Google не върна квартала')
-rep.append('   · Oval Business Center — не се намира по това име')
+    rep.append('OK   старите точки за трафика се махат (линиите остават)')
 
 ids = re.findall(r'\{\s*id:"([^"]+)"\s*,\s*name:', cand)
 dups = sorted({i for i in ids if ids.count(i) > 1})
@@ -108,21 +110,20 @@ r = subprocess.run(['node', '--check', '/tmp/app.c.js'], capture_output=True, te
 if r.returncode == 0:
     shutil.move('/tmp/app.c.js', 'app.js')
     idxh = open('index.html', encoding='utf-8').read()
-    idxh = re.sub(r'app\.js\?v=[0-9a-z]+', 'app.js?v=20260724v37', idxh)
+    idxh = re.sub(r'app\.js\?v=[0-9a-z]+', 'app.js?v=20260724v38', idxh)
     open('index.html', 'w', encoding='utf-8').write(idxh)
     try:
         sw = open('sw.js', encoding='utf-8').read()
         sw2, kk = re.subn(r"(CACHE[_A-Z]*\s*=\s*['\"])([^'\"]+)(['\"])",
-                          lambda mm: mm.group(1) + 'bak-v37' + mm.group(3), sw, count=1)
+                          lambda mm: mm.group(1) + 'bak-v38' + mm.group(3), sw, count=1)
         if kk:
             open('sw.js', 'w', encoding='utf-8').write(sw2)
     except FileNotFoundError:
         pass
-    rep.append('OK v37 + node --check + cache-bust v37')
+    rep.append('OK v38 + node --check + cache-bust v38')
 else:
     rep.append('FAIL node --check :: ' + (r.stderr or '')[:400])
 
 os.makedirs('debug', exist_ok=True)
-open('debug/coords-audit-3.txt', 'w', encoding='utf-8').write('\n'.join(rep) + '\n')
 open('flights-rain-report.txt', 'w', encoding='utf-8').write('\n'.join(rep) + '\n')
 print('\n'.join(rep))
