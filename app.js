@@ -154,7 +154,7 @@ let alertedEvents     = new Set();
 // ═══════════════════════════════════════════════
 // ZONE DEFINITIONS
 // ═══════════════════════════════════════════════
-const ZONES = [
+const ZONES = window.__ZONES = [
   { id:"airport",        name:"Летище София (СОФ)",                     icon:"✈️",  lat:42.6885, lng:23.4082, radius:600, type:"airport",          wazeName:"Летище София" },
   { id:"bpark",          name:"Business Park Sofia",                    icon:"🏢", lat:42.6269, lng:23.3784, radius:380, type:"office",           wazeName:"Business Park Sofia" },
   { id:"garitage",       name:"Garitage Park",                          icon:"🏢", lat:42.6227, lng:23.3735, radius:320, type:"office",           wazeName:"Garitage Park Sofia" },
@@ -436,11 +436,14 @@ window.demandColor = function demandColor(score, type) {
          :              {fill:"#991b1b",fillAlpha:0.40,stroke:"#cc3333",label:"🏥"};
   if (type === 'karyk')
     return {fill:"#f97316",fillAlpha:0.0,stroke:"transparent",label:"🥉"};
-  if (score>=3.2) return {fill:"#ef4444",fillAlpha:0.55,stroke:"#ff7777",label:"ПИК 🔥"};
-  if (score>=2.4) return {fill:"#f97316",fillAlpha:0.50,stroke:"#ffaa55",label:"Висок ▲"};
-  if (score>=1.6) return {fill:"#f59e0b",fillAlpha:0.45,stroke:"#ffd060",label:"Среден"};
-  if (score>=0.8) return {fill:"#22c55e",fillAlpha:0.35,stroke:"#55ee88",label:"Нормален"};
-  return               {fill:"#1a3050",fillAlpha:0.20,stroke:"#2a4870",label:"Тих"};
+  if (score>=3.8) return {fill:"#ef4444",fillAlpha:0.62,stroke:"#ff8f8f",label:"ПИК 🔥"};
+  if (score>=3.0) return {fill:"#f97316",fillAlpha:0.56,stroke:"#ffb070",label:"Висок ▲"};
+  if (score>=2.4) return {fill:"#f59e0b",fillAlpha:0.52,stroke:"#ffd060",label:"Добър"};
+  if (score>=1.8) return {fill:"#a3c23a",fillAlpha:0.48,stroke:"#cbe860",label:"Среден"};
+  if (score>=1.2) return {fill:"#4cba52",fillAlpha:0.44,stroke:"#84e88f",label:"Нормален"};
+  if (score>=0.7) return {fill:"#2fa88a",fillAlpha:0.40,stroke:"#63dcb8",label:"Слаб шанс"};
+  if (score>=0.35) return {fill:"#3d8fb5",fillAlpha:0.34,stroke:"#74c4e2",label:"Минимален"};
+  return               {fill:"#33415c",fillAlpha:0.15,stroke:"#4d5f80",label:"Тих"};
 }
 
 function karykColor(ks) {
@@ -2932,7 +2935,7 @@ function toggleMapView(){
 
 // ------ color-scale-v24: цвят още при малък шанс за клиент ------
 (function(){
-  if(typeof window.demandColor !== 'function') return;
+  return; // изключен от v33 — цветовете са в източника
   var orig = window.demandColor;
 
   // праг -> цвят. Сиво САМО при реално нула.
@@ -3498,4 +3501,141 @@ function toggleMapView(){
   setInterval(tick, 2500);
   try{ new MutationObserver(function(){ tick(); })
         .observe(document.body, {childList:true, subtree:true}); }catch(e){}
+})();
+
+
+// ------ zones-tune-v33 ------
+(function(){
+  var MALLS = {
+    paradise:1.18, ring_mall:1.12, the_mall:1.10, serdika:1.10,
+    mall_sofia:1.0, bulgaria_mall:1.0, park_center:0.85
+  };
+
+  // моловете имат постоянен поток — под по часове (отваряне 10:00, затваряне 22:00)
+  function mallFloor(zid){
+    var w = MALLS[zid]; if(!w) return null;
+    var d = new Date(), h = d.getHours() + d.getMinutes()/60;
+    var wknd = (d.getDay() === 0 || d.getDay() === 6);
+    var s;
+    if(h < 9.5) s = 0.25;                        // затворен
+    else if(h < 12) s = 0.9;                     // отваряне, рядко
+    else if(h < 15) s = 1.35;                    // обедна вълна
+    else if(h < 17.5) s = 1.5;
+    else if(h < 20) s = 2.0;                     // следобеден/вечерен пик
+    else if(h < 21.5) s = 2.3;                   // преди затваряне — най-силно
+    else if(h < 22.4) s = 2.6;                   // изходната вълна
+    else s = 0.3;
+    if(wknd && h >= 11 && h <= 21) s *= 1.25;    // уикендът е по-силен
+    return s * w;
+  }
+
+  // Студентски град: жилищен профил, не сесиен.
+  // Живущи без коли (нови и чужденци) — като Кръстова вада.
+  function studentskiScore(){
+    var d = new Date(), h = d.getHours() + d.getMinutes()/60, day = d.getDay();
+    var fri = (day === 5), sat = (day === 6), sun = (day === 0);
+    var s;
+    if(h < 6) s = (fri || sat) ? 1.9 : 0.8;      // нощем навън само в края на седмицата
+    else if(h < 9.5) s = 1.5;                    // сутрин на работа/лекции
+    else if(h < 16) s = 0.9;
+    else if(h < 19) s = 1.3;                     // прибиране
+    else if(h < 22) s = fri ? 2.1 : (sat ? 1.9 : 1.35);
+    else s = fri ? 2.4 : (sat ? 2.2 : 1.2);      // излизане навън
+    if(sun && h > 16) s += 0.4;                  // връщане в неделя вечер
+    return s;
+  }
+
+  var prev = window.__applyLive;
+  window.__applyLive = function(scores){
+    try{ if(prev) prev(scores); }catch(e){}
+    try{
+      for(var zid in MALLS){
+        if(typeof scores[zid] !== 'number') continue;
+        var f = mallFloor(zid);
+        if(f !== null) scores[zid] = Math.max(scores[zid], f);
+      }
+      if(typeof scores.studentski === 'number'){
+        scores.studentski = studentskiScore();
+      }
+    }catch(e){}
+  };
+
+  // ---- надписи върху големите кръгове ----
+  function shortName(z){
+    var n = (z.name || '').replace(/\([^)]*\)/g, '').trim();
+    n = n.replace(/^(жк|ЖК)\s+/, '').replace(/^Мол\s+/i, '').replace(/^Хотели\s+/i, '');
+    n = n.replace(/\s*[–—-]\s*.*$/, '');
+    var words = n.split(/\s+/).filter(Boolean);
+    var out = words.slice(0, 2).join(' ');
+    if(out.length > 15) out = words[0];
+    if(out.length > 15) out = out.slice(0, 14) + '…';
+    return out;
+  }
+  var LABEL_TYPES = {airport:1, transit:1, mall:1, residential:1, residential_lux:1,
+                     hospital:1, university:1, venue:1};
+
+  function addLabels(){
+    try{
+      var map = window.__leafletMap, Z = window.__ZONES;
+      if(!map || !Z || !window.L) return;
+      if(map.getZoom() < 12){ 
+        if(window.__labelLayer){ map.removeLayer(window.__labelLayer); window.__labelLayer = null; }
+        return;
+      }
+      if(window.__labelLayer) return;                 // вече са сложени
+      var lg = L.layerGroup();
+      Z.forEach(function(z){
+        if(!z.radius || z.radius < 240) return;       // само големите
+        if(!LABEL_TYPES[z.type]) return;
+        var txt = shortName(z);
+        if(!txt) return;
+        lg.addLayer(L.marker([z.lat, z.lng], {
+          interactive: false,
+          icon: L.divIcon({
+            className: '',
+            html: '<div style="white-space:nowrap;font:600 11px/1.1 system-ui,sans-serif;'
+                + 'color:#f2f6fc;text-shadow:0 1px 3px #000,0 0 6px #000;'
+                + 'transform:translate(-50%,-50%);pointer-events:none">'
+                + (z.icon || '') + ' ' + txt + '</div>',
+            iconSize: [0, 0]
+          })
+        }));
+      });
+      lg.addTo(map);
+      window.__labelLayer = lg;
+    }catch(e){}
+  }
+  function refreshLabels(){
+    try{
+      var map = window.__leafletMap;
+      if(!map) return;
+      if(window.__labelLayer){ map.removeLayer(window.__labelLayer); window.__labelLayer = null; }
+      addLabels();
+    }catch(e){}
+  }
+  var t = setInterval(function(){
+    if(window.__leafletMap && window.__ZONES){
+      clearInterval(t);
+      addLabels();
+      try{ window.__leafletMap.on('zoomend', refreshLabels); }catch(e){}
+    }
+  }, 700);
+
+  // ---- десктоп/телефон ----
+  try{
+    var st = document.createElement('style');
+    st.id = 'responsive-v33';
+    st.textContent =
+      '@media (min-width:1024px){'
+      + 'body{max-width:1400px;margin:0 auto;}'
+      + '#map{height:62vh!important;min-height:520px!important;}'
+      + '.leaflet-popup-content{font-size:14px!important;max-height:60vh!important;}'
+      + '}'
+      + '@media (max-width:480px){'
+      + '.leaflet-popup-content{font-size:12.5px!important;}'
+      + '.leaflet-popup-content-wrapper{border-radius:12px!important;}'
+      + '}'
+      + '@media (min-width:1400px){ #map{height:68vh!important;} }';
+    document.head.appendChild(st);
+  }catch(e){}
 })();
