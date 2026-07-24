@@ -180,7 +180,7 @@ const ZONES = window.__ZONES = [
   { id:"park_center",    name:"Park Center (бул.Арсеналски 2)",    icon:"🛍", lat:42.6788, lng:23.3208, radius:190, type:"mall",             wazeName:"Park Center Sofia" },
 
   { id:"hotels_ctr",     name:"Хотели Център (Radisson/Hilton)",        icon:"🏨", lat:42.6953, lng:23.3242, radius:280, type:"hotel",            wazeName:"Radisson Blu Sofia" },
-  { id:"hotels_ndk",     name:"Kempinski / InterContinental НДК",       icon:"🏨", lat:42.6855, lng:23.3188, radius:180, type:"hotel",            wazeName:"Kempinski Hotel Zografski Sofia" },
+  { id:"hotels_ndk",     name:"Хотел Hilton (бул.България 1)",       icon:"🏨", lat:42.6829, lng:23.3195, radius:180, type:"hotel",            wazeName:"Kempinski Hotel Zografski Sofia" },
   { id:"hotel_marinela", name:"Хотел Маринела (Джеймс Баучер 100)",    icon:"🏨", lat:42.6724, lng:23.319, radius:160, type:"hotel",            wazeName:"Hotel Marinela Sofia" },
 
   { id:"cjp",            name:"Централна ЖП гара",                      icon:"🚂", lat:42.7121, lng:23.3210, radius:240, type:"transit",          wazeName:"Централна жп гара София" },
@@ -191,7 +191,7 @@ const ZONES = window.__ZONES = [
 
   { id:"arena",          name:"Арена 8888",                             icon:"🎸", lat:42.6711, lng:23.3692, radius:290, type:"venue",            wazeName:"Arena Sofia 8888" },
   { id:"ndk",            name:"НДК",                                    icon:"🎭", lat:42.6855, lng:23.3188, radius:260, type:"venue",            wazeName:"Национален дворец на културата НДК" },
-  { id:"borisova",       name:"Борисова градина (парк)",      icon:"🌳", lat:42.6748, lng:23.3394, radius:400, type:"leisure",          wazeName:"Борисова градина София" },
+  { id:"borisova",       name:"Борисова градина (към Цариградско)",      icon:"🌳", lat:42.6805, lng:23.342, radius:400, type:"leisure",          wazeName:"Борисова градина София" },
   { id:"vl_stadium", name:"Нац. стадион Васил Левски", icon:"🏟️", lat:42.6882, lng:23.3346, radius:320, type:"leisure", wazeName:"Национален стадион Васил Левски София" },
   { id:"nat_theatre",    name:"Народен театър Иван Вазов",              icon:"🎭", lat:42.6944, lng:23.3261, radius:180, type:"theatre",          wazeName:"Народен театър Иван Вазов София" },
   { id:"opera",          name:"Национална опера и балет",               icon:"🎶", lat:42.6975, lng:23.3305, radius:180, type:"theatre",          wazeName:"Национална опера и балет София" },
@@ -218,17 +218,19 @@ const ZONES = window.__ZONES = [
 
   { id:"lyulin",         name:"жк Люлин",                               icon:"🏘", lat:42.7050, lng:23.2650, radius:400, type:"residential",      wazeName:"жк Люлин Sofia" },
   { id:"nadezhda",       name:"жк Надежда",                             icon:"🏘", lat:42.7200, lng:23.2900, radius:350, type:"residential",      wazeName:"жк Надежда Sofia" },
-  { id:"ovcha_kupel",    name:"жк Овча купел",                          icon:"🏘", lat:42.6617, lng:23.2878, radius:300, type:"residential",      wazeName:"жк Овча купел Sofia" },
+  { id:"ovcha_kupel",    name:"жк Овча купел",                          icon:"🏘", lat:42.69, lng:23.2541, radius:300, type:"residential",      wazeName:"жк Овча купел Sofia" },
   { id:"druzhba",        name:"жк Дружба / Горубляне",                  icon:"🏘", lat:42.6590, lng:23.4230, radius:380, type:"residential",      wazeName:"жк Дружба Sofia" },
-  { id:"mladost",        name:"жк Младост 1/2/3",                       icon:"🏘", lat:42.6500, lng:23.3700, radius:350, type:"residential",      wazeName:"жк Младост Sofia" },
+  { id:"mladost",        name:"жк Младост 1",                       icon:"🏘", lat:42.6498, lng:23.3722, radius:300, type:"residential",      wazeName:"жк Младост 1 София" },
+  { id:"mladost2", name:"жк Младост 2", icon:"🏘", lat:42.6422, lng:23.3689, radius:300, type:"residential", wazeName:"жк Младост 2 София" },
+  { id:"mladost3", name:"жк Младост 3", icon:"🏘", lat:42.6421, lng:23.3808, radius:300, type:"residential", wazeName:"жк Младост 3 София" },
 
   // Карък зони — невидими в нормален мод
-  { id:"k_borovo",       name:"жк Борово",                              icon:"🥉", lat:42.6710, lng:23.2960, radius:300, type:"karyk",            wazeName:"жк Борово Sofia" },
+  { id:"k_borovo",       name:"жк Борово",                              icon:"🥉", lat:42.6692, lng:23.2797, radius:300, type:"karyk",            wazeName:"жк Борово Sofia" },
   { id:"k_krasno",       name:"жк Красно село",                         icon:"🥉", lat:42.6890, lng:23.2990, radius:300, type:"karyk",            wazeName:"жк Красно село Sofia" },
   { id:"k_pavlovo",      name:"жк Павлово",                             icon:"🥉", lat:42.6770, lng:23.2820, radius:280, type:"karyk",            wazeName:"жк Павлово Sofia" },
-  { id:"k_izgrev",       name:"жк Изгрев",                              icon:"🥉", lat:42.6720, lng:23.3500, radius:260, type:"karyk",            wazeName:"жк Изгрев Sofia" },
+  { id:"k_izgrev",       name:"жк Изгрев",                              icon:"🥉", lat:42.6705, lng:23.3487, radius:260, type:"karyk",            wazeName:"жк Изгрев Sofia" },
   { id:"k_geo_milev",    name:"жк Гео Милев",                           icon:"🥉", lat:42.6860, lng:23.3680, radius:260, type:"karyk",            wazeName:"жк Гео Милев Sofia" },
-  { id:"k_iztok",        name:"жк Изток (жилищна зона)",                icon:"🥉", lat:42.6820, lng:23.3620, radius:280, type:"karyk",            wazeName:"жк Изток Sofia" },
+  { id:"k_iztok",        name:"жк Изток (жилищна зона)",                icon:"🥉", lat:42.6702, lng:23.3649, radius:280, type:"karyk",            wazeName:"жк Изток Sofia" },
 
   // ── ТЕАТРИ ──
   { id:"youth_theatre",  name:"Младежки театър (бул.Дондуков 8)",       icon:"🎭", lat:42.6978, lng:23.3269, radius:150, type:"theatre",          wazeName:"Младежки театър Николай Бинев София" },
@@ -3978,4 +3980,30 @@ function toggleMapView(){
     try{ if(prev) prev(scores); }catch(e){}
     try{ window.__lastScores = scores; }catch(e){}
   };
+})();
+
+
+// ------ ag-yug-v37: работно време на Автогара Юг ------
+(function(){
+  function enrich(el){
+    try{
+      if(!el || (el.dataset && el.dataset.agyug)) return;
+      var t = el.textContent || '';
+      if(!/Автогара Юг/i.test(t)) return;
+      if(el.dataset) el.dataset.agyug = '1';
+      var now = new Date(), h = now.getHours() + now.getMinutes()/60;
+      var open = (h >= 7.5 && h <= 18.5);
+      el.insertAdjacentHTML('beforeend',
+        '<div style="margin-top:7px;padding:6px 8px;border-radius:6px;'
+        + 'background:rgba(56,189,248,.10);border-left:3px solid #38bdf8;font-size:12px">'
+        + '<b>🚌 Автогара Юг</b><br>'
+        + 'Работи <b>07:30–18:30</b> · ' + (open ? '<span style="color:#22c55e">отворена</span>'
+                                                 : '<span style="color:#94a3b8">затворена</span>')
+        + '<br><span style="opacity:.7">Направление Самоков · Боровец · Рила<br>'
+        + 'Няма публично разписание · плащане в брой</span></div>');
+    }catch(e){}
+  }
+  function scan(){ try{ document.querySelectorAll('.leaflet-popup-content').forEach(enrich); }catch(e){} }
+  scan(); setInterval(scan, 4000);
+  try{ new MutationObserver(scan).observe(document.body, {childList:true, subtree:true}); }catch(e){}
 })();
