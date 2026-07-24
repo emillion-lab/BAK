@@ -3684,7 +3684,16 @@ function toggleMapView(){
     {id:'jam_serdika', lat:42.7049, lng:23.3239, name:'бул. Сливница'},
     {id:'jam_evlogi',  lat:42.6867, lng:23.3293, name:'Евлоги Георгиев'},
     {id:'jam_malinov', lat:42.6469, lng:23.3761, name:'Ал. Малинов (метро)'},
-    {id:'jam_malinov_s', lat:42.6369, lng:23.3773, name:'Ал. Малинов (юг)'}
+    {id:'jam_malinov_s', lat:42.6369, lng:23.3773, name:'Ал. Малинов (юг)'},
+    {id:'jam_evlogi_b', lat:42.687, lng:23.3287, name:'Хр. Георгиев (обратно)'},
+    {id:'jam_malinov_n', lat:42.6542, lng:23.3719, name:'Ал. Малинов (север)'},
+    {id:'jam_luiza', lat:42.7, lng:23.3218, name:'бул. Мария Луиза'},
+    {id:'jam_tsankov', lat:42.6703, lng:23.351, name:'бул. Драган Цанков'},
+    {id:'jam_botev', lat:42.698, lng:23.3157, name:'бул. Христо Ботев'},
+    {id:'jam_bg_north', lat:42.6813, lng:23.3197, name:'бул. България (север)'},
+    {id:'jam_levski', lat:42.6861, lng:23.3322, name:'бул. Васил Левски'},
+    {id:'jam_tsar_air', lat:42.65, lng:23.3945, name:'Цариградско (към летище)'},
+    {id:'jam_cherni', lat:42.658, lng:23.3155, name:'бул. Черни връх'}
   ];
   var LIVE = {};      // id -> {cur, free, ratio, closed}
   var LAST = 0, FAILED = 0;
@@ -3710,11 +3719,17 @@ function toggleMapView(){
       .catch(function(){ FAILED++; });
   }
   // нощем (23:00–06:00) питаме рядко — пътищата са свободни, пестим квота
-  function isNight(){ var h = new Date().getHours(); return (h >= 23 || h < 6); }
+  // опресняването следва графика на worker-а
+  function waitMs(){
+    var h = new Date().getHours();
+    if(h >= 23 || h < 6) return 3600000;                 // нощ: 60 мин
+    if(h >= 21) return 1800000;                          // късна вечер: 30 мин
+    if((h >= 8 && h < 10) || (h >= 17 && h < 19)) return 300000;   // пик: 5 мин
+    return 600000;                                       // ден: 10 мин
+  }
   pull();
   (function schedule(){
-    var wait = isNight() ? 1800000 : 180000;    // 30 мин нощем, 3 мин денем
-    setTimeout(function(){ pull(); schedule(); }, wait);
+    setTimeout(function(){ pull(); schedule(); }, waitMs());
   })();
 
   // забавяне -> скор
@@ -4229,7 +4244,7 @@ function toggleMapView(){
         if(el.dataset) el.dataset.night42 = '1';
         el.insertAdjacentHTML('beforeend',
           '<div style="font-size:10.5px;opacity:.5;margin-top:3px">'
-          + '🌙 нощен режим — данните се обновяват на 30 мин</div>');
+          + '🌙 нощен режим — данните се обновяват на час</div>');
       });
     }catch(e){}
   }
