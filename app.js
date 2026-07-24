@@ -4047,3 +4047,89 @@ function toggleMapView(){
   sweep();
   setInterval(sweep, 4000);
 })();
+
+
+// ------ airport-panel-v39: червените най-отгоре + цели имена ------
+(function(){
+  var CSS = '/*airport-panel-v39*/'
+    + '.leaflet-popup-content{font-size:12.5px!important;}'
+    + '.leaflet-popup-content *{text-overflow:clip!important;overflow:visible!important;'
+    + 'max-width:none!important;}'
+    + '.v39-hot{order:-1;}'
+    + '.v39-head{font:800 11px/1.3 system-ui,sans-serif;color:#fca5a5;'
+    + 'padding:4px 2px 2px;letter-spacing:.3px;}';
+  try{
+    if(!document.getElementById('v39-style')){
+      var st = document.createElement('style');
+      st.id = 'v39-style';
+      st.textContent = CSS;
+      document.head.appendChild(st);
+    }
+  }catch(e){}
+
+  var HOT = /ИЗЛИЗАТ\s+\d{1,2}:\d{2}/;
+
+  function isRow(el){
+    var t = el.textContent || '';
+    if(!HOT.test(t)) return false;
+    if(t.length > 160) return false;          // това е контейнер, не ред
+    // редът съдържа номер на полет
+    return /[A-Z]{2}\d{3,4}|W6\d{3,4}|FR\d{3,4}/.test(t);
+  }
+
+  function lift(panel){
+    try{
+      if(!panel || (panel.dataset && panel.dataset.v39 === '1')) return;
+      var all = panel.querySelectorAll('div,li,tr,section');
+      var rows = [];
+      Array.prototype.forEach.call(all, function(el){
+        if(isRow(el)){
+          // взимаме най-външния ред, не вложените парчета
+          var p = el.parentElement;
+          var outer = el;
+          while(p && p !== panel && isRow(p)){ outer = p; p = p.parentElement; }
+          if(rows.indexOf(outer) < 0) rows.push(outer);
+        }
+      });
+      if(!rows.length) return;
+
+      // общият родител на редовете
+      var parent = rows[0].parentElement;
+      if(!parent) return;
+      var same = rows.every(function(r){ return r.parentElement === parent; });
+      if(!same){
+        parent = rows[0].parentElement;
+        rows = rows.filter(function(r){ return r.parentElement === parent; });
+      }
+      if(rows.length < 1) return;
+
+      // заглавие + преместване най-отгоре, в същия ред помежду им
+      if(!parent.querySelector('.v39-head')){
+        var h = document.createElement('div');
+        h.className = 'v39-head';
+        h.textContent = '⬤ ИЗЛИЗАТ СЕГА — ' + rows.length + ' полета';
+        parent.insertBefore(h, parent.firstChild);
+      }
+      var anchor = parent.querySelector('.v39-head');
+      rows.slice().reverse().forEach(function(r){
+        try{ parent.insertBefore(r, anchor.nextSibling); }catch(e){}
+      });
+
+      if(panel.dataset) panel.dataset.v39 = '1';
+      // и панелът се връща най-горе
+      try{ panel.scrollTop = 0; }catch(e){}
+    }catch(e){}
+  }
+
+  function scan(){
+    try{
+      document.querySelectorAll('.leaflet-popup-content').forEach(function(el){
+        var t = el.textContent || '';
+        if(/Излизане на пасажери|Изходи Терминал/i.test(t)) lift(el);
+      });
+    }catch(e){}
+  }
+  scan();
+  setInterval(scan, 2000);
+  try{ new MutationObserver(scan).observe(document.body, {childList:true, subtree:true}); }catch(e){}
+})();
