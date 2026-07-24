@@ -1,126 +1,121 @@
 # -*- coding: utf-8 -*-
-"""v38: (1) Борово, Павлово, Младост 1 по линковете на Емил + Младост 4
-       (2) Oval Business Center — премахнат, обектът не съществува
-       (3) точката на бул.България отива на проверено място върху булеварда
-       (4) старите лилави точки за трафика се махат (линиите ги заместиха)
-"""
+"""v39: летищният панел — излизащите СЕГА отиват най-отгоре (без скролване),
+имената на градовете не се режат."""
 import re, subprocess, shutil, os
 
 rep = []
 src = open('app.js', encoding='utf-8').read()
 cand = src
 
-def move(zid, lat, lng, newname=None, note=''):
-    global cand
-    pat = re.compile(r'(\{\s*id:"%s"\s*,\s*name:")([^"]*)("[^}]*?lat:)([\d.]+)(\s*,\s*lng:)([\d.]+)'
-                     % re.escape(zid))
-    m = pat.search(cand)
-    if not m:
-        rep.append('SKIP %-12s не е намерена' % zid)
-        return
-    ol, og = float(m.group(4)), float(m.group(6))
-    d = int((((lat-ol)*111000)**2 + ((lng-og)*82000)**2) ** 0.5)
-    nm = newname if newname else m.group(2)
-    cand = pat.sub(lambda x: x.group(1)+nm+x.group(3)+str(lat)+x.group(5)+str(lng), cand, count=1)
-    rep.append('OK   %-12s -> %.4f,%.4f  (беше на %d м) %s' % (zid, lat, lng, d, note))
-
-# (1) по линковете
-move('k_borovo', 42.6687, 23.2897, None, 'по линка на Емил')
-move('k_pavlovo', 42.6678, 23.2658, None, 'трамвайна спирка кв.Павлово')
-move('mladost',  42.6542, 23.3719, 'жк Младост 1', 'метростанция Младост 1')
-
-# Младост 4
-if 'mladost4' not in cand:
-    anchor = '{ id:"mladost2",'
-    if cand.count(anchor) == 1:
-        z = ('{ id:"mladost4", name:"жк Младост 4", icon:"🏘", lat:42.6285, lng:23.3793, '
-             'radius:320, type:"residential", wazeName:"жк Младост 4 София" },\n  ')
-        cand = cand.replace(anchor, z + anchor, 1)
-        rep.append('OK   mladost4     + 42.6285, 23.3793 (по линка)')
-    else:
-        rep.append('SKIP котва mladost2 x%d' % cand.count(anchor))
-
-# (2) Oval не съществува
-pat_oval = re.compile(r'\s*\{\s*id:"oval".*?\}\s*,?', re.S)
-if pat_oval.search(cand):
-    cand = pat_oval.sub('\n  ', cand, count=1)
-    rep.append('OK   oval ПРЕМАХНАТ (обектът не съществува)')
-    # и събитията-сираци към него
-    ev = re.compile(r'\s*\{[^{}]*zone:\s*"oval"[^{}]*\}\s*,?')
-    n = len(ev.findall(cand))
-    if n:
-        cand = ev.sub('\n  ', cand)
-        rep.append('OK   премахнати %d събития към oval' % n)
-
-# (3) бул. България — точка ВЪРХУ булеварда (при Мол България, сверено)
-move('jam_ndk', 42.6655, 23.2895,
-     '⚠ Задръстване бул.България (при Мол България)',
-     'беше в преките до Петко Тодоров')
-
-# (4) старите точки за трафика
-if 'kill-jam-markers-v38' not in cand:
+if 'airport-panel-v39' in cand:
+    rep.append('SKIP v39 вече е приложен')
+else:
     cand += """
 
-// ------ kill-jam-markers-v38: махаме старите точки, линиите ги заместиха ------
+// ------ airport-panel-v39: червените най-отгоре + цели имена ------
 (function(){
-  var PTS = [
-    [42.6906, 23.3374], [42.6752, 23.3587], [42.6655, 23.2895], [42.7049, 23.3239]
-  ];
-  function near(a, b){
-    var dx = (a[0]-b[0])*111000, dy = (a[1]-b[1])*82000;
-    return Math.sqrt(dx*dx + dy*dy) < 120;
+  var CSS = '/*airport-panel-v39*/'
+    + '.leaflet-popup-content{font-size:12.5px!important;}'
+    + '.leaflet-popup-content *{text-overflow:clip!important;overflow:visible!important;'
+    + 'max-width:none!important;}'
+    + '.v39-hot{order:-1;}'
+    + '.v39-head{font:800 11px/1.3 system-ui,sans-serif;color:#fca5a5;'
+    + 'padding:4px 2px 2px;letter-spacing:.3px;}';
+  try{
+    if(!document.getElementById('v39-style')){
+      var st = document.createElement('style');
+      st.id = 'v39-style';
+      st.textContent = CSS;
+      document.head.appendChild(st);
+    }
+  }catch(e){}
+
+  var HOT = /ИЗЛИЗАТ\\s+\\d{1,2}:\\d{2}/;
+
+  function isRow(el){
+    var t = el.textContent || '';
+    if(!HOT.test(t)) return false;
+    if(t.length > 160) return false;          // това е контейнер, не ред
+    // редът съдържа номер на полет
+    return /[A-Z]{2}\\d{3,4}|W6\\d{3,4}|FR\\d{3,4}/.test(t);
   }
-  function sweep(){
+
+  function lift(panel){
     try{
-      var map = window.__leafletMap;
-      if(!map) return;
-      var kill = [];
-      map.eachLayer(function(l){
-        if(!l || typeof l.getLatLng !== 'function') return;
-        if(typeof l.getRadius === 'function') return;      // кръговете остават
-        if(l.__isTrafficLine) return;
-        var ll = l.getLatLng();
-        if(!ll) return;
-        for(var i = 0; i < PTS.length; i++){
-          if(near([ll.lat, ll.lng], PTS[i])){
-            // пазим надписите (те са с iconSize 0)
-            var ic = l.options && l.options.icon;
-            var sz = ic && ic.options && ic.options.iconSize;
-            if(sz && sz[0] === 0 && sz[1] === 0) return;
-            kill.push(l);
-            return;
-          }
+      if(!panel || (panel.dataset && panel.dataset.v39 === '1')) return;
+      var all = panel.querySelectorAll('div,li,tr,section');
+      var rows = [];
+      Array.prototype.forEach.call(all, function(el){
+        if(isRow(el)){
+          // взимаме най-външния ред, не вложените парчета
+          var p = el.parentElement;
+          var outer = el;
+          while(p && p !== panel && isRow(p)){ outer = p; p = p.parentElement; }
+          if(rows.indexOf(outer) < 0) rows.push(outer);
         }
       });
-      kill.forEach(function(l){ try{ map.removeLayer(l); }catch(e){} });
+      if(!rows.length) return;
+
+      // общият родител на редовете
+      var parent = rows[0].parentElement;
+      if(!parent) return;
+      var same = rows.every(function(r){ return r.parentElement === parent; });
+      if(!same){
+        parent = rows[0].parentElement;
+        rows = rows.filter(function(r){ return r.parentElement === parent; });
+      }
+      if(rows.length < 1) return;
+
+      // заглавие + преместване най-отгоре, в същия ред помежду им
+      if(!parent.querySelector('.v39-head')){
+        var h = document.createElement('div');
+        h.className = 'v39-head';
+        h.textContent = '⬤ ИЗЛИЗАТ СЕГА — ' + rows.length + ' полета';
+        parent.insertBefore(h, parent.firstChild);
+      }
+      var anchor = parent.querySelector('.v39-head');
+      rows.slice().reverse().forEach(function(r){
+        try{ parent.insertBefore(r, anchor.nextSibling); }catch(e){}
+      });
+
+      if(panel.dataset) panel.dataset.v39 = '1';
+      // и панелът се връща най-горе
+      try{ panel.scrollTop = 0; }catch(e){}
     }catch(e){}
   }
-  sweep();
-  setInterval(sweep, 4000);
+
+  function scan(){
+    try{
+      document.querySelectorAll('.leaflet-popup-content').forEach(function(el){
+        var t = el.textContent || '';
+        if(/Излизане на пасажери|Изходи Терминал/i.test(t)) lift(el);
+      });
+    }catch(e){}
+  }
+  scan();
+  setInterval(scan, 2000);
+  try{ new MutationObserver(scan).observe(document.body, {childList:true, subtree:true}); }catch(e){}
 })();
 """
-    rep.append('OK   старите точки за трафика се махат (линиите остават)')
-
-ids = re.findall(r'\{\s*id:"([^"]+)"\s*,\s*name:', cand)
-dups = sorted({i for i in ids if ids.count(i) > 1})
-rep.append('зони: %d · дубликати: %s' % (len(ids), ', '.join(dups) if dups else 'няма'))
+    rep.append('OK   излизащите СЕГА отиват най-отгоре + заглавие с брой')
+    rep.append('OK   имената на градовете не се режат (clip вместо ellipsis)')
 
 open('/tmp/app.c.js', 'w', encoding='utf-8').write(cand)
 r = subprocess.run(['node', '--check', '/tmp/app.c.js'], capture_output=True, text=True)
 if r.returncode == 0:
     shutil.move('/tmp/app.c.js', 'app.js')
     idxh = open('index.html', encoding='utf-8').read()
-    idxh = re.sub(r'app\.js\?v=[0-9a-z]+', 'app.js?v=20260724v38', idxh)
+    idxh = re.sub(r'app\.js\?v=[0-9a-z]+', 'app.js?v=20260724v39', idxh)
     open('index.html', 'w', encoding='utf-8').write(idxh)
     try:
         sw = open('sw.js', encoding='utf-8').read()
         sw2, kk = re.subn(r"(CACHE[_A-Z]*\s*=\s*['\"])([^'\"]+)(['\"])",
-                          lambda mm: mm.group(1) + 'bak-v38' + mm.group(3), sw, count=1)
+                          lambda mm: mm.group(1) + 'bak-v39' + mm.group(3), sw, count=1)
         if kk:
             open('sw.js', 'w', encoding='utf-8').write(sw2)
     except FileNotFoundError:
         pass
-    rep.append('OK v38 + node --check + cache-bust v38')
+    rep.append('OK v39 + node --check + cache-bust v39')
 else:
     rep.append('FAIL node --check :: ' + (r.stderr or '')[:400])
 
