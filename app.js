@@ -3708,7 +3708,13 @@ function toggleMapView(){
       })
       .catch(function(){ FAILED++; });
   }
-  pull(); setInterval(pull, 180000);              // на 3 мин (кешът в worker-а е също 3)
+  // нощем (23:00–06:00) питаме рядко — пътищата са свободни, пестим квота
+  function isNight(){ var h = new Date().getHours(); return (h >= 23 || h < 6); }
+  pull();
+  (function schedule(){
+    var wait = isNight() ? 1800000 : 180000;    // 30 мин нощем, 3 мин денем
+    setTimeout(function(){ pull(); schedule(); }, wait);
+  })();
 
   // забавяне -> скор
   function scoreOf(x){
@@ -4206,4 +4212,25 @@ function toggleMapView(){
   tidy();
   setInterval(tidy, 3000);
   try{ new MutationObserver(tidy).observe(document.body, {childList:true, subtree:true}); }catch(e){}
+})();
+
+
+// ------ night-note-v42: честна бележка за нощния режим ------
+(function(){
+  function isNight(){ var h = new Date().getHours(); return (h >= 23 || h < 6); }
+  function mark(){
+    try{
+      if(!isNight()) return;
+      document.querySelectorAll('.tr34, .leaflet-popup-content').forEach(function(el){
+        var t = el.textContent || '';
+        if(!/км\/ч|СВОБОДНО|ЗАДРЪСТЕНО|ЗАБАВЯНЕ|БАВНО/.test(t)) return;
+        if(el.dataset && el.dataset.night42) return;
+        if(el.dataset) el.dataset.night42 = '1';
+        el.insertAdjacentHTML('beforeend',
+          '<div style="font-size:10.5px;opacity:.5;margin-top:3px">'
+          + '🌙 нощен режим — данните се обновяват на 30 мин</div>');
+      });
+    }catch(e){}
+  }
+  setInterval(mark, 5000);
 })();
