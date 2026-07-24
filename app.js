@@ -169,7 +169,7 @@ const ZONES = window.__ZONES = [
   { id:"sopharma_rozhen", name:"Sopharma Trading (бул.Рожен 16)", icon:"🏢", lat:42.7289, lng:23.3133, radius:180, type:"office", wazeName:"Sopharma Trading бул Рожен 16 София" },
   { id:"telus",          name:"Telus Tower / пл.Македония",             icon:"🏢", lat:42.6947, lng:23.3154, radius:180, type:"office",           wazeName:"Telus Tower Sofia" },
   { id:"millennium",     name:"Millennium Center (бул.Витоша)",         icon:"🏢", lat:42.6822, lng:23.3147, radius:200, type:"office",           wazeName:"Millennium Center Sofia" },
-  { id:"oval",           name:"Oval Business Center (Лозенец)",         icon:"🏢", lat:42.6640, lng:23.3340, radius:180, type:"office",           wazeName:"Oval Business Center Sofia" },
+  
 
   { id:"serdika",        name:"Мол Сердика (бул.Ситняково 48)",                            icon:"🛍", lat:42.6918, lng:23.3532, radius:240, type:"mall",             wazeName:"Serdika Center Sofia" },
   { id:"paradise",       name:"Paradise Center",                        icon:"🛍", lat:42.6578, lng:23.3144, radius:290, type:"mall",             wazeName:"Paradise Center Sofia" },
@@ -220,14 +220,15 @@ const ZONES = window.__ZONES = [
   { id:"nadezhda",       name:"жк Надежда",                             icon:"🏘", lat:42.7200, lng:23.2900, radius:350, type:"residential",      wazeName:"жк Надежда Sofia" },
   { id:"ovcha_kupel",    name:"жк Овча купел",                          icon:"🏘", lat:42.69, lng:23.2541, radius:300, type:"residential",      wazeName:"жк Овча купел Sofia" },
   { id:"druzhba",        name:"жк Дружба / Горубляне",                  icon:"🏘", lat:42.6590, lng:23.4230, radius:380, type:"residential",      wazeName:"жк Дружба Sofia" },
-  { id:"mladost",        name:"жк Младост 1",                       icon:"🏘", lat:42.6498, lng:23.3722, radius:300, type:"residential",      wazeName:"жк Младост 1 София" },
+  { id:"mladost",        name:"жк Младост 1",                       icon:"🏘", lat:42.6542, lng:23.3719, radius:300, type:"residential",      wazeName:"жк Младост 1 София" },
+  { id:"mladost4", name:"жк Младост 4", icon:"🏘", lat:42.6285, lng:23.3793, radius:320, type:"residential", wazeName:"жк Младост 4 София" },
   { id:"mladost2", name:"жк Младост 2", icon:"🏘", lat:42.6422, lng:23.3689, radius:300, type:"residential", wazeName:"жк Младост 2 София" },
   { id:"mladost3", name:"жк Младост 3", icon:"🏘", lat:42.6421, lng:23.3808, radius:300, type:"residential", wazeName:"жк Младост 3 София" },
 
   // Карък зони — невидими в нормален мод
-  { id:"k_borovo",       name:"жк Борово",                              icon:"🥉", lat:42.6692, lng:23.2797, radius:300, type:"karyk",            wazeName:"жк Борово Sofia" },
+  { id:"k_borovo",       name:"жк Борово",                              icon:"🥉", lat:42.6687, lng:23.2897, radius:300, type:"karyk",            wazeName:"жк Борово Sofia" },
   { id:"k_krasno",       name:"жк Красно село",                         icon:"🥉", lat:42.6890, lng:23.2990, radius:300, type:"karyk",            wazeName:"жк Красно село Sofia" },
-  { id:"k_pavlovo",      name:"жк Павлово",                             icon:"🥉", lat:42.6770, lng:23.2820, radius:280, type:"karyk",            wazeName:"жк Павлово Sofia" },
+  { id:"k_pavlovo",      name:"жк Павлово",                             icon:"🥉", lat:42.6678, lng:23.2658, radius:280, type:"karyk",            wazeName:"жк Павлово Sofia" },
   { id:"k_izgrev",       name:"жк Изгрев",                              icon:"🥉", lat:42.6705, lng:23.3487, radius:260, type:"karyk",            wazeName:"жк Изгрев Sofia" },
   { id:"k_geo_milev",    name:"жк Гео Милев",                           icon:"🥉", lat:42.6860, lng:23.3680, radius:260, type:"karyk",            wazeName:"жк Гео Милев Sofia" },
   { id:"k_iztok",        name:"жк Изток (жилищна зона)",                icon:"🥉", lat:42.6702, lng:23.3649, radius:280, type:"karyk",            wazeName:"жк Изток Sofia" },
@@ -273,7 +274,7 @@ const ZONES = window.__ZONES = [
   // ── ЗАДРЪСТВАНИЯ ──
   { id:"jam_orl",        name:"⚠ Задръстване Орлов мост",               icon:"🚦", lat:42.6906, lng:23.3374, radius:150, type:"traffic",          wazeName:"Орлов мост София" },
   { id:"jam_tsar",       name:"⚠ Задръстване Цариградско (при хотел Плиска)",   icon:"🚦", lat:42.6752, lng:23.3587, radius:200, type:"traffic",          wazeName:"Цариградско шосе Армейски Sofia" },
-  { id:"jam_ndk",        name:"⚠ Задръстване бул.България (НДК → Мол България)",             icon:"🚦", lat:42.6745, lng:23.3028, radius:160, type:"traffic",          wazeName:"булевард България Sofia" },
+  { id:"jam_ndk",        name:"⚠ Задръстване бул.България (при Мол България)",             icon:"🚦", lat:42.6655, lng:23.2895, radius:160, type:"traffic",          wazeName:"булевард България Sofia" },
   { id:"jam_serdika",    name:"⚠ Задръстване бул.Сливница (при Лъвов мост)",   icon:"🚦", lat:42.7049, lng:23.3239, radius:160, type:"traffic",          wazeName:"Сердика бул Сливница Sofia" },
 ];
 
@@ -4006,4 +4007,43 @@ function toggleMapView(){
   function scan(){ try{ document.querySelectorAll('.leaflet-popup-content').forEach(enrich); }catch(e){} }
   scan(); setInterval(scan, 4000);
   try{ new MutationObserver(scan).observe(document.body, {childList:true, subtree:true}); }catch(e){}
+})();
+
+
+// ------ kill-jam-markers-v38: махаме старите точки, линиите ги заместиха ------
+(function(){
+  var PTS = [
+    [42.6906, 23.3374], [42.6752, 23.3587], [42.6655, 23.2895], [42.7049, 23.3239]
+  ];
+  function near(a, b){
+    var dx = (a[0]-b[0])*111000, dy = (a[1]-b[1])*82000;
+    return Math.sqrt(dx*dx + dy*dy) < 120;
+  }
+  function sweep(){
+    try{
+      var map = window.__leafletMap;
+      if(!map) return;
+      var kill = [];
+      map.eachLayer(function(l){
+        if(!l || typeof l.getLatLng !== 'function') return;
+        if(typeof l.getRadius === 'function') return;      // кръговете остават
+        if(l.__isTrafficLine) return;
+        var ll = l.getLatLng();
+        if(!ll) return;
+        for(var i = 0; i < PTS.length; i++){
+          if(near([ll.lat, ll.lng], PTS[i])){
+            // пазим надписите (те са с iconSize 0)
+            var ic = l.options && l.options.icon;
+            var sz = ic && ic.options && ic.options.iconSize;
+            if(sz && sz[0] === 0 && sz[1] === 0) return;
+            kill.push(l);
+            return;
+          }
+        }
+      });
+      kill.forEach(function(l){ try{ map.removeLayer(l); }catch(e){} });
+    }catch(e){}
+  }
+  sweep();
+  setInterval(sweep, 4000);
 })();
