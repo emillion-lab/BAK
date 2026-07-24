@@ -185,12 +185,12 @@ let alertedEvents     = new Set();
 // ═══════════════════════════════════════════════
 const ZONES = window.__ZONES = [
   { id:"airport",        name:"Летище София (СОФ)",                     icon:"✈️",  lat:42.6885, lng:23.4082, radius:600, type:"airport",          wazeName:"Летище София" },
-  { id:"bpark",          name:"Business Park Sofia",                    icon:"🏢", lat:42.6269, lng:23.3784, radius:380, type:"office",           wazeName:"Business Park Sofia" },
+  { id:"bpark",          name:"Business Park Sofia",                    icon:"🏢", lat:42.6269, lng:23.3784, radius:220, type:"office",           wazeName:"Business Park Sofia" },
   { id:"garitage",       name:"Garitage Park",                          icon:"🏢", lat:42.6227, lng:23.3735, radius:320, type:"office",           wazeName:"Garitage Park Sofia" },
   { id:"polygraphia",    name:"Polygraphia Office Center (Цариградско 47)",              icon:"🏢", lat:42.6874, lng:23.344, radius:260, type:"office",           wazeName:"Polygraphia Office Center Sofia" },
   { id:"capital_fort",   name:"Capital Fort",                           icon:"🏢", lat:42.6464, lng:23.3958, radius:230, type:"office",           wazeName:"Capital Fort Sofia" },
   { id:"megapark",       name:"Megapark / The Mall офиси",              icon:"🏢", lat:42.661, lng:23.38, radius:260, type:"office",           wazeName:"Megapark Sofia" },
-  { id:"advance_bc",     name:"Advance Business Center",                icon:"🏢", lat:42.6294, lng:23.3747, radius:230, type:"office",           wazeName:"Advance Business Center Sofia" },
+  { id:"advance_bc",     name:"Advance Business Center",                icon:"🏢", lat:42.6294, lng:23.3747, radius:190, type:"office",           wazeName:"Advance Business Center Sofia" },
   { id:"expo2000",       name:"Ellipse Center (Цариградско шосе)",             icon:"🏢", lat:42.6458, lng:23.3972, radius:280, type:"office",           wazeName:"Expo 2000 Sofia" },
   { id:"iec",            name:"IEC / Интер Експо Център (Цариградско 147)",               icon:"🏢", lat:42.6491, lng:23.3952, radius:280, type:"office",           wazeName:"Inter Expo Center Sofia" },
   { id:"office_center",  name:"Офис Център (пл.Патриарх Евтимий)",     icon:"🏢", lat:42.6883, lng:23.3285, radius:230, type:"office",           wazeName:"площад Патриарх Евтимий София" },
@@ -250,7 +250,7 @@ const ZONES = window.__ZONES = [
   { id:"ovcha_kupel",    name:"жк Овча купел",                          icon:"🏘", lat:42.69, lng:23.2541, radius:300, type:"residential",      wazeName:"жк Овча купел Sofia" },
   { id:"druzhba",        name:"жк Дружба / Горубляне",                  icon:"🏘", lat:42.6590, lng:23.4230, radius:380, type:"residential",      wazeName:"жк Дружба Sofia" },
   { id:"mladost",        name:"жк Младост 1",                       icon:"🏘", lat:42.6542, lng:23.3719, radius:300, type:"residential",      wazeName:"жк Младост 1 София" },
-  { id:"mladost4", name:"жк Младост 4", icon:"🏘", lat:42.6285, lng:23.3793, radius:320, type:"residential", wazeName:"жк Младост 4 София" },
+  { id:"mladost4", name:"жк Младост 4", icon:"🏘", lat:42.6285, lng:23.3793, radius:240, type:"residential", wazeName:"жк Младост 4 София" },
   { id:"mladost2", name:"жк Младост 2", icon:"🏘", lat:42.6422, lng:23.3689, radius:300, type:"residential", wazeName:"жк Младост 2 София" },
   { id:"mladost3", name:"жк Младост 3", icon:"🏘", lat:42.6421, lng:23.3808, radius:300, type:"residential", wazeName:"жк Младост 3 София" },
 
@@ -3681,7 +3681,9 @@ function toggleMapView(){
     {id:'jam_orl',     lat:42.6906, lng:23.3374, name:'Орлов мост'},
     {id:'jam_tsar',    lat:42.6752, lng:23.3587, name:'Цариградско (Плиска)'},
     {id:'jam_ndk',     lat:42.6655, lng:23.2895, name:'бул. България'},
-    {id:'jam_serdika', lat:42.7049, lng:23.3239, name:'бул. Сливница'}
+    {id:'jam_serdika', lat:42.7049, lng:23.3239, name:'бул. Сливница'},
+    {id:'jam_evlogi',  lat:42.6914, lng:23.3472, name:'Евлоги Георгиев'},
+    {id:'jam_malinov', lat:42.6469, lng:23.3761, name:'Ал. Малинов'}
   ];
   var LIVE = {};      // id -> {cur, free, ratio, closed}
   var LAST = 0, FAILED = 0;
@@ -4042,7 +4044,8 @@ function toggleMapView(){
 // ------ kill-jam-markers-v38: махаме старите точки, линиите ги заместиха ------
 (function(){
   var PTS = [
-    [42.6906, 23.3374], [42.6752, 23.3587], [42.6655, 23.2895], [42.7049, 23.3239]
+    [42.6906, 23.3374], [42.6752, 23.3587], [42.6655, 23.2895], [42.7049, 23.3239],
+    [42.6914, 23.3472], [42.6469, 23.3761]
   ];
   function near(a, b){
     var dx = (a[0]-b[0])*111000, dy = (a[1]-b[1])*82000;
@@ -4161,4 +4164,46 @@ function toggleMapView(){
   scan();
   setInterval(scan, 2000);
   try{ new MutationObserver(scan).observe(document.body, {childList:true, subtree:true}); }catch(e){}
+})();
+
+
+// ------ chips-tidy-v41: маха дублиращия чип и разрежда останалите ------
+(function(){
+  function tidy(){
+    try{
+      var chips = [];
+      Array.prototype.forEach.call(document.querySelectorAll('div'), function(el){
+        if(el.children.length > 2) return;
+        var cs = window.getComputedStyle(el);
+        if(cs.position !== 'fixed') return;
+        var t = (el.textContent || '').trim();
+        if(!t || t.length > 46) return;
+        if(parseFloat(cs.left) > 220) return;              // само лявата колона
+        chips.push({el:el, t:t, bottom:parseFloat(cs.bottom) || 0});
+      });
+
+      // 1) махаме "N довечера" — дублира по-описателното "N събития"
+      var hasEvents = chips.some(function(c){ return /\d+\s*събити/i.test(c.t); });
+      chips = chips.filter(function(c){
+        if(hasEvents && /довечера/i.test(c.t)){
+          try{ c.el.remove(); }catch(e){ c.el.style.display = 'none'; }
+          return false;
+        }
+        return true;
+      });
+
+      // 2) разреждаме — 46px стъпка отдолу нагоре
+      chips.sort(function(a, b){ return a.bottom - b.bottom; });
+      var y = 26;
+      chips.forEach(function(c){
+        if(c.el.style.display === 'none') return;
+        c.el.style.bottom = y + 'px';
+        c.el.style.marginBottom = '0';
+        y += 46;
+      });
+    }catch(e){}
+  }
+  tidy();
+  setInterval(tidy, 3000);
+  try{ new MutationObserver(tidy).observe(document.body, {childList:true, subtree:true}); }catch(e){}
 })();
