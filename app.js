@@ -2025,8 +2025,8 @@ function toggleMapView(){
       chip.onclick=function(){
         alert(evs.map(function(e){
           var en=new Date(e.e);
-          return hm(new Date(e.s))+' '+e.n.slice(0,40)+' @ '+(e.v||'?')+'\\n   🚕 pickup '+hm(en)+'–'+hm(new Date(e.e+45*60000));
-        }).join('\\n')+'\\n\\nИзточник: SEV ('+(d.sources_ok||[]).join('+')+')');
+          return hm(new Date(e.s))+' '+e.n.slice(0,40)+' @ '+(e.v||'?')+'\n   🚕 pickup '+hm(en)+'–'+hm(new Date(e.e+45*60000));
+        }).join('\n')+'\n\nИзточник: SEV ('+(d.sources_ok||[]).join('+')+')');
       };
       document.body.appendChild(chip);
     }).catch(function(e){});
@@ -3682,7 +3682,7 @@ function toggleMapView(){
     {id:'jam_tsar',    lat:42.6752, lng:23.3587, name:'Цариградско (Плиска)'},
     {id:'jam_ndk',     lat:42.6655, lng:23.2895, name:'бул. България'},
     {id:'jam_serdika', lat:42.7049, lng:23.3239, name:'бул. Сливница'},
-    {id:'jam_evlogi',  lat:42.6867, lng:23.3293, name:'Евлоги Георгиев'},
+    {id:'jam_evlogi',  lat:42.6845, lng:23.3245, name:'Евлоги Георгиев'},
     {id:'jam_malinov', lat:42.6469, lng:23.3761, name:'Ал. Малинов (метро)'},
     {id:'jam_malinov_s', lat:42.6369, lng:23.3773, name:'Ал. Малинов (юг)'},
     {id:'jam_evlogi_b', lat:42.687, lng:23.3287, name:'Хр. Георгиев (обратно)'},
@@ -3691,7 +3691,6 @@ function toggleMapView(){
     {id:'jam_tsankov', lat:42.6703, lng:23.351, name:'бул. Драган Цанков'},
     {id:'jam_botev', lat:42.698, lng:23.3157, name:'бул. Христо Ботев'},
     {id:'jam_bg_north', lat:42.6813, lng:23.3197, name:'бул. България (север)'},
-    {id:'jam_levski', lat:42.6861, lng:23.3322, name:'бул. Васил Левски'},
     {id:'jam_tsar_air', lat:42.65, lng:23.3945, name:'Цариградско (към летище)'},
     {id:'jam_cherni', lat:42.658, lng:23.3155, name:'бул. Черни връх'}
   ];
@@ -4249,4 +4248,114 @@ function toggleMapView(){
     }catch(e){}
   }
   setInterval(mark, 5000);
+})();
+
+
+// ------ visual-v45 ------
+(function(){
+  // ═══ надписите се появяват по-късно ═══
+  window.__labelMinRadius = function(z){
+    if(z >= 16) return 0;        // всичко
+    if(z >= 15) return 150;
+    if(z >= 14) return 260;
+    if(z >= 13) return 380;
+    return 520;                  // z12 — само най-големите
+  };
+
+  // ═══ КЪРК банерът: под заглавието, над картата ═══
+  try{
+    var st = document.createElement('style');
+    st.id = 'v45-style';
+    st.textContent =
+      '#karyk-banner{position:relative!important;z-index:5!important;'
+      + 'max-width:100%!important;box-sizing:border-box!important;'
+      + 'transform:none!important;opacity:1!important;'
+      + 'margin:4px 6px!important;padding:6px 9px!important;'
+      + 'font-size:11.5px!important;line-height:1.35!important;'
+      + 'border-radius:8px!important;}'
+      + '#karyk-btn{transform:scale(.75)!important;transform-origin:left bottom!important;'
+      + 'z-index:1200!important;}'
+      // popup: събитията се отделят по-ясно
+      + '.leaflet-popup-content>div{margin-bottom:5px!important;}'
+      + '.leaflet-popup-content hr{border:0!important;border-top:1px solid rgba(148,163,184,.28)!important;'
+      + 'margin:7px 0!important;}';
+    document.head.appendChild(st);
+  }catch(e){}
+
+  // ═══ бутон за чиста карта ═══
+  var clean = false;
+  var btn = document.createElement('div');
+  btn.textContent = '👁 чисто';
+  btn.style.cssText = 'position:fixed;right:8px;top:50%;z-index:1400;background:#0b1220e0;'
+    + 'color:#cbd5e1;border:1px solid #475569;border-radius:9px;padding:6px 9px;'
+    + 'font:700 11px system-ui,sans-serif;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.5)';
+  btn.onclick = function(){
+    clean = !clean;
+    btn.textContent = clean ? '👁 всичко' : '👁 чисто';
+    btn.style.background = clean ? '#1e3a5fe0' : '#0b1220e0';
+    try{
+      var map = window.__leafletMap;
+      if(!map) return;
+      if(clean){
+        if(window.__labelLayer){ map.removeLayer(window.__labelLayer); window.__labelLayer = null; }
+        window.__labelsOff = true;
+      } else {
+        window.__labelsOff = false;
+      }
+    }catch(e){}
+  };
+  document.body.appendChild(btn);
+
+  // ═══ пренаписване на надписите с новите прагове ═══
+  function shortName(zn){
+    var n = (zn.name || '').replace(/\([^)]*\)/g, '').trim();
+    n = n.replace(/^(жк|ЖК)\s+/, '').replace(/^Мол\s+/i, '').replace(/^Хотели\s+/i, '');
+    n = n.replace(/\s*[–—-]\s*.*$/, '').replace(/[⚠🚦]/g, '').trim();
+    var w = n.split(/\s+/).filter(Boolean);
+    var out = w.slice(0, 2).join(' ');
+    if(out.length > 16) out = w[0];
+    if(out.length > 16) out = out.slice(0, 15) + '…';
+    return out;
+  }
+  function rebuild(){
+    try{
+      var map = window.__leafletMap, Z = window.__ZONES;
+      if(!map || !Z || !window.L) return;
+      if(window.__labelLayer){ map.removeLayer(window.__labelLayer); window.__labelLayer = null; }
+      if(window.__labelsOff) return;
+      var zoom = map.getZoom();
+      if(zoom < 12) return;
+      var minR = window.__labelMinRadius(zoom);
+      var sc = (window.__lastScores || {});
+      var lg = L.layerGroup();
+      Z.forEach(function(zn){
+        if((zn.radius || 0) < minR) return;
+        var txt = shortName(zn);
+        if(!txt) return;
+        var s = sc[zn.id];
+        // скорът се показва само отблизо и само ако си заслужава
+        var badge = (typeof s === 'number' && zoom >= 15 && s >= 1.2)
+          ? ('<span style="opacity:.9"> ' + s.toFixed(1) + '</span>') : '';
+        lg.addLayer(L.marker([zn.lat, zn.lng], {
+          interactive: false,
+          icon: L.divIcon({ className: '', iconSize: [0, 0],
+            html: '<div style="white-space:nowrap;font:600 11px/1.1 system-ui,sans-serif;'
+                + 'color:#f4f8ff;text-shadow:0 1px 3px #000,0 0 7px #000;'
+                + 'transform:translate(-50%,-50%);pointer-events:none">'
+                + (zn.icon || '') + ' ' + txt + badge + '</div>' })
+        }));
+      });
+      lg.addTo(map);
+      window.__labelLayer = lg;
+    }catch(e){}
+  }
+  window.__rebuildLabels = rebuild;
+  var t = setInterval(function(){
+    if(window.__leafletMap && window.__ZONES){
+      clearInterval(t);
+      rebuild();
+      try{ window.__leafletMap.on('zoomend', rebuild); }catch(e){}
+      setInterval(rebuild, 60000);
+    }
+  }, 700);
 })();
