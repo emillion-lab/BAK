@@ -1,7 +1,4 @@
-OK   изнесени: toggleMapView
-     вече бяха: closeBakshish, closeNext90, startNav
-     ⚠ ненамерени: closeDirHint, closeEventAlert, closeNav
-OK   Малинов север -> 42.6570,23.3705 (беше паднал на ул. Липчев)
-OK   КЪРК списък: 14 места, скор, разстояние, цъкане за фокус
-OK   бутонът е фиксиран вдясно под "чисто"
-OK v46 + node --check + cache-bust v46
+showZonePopup: 9 срещания в app.js
+showZonePopup в index.html: 0
+OK   showZonePopup изнесена в window
+OK v47 + node --check + cache-bust v47

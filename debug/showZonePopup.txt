@@ -1,0 +1,98 @@
+--- ред 773 ---
+,sz], iconAnchor:[sz/2,sz/2],
+  });
+}
+
+function buildCircles() {
+  ZONES.forEach(z => {
+    if (z.type==='traffic') {
+      const info=TRAFFIC_INFO[z.id];
+      if(info){
+        const m=L.marker([z.lat,z.lng],{icon:makeTrafficIcon(info,false),zIndexOffset:600}).addTo(map);
+        m.on('click',()=>showZonePopup(z.id));
+        trafficMarkers[z.id]=m; circleMap[z.id]=m;
+      }
+      return;
+    }
+    if (z.type==='karyk') {
+      const c=L.circle([z.lat,z.lng],{radius:z.radius,fillOpacity:0,opacity:0,weight:0});
+ 
+
+--- ред 780 ---
+     trafficMarkers[z.id]=m; circleMap[z.id]=m;
+      }
+      return;
+    }
+    if (z.type==='karyk') {
+      const c=L.circle([z.lat,z.lng],{radius:z.radius,fillOpacity:0,opacity:0,weight:0});
+      c.on('click',()=>z.type==='airport'?showAirportSchedule():z.type==='transit'?showTransitPopup(z.id):showZonePopup(z.id)); c.addTo(map); circleMap[z.id]=c;
+      return;
+    }
+    if (z.type==='hospital') {
+      const hm=L.marker([z.lat,z.lng],{icon:makeHospitalIcon(BASE[z.id]||0.5),zIndexOffset:400}).addTo(map);
+     
+
+--- ред 785 ---
+wAirportSchedule():z.type==='transit'?showTransitPopup(z.id):showZonePopup(z.id)); c.addTo(map); circleMap[z.id]=c;
+      return;
+    }
+    if (z.type==='hospital') {
+      const hm=L.marker([z.lat,z.lng],{icon:makeHospitalIcon(BASE[z.id]||0.5),zIndexOffset:400}).addTo(map);
+      hm.on('click',()=>showZonePopup(z.id));
+      const hc=L.circle([z.lat,z.lng],{radius:z.radius,color:'#991b1b',fillColor:'#991b1b',fillOpacity:0.12,weight:1}).addTo(map);
+      hc.on('click',()=>showZonePopup(z.id));
+      hospitalMarkers
+
+--- ред 787 ---
+t hm=L.marker([z.lat,z.lng],{icon:makeHospitalIcon(BASE[z.id]||0.5),zIndexOffset:400}).addTo(map);
+      hm.on('click',()=>showZonePopup(z.id));
+      const hc=L.circle([z.lat,z.lng],{radius:z.radius,color:'#991b1b',fillColor:'#991b1b',fillOpacity:0.12,weight:1}).addTo(map);
+      hc.on('click',()=>showZonePopup(z.id));
+      hospitalMarkers[z.id]={marker:hm,circle:hc};
+      circleMap[z.id]={setStyle:(o)=>hc.setStyle({fillColor:o.fillColor||'#991b1b',fillOpacity:o.fillOpacity||0.12,color:o.color||'#cc2222'}),_hm:h
+
+--- ред 793 ---
+b1b',fillOpacity:o.fillOpacity||0.12,color:o.color||'#cc2222'}),_hm:hm,_hc:hc};
+      return;
+    }
+    const c=L.circle([z.lat,z.lng],{radius:z.radius,...getScoreStyle(BASE[z.id]||0.3,z.type)});
+    c.on('click',()=>z.type==='airport'?showAirportSchedule():z.type==='transit'?showTransitPopup(z.id):showZonePopup(z.id)); c.addTo(map); circleMap[z.id]=c;
+  });
+}
+
+function getScoreStyle(score, type) {
+  const c=demandColor(score,type);
+  return {color:c.stroke, fillColor:c.fill, fillOpacity:c.fillAlpha, weight:1.5, op
+
+--- ред 1035 ---
+.lat,airportZone.lng])
+      .setContent(html)
+      .openOn(map);
+    setTimeout(()=>{
+      const box=document.getElementById('fl-scroll'), el=document.getElementById('fl-now-anchor');
+      if(box && el) box.scrollTop = Math.max(0, el.offsetTop - box.offsetTop - 34);
+    }, 120);
+  }
+}
+
+function showZonePopup(zid) {
+  const z=ZONES.find(x=>x.id===zid); if(!z) return;
+  const {scores,activeEvents}=computeScores(currentHour); if(window.__applyLive)window.__applyLive(scores);
+  const s=scores[zid]||0;
+  const isTra
+
+--- ред 1161 ---
+   const sub=(activeEvents[zid]||[])[0]?.name||'';
+        return `<div class="zone-item" onclick="(function(){if(document.body.classList.contains('list-view'))toggleMapView();setTimeout(()=>{window.__focusZone(${z.lat},${z.lng},'${zid}'==='airport'?14:15);'${zid}'==='airport'?showAirportSchedule():showZonePopup('${zid}');},150);})()">
+          <div class="zone-dot" style="background:${c.fill}"></div>
+          <div style="flex:1;min-width:0">
+            <div class="zone-name">${z.icon} ${z.name}</div>
+          
+
+--- ред 1184 ---
+  const reason=ev||(z.type==='karyk'?'Тих квартал':z.type==='residential_lux'?'Луксозен жк':'');
+      return `<div class="karyk-item" onclick="(function(){if(document.body.classList.contains('list-view'))toggleMapView();setTimeout(function(){map.invalidateSize();map.setView([${z.lat},${z.lng}],15);showZonePopup('${z.id}');},200);})()">
+        <div class="karyk-rank" style="color:${c.fill}">#${i+1}</div>
+        <div class="karyk-dot" style="background:${c.fill}"></div>
+        <div style="flex:1;min-width:0">
+   

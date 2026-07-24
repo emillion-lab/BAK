@@ -1032,7 +1032,7 @@ function showAirportSchedule() {
   }
 }
 
-function showZonePopup(zid) {
+window.showZonePopup = function showZonePopup(zid) {
   const z=ZONES.find(x=>x.id===zid); if(!z) return;
   const {scores,activeEvents}=computeScores(currentHour); if(window.__applyLive)window.__applyLive(scores);
   const s=scores[zid]||0;
