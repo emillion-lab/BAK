@@ -3682,8 +3682,9 @@ function toggleMapView(){
     {id:'jam_tsar',    lat:42.6752, lng:23.3587, name:'Цариградско (Плиска)'},
     {id:'jam_ndk',     lat:42.6655, lng:23.2895, name:'бул. България'},
     {id:'jam_serdika', lat:42.7049, lng:23.3239, name:'бул. Сливница'},
-    {id:'jam_evlogi',  lat:42.6914, lng:23.3472, name:'Евлоги Георгиев'},
-    {id:'jam_malinov', lat:42.6469, lng:23.3761, name:'Ал. Малинов'}
+    {id:'jam_evlogi',  lat:42.6867, lng:23.3293, name:'Евлоги Георгиев'},
+    {id:'jam_malinov', lat:42.6469, lng:23.3761, name:'Ал. Малинов (метро)'},
+    {id:'jam_malinov_s', lat:42.6369, lng:23.3773, name:'Ал. Малинов (юг)'}
   ];
   var LIVE = {};      // id -> {cur, free, ratio, closed}
   var LAST = 0, FAILED = 0;
@@ -4051,7 +4052,7 @@ function toggleMapView(){
 (function(){
   var PTS = [
     [42.6906, 23.3374], [42.6752, 23.3587], [42.6655, 23.2895], [42.7049, 23.3239],
-    [42.6914, 23.3472], [42.6469, 23.3761]
+    [42.6867, 23.3293], [42.6469, 23.3761], [42.6369, 23.3773]
   ];
   function near(a, b){
     var dx = (a[0]-b[0])*111000, dy = (a[1]-b[1])*82000;
