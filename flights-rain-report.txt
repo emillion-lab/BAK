@@ -1,4 +1,4 @@
-showZonePopup: 9 срещания в app.js
-showZonePopup в index.html: 0
-OK   showZonePopup изнесена в window
-OK v47 + node --check + cache-bust v47
+намерени счупени изнасяния: demandColor, showZonePopup, toggleMapView
+OK   върнати декларации + отделен ред за изнасяне (3 бр.)
+блокове "}\n(function" (риск от слепване): 0
+OK v48 + node --check + cache-bust v48

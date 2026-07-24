@@ -461,7 +461,8 @@ const EVENTS = [
 // ═══════════════════════════════════════════════
 // HELPERS
 // ═══════════════════════════════════════════════
-window.demandColor = function demandColor(score, type) {
+window.demandColor = demandColor;
+function demandColor(score, type) {
   if (type === 'hospital')
     return score>=2.0 ? {fill:"#ff2020",fillAlpha:0.75,stroke:"#ff6060",label:"🏥 Активно"}
          : score>=1.3 ? {fill:"#ef4444",fillAlpha:0.60,stroke:"#ff5555",label:"🏥"}
@@ -1032,7 +1033,8 @@ function showAirportSchedule() {
   }
 }
 
-window.showZonePopup = function showZonePopup(zid) {
+window.showZonePopup = showZonePopup;
+function showZonePopup(zid) {
   const z=ZONES.find(x=>x.id===zid); if(!z) return;
   const {scores,activeEvents}=computeScores(currentHour); if(window.__applyLive)window.__applyLive(scores);
   const s=scores[zid]||0;
@@ -1904,7 +1906,8 @@ window.addEventListener('resize',()=>{drawSparkline(currentHour); map.invalidate
 }); // end DOMContentLoaded
 
 
-window.toggleMapView = function toggleMapView(){
+window.toggleMapView = toggleMapView;
+function toggleMapView(){
   const listView = document.body.classList.toggle('list-view');
   const btn = document.getElementById('toggle-map-btn');
   if(btn) btn.textContent = listView ? '🗺️ Карта' : '📋 Списък';
