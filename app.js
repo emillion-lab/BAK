@@ -1,3 +1,32 @@
+// map-div-shim-v40 — <div id="map"> е глобалното `map` в браузъра, а Leaflet
+// картата е в затворен обхват. Даваме на div-а методите на картата, за да не
+// гърми никой inline onclick, който вика map.setView / map.invalidateSize.
+(function(){
+  var METHODS = ['invalidateSize','setView','flyTo','panTo','setZoom','zoomIn','zoomOut',
+                 'fitBounds','getZoom','getCenter','getBounds','openPopup','closePopup',
+                 'addLayer','removeLayer','eachLayer','locate','stop'];
+  function attach(){
+    try{
+      var el = document.getElementById('map');
+      if(!el || el.__mapShim) return;
+      el.__mapShim = 1;
+      METHODS.forEach(function(fn){
+        if(typeof el[fn] !== 'undefined') return;      // не пипаме DOM методи
+        el[fn] = function(){
+          var m = window.__leafletMap;
+          if(m && typeof m[fn] === 'function'){
+            try{ return m[fn].apply(m, arguments); }catch(e){}
+          }
+          return undefined;
+        };
+      });
+    }catch(e){}
+  }
+  attach();
+  var t = setInterval(function(){ attach(); }, 1000);
+  setTimeout(function(){ clearInterval(t); }, 30000);
+})();
+
 // inline-closer-v23 — работещи реализации за inline хендлъри от index.html
 (function(){
   function hideOwner(){
@@ -3651,7 +3680,7 @@ function toggleMapView(){
   var SEG = [
     {id:'jam_orl',     lat:42.6906, lng:23.3374, name:'Орлов мост'},
     {id:'jam_tsar',    lat:42.6752, lng:23.3587, name:'Цариградско (Плиска)'},
-    {id:'jam_ndk',     lat:42.6745, lng:23.3028, name:'бул. България'},
+    {id:'jam_ndk',     lat:42.6655, lng:23.2895, name:'бул. България'},
     {id:'jam_serdika', lat:42.7049, lng:23.3239, name:'бул. Сливница'}
   ];
   var LIVE = {};      // id -> {cur, free, ratio, closed}
@@ -3858,7 +3887,7 @@ function toggleMapView(){
     + 'box-shadow:0 2px 10px rgba(0,0,0,.5);background:#10233af0;color:#93c5fd;'
     + 'border:1px solid #3b82f6';
   chip.textContent = '🚦 трафик…';
-  document.body.appendChild(chip);
+  // v40: не се показва — заемаше мястото на автогарата
   chip.onclick = function(){
     var D = window.__trafficData || [];
     var lines = D.map(function(s){
