@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
-"""v40: (1) точката за трафика на бул.България беше стара (в преките при
-           Петко Тодоров) — синхронизира се със зоната
-       (2) индикаторът "4/4 отсечки" се маха — заемаше мястото на автогарата
-       (3) map.invalidateSize/setView: <div id='map'> получава методите на
-           Leaflet картата, за да не гърми НИКЪДЕ повече
+"""v41: (1) + 2 булеварда: Евлоги и Христо Георгиев, Александър Малинов
+       (2) чипът "1 довечера" се маха (дублира "2 събития", което е по-описателно)
+       (3) чиповете се разреждат, за да не лежат един върху друг
+       (4) Advance BC / Business Park / Младост 4 — по-малки радиуси, спират да се застъпват
 """
 import re, subprocess, shutil, os
 
@@ -11,81 +10,104 @@ rep = []
 src = open('app.js', encoding='utf-8').read()
 cand = src
 
-# ── (1) синхронизиране на точката ──
-old = "{id:'jam_ndk',     lat:42.6745, lng:23.3028, name:'бул. България'}"
-new = "{id:'jam_ndk',     lat:42.6655, lng:23.2895, name:'бул. България'}"
+# ── (1) двата нови булеварда ──
+old = "{id:'jam_serdika', lat:42.7049, lng:23.3239, name:'бул. Сливница'}"
+new = ("{id:'jam_serdika', lat:42.7049, lng:23.3239, name:'бул. Сливница'},\n"
+       "    {id:'jam_evlogi',  lat:42.6914, lng:23.3472, name:'Евлоги Георгиев'},\n"
+       "    {id:'jam_malinov', lat:42.6469, lng:23.3761, name:'Ал. Малинов'}")
 if old in cand:
-    cand = cand.replace(old, new)
-    rep.append('OK   точката за трафика на бул.България синхронизирана (беше 1.5 км встрани)')
+    cand = cand.replace(old, new, 1)
+    rep.append('OK   + Евлоги Георгиев (42.6914,23.3472) и Ал.Малинов (42.6469,23.3761)')
 else:
-    n = len(re.findall(r"lat:42\.6745,\s*lng:23\.3028", cand))
-    if n:
-        cand = re.sub(r"lat:42\.6745,\s*lng:23\.3028", "lat:42.6655, lng:23.2895", cand)
-        rep.append('OK   точката синхронизирана (%d места, резервен път)' % n)
-    else:
-        rep.append('SKIP старата точка не е намерена')
+    rep.append('SKIP списъкът с отсечки не е намерен')
 
-# ── (2) махаме индикатора за трафика ──
-if 'bottom:240px' in cand:
-    cand = cand.replace("chip.textContent = '🚦 трафик…';\n  document.body.appendChild(chip);",
-                        "chip.textContent = '🚦 трафик…';\n  // v40: не се показва — заемаше мястото на автогарата")
-    rep.append('OK   индикаторът "отсечки/линии" вече не се показва')
-else:
-    rep.append('SKIP индикаторът не е намерен')
+# и в списъка за чистене на стари маркери
+oldp = "[42.6906, 23.3374], [42.6752, 23.3587], [42.6655, 23.2895], [42.7049, 23.3239]"
+if oldp in cand:
+    cand = cand.replace(oldp, oldp + ',\n    [42.6914, 23.3472], [42.6469, 23.3761]', 1)
+    rep.append('OK   новите точки влизат и в чистенето на стари маркери')
 
-# ── (3) шим: div#map получава методите на Leaflet картата ──
-if 'map-div-shim-v40' in cand:
-    rep.append('SKIP шимът вече е сложен')
+# ── (4) радиуси, за да не се застъпват ──
+def radius(zid, val):
+    global cand
+    pat = re.compile(r'(\{\s*id:"%s"[^}]*?radius:)(\d+)' % re.escape(zid))
+    m = pat.search(cand)
+    if not m:
+        rep.append('SKIP радиус %s' % zid)
+        return
+    old_r = m.group(2)
+    cand = cand[:m.start(2)] + str(val) + cand[m.end(2):]
+    rep.append('OK   радиус %-10s %s -> %d' % (zid, old_r, val))
+
+radius('advance_bc', 190)
+radius('bpark', 220)
+radius('mladost4', 240)
+
+# ── (2)+(3) чиповете ──
+if 'chips-tidy-v41' in cand:
+    rep.append('SKIP v41 вече е приложен')
 else:
-    shim = """// map-div-shim-v40 — <div id="map"> е глобалното `map` в браузъра, а Leaflet
-// картата е в затворен обхват. Даваме на div-а методите на картата, за да не
-// гърми никой inline onclick, който вика map.setView / map.invalidateSize.
+    cand += """
+
+// ------ chips-tidy-v41: маха дублиращия чип и разрежда останалите ------
 (function(){
-  var METHODS = ['invalidateSize','setView','flyTo','panTo','setZoom','zoomIn','zoomOut',
-                 'fitBounds','getZoom','getCenter','getBounds','openPopup','closePopup',
-                 'addLayer','removeLayer','eachLayer','locate','stop'];
-  function attach(){
+  function tidy(){
     try{
-      var el = document.getElementById('map');
-      if(!el || el.__mapShim) return;
-      el.__mapShim = 1;
-      METHODS.forEach(function(fn){
-        if(typeof el[fn] !== 'undefined') return;      // не пипаме DOM методи
-        el[fn] = function(){
-          var m = window.__leafletMap;
-          if(m && typeof m[fn] === 'function'){
-            try{ return m[fn].apply(m, arguments); }catch(e){}
-          }
-          return undefined;
-        };
+      var chips = [];
+      Array.prototype.forEach.call(document.querySelectorAll('div'), function(el){
+        if(el.children.length > 2) return;
+        var cs = window.getComputedStyle(el);
+        if(cs.position !== 'fixed') return;
+        var t = (el.textContent || '').trim();
+        if(!t || t.length > 46) return;
+        if(parseFloat(cs.left) > 220) return;              // само лявата колона
+        chips.push({el:el, t:t, bottom:parseFloat(cs.bottom) || 0});
+      });
+
+      // 1) махаме "N довечера" — дублира по-описателното "N събития"
+      var hasEvents = chips.some(function(c){ return /\\d+\\s*събити/i.test(c.t); });
+      chips = chips.filter(function(c){
+        if(hasEvents && /довечера/i.test(c.t)){
+          try{ c.el.remove(); }catch(e){ c.el.style.display = 'none'; }
+          return false;
+        }
+        return true;
+      });
+
+      // 2) разреждаме — 46px стъпка отдолу нагоре
+      chips.sort(function(a, b){ return a.bottom - b.bottom; });
+      var y = 26;
+      chips.forEach(function(c){
+        if(c.el.style.display === 'none') return;
+        c.el.style.bottom = y + 'px';
+        c.el.style.marginBottom = '0';
+        y += 46;
       });
     }catch(e){}
   }
-  attach();
-  var t = setInterval(function(){ attach(); }, 1000);
-  setTimeout(function(){ clearInterval(t); }, 30000);
+  tidy();
+  setInterval(tidy, 3000);
+  try{ new MutationObserver(tidy).observe(document.body, {childList:true, subtree:true}); }catch(e){}
 })();
-
 """
-    cand = shim + cand
-    rep.append('OK   шим за div#map — map.setView/invalidateSize вече не гърмят никъде')
+    rep.append('OK   "довечера" се маха при наличие на "събития"; чиповете на 46px стъпка')
 
 open('/tmp/app.c.js', 'w', encoding='utf-8').write(cand)
 r = subprocess.run(['node', '--check', '/tmp/app.c.js'], capture_output=True, text=True)
 if r.returncode == 0:
     shutil.move('/tmp/app.c.js', 'app.js')
     idxh = open('index.html', encoding='utf-8').read()
-    idxh = re.sub(r'app\.js\?v=[0-9a-z]+', 'app.js?v=20260724v40', idxh)
+    idxh = re.sub(r'app\.js\?v=[0-9a-z]+', 'app.js?v=20260724v41', idxh)
     open('index.html', 'w', encoding='utf-8').write(idxh)
     try:
         sw = open('sw.js', encoding='utf-8').read()
         sw2, kk = re.subn(r"(CACHE[_A-Z]*\s*=\s*['\"])([^'\"]+)(['\"])",
-                          lambda mm: mm.group(1) + 'bak-v40' + mm.group(3), sw, count=1)
+                          lambda mm: mm.group(1) + 'bak-v41' + mm.group(3), sw, count=1)
         if kk:
             open('sw.js', 'w', encoding='utf-8').write(sw2)
     except FileNotFoundError:
         pass
-    rep.append('OK v40 + node --check + cache-bust v40')
+    rep.append('OK v41 + node --check + cache-bust v41')
 else:
     rep.append('FAIL node --check :: ' + (r.stderr or '')[:400])
 
