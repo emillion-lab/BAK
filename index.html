@@ -877,9 +877,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .ticker-bar{background:#06101c;border-bottom:1px solid var(--border);padding:0 12px;height:30px;overflow:hidden;flex-shrink:0;display:flex;align-items:center;}
 .ticker-wrap{display:flex;gap:50px;animation:ticker 280s linear infinite;width:max-content;white-space:nowrap;}
 @keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-.tick-item{font-family:'Courier New',Courier,monospace;font-size:16px;}
+.tick-item{font-family:'Courier New',Courier,monospace;font-size:16px;color:#e8eef7;font-weight:700;text-shadow:0 1px 2px rgba(0,0,0,.6);}
 .tick-item .ev-time{color:var(--amber);}
-.tick-item .ev-loc{color:var(--muted);}
+.tick-item .ev-loc{color:#9fb3c8;}
 
 /* MAP — фиксирана височина вместо flex:1 за да се рендира правилно */
 #map{ height:calc(100vh - 340px) !important; min-height:250px !important;
@@ -1407,7 +1407,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260725v67"></script>
+<script src="app.js?v=20260725v68"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">

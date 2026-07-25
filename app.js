@@ -764,8 +764,9 @@ function buildNext90(){
   const list=document.getElementById('next90-list');
   if(!list) return;
   const now = Date.now();
+  const POST_W = 45*60000;
   const sev = (window.__sevEvents || []).filter(function(e){
-    return e.s > now - 30*60000 && e.s < now + 24*3600000;   // идните 24ч
+    return (e.e + POST_W) > now && e.s < now + 24*3600000;   // още има вземане ИЛИ предстои
   });
   if(!sev.length){
     list.innerHTML='<div style="padding:14px;color:var(--muted);font-size:14px;line-height:1.5">'
@@ -990,7 +991,8 @@ window.openWaze = function(name, lat, lng){
   if(isAndroid){
     // intent:// е най-надеждният начин — Android отваря Waze, а ако липсва, пада към уеб
     var payload = hasLL ? ('?ll=' + lat + ',' + lng + '&navigate=yes') : ('?q=' + q + '&navigate=yes');
-    window.location.href = 'intent://' + payload.slice(1) +
+    // ВАЖНО: въпросителната остава — иначе става waze://ll=… и приложението не навигира
+    window.location.href = 'intent://' + payload +
       '#Intent;scheme=waze;package=com.waze;S.browser_fallback_url=' +
       encodeURIComponent(web) + ';end';
     return;
@@ -1104,7 +1106,7 @@ function showAirportSchedule() {
   }
   // легендата е ВЪТРЕ в скрола, за да не се наслагва върху редовете
   html+='<div style="font-size:10.5px;color:var(--muted);margin-top:10px;padding-top:7px;border-top:1px solid var(--border);line-height:1.5">🇪🇺 Шенген +5–15 мин · 🛂 Извън +10–30 мин · 🔴 излизат сега · бледите още се точат</div>';
-  html+=`<div style="font-size:10.5px;color:#f59e0b;margin-top:5px;line-height:1.45">⚠️ Източникът дава ${flightDetails.length} полета за днес; реалният СОФ прави ~100. Възможно е да има повече от показаните.</div>`;
+  html+=`<div style="font-size:10.5px;color:#f59e0b;margin-top:5px;line-height:1.45">⚠️ Виждаме само ${flightDetails.length} полета — безплатният план на доставчика дава главно това, което е във въздуха сега. Реално СОФ приема ~100 на ден, тоест пред терминала може да има повече хора, отколкото показва списъкът.</div>`;
   html+='</div>';
   html+='</div>';
 
@@ -1178,7 +1180,7 @@ window.startNav=function(zid){
 // ═══════════════════════════════════════════════
 const canvas=document.getElementById('demand-canvas');
 const ctx=canvas.getContext('2d');
-const MIN_H=6, MAX_H=24, STEPS=72;
+const MIN_H=0, MAX_H=24, STEPS=96;
 
 function buildCurve() {
   demandCurve=[];
@@ -1489,13 +1491,53 @@ karykBtn.addEventListener('click',()=>{
 // TICKER
 // ═══════════════════════════════════════════════
 function buildTicker(){
-  const zMap={}; ZONES.forEach(z=>{zMap[z.id]=z;});
-  const items=EVENTS.filter(dayMatches).sort((a,b)=>a.endHour-b.endHour).map(ev=>{
-    const z=zMap[ev.zone]; if(!z) return '';
-    return `<span class="tick-item"><span class="ev-time">${fmtHour(ev.endHour)}</span> ${ev.name} <span class="ev-loc">@ ${z.name.split('(')[0].trim()}</span> <span style="color:#0f2040"> ·· </span></span>`;
-  }).filter(Boolean);
-  const el=document.getElementById('ticker');
-  el.innerHTML=items.join('')+items.join('');
+  // Лентата показва МЕСТА, които раждат клиенти: летище, гари, автогари,
+  // плюс края на големи събития. Гради се от данни и не остава празна.
+  const now = Date.now(), HORIZON = 180*60000;
+  const hm = ts => new Date(ts).toLocaleTimeString('bg',{hour:'2-digit',minute:'2-digit'});
+  let items = [];
+
+  try{
+    (typeof flightDetails !== 'undefined' ? flightDetails : []).forEach(f => {
+      const d = f.exitFromTs - now;
+      if(d >= -20*60000 && d <= HORIZON)
+        items.push({ d, t:`✈️ ${hm(f.exitFromTs)} ${f.fn} от ${(f.depAirport||'').slice(0,16)}${d<=0?' — ИЗЛИЗАТ':''}` });
+    });
+  }catch(e){}
+
+  try{
+    (window.__transitUpcoming||[]).forEach(t => {
+      if(t.min >= -20 && t.min <= 180)
+        items.push({ d:t.min*60000, t:`${t.icon} ${t.time} ${t.what}` });
+    });
+  }catch(e){}
+
+  try{
+    (window.__sevEvents||[]).forEach(e => {
+      const d = e.e - now;                       // краят ражда клиенти
+      if(d >= -15*60000 && d <= HORIZON && (e.cap||0) >= 500)
+        items.push({ d, t:`🎫 ${hm(e.e)} край · ${String(e.n).slice(0,26)}` });
+    });
+  }catch(e){}
+
+  items.sort((a,b)=>a.d-b.d);
+  let out = items.slice(0,12).map(i=>i.t);
+
+  if(!out.length){                                // никога празна
+    try{
+      const sc = computeScores(new Date().getHours());
+      out = Object.entries(sc).sort((a,b)=>b[1]-a[1]).slice(0,5).map(p=>{
+        const z = ZONES.find(x=>x.id===p[0]);
+        return `${z&&z.icon?z.icon+' ':''}${z?z.name.split('(')[0].trim():p[0]} (${p[1].toFixed(1)})`;
+      });
+    }catch(e){}
+  }
+  if(!out.length) out = ['📍 Зоните се обновяват…'];
+
+  const el = document.getElementById('ticker');
+  if(!el) return;
+  const html = out.map(s=>`<span class="tick-item">${s}<span style="color:#4a5f7a"> · </span></span>`).join('');
+  el.innerHTML = html + html;
   el.style.animation='none'; el.offsetHeight; el.style.animation='';
 }
 
@@ -1751,6 +1793,7 @@ function getLiveArrivals(count){
   const now = new Date();
   const nowMin = now.getHours()*60 + now.getMinutes();
   const out = [];
+  window.__transitUpcoming = [];
   for(const a of (liveArrivals.arrivals||[])){
     const [h,m] = a.time.split(':').map(Number);
     if(isNaN(h)||isNaN(m)) continue;
@@ -3479,66 +3522,7 @@ function toggleMapView(){
 })();
 
 
-// ------ ticker-v31: изгражда се от ДАННИ — места, които раждат клиенти ------
-// Летище, гари, автогари и ключови точки. Не остава празна.
-(function(){
-  var HORIZON_MIN = 180;         // ~3ч напред
-  function hm(ts){ return new Date(ts).toLocaleTimeString('bg',{hour:'2-digit',minute:'2-digit'}); }
-  function nowMin(){ var d=new Date(); return d.getHours()*60+d.getMinutes(); }
 
-  function build(){
-    var now = Date.now(), items = [];
-
-    // ✈️ полети — изходни прозорци напред
-    try{
-      (typeof flightDetails !== 'undefined' ? flightDetails : []).forEach(function(f){
-        var d = Math.round((f.exitFromTs - now)/60000);
-        if(d >= -20 && d <= HORIZON_MIN)
-          items.push({ d:d, t:'✈️ ' + hm(f.exitFromTs) + ' ' + f.fn + ' от ' + (f.depAirport||'').slice(0,16) + (d<=0?' — ИЗЛИЗАТ':'') });
-      });
-    }catch(e){}
-
-    // 🚆🚌 пристигания по разписание
-    try{
-      (window.__transitUpcoming||[]).forEach(function(t){
-        if(t.min >= -20 && t.min <= HORIZON_MIN)
-          items.push({ d:t.min, t:(t.icon||'🚌') + ' ' + t.time + ' ' + t.what });
-      });
-    }catch(e){}
-
-    // 🎫 големи събития — само като допълнение
-    try{
-      (window.__sevEvents||[]).forEach(function(e){
-        var d = Math.round((e.e - now)/60000);            // краят ражда клиенти
-        if(d >= -15 && d <= HORIZON_MIN && e.cap >= 800)
-          items.push({ d:d, t:'🎫 ' + hm(e.e) + ' край · ' + String(e.n).slice(0,28) });
-      });
-    }catch(e){}
-
-    items.sort(function(a,b){ return a.d - b.d; });
-    var out = items.slice(0, 12).map(function(i){ return i.t; });
-
-    // никога празна: падаме към водещите зони по текущ скор
-    if(!out.length){
-      try{
-        var sc = computeScores(new Date().getHours());
-        out = Object.entries(sc).sort(function(a,b){ return b[1]-a[1]; }).slice(0,5)
-          .map(function(p){
-            var z = ZONES.find(function(x){ return x.id===p[0]; });
-            return (z && z.icon ? z.icon+' ' : '') + (z ? z.name.split('(')[0].trim() : p[0]) + ' (' + p[1].toFixed(1) + ')';
-          });
-      }catch(e){}
-    }
-    if(!out.length) out = ['📍 Зоните се обновяват…'];
-
-    var el = document.getElementById('ticker');
-    if(el) el.textContent = out.join('   ·   ');
-  }
-
-  build();
-  setInterval(build, 60000);
-  window.__rebuildTicker = build;
-})();
 
 
 // ------ jam-status-v31: "ЗАДРЪСТЕНО СЕГА" само ако наистина е пиков час ------
