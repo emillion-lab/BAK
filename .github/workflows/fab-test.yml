@@ -45,6 +45,11 @@ jobs:
               return { t:e.textContent.trim(), y:Math.round(r.y), h:Math.round(r.height),
                        fits: r.x>=0 && r.right<=innerWidth };
             }).sort((a,b)=>a.y-b.y);
+            const cs = [...document.querySelectorAll('#fab-wrap .fab-sat')].map(e=>{
+              const r=e.getBoundingClientRect(); return {x:r.x+r.width/2, y:r.y+r.height/2, w:r.width};
+            }).sort((a,b)=>a.y-b.y);
+            const neigh=[]; for(let i=1;i<cs.length;i++)
+              neigh.push(Math.round(Math.hypot(cs[i].x-cs[i-1].x, cs[i].y-cs[i-1].y)));
             let overlaps=0;
             for(let i=1;i<labs.length;i++) if(labs[i].y < labs[i-1].y+labs[i-1].h) overlaps++;
             // подравняване: центърът на всеки надпис спрямо центъра на неговия бутон
@@ -77,6 +82,8 @@ jobs:
             return {
               karyk,
               align,
+              neighbours: neigh,
+              satSize: cs.length?Math.round(cs[0].w):0,
               n90: (()=>{const b=document.getElementById('next90-btn'); if(b) b.click();
                         const t=(document.querySelector('#next90-panel .n90-header')||{}).textContent||'';
                         const rows=document.querySelectorAll('#next90-panel .n90-item').length;

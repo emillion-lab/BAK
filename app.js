@@ -4598,24 +4598,27 @@ function toggleMapView(){
     var n = live.length;
     if(!n) return;
     var open = document.body.classList.contains('fab-open');
-    // Дъга с ПОСТОЯНЕН радиус (еднакво близо до палеца)
-    // + РАВНОМЕРНИ вертикални стъпки (надписите не се застъпват).
-    // Затова разпределяме по Y, а X смятаме от окръжността: x = -√(R²-y²)
-    var R    = Math.max(132, Math.min(164, window.innerHeight * 0.20));
-    var gap  = 29;
-    var yTop = -Math.min(R - 6, (n - 1) * gap - 20);
+    // ЕЛИПСА, а не окръжност: върху окръжност равните стъпки по Y слепват
+    // долните бутони (X почти не се мени при y≈0). Сплесната по X елипса
+    // дава почти равни разстояния между съседите И равни стъпки по Y,
+    // тоест надписите остават подравнени, а палецът стига до всички.
+    var H   = window.innerHeight;
+    var Ry  = Math.max(150, Math.min(190, H * 0.235));
+    var Rx  = Math.round(Ry * 0.75);
+    var gap = Math.max(32, Math.min(38, Ry * 0.20));
+    var yTop = -Math.min(Ry * 0.80, (n - 1) * gap * 0.667);
     var lines = '';
     live.forEach(function(it, i){
-      var dyv = yTop + i * gap;
-      var dy  = open ? Math.round(dyv) : 0;
-      var dx  = open ? -Math.round(Math.sqrt(Math.max(0, R*R - dyv*dyv))) : 0;
+      var yv = yTop + i * gap;
+      var dy = open ? Math.round(yv) : 0;
+      var dx = open ? -Math.round(Rx * Math.sqrt(Math.max(0, 1 - (yv/Ry)*(yv/Ry)))) : 0;
       var rec = adopted[it.id];
       rec.el.style.left = dx + 'px';
       rec.el.style.top  = dy + 'px';
-      rec.label.style.left = (open ? dx - 26 : 0) + 'px';
+      rec.label.style.left = (open ? dx - 24 : 0) + 'px';
       rec.label.style.top  = dy + 'px';
       if(open){
-        var d = Math.sqrt(dx*dx + dy*dy), k = d ? (1 - 22/d) : 0;
+        var d = Math.sqrt(dx*dx + dy*dy), k = d ? (1 - 20/d) : 0;
         lines += '<line x1="0" y1="0" x2="' + Math.round(dx*k) + '" y2="' + Math.round(dy*k) + '"/>';
       }
     });
