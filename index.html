@@ -843,20 +843,24 @@ body.karyk-active .sidebar-title{ color:#e8a050; }
 /* ═══ Летищен прозорец — независим от картата, винаги цял на екрана ═══ */
 #airport-modal{
   display:none; position:fixed; inset:0; z-index:3000;
-  background:rgba(3,7,18,.55); backdrop-filter:blur(2px);
+  background:rgba(2,6,16,.78); backdrop-filter:blur(3px);
   align-items:center; justify-content:center; padding:14px;
 }
 #airport-modal-box{
   width:100%; max-width:430px; max-height:82vh;
   display:flex; flex-direction:column;
-  background:var(--surf); color:var(--text);
-  border:1px solid var(--border); border-radius:14px;
-  box-shadow:0 10px 40px rgba(0,0,0,.6); overflow:hidden;
+  background:#0d1524;                     /* ПЛЪТЕН — картата не бива да прозира */
+  color:#e8eef7;
+  border:1.5px solid #22d3ee; border-radius:16px;
+  box-shadow:0 10px 44px rgba(0,0,0,.75), 0 0 26px rgba(34,211,238,.22);
+  overflow:hidden;
 }
 #airport-modal-head{
   flex-shrink:0; display:flex; align-items:center; justify-content:space-between; gap:10px;
-  padding:11px 12px; border-bottom:1px solid var(--border);
-  font:900 15px system-ui,sans-serif; color:var(--cyan); background:var(--surf);
+  padding:12px 13px; border-bottom:1px solid rgba(34,211,238,.35);
+  font:900 15.5px system-ui,sans-serif; color:#67e8f9;
+  background:linear-gradient(180deg,#122036,#0d1524);
+  text-shadow:0 0 12px rgba(34,211,238,.45);
 }
 #airport-modal-x{
   width:40px; height:40px; flex-shrink:0; border-radius:50%;
@@ -868,6 +872,18 @@ body.karyk-active .sidebar-title{ color:#e8a050; }
   padding:10px 12px 14px;
 }
 #airport-modal-body #fl-scroll{ max-height:none !important; overflow:visible !important; }
+
+/* ═══ Четимост и неон в летищния прозорец ═══ */
+#airport-modal-body{ color:#dbe6f5; }
+#airport-modal-body div[style*="ИЗЛИЗА"], #airport-modal-body .fl-now{ }
+#airport-modal-body b, #airport-modal-body span[style*="font-weight:800"]{ color:#f1f6ff; }
+@keyframes fl-pulse{
+  0%,100%{ box-shadow:0 0 0 rgba(239,68,68,0); }
+  50%    { box-shadow:0 0 14px rgba(239,68,68,.55), inset 0 0 10px rgba(239,68,68,.18); }
+}
+#fl-now-anchor, #airport-modal-body [data-now="1"]{
+  animation:fl-pulse 1.9s ease-in-out infinite;
+}
 </style>
 <style>
 
@@ -904,7 +920,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 
 /* TICKER */
 .ticker-bar{background:#06101c;border-bottom:1px solid var(--border);padding:0 12px;height:30px;overflow:hidden;flex-shrink:0;display:flex;align-items:center;}
-.ticker-wrap{display:flex;gap:50px;animation:ticker 70s linear infinite;width:max-content;white-space:nowrap;}
+.ticker-wrap{display:flex;gap:50px;animation:ticker 45s linear infinite;width:max-content;white-space:nowrap;}
 @keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 .tick-item{font-family:'Courier New',Courier,monospace;font-size:16px;color:#e8eef7;font-weight:700;text-shadow:0 1px 2px rgba(0,0,0,.6);}
 .tick-item .ev-time{color:var(--amber);}
@@ -1436,7 +1452,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260726v74"></script>
+<script src="app.js?v=20260726v75"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">

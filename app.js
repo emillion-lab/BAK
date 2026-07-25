@@ -209,13 +209,13 @@ const ZONES = window.__ZONES = [
   { id:"millennium",     name:"Millennium Center (бул.Витоша)",         icon:"🏢", lat:42.6822, lng:23.3147, radius:200, type:"office",           wazeName:"Millennium Center Sofia" },
   
 
-  { id:"serdika",        name:"Мол Сердика (бул.Ситняково 48)",                            icon:"🛍", lat:42.6918, lng:23.3532, radius:240, type:"mall",             wazeName:"Serdika Center Sofia" },
-  { id:"paradise",       name:"Paradise Center",                        icon:"🛍", lat:42.6578, lng:23.3144, radius:290, type:"mall",             wazeName:"Paradise Center Sofia" },
-  { id:"mall_sofia",     name:"Mall of Sofia",                          icon:"🛍", lat:42.6981, lng:23.3086, radius:210, type:"mall",             wazeName:"Mall of Sofia" },
-  { id:"ring_mall",      name:"Ring Mall / IKEA",                       icon:"🛍", lat:42.6246, lng:23.3519, radius:340, type:"mall",             wazeName:"Ring Mall Sofia" },
-  { id:"the_mall",       name:"The Mall Sofia",                         icon:"🛍", lat:42.6605, lng:23.3822, radius:290, type:"mall",             wazeName:"The Mall Sofia" },
-  { id:"bulgaria_mall",  name:"България Мол",                           icon:"🛍", lat:42.6641, lng:23.2885, radius:240, type:"mall",             wazeName:"Bulgaria Mall Sofia" },
-  { id:"park_center",    name:"Park Center (бул.Арсеналски 2)",    icon:"🛍", lat:42.6788, lng:23.3208, radius:190, type:"mall",             wazeName:"Park Center Sofia" },
+  { id:"serdika",        name:"Мол Сердика (бул.Ситняково 48)",                            icon:"🛍", lat:42.6918, lng:23.3532, radius:240, type:"mall", hours:[10,22],             wazeName:"Serdika Center Sofia" },
+  { id:"paradise",       name:"Paradise Center",                        icon:"🛍", lat:42.6578, lng:23.3144, radius:290, type:"mall", hours:[10,22],             wazeName:"Paradise Center Sofia" },
+  { id:"mall_sofia",     name:"Mall of Sofia",                          icon:"🛍", lat:42.6981, lng:23.3086, radius:210, type:"mall", hours:[10,22],             wazeName:"Mall of Sofia" },
+  { id:"ring_mall",      name:"Ring Mall / IKEA",                       icon:"🛍", lat:42.6246, lng:23.3519, radius:340, type:"mall", hours:[10,22],             wazeName:"Ring Mall Sofia" },
+  { id:"the_mall",       name:"The Mall Sofia",                         icon:"🛍", lat:42.6605, lng:23.3822, radius:290, type:"mall", hours:[10,22],             wazeName:"The Mall Sofia" },
+  { id:"bulgaria_mall",  name:"България Мол",                           icon:"🛍", lat:42.6641, lng:23.2885, radius:240, type:"mall", hours:[10,22],             wazeName:"Bulgaria Mall Sofia" },
+  { id:"park_center",    name:"Park Center (бул.Арсеналски 2)",    icon:"🛍", lat:42.6788, lng:23.3208, radius:190, type:"mall", hours:[10,22],             wazeName:"Park Center Sofia" },
 
   { id:"hotels_ctr",     name:"Хотели Център (Radisson/Hilton)",        icon:"🏨", lat:42.6953, lng:23.3242, radius:280, type:"hotel",            wazeName:"Radisson Blu Sofia" },
   { id:"hotels_ndk",     name:"Хотел Hilton (бул.България 1)",       icon:"🏨", lat:42.6829, lng:23.3195, radius:180, type:"hotel",            wazeName:"Kempinski Hotel Zografski Sofia" },
@@ -596,7 +596,11 @@ function computeScores(hour) {
     if(!z.hours) return;
     const open = hour >= z.hours[0] && hour <= z.hours[1];
     if(!open) scores[z.id] *= 0.12;                 // почти нула, но остава видима в списъка
-    else if(hour >= z.hours[1] - 1) scores[z.id] *= 1.15;  // последният час преди затваряне е реален пик
+    else {
+      const shopsClose = z.type === 'mall' ? z.hours[1] - 1 : z.hours[1];  // магазините спират час по-рано
+      if(hour >= shopsClose - 1 && hour <= shopsClose + 1) scores[z.id] *= 1.25;  // изпразване
+      else if(hour >= z.hours[1] - 1) scores[z.id] *= 1.10;
+    }
   });
   // Летищна вълна: излизащи полети вдигат скора на летището (силно — 10 полета≈3.6)
   try{ var _ax = window.__airportExiting|0; if(_ax>0 && scores['airport']!==undefined){ scores['airport'] += Math.min(4.0, _ax*0.36); } }catch(e){}
@@ -1040,7 +1044,6 @@ function showAirportSchedule() {
   });
 
   let html='<div style="font-size:14px">';
-  html+='<div style="font-weight:800;font-size:15px;margin-bottom:8px;color:var(--cyan)">✈️ Излизане на пасажери — СОФ</div>';
 
   const nowCount = visible.filter(f=>f._state==='now').length;
   if(nowCount){
@@ -1100,7 +1103,7 @@ function showAirportSchedule() {
       const col = isNow ? '#ef4444' : isDone ? 'var(--muted)' : 'var(--amber)';
       const op  = isDone ? 'opacity:.72;' : '';
       const anchor = (!anchorSet && (isNow || f._state==='future')) ? (anchorSet=true, ' id="fl-now-anchor"') : '';
-      html+=`<div${anchor} style="display:flex;align-items:center;gap:5px;padding:4px 7px;border-radius:7px;background:${bg};border:${brd};margin-bottom:1px;${op}">
+      html+=`<div${anchor}${isNow?' data-now="1"':''} style="display:flex;align-items:center;gap:5px;padding:4px 7px;border-radius:7px;background:${bg};border:${brd};margin-bottom:1px;${op}">
         <span style="font-weight:800;font-size:14px;min-width:44px;color:var(--text)">${f.fn}</span>
         ${flTerm==='all'?`<span style="font-size:10.5px;font-weight:900;color:var(--cyan);border:1px solid var(--border);border-radius:4px;padding:0 4px">${'Т'+f.term}</span>`:''}
         <span style="flex:1;min-width:0;overflow:hidden">
