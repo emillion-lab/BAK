@@ -4598,18 +4598,20 @@ function toggleMapView(){
     var n = live.length;
     if(!n) return;
     var open = document.body.classList.contains('fab-open');
-    // равномерно вертикално разстояние → надписите се подреждат точно до бутоните
-    var gap = Math.max(42, Math.min(52, (window.innerHeight - 330) / n));
-    var BOTTOM = 62, BOW = 34, BASE = 26;
+    // Дъга с ПОСТОЯНЕН радиус (еднакво близо до палеца)
+    // + РАВНОМЕРНИ вертикални стъпки (надписите не се застъпват).
+    // Затова разпределяме по Y, а X смятаме от окръжността: x = -√(R²-y²)
+    var R    = Math.max(132, Math.min(164, window.innerHeight * 0.20));
+    var gap  = 29;
+    var yTop = -Math.min(R - 6, (n - 1) * gap - 20);
     var lines = '';
     live.forEach(function(it, i){
-      var t  = n > 1 ? i / (n - 1) : 0;               // 0 = най-горе
-      var dy = open ? -(BOTTOM + (n - 1 - i) * gap) : 0;
-      var dx = open ? -(BASE + Math.round(BOW * Math.sin(Math.PI * t))) : 0;
+      var dyv = yTop + i * gap;
+      var dy  = open ? Math.round(dyv) : 0;
+      var dx  = open ? -Math.round(Math.sqrt(Math.max(0, R*R - dyv*dyv))) : 0;
       var rec = adopted[it.id];
       rec.el.style.left = dx + 'px';
       rec.el.style.top  = dy + 'px';
-      // надписът: залепен вляво от СВОЯ бутон, на същата височина
       rec.label.style.left = (open ? dx - 26 : 0) + 'px';
       rec.label.style.top  = dy + 'px';
       if(open){
