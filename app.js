@@ -526,6 +526,44 @@ function deadZoneFactor(h) {
   return 1.0;
 }
 
+// ------ ден от седмицата × час: коригира типовете зони ------
+// Болниците са амбулаторни в делнична сутрин; в събота/неделя работи само спешното.
+// Летището и гарите имат свои пик часове и в уикенда те са водещи.
+function dayTypeFactor(type, hour){
+  var dow = new Date().getDay();            // 0=нд, 6=сб
+  var wknd = (dow === 0 || dow === 6);
+  var fri  = (dow === 5);
+  switch(type){
+    case 'hospital':
+      if(wknd) return 0.35;                            // само спешни случаи
+      if(hour >= 7 && hour <= 13) return 1.15;         // амбулаторен пик
+      if(hour >= 13 && hour <= 17) return 0.85;
+      return 0.5;
+    case 'office': case 'business':
+      if(wknd) return 0.25;
+      return (hour >= 8 && hour <= 19) ? 1.0 : 0.45;
+    case 'airport':
+      // пикове: сутрешна вълна и вечерни пристигания; в уикенда — по-силни
+      var ap = (hour >= 5 && hour <= 9) ? 1.30
+             : (hour >= 11 && hour <= 14) ? 1.15
+             : (hour >= 17 && hour <= 23) ? 1.35 : 0.9;
+      return wknd ? ap * 1.20 : ap;
+    case 'transit':
+      // гари/автогари: сутрешно тръгване, следобедно пристигане, неделя вечер = връщане
+      var tr = (hour >= 6 && hour <= 9) ? 1.25
+             : (hour >= 12 && hour <= 15) ? 1.10
+             : (hour >= 16 && hour <= 21) ? 1.30 : 0.85;
+      if(dow === 0 && hour >= 15) tr *= 1.35;          // неделя вечер — връщащи се
+      if(fri && hour >= 14) tr *= 1.20;                // петък следобед — тръгващи
+      return wknd ? tr * 1.10 : tr;
+    case 'mall':
+      return wknd ? 1.25 : (hour >= 17 && hour <= 21 ? 1.1 : 0.9);
+    case 'nightlife':
+      return (wknd || fri) && (hour >= 21 || hour <= 4) ? 1.35 : 1.0;
+    default:
+      return 1.0;
+  }
+}
 function computeScores(hour) {
   const scores={}, activeEvents={};
   ZONES.forEach(z => { scores[z.id]=BASE[z.id]||0.3; activeEvents[z.id]=[]; });
@@ -551,6 +589,8 @@ function computeScores(hour) {
     });
   }
   if (dz<1) ZONES.forEach(z => { if(z.id!=='airport') scores[z.id]*=(0.7+0.3*dz); });
+  // ден от седмицата × час
+  ZONES.forEach(z => { scores[z.id] *= dayTypeFactor(z.type, hour); });
   // Летищна вълна: излизащи полети вдигат скора на летището (силно — 10 полета≈3.6)
   try{ var _ax = window.__airportExiting|0; if(_ax>0 && scores['airport']!==undefined){ scores['airport'] += Math.min(4.0, _ax*0.36); } }catch(e){}
   return {scores, activeEvents};
@@ -1159,8 +1199,19 @@ function render(hour) {
   const sorted=Object.entries(scores).sort((a,b)=>b[1]-a[1]);
   const top=sorted[0];
   const tz=ZONES.find(z=>z.id===top[0]);
-  document.getElementById('tl-hint').textContent=
-    dead?'— мъртва зона, почини':`Топ: ${tz?.icon||''} ${tz?.name||top[0]} (${top[1].toFixed(1)})`;
+  if(dead){
+    document.getElementById('tl-hint').textContent='— мъртва зона, почини';
+    window.__topRot = null;
+  } else {
+    window.__topRot = sorted.slice(0,3).map(function(e){
+      var zz=ZONES.find(x=>x.id===e[0]);
+      var tag = zz && zz.type==='airport' ? ' ✈ пик'
+              : zz && zz.type==='transit' ? ' 🚉 пик' : '';
+      return 'Топ: '+(zz?.icon||'')+' '+(zz?.name||e[0]).split('(')[0].trim()+' ('+e[1].toFixed(1)+')'+tag;
+    });
+    var el=document.getElementById('tl-hint');
+    el.textContent = window.__topRot[(window.__topIdx||0) % window.__topRot.length];
+  }
   const zList=document.getElementById('zone-list');
   if (zList && !karykMode) {
     zList.innerHTML=sorted
@@ -1328,6 +1379,11 @@ karykBtn.addEventListener('click',()=>{
   document.body.classList.toggle('karyk-active',karykMode);
   document.getElementById('karyk-banner').style.display=karykMode?'block':'none';
   (function(){
+    if(!document.getElementById('karyk-corner-tr')){
+      ['karyk-corner-tr','karyk-corner-bl'].forEach(function(id){
+        var c=document.createElement('div'); c.id=id; document.body.appendChild(c);
+      });
+    }
     var b=document.getElementById('karyk-badge');
     if(!b){
       b=document.createElement('div'); b.id='karyk-badge';
@@ -1889,13 +1945,10 @@ function buildBakshishPanel() {
       <div class="bp-rank">#${i+1}</div>
       <div class="bp-dot" style="background:${color};box-shadow:0 0 5px ${color}66"></div>
       <div class="bp-info">
-        <div class="bp-name">${z.icon} ${z.name.split('(')[0].trim()}</div>
-        <div class="bp-why">${reason}${rainTxt}</div>
-        <div style="font-size:14px;color:#5a4000;margin-top:1px">${stars}</div>
+        <div class="bp-name">${z.icon} ${z.name.split('(')[0].trim()}${rainTxt}</div>
       </div>
       <div class="bp-score-wrap">
         <div class="bp-score" style="color:${color}">${bs.toFixed(1)}</div>
-        <div class="bp-multiplier">demand ${demand.toFixed(1)}</div>
       </div>
     </div>`;
   }).join('') + '<div style="padding:12px 12px 16px;text-align:center"><button onclick="closeBakshish()" style="background:#d4af37;color:#0d0e00;border:none;border-radius:8px;padding:10px 32px;font-weight:800;font-size:14px;cursor:pointer">✕ Затвори</button></div>';
@@ -4580,4 +4633,18 @@ function toggleMapView(){
 
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', build);
   else build();
+})();
+
+// „Топ:" се сменя на 6 сек между първите три зони
+(function(){
+  window.__topIdx = 0;
+  setInterval(function(){
+    var r = window.__topRot;
+    if(!r || !r.length) return;
+    window.__topIdx = (window.__topIdx + 1) % r.length;
+    var el = document.getElementById('tl-hint');
+    if(el){ el.style.opacity='0'; setTimeout(function(){ el.textContent = r[window.__topIdx]; el.style.opacity='1'; }, 180); }
+  }, 6000);
+  var el0 = document.getElementById('tl-hint');
+  if(el0) el0.style.transition = 'opacity .18s';
 })();

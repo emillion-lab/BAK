@@ -792,13 +792,36 @@ body.map-clean .leaflet-marker-pane{ opacity:.55 !important; transition:opacity 
    • РЕЖИМ (златен / карък) — сменя КАРТАТА и АКЦЕНТИТЕ (тук)
    • ТЕМА (дневна / нощна)  — сменя ХРОМА (заглавие, панели) — остава свободна
    Затова карък не „изяжда" бъдещата нощна тема.                        */
-body.karyk-active #map{
-  filter:brightness(.34) saturate(.28) contrast(1.22) !important;
+/* картата остава четима — потъмняването убива смисъла ѝ */
+/* бронзови скоби в четирите ъгъла с лек неонов пулс */
+body.karyk-active::before,
+body.karyk-active::after{
+  content:''; position:fixed; pointer-events:none; z-index:2400;
+  width:62px; height:62px; border:0 solid #cd7f32;
+  animation:karyk-neon 2.4s ease-in-out infinite;
+}
+body.karyk-active::before{
+  top:0; left:0; border-top-width:7px; border-left-width:7px;
+  border-top-left-radius:6px;
+  box-shadow:
+     calc(100vw - 62px) 0 0 -0px transparent;
 }
 body.karyk-active::after{
-  content:''; position:fixed; inset:0; z-index:2400; pointer-events:none;
-  border:3px solid #cd7f32;
-  box-shadow:inset 0 0 44px rgba(205,127,50,.22);
+  bottom:0; right:0; border-bottom-width:7px; border-right-width:7px;
+  border-bottom-right-radius:6px;
+}
+#karyk-corner-tr, #karyk-corner-bl{
+  display:none; position:fixed; pointer-events:none; z-index:2400;
+  width:62px; height:62px; border:0 solid #cd7f32;
+  animation:karyk-neon 2.4s ease-in-out infinite;
+}
+#karyk-corner-tr{ top:0; right:0; border-top-width:7px; border-right-width:7px; border-top-right-radius:6px; }
+#karyk-corner-bl{ bottom:0; left:0; border-bottom-width:7px; border-left-width:7px; border-bottom-left-radius:6px; }
+body.karyk-active #karyk-corner-tr,
+body.karyk-active #karyk-corner-bl{ display:block; }
+@keyframes karyk-neon{
+  0%,100%{ filter:drop-shadow(0 0 3px #cd7f3288); opacity:.85; }
+  50%    { filter:drop-shadow(0 0 12px #ffa040) drop-shadow(0 0 22px #cd7f3266); opacity:1; }
 }
 #karyk-badge{
   display:none; position:fixed; z-index:2500;
@@ -817,6 +840,12 @@ body.karyk-active .sidebar-title{ color:#e8a050; }
 
 /* връзка етикет → икона в радиалното меню */
 #fab-rays line.fab-link{ stroke:#94a3b8; stroke-width:1.2; opacity:.32; stroke-dasharray:2 4; }
+
+/* бакшиш: компактни редове (като карък списъка) */
+#bakshish-panel .bp-item{ padding:6px 12px !important; gap:8px !important; }
+#bakshish-panel .bp-name{ font-size:13px !important; line-height:1.25 !important; }
+#bakshish-panel .bp-score{ font-size:16px !important; }
+#bakshish-panel .bp-rank{ font-size:11px !important; min-width:22px !important; }
 </style>
 <style>
 
@@ -1385,7 +1414,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260725v53"></script>
+<script src="app.js?v=20260725v54"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">
