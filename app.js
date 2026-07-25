@@ -1054,25 +1054,25 @@ function showAirportSchedule() {
       const col = isNow ? '#ef4444' : isDone ? 'var(--muted)' : 'var(--amber)';
       const op  = isDone ? 'opacity:.72;' : '';
       const anchor = (!anchorSet && (isNow || f._state==='future')) ? (anchorSet=true, ' id="fl-now-anchor"') : '';
-      html+=`<div${anchor} style="display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:8px;background:${bg};border:${brd};margin-bottom:2px;${op}">
-        <span style="font-weight:800;font-size:16px;min-width:48px;color:var(--text)">${f.fn}</span>
-        ${flTerm==='all'?`<span style="font-size:12px;font-weight:900;color:var(--cyan);border:1px solid var(--border);border-radius:5px;padding:1px 5px">${'Т'+f.term}</span>`:''}
+      html+=`<div${anchor} style="display:flex;align-items:center;gap:5px;padding:4px 7px;border-radius:7px;background:${bg};border:${brd};margin-bottom:1px;${op}">
+        <span style="font-weight:800;font-size:14px;min-width:44px;color:var(--text)">${f.fn}</span>
+        ${flTerm==='all'?`<span style="font-size:10.5px;font-weight:900;color:var(--cyan);border:1px solid var(--border);border-radius:4px;padding:0 4px">${'Т'+f.term}</span>`:''}
         <span style="flex:1;min-width:0;overflow:hidden">
-          <span style="display:block;font-size:14px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(f.depAirport||'').slice(0,22)}</span>
-          <span style="display:block;font-size:11px;color:var(--muted);opacity:.85;white-space:nowrap">🛬 кацнал ${fmt(f.landH,f.landM)}</span>
+          <span style="display:block;font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.25">${(f.depAirport||'').slice(0,20)}</span>
+          <span style="display:block;font-size:10px;color:var(--muted);opacity:.8;white-space:nowrap;line-height:1.2">🛬 ${fmt(f.landH,f.landM)}</span>
         </span>
         <span style="font-size:13px">${flag(f)}</span>
-        ${isNow?'<span style="font-size:12px;font-weight:900;color:#ef4444;white-space:nowrap">ИЗЛИЗАТ</span>':''}
-        ${isDone?'<span style="font-size:11px;font-weight:800;color:var(--muted);white-space:nowrap">още излизат?</span>':''}
-        <span style="font-weight:800;font-size:15px;color:${col};white-space:nowrap">${fmt(f.exitFromH,f.exitFromM)}–${fmt(f.exitToH,f.exitToM)}</span>
+        ${isNow?'<span style="font-size:10.5px;font-weight:900;color:#ef4444;white-space:nowrap">ИЗЛИЗА</span>':''}
+        ${isDone?'<span style="font-size:10px;font-weight:800;color:var(--muted);white-space:nowrap">още?</span>':''}
+        <span style="font-weight:800;font-size:13.5px;color:${col};white-space:nowrap">${fmt(f.exitFromH,f.exitFromM)}–${fmt(f.exitToH,f.exitToM)}</span>
       </div>`;
     });
     if(!grp.length) html+='<div style="color:var(--muted);text-align:center;padding:14px 0;font-size:13px">Няма полети за този терминал</div>';
   }
+  // легендата е ВЪТРЕ в скрола, за да не се наслагва върху редовете
+  html+='<div style="font-size:10.5px;color:var(--muted);margin-top:10px;padding-top:7px;border-top:1px solid var(--border);line-height:1.5">🇪🇺 Шенген +5–15 мин · 🛂 Извън +10–30 мин · 🔴 излизат сега · бледите още се точат</div>';
+  html+=`<div style="font-size:10.5px;color:#f59e0b;margin-top:5px;line-height:1.45">⚠️ Източникът дава ${flightDetails.length} полета за днес; реалният СОФ прави ~100. Възможно е да има повече от показаните.</div>`;
   html+='</div>';
-
-  html+='<div style="font-size:11px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">🇪🇺 Шенген: +5–15 мин &nbsp;|&nbsp; 🛂 Извън Шенген: +10–30 мин &nbsp;|&nbsp; 🔴 = излизат сега &nbsp;|&nbsp; бледите още може да се точат</div>';
-  html+='<div class="fl-close-bar" onclick="map.closePopup()">✕ ЗАТВОРИ</div>';
   html+='</div>';
 
   const airportZone=ZONES.find(z=>z.id==='airport');
@@ -3437,7 +3437,7 @@ function toggleMapView(){
 
 // ------ ticker-future-v30: само предстоящи точки (напред ~5ч) ------
 (function(){
-  var HORIZON_H = 24;     // колко часа напред показваме (концерти/театри/групи — рядко са много)
+  var HORIZON_H = 3;      // лентата показва само близкото; панелът „Събития 24ч" е отделен
   var GRACE_MIN = 10;     // толкова минути след часа още се брои за "сега"
 
   function nowMin(){ var d = new Date(); return d.getHours()*60 + d.getMinutes(); }
