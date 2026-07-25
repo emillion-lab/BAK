@@ -4757,3 +4757,62 @@ function toggleMapView(){
   var el0 = document.getElementById('tl-hint');
   if(el0) el0.style.transition = 'opacity .18s';
 })();
+
+// ═══════════════════════════════════════════════
+// ТЕМИ: дневна (класическа) и нощна (неон)
+// Логиката на приложението не се променя — само облеклото.
+// ═══════════════════════════════════════════════
+(function(){
+  var KEY = 'bak_theme';                 // 'day' | 'night' | 'auto'
+
+  function autoTheme(){
+    var h = new Date().getHours();
+    return (h >= 7 && h < 19) ? 'day' : 'night';
+  }
+  function resolve(){
+    var saved = null;
+    try{ saved = localStorage.getItem(KEY); }catch(e){}
+    if(saved === 'day' || saved === 'night') return saved;
+    return autoTheme();
+  }
+  function apply(t){
+    document.body.classList.toggle('theme-night', t === 'night');
+    document.body.classList.toggle('theme-day',   t === 'day');
+    var b = document.getElementById('theme-btn');
+    if(b){
+      b.textContent = t === 'night' ? '☀️' : '🌙';
+      b.title = t === 'night' ? 'Дневна тема' : 'Нощна тема';
+    }
+    // картата също сменя настроението
+    var m = document.getElementById('map');
+    if(m && !document.body.classList.contains('karyk-active')){
+      m.style.filter = t === 'night'
+        ? 'brightness(.72) saturate(.55) contrast(1.06)'
+        : 'brightness(.98) saturate(.85)';
+    }
+    try{ if(typeof drawSparkline === 'function') drawSparkline(currentHour); }catch(e){}
+  }
+
+  function mount(){
+    if(document.getElementById('theme-btn')) return;
+    var b = document.createElement('button');
+    b.id = 'theme-btn';
+    b.addEventListener('click', function(){
+      var next = document.body.classList.contains('theme-night') ? 'day' : 'night';
+      try{ localStorage.setItem(KEY, next); }catch(e){}
+      apply(next);
+    });
+    document.body.appendChild(b);
+    apply(resolve());
+    // ако е на автоматичен режим — сверява се на всеки половин час
+    setInterval(function(){
+      var saved = null;
+      try{ saved = localStorage.getItem(KEY); }catch(e){}
+      if(saved !== 'day' && saved !== 'night') apply(autoTheme());
+    }, 1800000);
+  }
+
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount);
+  else mount();
+  window.__setTheme = function(t){ try{ localStorage.setItem(KEY, t); }catch(e){} apply(t); };
+})();

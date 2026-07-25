@@ -888,11 +888,84 @@ body.karyk-active .sidebar-title{ color:#e8a050; }
 <style>
 
 /* System fonts - no external dependency */
+/* ═══════ ДВЕ ТЕМИ ═══════
+   ДЕН  — класическа, светла, спокойна
+   НОЩ  — неон, сияния, пулсации
+   Логиката е обща; сменят се само цветовете и ефектите.        */
 :root {
-  --bg:#f5f7fa; --surface:#ffffff; --border:#d0d7e3;
-  --amber:#f59e0b; --cyan:#0284c7; --green:#22c55e;
-  --red:#ef4444; --orange:#f97316; --muted:#64748b; --text:#1e293b;
+  --bg:#eef2f8; --surface:#ffffff; --border:#cbd5e6;
+  --amber:#d97706; --cyan:#0369a1; --green:#16a34a;
+  --red:#dc2626; --orange:#ea580c; --muted:#55657c; --text:#0f1b2d;
+  --surf:#ffffff;
+  --glow:none;
+  --glow-soft:none;
+  --card:0 1px 2px rgba(15,27,45,.08), 0 8px 22px rgba(15,27,45,.07);
+  --ring:rgba(3,105,161,.22);
+  --sheen:linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,255,255,.55));
+  --ease:cubic-bezier(.22,1,.36,1);
 }
+body.theme-night {
+  --bg:#060b14; --surface:#0e1726; --border:#22334c;
+  --amber:#fbbf24; --cyan:#22d3ee; --green:#34d399;
+  --red:#f87171; --orange:#fb923c; --muted:#8ea6c2; --text:#e9eff8;
+  --surf:#0e1726;
+  --glow:0 0 10px currentColor;
+  --glow-soft:0 0 22px rgba(34,211,238,.18);
+  --card:0 2px 8px rgba(0,0,0,.55), 0 0 24px rgba(34,211,238,.09);
+  --ring:rgba(34,211,238,.38);
+  --sheen:linear-gradient(180deg,rgba(34,211,238,.10),rgba(14,23,38,.65));
+}
+
+/* плавна смяна на темата */
+body, .zone-row, .hist-table, #airport-modal-box,
+.leaflet-popup-content-wrapper, .ticker-bar{
+  transition:background-color .35s var(--ease), color .35s var(--ease),
+             border-color .35s var(--ease), box-shadow .35s var(--ease);
+}
+
+/* ── 2026: живи повърхности ── */
+.zone-row{ box-shadow:var(--card); }
+.zone-row:active{ transform:scale(.985); }
+body.theme-night .sidebar-title,
+body.theme-night .tl-hint,
+body.theme-night #karyk-badge{ text-shadow:var(--glow); }
+
+/* неонов ръб само нощем */
+body.theme-night .hist-table-wrap,
+body.theme-night #bakshish-panel,
+body.theme-night #next90-panel{
+  box-shadow:var(--card), inset 0 0 0 1px rgba(34,211,238,.07);
+}
+
+/* ── FAB: 3D разгъване ── */
+#fab-wrap{ perspective:900px; }
+#fab-wrap .fab-sat{
+  animation:none;
+  filter:blur(6px);
+  transition:left .34s var(--ease), top .34s var(--ease),
+             opacity .22s linear, filter .3s var(--ease);
+}
+body.fab-open #fab-wrap .fab-sat{ filter:blur(0); }
+body.fab-open #fab-wrap .fab-sat:nth-child(2){ transition-delay:.02s }
+body.fab-open #fab-wrap .fab-sat:nth-child(4){ transition-delay:.05s }
+body.fab-open #fab-wrap .fab-sat:nth-child(6){ transition-delay:.08s }
+body.fab-open #fab-wrap .fab-sat:nth-child(8){ transition-delay:.11s }
+body.fab-open #fab-wrap .fab-sat:nth-child(10){ transition-delay:.14s }
+body.fab-open #fab-wrap .fab-sat:nth-child(12){ transition-delay:.17s }
+#fab-hub{ transform-style:preserve-3d; }
+body.fab-open #fab-hub{ transform:rotate3d(0,0,1,135deg) scale(1.04); }
+body.theme-night #fab-hub{ box-shadow:0 4px 18px rgba(0,0,0,.7), 0 0 22px var(--ring); }
+
+/* ── превключвател на темата ── */
+#theme-btn{
+  position:fixed; top:8px; right:8px; z-index:2600;
+  width:40px; height:40px; border-radius:50%; cursor:pointer;
+  border:1.5px solid var(--border); background:var(--surface); color:var(--text);
+  font-size:19px; line-height:1; box-shadow:var(--card);
+  transition:transform .3s var(--ease), box-shadow .3s var(--ease);
+}
+#theme-btn:active{ transform:scale(.9) rotate(-25deg); }
+body.theme-night #theme-btn{ border-color:var(--cyan); box-shadow:0 0 16px var(--ring); }
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{font-size:16px;min-height:100%;margin:0;padding:0;}
 body{font-size:16px;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;}
@@ -1452,7 +1525,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260726v75"></script>
+<script src="app.js?v=20260726v76"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">
