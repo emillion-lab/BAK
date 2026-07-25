@@ -20,21 +20,66 @@ AFTER OPEN: {
   "corners": 4,
   "pulse": "karyk-neon"
  },
- "links": 5,
- "topHint": "Топ: ✈️ Летище София (1.9) ✈ пик",
+ "align": [
+  {
+   "id": "karyk-btn",
+   "dy": 0,
+   "gap": 6
+  },
+  {
+   "id": "karyk-list-btn",
+   "dy": 0,
+   "gap": 6
+  },
+  {
+   "id": "bakshish-btn",
+   "dy": 0,
+   "gap": 6
+  },
+  {
+   "id": "next90-btn",
+   "dy": 0,
+   "gap": 6
+  },
+  {
+   "id": "clean-btn",
+   "dy": 0,
+   "gap": 6
+  },
+  {
+   "id": "gps-btn",
+   "dy": 0,
+   "gap": 6
+  },
+  {
+   "id": "fs-btn",
+   "dy": 0,
+   "gap": 6
+  }
+ ],
+ "frame": {
+  "border": "0px 0px 0px 0px",
+  "anim": "none"
+ },
+ "n90": {
+  "title": "⏱ СЪБИТИЯ — СЛЕДВАЩИТЕ 24 ЧАСА\n    ✕",
+  "rows": 59
+ },
+ "links": 0,
+ "topHint": "Топ: 🌍 🌍 Междунар. автогара Сердика / FlixBus (2.4) 🚉 пик",
  "bakshishRows": {
   "height": 31,
   "whyLines": 0
  },
  "open": true,
- "rays": 12,
+ "rays": 7,
  "hubCovered": "fab-hub",
  "sats": [
   {
    "id": "karyk-btn",
    "w": 40,
    "h": 40,
-   "dist": 155,
+   "dist": 375,
    "onScreen": true,
    "hit": "karyk-btn"
   },
@@ -42,7 +87,7 @@ AFTER OPEN: {
    "id": "karyk-list-btn",
    "w": 40,
    "h": 40,
-   "dist": 155,
+   "dist": 325,
    "onScreen": true,
    "hit": "karyk-list-btn"
   },
@@ -50,7 +95,7 @@ AFTER OPEN: {
    "id": "bakshish-btn",
    "w": 40,
    "h": 40,
-   "dist": 155,
+   "dist": 276,
    "onScreen": true,
    "hit": "bakshish-btn"
   },
@@ -58,7 +103,7 @@ AFTER OPEN: {
    "id": "next90-btn",
    "w": 40,
    "h": 40,
-   "dist": 155,
+   "dist": 226,
    "onScreen": true,
    "hit": "next90-btn"
   },
@@ -66,7 +111,7 @@ AFTER OPEN: {
    "id": "clean-btn",
    "w": 40,
    "h": 40,
-   "dist": 155,
+   "dist": 175,
    "onScreen": true,
    "hit": "clean-btn"
   },
@@ -74,7 +119,7 @@ AFTER OPEN: {
    "id": "gps-btn",
    "w": 40,
    "h": 40,
-   "dist": 155,
+   "dist": 122,
    "onScreen": true,
    "hit": "gps-btn"
   },
@@ -82,7 +127,7 @@ AFTER OPEN: {
    "id": "fs-btn",
    "w": 40,
    "h": 40,
-   "dist": 155,
+   "dist": 67,
    "onScreen": true,
    "hit": "fs-btn"
   }
@@ -92,7 +137,7 @@ AFTER OPEN: {
   "Карък Mode",
   "Карък списък",
   "Бакшиш радар",
-  "Следващи 90 мин",
+  "Събития 24ч",
   "Чиста карта",
   "Моята локация",
   "Цял екран"
