@@ -769,6 +769,10 @@ function buildNext90(){
     return (e.e + POST_W) > now && e.s < now + 24*3600000;   // още има вземане ИЛИ предстои
   });
   if(!sev.length){
+    if(!window.__sevLoaded){
+      list.innerHTML='<div style="padding:14px;color:var(--muted);font-size:14px">⏳ Зарежда програмата…</div>';
+      return;
+    }
     list.innerHTML='<div style="padding:14px;color:var(--muted);font-size:14px;line-height:1.5">'
       + 'Няма театри, кина или концерти в следващите 24 часа.<br>'
       + '<span style="font-size:12px;opacity:.8">Източник: SEV (theatre.art.bg и др.)</span></div>';
@@ -2210,6 +2214,9 @@ function toggleMapView(){
         return e.e+POST>now && e.s<=todayEnd.getTime()+36*3600000; // до утре вечер
       }).sort(function(a,b){return a.s-b.s});
       window.__sevEvents = evs;          // ползват се и от панела „Събития 24ч"
+      window.__sevLoaded = true;
+      try{ if(typeof next90Open !== 'undefined' && next90Open) buildNext90(); }catch(e){}
+      try{ buildTicker(); }catch(e){}
       if(!evs.length) return;
       var layer=L.layerGroup();
       evs.forEach(function(e){
