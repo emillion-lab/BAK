@@ -969,6 +969,7 @@ function showTransitPopup(zid){
 }
 
 // ═══ AIRPORT SCHEDULE POPUP ═══
+window.showAirportSchedule = showAirportSchedule;   // вика се от inline onclick → трябва да е глобална
 function showAirportSchedule() {
   const now = new Date();
   const nowMin = ((now.getUTCHours()+3)%24)*60 + now.getUTCMinutes();

@@ -1,0 +1,14 @@
+name: Scope Check
+on:
+  push:
+    paths: ['app.js', 'index.html']
+  workflow_dispatch:
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inline handlers must reach global scope
+        run: python3 tools-scan-inline-handlers.py
+      - name: JS syntax
+        run: node --check app.js
