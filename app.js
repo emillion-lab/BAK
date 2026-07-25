@@ -4598,28 +4598,43 @@ function toggleMapView(){
     var n = live.length;
     if(!n) return;
     var open = document.body.classList.contains('fab-open');
-    // ЕЛИПСА, а не окръжност: върху окръжност равните стъпки по Y слепват
-    // долните бутони (X почти не се мени при y≈0). Сплесната по X елипса
-    // дава почти равни разстояния между съседите И равни стъпки по Y,
-    // тоест надписите остават подравнени, а палецът стига до всички.
-    var H   = window.innerHeight;
-    var Ry  = Math.max(150, Math.min(200, H * 0.245));
-    var Rx  = Math.round(Ry * 0.75);
-    var gap = 40;                                   // дава ≥40px между съседи → 6px просвет при 34px бутони
-    var yTop = -Math.min(Ry * 0.88, (n - 1) * gap - 70);
+    // ИСТИНСКО ВЕТРИЛО: равни ъглови стъпки от 90° (нагоре) до 180° (наляво).
+    // Разстоянията между съседите са еднакви, размахът е пълен.
+    var H  = window.innerHeight;
+    var R  = Math.max(140, Math.min(176, H * 0.215));
+    var LR = R + 48;                       // надписите — радиално навън
+    var A0 = 90, A1 = 180;
+    var step = n > 1 ? (A1 - A0) / (n - 1) : 0;
+
+    var pos = [], lab = [];
+    live.forEach(function(it, i){
+      var a = (A0 + step * i) * Math.PI / 180;
+      pos.push({ x: Math.round(Math.cos(a) * R),  y: Math.round(-Math.sin(a) * R) });
+      lab.push({ x: Math.round(Math.cos(a) * LR), y: Math.round(-Math.sin(a) * LR) });
+    });
+    // разместване на надписите по вертикала, ако се застъпват (отдолу нагоре)
+    var MINGAP = 30;
+    for(var i = lab.length - 2; i >= 0; i--){
+      if(lab[i + 1].y - lab[i].y < MINGAP) lab[i].y = lab[i + 1].y - MINGAP;
+    }
+
     var lines = '';
     live.forEach(function(it, i){
-      var yv = yTop + i * gap;
-      var dy = open ? Math.round(yv) : 0;
-      var dx = open ? -Math.round(Rx * Math.sqrt(Math.max(0, 1 - (yv/Ry)*(yv/Ry)))) : 0;
       var rec = adopted[it.id];
+      var dx = open ? pos[i].x : 0, dy = open ? pos[i].y : 0;
       rec.el.style.left = dx + 'px';
       rec.el.style.top  = dy + 'px';
-      rec.label.style.left = (open ? dx - 24 : 0) + 'px';
-      rec.label.style.top  = dy + 'px';
+      // надписът се подравнява вдясно спрямо своята точка → разгъва се наляво
+      var lx = open ? Math.min(lab[i].x, dx - 24) : 0;
+      var ly = open ? lab[i].y : 0;
+      rec.label.style.left = lx + 'px';
+      rec.label.style.top  = ly + 'px';
       if(open){
-        var d = Math.sqrt(dx*dx + dy*dy), k = d ? (1 - 20/d) : 0;
+        var d = Math.sqrt(dx*dx + dy*dy), k = d ? (1 - 21/d) : 0;
         lines += '<line x1="0" y1="0" x2="' + Math.round(dx*k) + '" y2="' + Math.round(dy*k) + '"/>';
+        // къса връзка надпис → бутон, когато надписът е бил изместен
+        if(Math.abs(ly - dy) > 6)
+          lines += '<line class="fab-link" x1="' + (lx + 4) + '" y1="' + ly + '" x2="' + (dx - 20) + '" y2="' + dy + '"/>';
       }
     });
     rays.innerHTML = lines;
