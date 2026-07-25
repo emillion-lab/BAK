@@ -1,3 +1,12 @@
+// ------ разпознаване на международни автобусни направления ------
+// Скрейпнатите данни често нямат intl флаг → познаваме по името на града.
+var __INTL_RE = /(истанб|istanbul|одрин|edirne|бурса|bursa|измир|izmir|анкара|ankara|анталия|antalya|солун|thessalon|атина|athen|скопие|skopje|битоля|bitola|охрид|ohrid|белград|belgrad|ниш|\bnis\b|нови сад|novi sad|букурещ|bucharest|bucure|русе-букурещ|крайова|craiova|тимишоара|timis|загреб|zagreb|любляна|ljubljan|сараево|saraje|подгорица|podgoric|тирана|tiran|прищина|pristin|priştin|виена|vienna|wien|мюнхен|munich|münchen|берлин|berlin|хамбург|hamburg|кьолн|cologne|köln|щутгарт|stuttgart|франкфурт|frankfurt|дюселдорф|dусseldorf|прага|prague|praha|братислава|bratislav|будапеща|budapest|варшава|warsaw|warszaw|краков|krakow|милано|milan|рим|\broma\b|\brome\b|венеция|venice|venezia|болоня|bologna|торино|turin|неапол|naples|napoli|флоренция|florence|firenze|барселона|barcelona|мадрид|madrid|валенсия|valencia|лисабон|lisbon|порто|porto|париж|paris|лион|lyon|марсилия|marseille|брюксел|brussels|амстердам|amsterdam|ротердам|rotterdam|цюрих|zurich|zürich|женева|geneva|базел|basel|берн|\bbern\b|лондон|london|стокхолм|stockholm|осло|\boslo\b|копенхаген|copenhagen|хелзинки|helsinki|кишинев|chisinau|chişin|киев|kyiv|kiev|одеса|odesa|odessa|москва|moscow)/i;
+function isIntlBus(o){
+  if(!o) return false;
+  if(o.intl === true) return true;
+  var txt = [o.origin, o.from, o.name, o.to, o.operator].filter(Boolean).join(' ');
+  return __INTL_RE.test(txt);
+}
 // map-div-shim-v40 — <div id="map"> е глобалното `map` в браузъра, а Leaflet
 // картата е в затворен обхват. Даваме на div-а методите на картата, за да не
 // гърми никой inline onclick, който вика map.setView / map.invalidateSize.
@@ -1597,7 +1606,7 @@ function getLiveArrivals(count){
     if(isNaN(h)||isNaN(m)) continue;
     let delta = h*60+m - nowMin;
     if(delta < -20) continue;
-    out.push({origin:a.from, operator:a.operator, sector:a.sector||'', intl:!!a.intl, arrTime:a.time, until:delta, live:true});
+    out.push({origin:a.from, operator:a.operator, sector:a.sector||'', intl:isIntlBus(a)||!!a.intl, arrTime:a.time, until:delta, live:true});
   }
   return out.slice(0, count||10);
 }
@@ -1649,11 +1658,11 @@ function renderBusPanel(){
       const urgency = b.until <= 15 ? 'color:#ef4444;font-weight:800' : 'color:var(--text)';
       const sec = b.sector ? `<span style="color:#f5c518;font-size:11px;font-weight:800;white-space:nowrap"> → Сектор ${b.sector}</span>` : '';
       return `<div style="display:flex;justify-content:space-between;gap:8px;padding:4px 0;border-bottom:1px solid var(--border);font-size:13px">
-        <span>${b.intl?'🌍':'🚌'} ${b.origin}${sec} <span style="color:var(--muted);font-size:11px">${b.operator||''}</span></span>
+        <span>${isIntlBus(b)?'🌍':'🚌'} ${b.origin}${sec} <span style="color:var(--muted);font-size:11px">${b.operator||''}</span></span>
         <span style="${urgency};white-space:nowrap">${b.arrTime}${b.until>=0?' · след '+b.until+' мин':''}</span>
       </div>`;
     };
-    const dom = live.filter(b=>!b.intl), intl = live.filter(b=>b.intl);
+    const dom = live.filter(b=>!isIntlBus(b)), intl = live.filter(b=>isIntlBus(b));
     html += '<div style="font-size:11px;font-weight:800;color:#ef4444;margin-bottom:4px">🔴 LIVE — centralnaavtogara.bg</div>';
     html += '<div style="max-height:32vh;overflow-y:auto;-webkit-overflow-scrolling:touch">';
     for(const b of dom) html += busRow(b);
@@ -1674,7 +1683,7 @@ function renderBusPanel(){
                     until < 90 ? `~${b.arrTime} · след ${until} мин` :
                     `~${b.arrTime}`;
       html += `<div style="display:flex;justify-content:space-between;gap:8px;padding:4px 0;border-bottom:1px solid var(--border);font-size:13px">
-        <span>${b.route.intl?'🌍':'🚌'} ${origin} <span style="color:var(--muted);font-size:11px">${b.dep}${b.route.approx?' ≈':''}</span></span>
+        <span>${isIntlBus(b.route)?'🌍':'🚌'} ${origin} <span style="color:var(--muted);font-size:11px">${b.dep}${b.route.approx?' ≈':''}</span></span>
         <span style="${urgency};white-space:nowrap">${label}</span>
       </div>`;
     }
