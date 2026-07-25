@@ -1565,9 +1565,13 @@ function buildTicker(){
 
   const el = document.getElementById('ticker');
   if(!el) return;
-  const html = out.map(s=>`<span class="tick-item">${s}<span style="color:#4a5f7a"> · </span></span>`).join('');
+  const html = out.map(s=>`<span class="tick-item">${s}<span style="opacity:.45"> · </span></span>`).join('');
   el.innerHTML = html + html;
-  el.style.animation='none'; el.offsetHeight; el.style.animation='';
+  // постоянна скорост в пиксели/сек — иначе при много редове изглежда, че пълзи
+  const SPEED = 115;                                  // px/сек
+  const half  = Math.max(400, el.scrollWidth / 2);
+  el.style.animation = 'none'; el.offsetHeight;
+  el.style.animation = `ticker ${Math.round(half / SPEED)}s linear infinite`;
 }
 
 // ═══════════════════════════════════════════════
