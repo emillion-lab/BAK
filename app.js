@@ -970,6 +970,29 @@ function showTransitPopup(zid){
 
 // ═══ AIRPORT SCHEDULE POPUP ═══
 window.showAirportSchedule = showAirportSchedule;   // вика се от inline onclick → трябва да е глобална
+// ------ Waze: отваря ПРИЛОЖЕНИЕТО, не уеб страницата ------
+window.openWaze = function(name, lat, lng){
+  var hasLL = isFinite(lat) && isFinite(lng);
+  var q     = encodeURIComponent(name || '');
+  var web   = hasLL ? 'https://waze.com/ul?ll=' + lat + ',' + lng + '&navigate=yes'
+                    : 'https://waze.com/ul?q=' + q + '&navigate=yes';
+  var isAndroid = /android/i.test(navigator.userAgent);
+  if(isAndroid){
+    // intent:// е най-надеждният начин — Android отваря Waze, а ако липсва, пада към уеб
+    var payload = hasLL ? ('?ll=' + lat + ',' + lng + '&navigate=yes') : ('?q=' + q + '&navigate=yes');
+    window.location.href = 'intent://' + payload.slice(1) +
+      '#Intent;scheme=waze;package=com.waze;S.browser_fallback_url=' +
+      encodeURIComponent(web) + ';end';
+    return;
+  }
+  // iOS и останалите: пробваме схемата, после уеб
+  var deep = hasLL ? ('waze://?ll=' + lat + ',' + lng + '&navigate=yes')
+                   : ('waze://?q=' + q + '&navigate=yes');
+  var t = Date.now();
+  window.location.href = deep;
+  setTimeout(function(){ if(Date.now() - t < 1800) window.open(web, '_blank'); }, 1100);
+};
+
 function showAirportSchedule() {
   const now = new Date();
   const nowMin = ((now.getUTCHours()+3)%24)*60 + now.getUTCMinutes();
@@ -1127,7 +1150,7 @@ function showZonePopup(zid) {
     <div style="font-size:15px;color:#c8daf0;margin:6px 0">${evHtml}</div>
     ${!isTraffic?`<button onclick="startNav('${zid}')" style="width:100%;background:#00e5ff;color:#000;border:none;border-radius:4px;padding:5px;font-size:15px;cursor:pointer;margin-top:4px">🧭 Навигирай</button>
     <div style="display:flex;gap:5px;margin-top:5px">
-      <a href="https://waze.com/ul?q=${encodeURIComponent(z.wazeName||z.name)}&navigate=yes" target="_blank"
+      <a href="#" onclick="event.preventDefault();openWaze('${(z.wazeName||z.name).replace(/'/g,"\\'")}',${z.lat},${z.lng});return false;"
          style="flex:1;text-align:center;font-size:14px;color:#00e5ff;padding:4px;background:#0d1929;border:1px solid #182d47;border-radius:4px;text-decoration:none">🚗 Waze</a>
       <a href="https://www.google.com/maps?q=${z.lat},${z.lng}" target="_blank"
          style="flex:1;text-align:center;font-size:14px;color:#4a6080;padding:4px;background:#0d1929;border:1px solid #182d47;border-radius:4px;text-decoration:none">📍 Google</a>
@@ -1137,7 +1160,7 @@ function showZonePopup(zid) {
 window.startNav=function(zid){
   const z=ZONES.find(x=>x.id===zid); if(!z) return;
   navTarget=z; map.closePopup();
-  window.open(`https://waze.com/ul?q=${encodeURIComponent(z.wazeName||z.name)}&navigate=yes`,'_blank');
+  openWaze(z.wazeName||z.name, z.lat, z.lng);
 };
 
 // ═══════════════════════════════════════════════
@@ -1642,7 +1665,7 @@ function checkEventAlerts(){
   document.getElementById('ea-title').textContent=`${ev.name} — след ${min} мин!`;
   document.getElementById('ea-sub').textContent=`${z.name.split('(')[0].trim()} · ${fmtHour(ev.endHour)}`;
   document.getElementById('ea-dist').textContent=userLat?`📏 ${(haversine(userLat,userLng,z.lat,z.lng)/1000).toFixed(1)} км`:'';
-  document.getElementById('ea-waze').onclick=()=>window.open(`https://waze.com/ul?q=${encodeURIComponent(z.wazeName||z.name)}&navigate=yes`,'_blank');
+  document.getElementById('ea-waze').onclick=()=>openWaze(z.wazeName||z.name, z.lat, z.lng);
   panel.style.display='block';
 }
 setInterval(checkEventAlerts,60000);
@@ -2172,7 +2195,8 @@ function toggleMapView(){
   chip.style.cssText='position:fixed;left:8px;bottom:70px;z-index:1500;background:#0f2818f0;color:#86efac;border:1px solid #22c55e;border-radius:10px;padding:7px 11px;font-family:sans-serif;font-size:13px;font-weight:900;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.5);display:none';
   document.body.appendChild(chip);
   var panel=document.createElement('div');
-  panel.style.cssText='position:fixed;left:8px;right:8px;bottom:80px;max-height:55vh;overflow-y:auto;z-index:2500;background:#0b1220f8;color:#e5e7eb;border:1px solid #334155;border-radius:14px;padding:12px;font-family:sans-serif;font-size:13px;display:none;box-shadow:0 6px 30px rgba(0,0,0,.7)';
+  panel.id='exit-now-panel';
+  panel.style.cssText='position:fixed;left:8px;right:8px;bottom:80px;max-height:55vh;overflow-y:auto;overscroll-behavior:contain;z-index:2500;background:#0b1220f8;color:#e5e7eb;border:1px solid #334155;border-radius:14px;padding:12px;font-family:sans-serif;font-size:13px;display:none;box-shadow:0 6px 30px rgba(0,0,0,.7)';
   document.body.appendChild(panel);
   chip.onclick=function(){ panel.style.display = panel.style.display==='none'?'block':'none'; };
   function refresh(){
@@ -2199,18 +2223,22 @@ function toggleMapView(){
         chip.style.background='#0f2818f0'; chip.style.color='#86efac'; chip.style.borderColor='#22c55e';
         chip.textContent='🛬 '+(out.length?out.length+' излизат СЕГА':'')+(out.length&&soon.length?' · ':'')+(soon.length?soon.length+' до 1ч':'');
       }
-      var html='<div style=\"font-weight:900;font-size:14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center\"><span>🛬 Изходи Терминал 1/2</span><span style=\"cursor:pointer;padding:2px 10px;font-size:16px;color:#94a3b8\" onclick=\"this.parentElement.parentElement.style.display=&quot;none&quot;\">✕</span></div>';
+      var html='<div style=\"position:sticky;top:-12px;z-index:3;background:#0b1220f8;padding:6px 0 6px;margin:-6px 0 6px;font-weight:900;font-size:13px;display:flex;justify-content:space-between;align-items:center;gap:8px\">'+
+        '<span>🛬 Изходи Т1/Т2</span>'+
+        '<button onclick=\"document.getElementById(\'exit-now-panel\').style.display=\'none\'\" '+
+          'style=\"width:30px;height:30px;line-height:28px;padding:0;flex-shrink:0;border-radius:50%;'+
+          'background:#0b1220;color:#fff;border:1.5px solid #22c3a6;font-size:17px;font-weight:700;cursor:pointer\">✕</button></div>';
       out.forEach(function(f){
-        html+='<div style=\"background:#14532d80;border-left:3px solid #22c55e;border-radius:6px;padding:6px 8px;margin:5px 0\">'+
-          '<b>ИЗЛИЗАТ СЕГА</b> '+(f.ns?'🛂':'🇪🇺')+' · '+f.from+' '+(f.term?('· T'+f.term):'')+'<br>'+
-          '<span style=\"color:#9ca3af\">Кацна '+hm(new Date(f.land))+'</span> → изход <b>'+hm(new Date(f.xs))+'–'+hm(new Date(f.xe))+'</b> · '+f.num+'</div>';
+        html+='<div style=\"background:#14532d80;border-left:3px solid #22c55e;border-radius:5px;padding:4px 7px;margin:3px 0;font-size:12px;line-height:1.35\">'+
+          '<b style=\"font-size:11px\">СЕГА</b> '+(f.ns?'🛂':'🇪🇺')+' '+f.from+(f.term?(' ·T'+f.term):'')+' <span style=\"color:#9ca3af\">'+f.num+'</span><br>'+
+          '<span style=\"color:#9ca3af;font-size:11px\">🛬'+hm(new Date(f.land))+' → </span><b>'+hm(new Date(f.xs))+'–'+hm(new Date(f.xe))+'</b></div>';
       });
       soon.forEach(function(f){
-        html+='<div style=\"background:#1e293b80;border-left:3px solid #64748b;border-radius:6px;padding:6px 8px;margin:5px 0\">'+
-          f.from+' '+(f.term?('· T'+f.term):'')+'<br>'+
-          '<span style=\"color:#9ca3af\">Кацане '+hm(new Date(f.land))+(f.st==='landed'?' ✓':'')+'</span> → изход <b>'+hm(new Date(f.xs))+'–'+hm(new Date(f.xe))+'</b> · '+f.num+'</div>';
+        html+='<div style=\"background:#1e293b80;border-left:3px solid #64748b;border-radius:5px;padding:4px 7px;margin:3px 0;font-size:12px;line-height:1.35\">'+
+          f.from+(f.term?(' ·T'+f.term):'')+' <span style=\"color:#9ca3af\">'+f.num+'</span><br>'+
+          '<span style=\"color:#9ca3af;font-size:11px\">🛬'+hm(new Date(f.land))+(f.st==='landed'?'✓':'')+' → </span><b>'+hm(new Date(f.xs))+'–'+hm(new Date(f.xe))+'</b></div>';
       });
-      html+='<div style=\"color:#64748b;font-size:11px;margin-top:6px\">🇪🇺 Шенген: изход +10–30 мин · 🛂 не-Шенген: +20–50 мин · опресн. на 60 сек</div>';
+      html+='<div style=\"color:#64748b;font-size:10px;margin-top:5px;line-height:1.4\">🇪🇺 +10–30 мин · 🛂 +20–50 мин · опресн. 60 сек</div>';
       panel.innerHTML=html;
     }).catch(function(e){});
   }
@@ -2317,7 +2345,8 @@ function toggleMapView(){
   chip.style.cssText='position:fixed;left:8px;bottom:28px;z-index:1500;border-radius:10px;padding:7px 11px;font-family:sans-serif;font-size:13px;font-weight:900;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.5);display:none';
   document.body.appendChild(chip);
   var panel=document.createElement('div');
-  panel.style.cssText='position:fixed;left:8px;right:8px;bottom:80px;max-height:55vh;overflow-y:auto;z-index:2500;background:#0b1220f8;color:#e5e7eb;border:1px solid #334155;border-radius:14px;padding:12px;font-family:sans-serif;font-size:13px;display:none;box-shadow:0 6px 30px rgba(0,0,0,.7)';
+  panel.id='exit-now-panel';
+  panel.style.cssText='position:fixed;left:8px;right:8px;bottom:80px;max-height:55vh;overflow-y:auto;overscroll-behavior:contain;z-index:2500;background:#0b1220f8;color:#e5e7eb;border:1px solid #334155;border-radius:14px;padding:12px;font-family:sans-serif;font-size:13px;display:none;box-shadow:0 6px 30px rgba(0,0,0,.7)';
   document.body.appendChild(panel);
   chip.onclick=function(){ panel.style.display=panel.style.display==='none'?'block':'none'; };
   function refresh(){
