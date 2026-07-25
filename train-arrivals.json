@@ -1,42 +1,10 @@
 {
-  "updated": "2026-07-25T18:15:42.202486+03:00",
+  "updated": "2026-07-25T19:29:19.454394+03:00",
   "source": "live.bdz.bg",
   "station": "София Централна",
-  "count": 17,
+  "count": 13,
   "far_count": 7,
   "arrivals": [
-    {
-      "time": "18:25",
-      "from": "София Север",
-      "train": "КПВ 20244",
-      "delay": 5,
-      "tier": "mid",
-      "weight": 0.5
-    },
-    {
-      "time": "18:45",
-      "from": "Радомир",
-      "train": "КПВ 50210",
-      "delay": 0,
-      "tier": "mid",
-      "weight": 0.5
-    },
-    {
-      "time": "19:10",
-      "from": "Костенец",
-      "train": "КПВ 10226",
-      "delay": 4,
-      "tier": "near",
-      "weight": 0.35
-    },
-    {
-      "time": "19:11",
-      "from": "Лакатник",
-      "train": "КПВ 20226",
-      "delay": 0,
-      "tier": "near",
-      "weight": 0.35
-    },
     {
       "time": "19:52",
       "from": "Перник",
@@ -70,14 +38,6 @@
       "weight": 0.5
     },
     {
-      "time": "20:52",
-      "from": "Карлово",
-      "train": "ПВ 30116",
-      "delay": 2,
-      "tier": "far",
-      "weight": 1.0
-    },
-    {
       "time": "21:11",
       "from": "Кюстендил",
       "train": "БВ 6622",
@@ -102,6 +62,14 @@
       "weight": 0.85
     },
     {
+      "time": "21:24",
+      "from": "Карлово",
+      "train": "ПВ 30116",
+      "delay": 34,
+      "tier": "far",
+      "weight": 1.0
+    },
+    {
       "time": "21:40",
       "from": "Варна",
       "train": "БВ 2616",
@@ -113,15 +81,15 @@
       "time": "22:08",
       "from": "Петрич",
       "train": "БВ 5616",
-      "delay": 9,
+      "delay": 0,
       "tier": "far",
       "weight": 1.0
     },
     {
-      "time": "22:22",
+      "time": "22:13",
       "from": "Бургас",
       "train": "БВ 8612",
-      "delay": 9,
+      "delay": 1,
       "tier": "far",
       "weight": 1.0
     },
@@ -134,10 +102,10 @@
       "weight": 0.5
     },
     {
-      "time": "22:38",
+      "time": "22:39",
       "from": "Бургас",
       "train": "БВ 3624",
-      "delay": 11,
+      "delay": 12,
       "tier": "far",
       "weight": 1.0
     }
