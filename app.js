@@ -224,7 +224,7 @@ const ZONES = window.__ZONES = [
   { id:"cjp",            name:"Централна ЖП гара",                      icon:"🚂", lat:42.7121, lng:23.3210, radius:240, type:"transit",          wazeName:"Централна жп гара София" },
   { id:"cab_north",      name:"Централна автогара",                     icon:"🚌", lat:42.7103, lng:23.3233, radius:200, type:"transit",          wazeName:"Централна автогара София" },
   { id:"cas_intl", name:"🌍 Междунар. автогара Сердика / FlixBus", icon:"🌍", lat:42.7108, lng:23.3224, radius:150, type:"transit", wazeName:"Международна автогара Сердика София" },
-  { id:"ag_yug",         name:"Автогара Юг (бул.Драган Цанков)",        icon:"🚌", lat:42.6689, lng:23.3526, radius:190, type:"transit",          wazeName:"Автогара Юг София" },
+  { id:"ag_yug",         name:"Автогара Юг (бул.Драган Цанков)",        icon:"🚌", lat:42.6689, lng:23.3526, radius:190, type:"transit",          hours:[7.5,18.5], wazeName:"Автогара Юг София" },
   { id:"ag_pod",         name:"Автогара Подуяне",                       icon:"🚌", lat:42.7034, lng:23.3601, radius:190, type:"transit",          wazeName:"Автогара Подуяне София" },
 
   { id:"arena",          name:"Арена 8888",                             icon:"🎸", lat:42.6711, lng:23.3692, radius:290, type:"venue",            wazeName:"Arena Sofia 8888" },
@@ -389,8 +389,8 @@ const EVENTS = [
   // Транзит
   { zone:"cjp",          name:"Влак Варна→София",               endHour:18.5, boost:2.2, repeat:"daily" },
   { zone:"cjp",          name:"Влак Пловдив→София",             endHour:20.0, boost:1.8, repeat:"daily" },
-  { zone:"ag_yug",       name:"Автобуси от Пловдив",            endHour:19.5, boost:2.0, repeat:"daily" },
-  { zone:"ag_yug",       name:"Нощни автобуси",                 endHour:22.0, boost:1.5, repeat:"daily" },
+  { zone:"cab_north",    name:"Автобуси от Пловдив",            endHour:19.5, boost:2.0, repeat:"daily" },
+  { zone:"ag_yug",       name:"Последни курсове Самоков/Боровец", endHour:18.5, boost:1.5, repeat:"daily" },
 
   // Болници — меки вълни
   { zone:"pirogov",      name:"Пирогов – прегледи",             endHour:9.0,  boost:1.4, repeat:"mon-fri" },
@@ -591,6 +591,13 @@ function computeScores(hour) {
   if (dz<1) ZONES.forEach(z => { if(z.id!=='airport') scores[z.id]*=(0.7+0.3*dz); });
   // ден от седмицата × час
   ZONES.forEach(z => { scores[z.id] *= dayTypeFactor(z.type, hour); });
+  // работно време: затворен обект не ражда клиенти, каквото и да казва базовата крива
+  ZONES.forEach(z => {
+    if(!z.hours) return;
+    const open = hour >= z.hours[0] && hour <= z.hours[1];
+    if(!open) scores[z.id] *= 0.12;                 // почти нула, но остава видима в списъка
+    else if(hour >= z.hours[1] - 1) scores[z.id] *= 1.15;  // последният час преди затваряне е реален пик
+  });
   // Летищна вълна: излизащи полети вдигат скора на летището (силно — 10 полета≈3.6)
   try{ var _ax = window.__airportExiting|0; if(_ax>0 && scores['airport']!==undefined){ scores['airport'] += Math.min(4.0, _ax*0.36); } }catch(e){}
   return {scores, activeEvents};
