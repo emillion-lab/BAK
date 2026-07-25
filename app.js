@@ -986,7 +986,7 @@ function showAirportSchedule() {
   // Крие излезли преди >2ч; класифицира останалите
   const visible = [];
   all.forEach(f=>{
-    if(f.exitToTs < nowTs - 120*60000) return;      // >2ч назад — вън
+    if(f.exitToTs < nowTs - 15*60000) return;       // изминалите не се показват (15 мин грейс)
     const graceTs = f.exitToTs + 15*60000; // грейс: все още може да излизат
     f._state = (nowTs >= f.exitFromTs && nowTs <= graceTs) ? 'now'
              : (f.exitToTs < nowTs) ? 'done' : 'future';
@@ -1155,16 +1155,45 @@ function drawSparkline(h) {
   const x20=((20-MIN_H)/(MAX_H-MIN_H))*W;
   const x21=((21-MIN_H)/(MAX_H-MIN_H))*W;
   ctx.fillStyle='rgba(239,68,68,0.08)'; ctx.fillRect(x20,0,x21-x20,H);
-  // Red bands for airport exit windows
-  if(flightDetails && flightDetails.length) {
-    flightDetails.forEach(f=>{
-      const x1=((f.exitFromH + f.exitFromM/60 - MIN_H)/(MAX_H-MIN_H))*W;
-      const x2=((f.exitToH   + f.exitToM/60   - MIN_H)/(MAX_H-MIN_H))*W;
-      if(x2>0 && x1<W) {
-        ctx.fillStyle='rgba(239,68,68,0.18)';
-        ctx.fillRect(Math.max(0,x1),0,Math.min(W,x2)-Math.max(0,x1),H);
+  // Полетни ленти за ЦЕЛИЯ ден — интензитет по брой рейсове, неон на пиковете
+  if(flightHours && flightHours.length){
+    const fmax = Math.max(...flightHours);
+    if(fmax > 0){
+      const peakCut = fmax * 0.72;
+      for(let fh = 0; fh < 24; fh++){
+        const live = flightHours[fh];
+        const est  = (window.__flightBase && window.__flightBase[fh]) || 0;
+        const c    = live || est;
+        if(!c) continue;
+        const isLive = !!live;
+        const x1 = ((fh     - MIN_H)/(MAX_H-MIN_H))*W;
+        const x2 = ((fh + 1 - MIN_H)/(MAX_H-MIN_H))*W;
+        if(x2 <= 0 || x1 >= W) continue;
+        const xa = Math.max(0,x1), xb = Math.min(W,x2);
+        const isPeak = isLive && c >= peakCut;
+        ctx.save();
+        if(!isLive){                       // прогнозен час — бледо, без неон
+          ctx.fillStyle = 'rgba(239,68,68,' + (0.05 + 0.07*(c/fmax)).toFixed(3) + ')';
+          ctx.fillRect(xa, 0, xb-xa, H);
+          ctx.restore();
+          continue;
+        }
+        if(isPeak){
+          ctx.shadowColor = 'rgba(255,64,64,0.95)';
+          ctx.shadowBlur  = 12;
+          ctx.fillStyle   = 'rgba(255,72,72,0.42)';
+        } else {
+          ctx.fillStyle   = 'rgba(239,68,68,' + (0.10 + 0.22*(c/fmax)).toFixed(3) + ')';
+        }
+        ctx.fillRect(xa, 0, xb-xa, H);
+        if(isPeak){                       // ярък неонов ръб отгоре
+          ctx.shadowBlur = 16;
+          ctx.fillStyle  = 'rgba(255,110,110,0.95)';
+          ctx.fillRect(xa, 0, xb-xa, 2.5);
+        }
+        ctx.restore();
       }
-    });
+    }
   }
   // Fill
   const grad=ctx.createLinearGradient(0,0,0,H);
@@ -1204,7 +1233,12 @@ function render(hour) {
     document.getElementById('tl-hint').textContent='— мъртва зона, почини';
     window.__topRot = null;
   } else {
-    window.__topRot = sorted.slice(0,3).map(function(e){
+    window.__topRot = sorted
+      .filter(function(e){
+        var zz = ZONES.find(function(x){ return x.id === e[0]; });
+        return !zz || zz.type !== 'hospital';   // болници не влизат в ротацията
+      })
+      .slice(0,3).map(function(e){
       var zz=ZONES.find(x=>x.id===e[0]);
       var tag = zz && zz.type==='airport' ? ' ✈ пик'
               : zz && zz.type==='transit' ? ' 🚉 пик' : '';
@@ -1434,6 +1468,11 @@ function injectAirportEvents(){
   }
   EVENTS.length=0; keep.forEach(e=>EVENTS.push(e));
 }
+
+// Типичен дневен профил на СОФ — ползва се за часовете, които кешът не покрива
+window.__flightBase = {};
+[[6,2],[7,4],[8,5],[9,5],[10,4],[11,4],[12,3],[13,4],[14,3],[15,4],[16,6],
+ [17,5],[18,7],[19,8],[20,6],[21,5],[22,5],[23,4]].forEach(function(p){ window.__flightBase[p[0]] = p[1]; });
 
 function applyFallbackAirport(){
   airportStatus='fallback';
