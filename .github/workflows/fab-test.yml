@@ -50,6 +50,13 @@ jobs:
             }).sort((a,b)=>a.y-b.y);
             const neigh=[]; for(let i=1;i<cs.length;i++)
               neigh.push(Math.round(Math.hypot(cs[i].x-cs[i-1].x, cs[i].y-cs[i-1].y)));
+            // реално разстояние между съседни бутони
+            const cs = [...document.querySelectorAll('#fab-wrap .fab-sat')].map(e=>{
+              const r=e.getBoundingClientRect(); return {x:r.x+r.width/2, y:r.y+r.height/2, w:r.width};
+            }).sort((a,b)=>a.y-b.y);
+            let minAdjacent = 9999, size = cs.length?Math.round(cs[0].w):0;
+            for(let i=1;i<cs.length;i++)
+              minAdjacent = Math.min(minAdjacent, Math.round(Math.hypot(cs[i].x-cs[i-1].x, cs[i].y-cs[i-1].y)));
             let overlaps=0;
             for(let i=1;i<labs.length;i++) if(labs[i].y < labs[i-1].y+labs[i-1].h) overlaps++;
             // подравняване: центърът на всеки надпис спрямо центъра на неговия бутон
@@ -80,7 +87,7 @@ jobs:
             };
             if(kb) kb.click();
             return {
-              karyk,
+              karyk, minAdjacent, size,
               align,
               neighbours: neigh,
               satSize: cs.length?Math.round(cs[0].w):0,

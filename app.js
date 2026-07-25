@@ -4603,10 +4603,10 @@ function toggleMapView(){
     // дава почти равни разстояния между съседите И равни стъпки по Y,
     // тоест надписите остават подравнени, а палецът стига до всички.
     var H   = window.innerHeight;
-    var Ry  = Math.max(150, Math.min(190, H * 0.235));
+    var Ry  = Math.max(150, Math.min(200, H * 0.245));
     var Rx  = Math.round(Ry * 0.75);
-    var gap = Math.max(32, Math.min(38, Ry * 0.20));
-    var yTop = -Math.min(Ry * 0.80, (n - 1) * gap * 0.667);
+    var gap = 40;                                   // дава ≥40px между съседи → 6px просвет при 34px бутони
+    var yTop = -Math.min(Ry * 0.88, (n - 1) * gap - 70);
     var lines = '';
     live.forEach(function(it, i){
       var yv = yTop + i * gap;
