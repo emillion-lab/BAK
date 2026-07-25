@@ -16,9 +16,16 @@ AFTER OPEN: {
  "karyk": {
   "active": true,
   "badge": "block",
-  "mapFilter": "brightness(0.34) saturate(0.28) contrast(1"
+  "mapFilter": "brightness(0.85) saturate(0.6)",
+  "corners": 4,
+  "pulse": "karyk-neon"
  },
  "links": 5,
+ "topHint": "Топ: ✈️ Летище София (1.9) ✈ пик",
+ "bakshishRows": {
+  "height": 31,
+  "whyLines": 0
+ },
  "open": true,
  "rays": 12,
  "hubCovered": "fab-hub",
