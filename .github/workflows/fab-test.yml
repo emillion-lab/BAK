@@ -47,7 +47,19 @@ jobs:
             }).sort((a,b)=>a.y-b.y);
             let overlaps=0;
             for(let i=1;i<labs.length;i++) if(labs[i].y < labs[i-1].y+labs[i-1].h) overlaps++;
+            // карък: включваме и мерим индикацията
+            const kb = document.getElementById('karyk-btn'); if(kb) kb.click();
+            const karyk = {
+              active: document.body.classList.contains('karyk-active'),
+              badge: (()=>{const b=document.getElementById('karyk-badge');
+                        return b ? getComputedStyle(b).display : 'липсва';})(),
+              mapFilter: (()=>{const m=document.getElementById('map');
+                        return m ? getComputedStyle(m).filter.slice(0,42) : '?';})()
+            };
+            if(kb) kb.click();
             return {
+              karyk,
+              links: document.querySelectorAll('#fab-rays line.fab-link').length,
               open: document.body.classList.contains('fab-open'),
               rays: document.querySelectorAll('#fab-rays line').length,
               hubCovered: (document.elementFromPoint(hubC.x,hubC.y)||{}).id,
