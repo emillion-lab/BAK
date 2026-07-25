@@ -2093,7 +2093,7 @@ setInterval(()=>{ if(bakshishOpen) buildBakshishPanel(); }, 60000);
 
 
 const nowH=new Date().getHours()+new Date().getMinutes()/60;
-currentHour=Math.min(24,Math.max(6,Math.round(nowH*2)/2));
+currentHour=Math.min(24,Math.max(0,Math.round(nowH*2)/2));
 slider.value=currentHour;
 document.getElementById('time-display').textContent=fmtHour(currentHour);
 
