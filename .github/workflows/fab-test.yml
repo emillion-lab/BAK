@@ -83,7 +83,7 @@ jobs:
             return {
               karyk, minAdjacent, size,
               align,
-              neighbours: neigh,
+              neighbours: minAdjacent,
               satSize: cs.length?Math.round(cs[0].w):0,
               n90: (()=>{const b=document.getElementById('next90-btn'); if(b) b.click();
                         const t=(document.querySelector('#next90-panel .n90-header')||{}).textContent||'';
