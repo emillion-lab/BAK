@@ -63,18 +63,18 @@ AFTER OPEN: {
  "neighbours": 63,
  "satSize": 52,
  "links": 1,
- "ticker": "✈️ 21:55 FR6753 от Lamezia Terme — ИЗЛИЗАТ · ✈️ 22:00 W64452 от Alghero · ✈️ 22:00 W64402 от Madrid · ✈️ 22:15 FR3621 от Wrocław · ✈️ 22:25 FR1730 от London · ✈️ 22:35 W64412 от Málaga · ✈️ 22:35 W64404 от Palma De Mallorc · ✈️ 22:40 W64406 от Barcelona · ✈️ 21:55 FR6753 от Lamezia Terme — ИЗЛИЗАТ · ✈️ 22:00 W64452 от Alghero · ✈️ 22:00 W64402 от Madrid · ✈️ 22:15 FR3621 от Wrocław · ✈️ 22:25 FR1730 от London · ✈️ 22:35 W64412 от Málaga · ✈️ 22:35 W64404 от Palma De Mallorc · ✈️ 22:40 W64406 от Barcelona · ",
+ "ticker": "✈️ 22:40 W64406 от Barcelona — ИЗЛИЗАТ · ✈️ 22:40 W64406 от Barcelona — ИЗЛИЗАТ · ",
  "n90": "Няма театри, кина или концерти в следващите 24 часа.Източник: SEV (theatre.art.bg и др.)",
- "topHint": "Топ: 🎭 НДК (4.7)",
+ "topHint": "Топ: 🏨 Хотели Център (2.7)",
  "topRot": [
-  "Топ: 🎶 Национална опера и балет (5.3)",
-  "Топ: 🎭 НДК (4.7)",
-  "Топ: 🍷 Бул.Витоша – ресторанти/барове (3.8)"
+  "Топ: ✈️ Летище София (7.0) ✈ пик",
+  "Топ: 🏨 Хотели Център (2.7)",
+  "Топ: 🌳 Борисова градина (2.3)"
  ],
  "flights": {
-  "redove": 9,
-  "minali": 9,
-  "chas": "21:59"
+  "redove": 78,
+  "minali": 78,
+  "chas": "22:58"
  },
  "bakshishRows": {
   "height": 31,
@@ -82,7 +82,7 @@ AFTER OPEN: {
  },
  "open": true,
  "rays": 8,
- "hubCovered": "fab-hub",
+ "hubCovered": "",
  "sats": [
   {
    "id": "karyk-btn",
