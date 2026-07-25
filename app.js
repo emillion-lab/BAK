@@ -986,8 +986,8 @@ function showAirportSchedule() {
   // Крие излезли преди >2ч; класифицира останалите
   const visible = [];
   all.forEach(f=>{
-    if(f.exitToTs < nowTs - 15*60000) return;       // изминалите не се показват (15 мин грейс)
-    const graceTs = f.exitToTs + 15*60000; // грейс: все още може да излизат
+    if(f.exitToTs < nowTs - 45*60000) return;       // хората излизат по-бавно — пазим 45 мин назад
+    const graceTs = f.exitToTs + 25*60000; // грейс: пасажерите се точат и след прозореца
     f._state = (nowTs >= f.exitFromTs && nowTs <= graceTs) ? 'now'
              : (f.exitToTs < nowTs) ? 'done' : 'future';
     visible.push(f);
@@ -1052,14 +1052,18 @@ function showAirportSchedule() {
       const bg  = isNow ? 'rgba(239,68,68,.16)' : 'transparent';
       const brd = isNow ? '1px solid #ef4444'    : '1px solid transparent';
       const col = isNow ? '#ef4444' : isDone ? 'var(--muted)' : 'var(--amber)';
-      const op  = isDone ? 'opacity:.45;' : '';
+      const op  = isDone ? 'opacity:.72;' : '';
       const anchor = (!anchorSet && (isNow || f._state==='future')) ? (anchorSet=true, ' id="fl-now-anchor"') : '';
       html+=`<div${anchor} style="display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:8px;background:${bg};border:${brd};margin-bottom:2px;${op}">
         <span style="font-weight:800;font-size:16px;min-width:48px;color:var(--text)">${f.fn}</span>
         ${flTerm==='all'?`<span style="font-size:12px;font-weight:900;color:var(--cyan);border:1px solid var(--border);border-radius:5px;padding:1px 5px">${'Т'+f.term}</span>`:''}
-        <span style="flex:1;font-size:14px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(f.depAirport||'').slice(0,22)}</span>
+        <span style="flex:1;min-width:0;overflow:hidden">
+          <span style="display:block;font-size:14px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(f.depAirport||'').slice(0,22)}</span>
+          <span style="display:block;font-size:11px;color:var(--muted);opacity:.85;white-space:nowrap">🛬 кацнал ${fmt(f.landH,f.landM)}</span>
+        </span>
         <span style="font-size:13px">${flag(f)}</span>
         ${isNow?'<span style="font-size:12px;font-weight:900;color:#ef4444;white-space:nowrap">ИЗЛИЗАТ</span>':''}
+        ${isDone?'<span style="font-size:11px;font-weight:800;color:var(--muted);white-space:nowrap">още излизат?</span>':''}
         <span style="font-weight:800;font-size:15px;color:${col};white-space:nowrap">${fmt(f.exitFromH,f.exitFromM)}–${fmt(f.exitToH,f.exitToM)}</span>
       </div>`;
     });
@@ -1067,7 +1071,8 @@ function showAirportSchedule() {
   }
   html+='</div>';
 
-  html+='<div style="font-size:11px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">🇪🇺 Шенген: +5–15 мин &nbsp;|&nbsp; 🛂 Извън Шенген: +10–30 мин &nbsp;|&nbsp; 🔴 = излизат сега</div>';
+  html+='<div style="font-size:11px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">🇪🇺 Шенген: +5–15 мин &nbsp;|&nbsp; 🛂 Извън Шенген: +10–30 мин &nbsp;|&nbsp; 🔴 = излизат сега &nbsp;|&nbsp; бледите още може да се точат</div>';
+  html+='<div class="fl-close-bar" onclick="map.closePopup()">✕ ЗАТВОРИ</div>';
   html+='</div>';
 
   const airportZone=ZONES.find(z=>z.id==='airport');
@@ -1078,7 +1083,12 @@ function showAirportSchedule() {
       .openOn(map);
     setTimeout(()=>{
       const box=document.getElementById('fl-scroll'), el=document.getElementById('fl-now-anchor');
-      if(box && el) box.scrollTop = Math.max(0, el.offsetTop - box.offsetTop - 34);
+      if(box){
+        if(el) box.scrollTop = Math.max(0, el.offsetTop - box.offsetTop - 34);
+        try{ L.DomEvent.disableScrollPropagation(box); L.DomEvent.disableClickPropagation(box); }catch(e){}
+      }
+      const wrap=document.querySelector('.airport-popup .leaflet-popup-content-wrapper');
+      if(wrap){ try{ L.DomEvent.disableScrollPropagation(wrap); }catch(e){} }
     }, 120);
   }
 }

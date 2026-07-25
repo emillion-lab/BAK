@@ -826,6 +826,25 @@ body.karyk-active .sidebar-title{ color:#e8a050; }
 #bakshish-panel .bp-name{ font-size:13px !important; line-height:1.25 !important; }
 #bakshish-panel .bp-score{ font-size:16px !important; }
 #bakshish-panel .bp-rank{ font-size:11px !important; min-width:22px !important; }
+
+/* ═══ Летищен попъп: винаги видим Х + без дърпане на картата ═══ */
+.airport-popup .leaflet-popup-close-button{
+  position:absolute !important; top:8px !important; right:8px !important; z-index:20 !important;
+  width:36px !important; height:36px !important; line-height:34px !important;
+  font-size:22px !important; font-weight:700 !important; text-align:center !important;
+  background:#0b1220f2 !important; color:#fff !important;
+  border:1.5px solid var(--cyan) !important; border-radius:50% !important;
+  box-shadow:0 2px 10px rgba(0,0,0,.6) !important; padding:0 !important;
+}
+.airport-popup .leaflet-popup-content{ margin:14px 12px 12px !important; }
+.airport-popup .leaflet-popup-content-wrapper{ overscroll-behavior:contain; }
+#fl-scroll{ overscroll-behavior:contain; touch-action:pan-y; }
+.fl-close-bar{
+  position:sticky; bottom:0; margin-top:8px; padding:9px 0; text-align:center;
+  background:linear-gradient(180deg,transparent,var(--surf) 35%);
+  font:800 14px system-ui,sans-serif; color:var(--cyan); cursor:pointer;
+  border-top:1px solid var(--border);
+}
 </style>
 <style>
 
@@ -1394,7 +1413,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260725v63"></script>
+<script src="app.js?v=20260725v64"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">
