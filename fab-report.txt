@@ -25,39 +25,48 @@ AFTER OPEN: {
   {
    "id": "karyk-btn",
    "dy": 0,
-   "gap": 6
+   "gap": 7
   },
   {
    "id": "karyk-list-btn",
    "dy": 0,
-   "gap": 6
+   "gap": 7
   },
   {
    "id": "bakshish-btn",
    "dy": 0,
-   "gap": 6
+   "gap": 7
   },
   {
    "id": "next90-btn",
    "dy": 0,
-   "gap": 6
+   "gap": 7
   },
   {
    "id": "clean-btn",
    "dy": 0,
-   "gap": 6
+   "gap": 7
   },
   {
    "id": "gps-btn",
    "dy": 0,
-   "gap": 6
+   "gap": 7
   },
   {
    "id": "fs-btn",
    "dy": 0,
-   "gap": 6
+   "gap": 7
   }
  ],
+ "neighbours": [
+  47,
+  42,
+  39,
+  38,
+  38,
+  39
+ ],
+ "satSize": 34,
  "n90": {
   "title": "⏱ СЪБИТИЯ — СЛЕДВАЩИТЕ 24 ЧАСА\n    ✕",
   "rows": 59
@@ -74,57 +83,57 @@ AFTER OPEN: {
  "sats": [
   {
    "id": "karyk-btn",
-   "w": 40,
-   "h": 40,
-   "dist": 164,
+   "w": 34,
+   "h": 34,
+   "dist": 175,
    "onScreen": true,
    "hit": "karyk-btn"
   },
   {
    "id": "karyk-list-btn",
-   "w": 40,
-   "h": 40,
-   "dist": 164,
+   "w": 34,
+   "h": 34,
+   "dist": 161,
    "onScreen": true,
    "hit": "karyk-list-btn"
   },
   {
    "id": "bakshish-btn",
-   "w": 40,
-   "h": 40,
-   "dist": 164,
+   "w": 34,
+   "h": 34,
+   "dist": 151,
    "onScreen": true,
    "hit": "bakshish-btn"
   },
   {
    "id": "next90-btn",
-   "w": 40,
-   "h": 40,
-   "dist": 164,
+   "w": 34,
+   "h": 34,
+   "dist": 145,
    "onScreen": true,
    "hit": "next90-btn"
   },
   {
    "id": "clean-btn",
-   "w": 40,
-   "h": 40,
-   "dist": 164,
+   "w": 34,
+   "h": 34,
+   "dist": 143,
    "onScreen": true,
    "hit": "clean-btn"
   },
   {
    "id": "gps-btn",
-   "w": 40,
-   "h": 40,
-   "dist": 164,
+   "w": 34,
+   "h": 34,
+   "dist": 145,
    "onScreen": true,
    "hit": "gps-btn"
   },
   {
    "id": "fs-btn",
-   "w": 40,
-   "h": 40,
-   "dist": 164,
+   "w": 34,
+   "h": 34,
+   "dist": 151,
    "onScreen": true,
    "hit": "fs-btn"
   }
