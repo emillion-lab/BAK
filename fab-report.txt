@@ -1,12 +1,14 @@
-file:///home/runner/work/BAK/BAK/ft.mjs:40
-  const cs = [...document.querySelectorAll('#fab-wrap .fab-sat')].map(e=>{
-        ^
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
 
-SyntaxError: Identifier 'cs' has already been declared
-    at compileSourceTextModule (node:internal/modules/esm/utils:346:16)
-    at ModuleLoader.moduleStrategy (node:internal/modules/esm/translators:146:18)
-    at #translate (node:internal/modules/esm/loader:497:12)
-    at ModuleLoader.loadAndTranslate (node:internal/modules/esm/loader:544:27)
-    at async ModuleJob._link (node:internal/modules/esm/module_job:148:19)
+Error [ReferenceError]: neigh is not defined
+    at evaluate (evaluate at file:///home/runner/work/BAK/BAK/ft.mjs:17:23, <anonymous>:55:16)
+    at #evaluate (file:///home/runner/work/BAK/BAK/node_modules/puppeteer-core/lib/esm/puppeteer/cdp/ExecutionContext.js:383:19)
+    at async ExecutionContext.evaluate (file:///home/runner/work/BAK/BAK/node_modules/puppeteer-core/lib/esm/puppeteer/cdp/ExecutionContext.js:270:16)
+    at async IsolatedWorld.evaluate (file:///home/runner/work/BAK/BAK/node_modules/puppeteer-core/lib/esm/puppeteer/cdp/IsolatedWorld.js:96:16)
+    at async CdpFrame.evaluate (file:///home/runner/work/BAK/BAK/node_modules/puppeteer-core/lib/esm/puppeteer/api/Frame.js:335:20)
+    at async CdpPage.evaluate (file:///home/runner/work/BAK/BAK/node_modules/puppeteer-core/lib/esm/puppeteer/api/Page.js:799:20)
+    at async file:///home/runner/work/BAK/BAK/ft.mjs:17:15
 
 Node.js v20.20.2
