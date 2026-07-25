@@ -762,27 +762,27 @@ window.closeNext90=function(){
 
 function buildNext90(){
   const h=currentHour; // следва slider-а
-  const end=Math.min(24,h+1.5);
   const zMap={}; ZONES.forEach(z=>{zMap[z.id]=z;});
+  const ahead=ev=>{ let d=ev.endHour-h; if(d<0) d+=24; return d; };
   const upcoming=EVENTS.filter(ev=>dayMatches(ev)&&!ev._fromFlight)
-    .filter(ev=>ev.endHour>h&&ev.endHour<=end)
-    .sort((a,b)=>a.endHour-b.endHour);
+    .filter(ev=>{ const d=ahead(ev); return d>0 && d<=24; })
+    .sort((a,b)=>ahead(a)-ahead(b));
   const list=document.getElementById('next90-list');
   if(!list) return;
   if(!upcoming.length){
-    list.innerHTML='<div style="padding:14px;color:var(--muted);font-size:15px">Няма значими events в следващите 90 мин</div>';
+    list.innerHTML='<div style="padding:14px;color:var(--muted);font-size:15px">Няма значими събития в следващите 24 часа</div>';
     return;
   }
   list.innerHTML=upcoming.map(ev=>{
     const z=zMap[ev.zone]; if(!z) return '';
-    const min=Math.round((ev.endHour-h)*60);
+    const min=Math.round(ahead(ev)*60);
     const c=demandColor(ev.boost,z.type);
     return `<div class="n90-item">
       <div class="n90-time">${fmtHour(ev.endHour)}</div>
       <div class="n90-icon">${z.icon}</div>
       <div class="n90-info">
         <div class="n90-name">${ev.name}</div>
-        <div class="n90-zone">${z.name.split('(')[0].trim()} · след ${min} мин</div>
+        <div class="n90-zone">${z.name.split('(')[0].trim()} · след ${min<60?(min+' мин'):(Math.floor(min/60)+'ч '+(min%60)+'м')}</div>
       </div>
       <div class="n90-score" style="color:${c.fill}">+${ev.boost.toFixed(1)}</div>
     </div>`;
@@ -4526,7 +4526,7 @@ function toggleMapView(){
     { id:'karyk-btn',      label:'Карък Mode' },
     { id:'karyk-list-btn', label:'Карък списък' },
     { id:'bakshish-btn',   label:'Бакшиш радар' },
-    { id:'next90-btn',     label:'Следващи 90 мин' },
+    { id:'next90-btn',     label:'Събития 24ч' },
     { id:'clean-btn',      label:'Чиста карта' },
     { id:'gps-btn',        label:'Моята локация' },
     { id:'fs-btn',         label:'Цял екран' }
@@ -4598,25 +4598,23 @@ function toggleMapView(){
     var n = live.length;
     if(!n) return;
     var open = document.body.classList.contains('fab-open');
-    var step = n > 1 ? (A1 - A0) / (n - 1) : 0;
+    // равномерно вертикално разстояние → надписите се подреждат точно до бутоните
+    var gap = Math.max(42, Math.min(52, (window.innerHeight - 330) / n));
+    var BOTTOM = 62, BOW = 34, BASE = 26;
     var lines = '';
     live.forEach(function(it, i){
-      var a  = (A0 + step * i) * Math.PI / 180;
-      var dx = open ? Math.round(Math.cos(a) * R) : 0;
-      var dy = open ? Math.round(-Math.sin(a) * R) : 0;
+      var t  = n > 1 ? i / (n - 1) : 0;               // 0 = най-горе
+      var dy = open ? -(BOTTOM + (n - 1 - i) * gap) : 0;
+      var dx = open ? -(BASE + Math.round(BOW * Math.sin(Math.PI * t))) : 0;
       var rec = adopted[it.id];
       rec.el.style.left = dx + 'px';
       rec.el.style.top  = dy + 'px';
-      // етикетите: изправена колона, за да не се застъпват
-      var ly = open ? -(n - 1 - i) * LBL_GAP : 0;
-      rec.label.style.left = (open ? LBL_X : 0) + 'px';
-      rec.label.style.top  = ly + 'px';
+      // надписът: залепен вляво от СВОЯ бутон, на същата височина
+      rec.label.style.left = (open ? dx - 26 : 0) + 'px';
+      rec.label.style.top  = dy + 'px';
       if(open){
-        var k = 1 - (24 / R);
+        var d = Math.sqrt(dx*dx + dy*dy), k = d ? (1 - 22/d) : 0;
         lines += '<line x1="0" y1="0" x2="' + Math.round(dx*k) + '" y2="' + Math.round(dy*k) + '"/>';
-        // от десния край на етикета до иконата — за да се вижда кое за кое е
-        var lx = LBL_X + 6, ux = dx - 22;
-        if(ux > lx) lines += '<line class="fab-link" x1="' + lx + '" y1="' + ly + '" x2="' + ux + '" y2="' + dy + '"/>';
       }
     });
     rays.innerHTML = lines;

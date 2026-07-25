@@ -793,35 +793,15 @@ body.map-clean .leaflet-marker-pane{ opacity:.55 !important; transition:opacity 
    • ТЕМА (дневна / нощна)  — сменя ХРОМА (заглавие, панели) — остава свободна
    Затова карък не „изяжда" бъдещата нощна тема.                        */
 /* картата остава четима — потъмняването убива смисъла ѝ */
-/* бронзови скоби в четирите ъгъла с лек неонов пулс */
-body.karyk-active::before,
+/* дебела бронзова линия с неонов пулс около целия екран */
 body.karyk-active::after{
-  content:''; position:fixed; pointer-events:none; z-index:2400;
-  width:62px; height:62px; border:0 solid #cd7f32;
-  animation:karyk-neon 2.4s ease-in-out infinite;
+  content:''; position:fixed; inset:0; z-index:2400; pointer-events:none;
+  border:7px solid #cd7f32; border-radius:4px;
+  animation:karyk-neon 2.6s ease-in-out infinite;
 }
-body.karyk-active::before{
-  top:0; left:0; border-top-width:7px; border-left-width:7px;
-  border-top-left-radius:6px;
-  box-shadow:
-     calc(100vw - 62px) 0 0 -0px transparent;
-}
-body.karyk-active::after{
-  bottom:0; right:0; border-bottom-width:7px; border-right-width:7px;
-  border-bottom-right-radius:6px;
-}
-#karyk-corner-tr, #karyk-corner-bl{
-  display:none; position:fixed; pointer-events:none; z-index:2400;
-  width:62px; height:62px; border:0 solid #cd7f32;
-  animation:karyk-neon 2.4s ease-in-out infinite;
-}
-#karyk-corner-tr{ top:0; right:0; border-top-width:7px; border-right-width:7px; border-top-right-radius:6px; }
-#karyk-corner-bl{ bottom:0; left:0; border-bottom-width:7px; border-left-width:7px; border-bottom-left-radius:6px; }
-body.karyk-active #karyk-corner-tr,
-body.karyk-active #karyk-corner-bl{ display:block; }
 @keyframes karyk-neon{
-  0%,100%{ filter:drop-shadow(0 0 3px #cd7f3288); opacity:.85; }
-  50%    { filter:drop-shadow(0 0 12px #ffa040) drop-shadow(0 0 22px #cd7f3266); opacity:1; }
+  0%,100%{ box-shadow:inset 0 0 10px rgba(205,127,50,.35), 0 0 6px rgba(205,127,50,.4); opacity:.9; }
+  50%    { box-shadow:inset 0 0 26px rgba(255,160,64,.7), inset 0 0 54px rgba(205,127,50,.28), 0 0 18px rgba(255,160,64,.55); opacity:1; }
 }
 #karyk-badge{
   display:none; position:fixed; z-index:2500;
@@ -1362,7 +1342,7 @@ body.map-fullscreen #next90-btn { display:none; }
     <span class="dh-close" onclick="closeDirHint()">✕</span>
   </div>
 </div>
-<button id="next90-btn" title="Следващи 90 минути">⏱</button>
+<button id="next90-btn" title="Събития в следващите 24 часа">⏱</button>
 <button id="gps-btn" title="GPS локация">📍</button>
 <button id="bakshish-btn" title="Бакшиш радар">🎩</button>
 
@@ -1383,7 +1363,7 @@ body.map-fullscreen #next90-btn { display:none; }
 
 <div id="next90-panel">
   <div class="n90-header">
-    ⏱ СЛЕДВАЩИ 90 МИНУТИ
+    ⏱ СЪБИТИЯ — СЛЕДВАЩИТЕ 24 ЧАСА
     <span class="n90-close" onclick="closeNext90()">✕</span>
   </div>
   <div id="next90-list"></div>
@@ -1414,7 +1394,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260725v54"></script>
+<script src="app.js?v=20260725v55"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">
