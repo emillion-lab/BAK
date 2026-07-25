@@ -1110,7 +1110,7 @@ function showAirportSchedule() {
   }
   // легендата е ВЪТРЕ в скрола, за да не се наслагва върху редовете
   html+='<div style="font-size:10.5px;color:var(--muted);margin-top:10px;padding-top:7px;border-top:1px solid var(--border);line-height:1.5">🇪🇺 Шенген +5–15 мин · 🛂 Извън +10–30 мин · 🔴 излизат сега · бледите още се точат</div>';
-  html+=`<div style="font-size:10.5px;color:#f59e0b;margin-top:5px;line-height:1.45">⚠️ Виждаме само ${flightDetails.length} полета — безплатният план на доставчика дава главно това, което е във въздуха сега. Реално СОФ приема ~100 на ден, тоест пред терминала може да има повече хора, отколкото показва списъкът.</div>`;
+  html+=`<div style="font-size:10.5px;color:var(--muted);margin-top:5px;line-height:1.45">Източник: AeroDataBox · ${flightDetails.length} пристигания за денонощието</div>`;
   html+='</div>';
   html+='</div>';
 
