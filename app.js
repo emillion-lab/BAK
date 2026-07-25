@@ -1114,23 +1114,36 @@ function showAirportSchedule() {
   html+='</div>';
   html+='</div>';
 
-  const airportZone=ZONES.find(z=>z.id==='airport');
-  if(airportZone){
-    L.popup({maxWidth:Math.min(340,window.innerWidth-30),maxHeight:Math.min(420,window.innerHeight*0.6),className:'airport-popup',autoPan:true})
-      .setLatLng([airportZone.lat,airportZone.lng])
-      .setContent(html)
-      .openOn(map);
-    setTimeout(()=>{
-      const box=document.getElementById('fl-scroll'), el=document.getElementById('fl-now-anchor');
-      if(box){
-        if(el) box.scrollTop = Math.max(0, el.offsetTop - box.offsetTop - 34);
-        try{ L.DomEvent.disableScrollPropagation(box); L.DomEvent.disableClickPropagation(box); }catch(e){}
-      }
-      const wrap=document.querySelector('.airport-popup .leaflet-popup-content-wrapper');
-      if(wrap){ try{ L.DomEvent.disableScrollPropagation(wrap); }catch(e){} }
-    }, 120);
+  // Самостоятелен прозорец, НЕ Leaflet попъп: попъпът се закача за маркера
+  // и когато летището е горе на екрана, съдържанието се реже извън картата.
+  var modal = document.getElementById('airport-modal');
+  if(!modal){
+    modal = document.createElement('div');
+    modal.id = 'airport-modal';
+    modal.innerHTML = '<div id="airport-modal-box">'
+      + '<div id="airport-modal-head"><span>✈️ Излизане на пасажери — СОФ</span>'
+      + '<button id="airport-modal-x" aria-label="Затвори">✕</button></div>'
+      + '<div id="airport-modal-body"></div></div>';
+    document.body.appendChild(modal);
+    modal.addEventListener('click', function(e){ if(e.target === modal) closeAirportModal(); });
+    modal.querySelector('#airport-modal-x').addEventListener('click', closeAirportModal);
   }
+  modal.querySelector('#airport-modal-body').innerHTML = html;
+  modal.style.display = 'flex';
+  setTimeout(function(){
+    var box = document.getElementById('fl-scroll'), el = document.getElementById('fl-now-anchor');
+    if(box && el) box.scrollTop = Math.max(0, el.offsetTop - box.offsetTop - 34);
+  }, 60);
 }
+
+function closeAirportModal(){
+  var m = document.getElementById('airport-modal');
+  if(m) m.style.display = 'none';
+}
+window.closeAirportModal = closeAirportModal;
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape') closeAirportModal();
+});
 
 window.showZonePopup = showZonePopup;
 function showZonePopup(zid) {

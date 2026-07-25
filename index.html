@@ -839,6 +839,35 @@ body.karyk-active .sidebar-title{ color:#e8a050; }
 .airport-popup .leaflet-popup-content{ margin:14px 12px 12px !important; }
 .airport-popup .leaflet-popup-content-wrapper{ overscroll-behavior:contain; }
 #fl-scroll{ overscroll-behavior:contain; touch-action:pan-y; }
+
+/* ═══ Летищен прозорец — независим от картата, винаги цял на екрана ═══ */
+#airport-modal{
+  display:none; position:fixed; inset:0; z-index:3000;
+  background:rgba(3,7,18,.55); backdrop-filter:blur(2px);
+  align-items:center; justify-content:center; padding:14px;
+}
+#airport-modal-box{
+  width:100%; max-width:430px; max-height:82vh;
+  display:flex; flex-direction:column;
+  background:var(--surf); color:var(--text);
+  border:1px solid var(--border); border-radius:14px;
+  box-shadow:0 10px 40px rgba(0,0,0,.6); overflow:hidden;
+}
+#airport-modal-head{
+  flex-shrink:0; display:flex; align-items:center; justify-content:space-between; gap:10px;
+  padding:11px 12px; border-bottom:1px solid var(--border);
+  font:900 15px system-ui,sans-serif; color:var(--cyan); background:var(--surf);
+}
+#airport-modal-x{
+  width:40px; height:40px; flex-shrink:0; border-radius:50%;
+  background:#0b1220; color:#fff; border:1.5px solid var(--cyan);
+  font-size:20px; font-weight:700; line-height:1; cursor:pointer;
+}
+#airport-modal-body{
+  overflow-y:auto; overscroll-behavior:contain;
+  padding:10px 12px 14px;
+}
+#airport-modal-body #fl-scroll{ max-height:none !important; overflow:visible !important; }
 </style>
 <style>
 
@@ -1407,7 +1436,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260726v72"></script>
+<script src="app.js?v=20260726v73"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">
