@@ -91,6 +91,18 @@ jobs:
                         if(b) b.click(); return {title:t.trim().slice(0,40), rows};})(),
               links: document.querySelectorAll('#fab-rays line.fab-link').length,
               topHint: (document.getElementById('tl-hint')||{}).textContent,
+              topRot: (window.__topRot||[]).slice(0,3),
+              flights: (()=>{
+                if(typeof showAirportSchedule!=='function') return 'функцията не е глобална!';
+                showAirportSchedule();
+                const txt=document.body.innerText||'';
+                const now=new Date(); const nowMin=now.getHours()*60+now.getMinutes();
+                // всички часове, показани в панела
+                const times=[...txt.matchAll(/(\d{2}):(\d{2})–(\d{2}):(\d{2})/g)]
+                  .map(m=>({from:+m[1]*60 + +m[2], to:+m[3]*60 + +m[4]}));
+                const past=times.filter(t=>t.to < nowMin-20).length;
+                return {redove:times.length, minali:past, chas:now.getHours()+':'+String(now.getMinutes()).padStart(2,'0')};
+              })(),
               bakshishRows: (()=>{const b=document.getElementById('bakshish-btn');
                         if(b) b.click();
                         const it=document.querySelector('#bakshish-list .bp-item');
