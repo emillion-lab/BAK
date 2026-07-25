@@ -21,114 +21,114 @@ AFTER OPEN: {
   "corners": 4,
   "pulse": "karyk-neon"
  },
- "minAdjacent": 46,
- "size": 38,
+ "minAdjacent": 63,
+ "size": 52,
  "align": [
   {
    "id": "karyk-btn",
-   "dy": -38,
-   "gap": 5
+   "dy": -27,
+   "gap": 6
   },
   {
    "id": "karyk-list-btn",
-   "dy": -14,
-   "gap": 5
+   "dy": -4,
+   "gap": 6
   },
   {
    "id": "bakshish-btn",
-   "dy": -2,
-   "gap": 5
+   "dy": 0,
+   "gap": 6
   },
   {
    "id": "next90-btn",
    "dy": 0,
-   "gap": 5
+   "gap": 6
   },
   {
    "id": "clean-btn",
    "dy": 0,
-   "gap": 5
+   "gap": 6
   },
   {
    "id": "gps-btn",
    "dy": 0,
-   "gap": 5
+   "gap": 6
   },
   {
    "id": "fs-btn",
    "dy": 0,
-   "gap": 5
+   "gap": 6
   }
  ],
- "neighbours": 46,
- "satSize": 38,
+ "neighbours": 63,
+ "satSize": 52,
  "n90": {
   "title": "⏱ СЪБИТИЯ — СЛЕДВАЩИТЕ 24 ЧАСА\n    ✕",
   "rows": 48
  },
- "links": 2,
+ "links": 1,
  "topHint": "Топ: 🛍 Paradise Center (2.0)",
  "bakshishRows": {
   "height": 31,
   "whyLines": 0
  },
  "open": true,
- "rays": 9,
+ "rays": 8,
  "hubCovered": "fab-hub",
  "sats": [
   {
    "id": "karyk-btn",
-   "w": 38,
-   "h": 38,
-   "dist": 176,
+   "w": 52,
+   "h": 52,
+   "dist": 192,
    "onScreen": true,
    "hit": "karyk-btn"
   },
   {
    "id": "karyk-list-btn",
-   "w": 38,
-   "h": 38,
-   "dist": 176,
+   "w": 52,
+   "h": 52,
+   "dist": 192,
    "onScreen": true,
    "hit": "karyk-list-btn"
   },
   {
    "id": "bakshish-btn",
-   "w": 38,
-   "h": 38,
-   "dist": 176,
+   "w": 52,
+   "h": 52,
+   "dist": 192,
    "onScreen": true,
    "hit": "bakshish-btn"
   },
   {
    "id": "next90-btn",
-   "w": 38,
-   "h": 38,
-   "dist": 175,
+   "w": 52,
+   "h": 52,
+   "dist": 192,
    "onScreen": true,
    "hit": "next90-btn"
   },
   {
    "id": "clean-btn",
-   "w": 38,
-   "h": 38,
-   "dist": 176,
+   "w": 52,
+   "h": 52,
+   "dist": 192,
    "onScreen": true,
    "hit": "clean-btn"
   },
   {
    "id": "gps-btn",
-   "w": 38,
-   "h": 38,
-   "dist": 176,
+   "w": 52,
+   "h": 52,
+   "dist": 192,
    "onScreen": true,
    "hit": "gps-btn"
   },
   {
    "id": "fs-btn",
-   "w": 38,
-   "h": 38,
-   "dist": 176,
+   "w": 52,
+   "h": 52,
+   "dist": 192,
    "onScreen": true,
    "hit": "fs-btn"
   }
@@ -140,7 +140,7 @@ AFTER OPEN: {
   "Бакшиш радар",
   "Събития 24ч",
   "Чиста карта",
-  "Моята локация",
+  "Моята локация [ИЗЛИЗА ОТ ЕКРАНА]",
   "Цял екран"
  ]
 }
