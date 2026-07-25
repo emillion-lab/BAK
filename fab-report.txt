@@ -19,43 +19,57 @@ AFTER OPEN: {
  "sats": [
   {
    "id": "karyk-btn",
-   "dist": 140,
-   "onScreen": false,
+   "w": 40,
+   "h": 40,
+   "dist": 155,
+   "onScreen": true,
    "hit": "karyk-btn"
   },
   {
    "id": "karyk-list-btn",
-   "dist": 140,
+   "w": 40,
+   "h": 40,
+   "dist": 155,
    "onScreen": true,
    "hit": "karyk-list-btn"
   },
   {
    "id": "bakshish-btn",
-   "dist": 140,
+   "w": 40,
+   "h": 40,
+   "dist": 155,
    "onScreen": true,
    "hit": "bakshish-btn"
   },
   {
    "id": "next90-btn",
-   "dist": 140,
+   "w": 40,
+   "h": 40,
+   "dist": 155,
    "onScreen": true,
    "hit": "next90-btn"
   },
   {
    "id": "clean-btn",
-   "dist": 140,
+   "w": 40,
+   "h": 40,
+   "dist": 155,
    "onScreen": true,
    "hit": "clean-btn"
   },
   {
    "id": "gps-btn",
-   "dist": 140,
+   "w": 40,
+   "h": 40,
+   "dist": 155,
    "onScreen": true,
    "hit": "gps-btn"
   },
   {
    "id": "fs-btn",
-   "dist": 140,
+   "w": 40,
+   "h": 40,
+   "dist": 155,
    "onScreen": true,
    "hit": "fs-btn"
   }
@@ -63,7 +77,7 @@ AFTER OPEN: {
  "labelOverlaps": 0,
  "labels": [
   "Карък Mode",
-  "Карък зони (списък)",
+  "Карък списък",
   "Бакшиш радар",
   "Следващи 90 мин",
   "Чиста карта",
