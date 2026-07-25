@@ -28,14 +28,33 @@ jobs:
           }));
           await p.click('#fab-hub');
           await new Promise(r=>setTimeout(r,700));
-          const after = await p.evaluate(() => ({
-            open: document.body.classList.contains('fab-open'),
-            rays: document.querySelectorAll('#fab-rays line').length,
-            positions: [...document.querySelectorAll('#fab-wrap .fab-sat')].map(e=>({
-              id:e.id, left:e.style.left, top:e.style.top
-            })),
-            labels: [...document.querySelectorAll('.fab-label')].map(e=>e.textContent.trim())
-          }));
+          const after = await p.evaluate(() => {
+            const hubR = document.getElementById('fab-hub').getBoundingClientRect();
+            const hubC = {x:hubR.x+hubR.width/2, y:hubR.y+hubR.height/2};
+            const sats = [...document.querySelectorAll('#fab-wrap .fab-sat')].map(e=>{
+              const r = e.getBoundingClientRect();
+              const c = {x:r.x+r.width/2, y:r.y+r.height/2};
+              return { id:e.id,
+                dist: Math.round(Math.hypot(c.x-hubC.x, c.y-hubC.y)),
+                onScreen: r.x>=0 && r.y>=0 && r.right<=innerWidth && r.bottom<=innerHeight,
+                // кой елемент реално получава допира в центъра на бутона
+                hit: (document.elementFromPoint(c.x,c.y)||{}).id || '?' };
+            });
+            const labs = [...document.querySelectorAll('.fab-label')].map(e=>{
+              const r=e.getBoundingClientRect();
+              return { t:e.textContent.trim(), y:Math.round(r.y), h:Math.round(r.height),
+                       fits: r.x>=0 && r.right<=innerWidth };
+            }).sort((a,b)=>a.y-b.y);
+            let overlaps=0;
+            for(let i=1;i<labs.length;i++) if(labs[i].y < labs[i-1].y+labs[i-1].h) overlaps++;
+            return {
+              open: document.body.classList.contains('fab-open'),
+              rays: document.querySelectorAll('#fab-rays line').length,
+              hubCovered: (document.elementFromPoint(hubC.x,hubC.y)||{}).id,
+              sats, labelOverlaps: overlaps,
+              labels: labs.map(l=>l.t+(l.fits?'':' [ИЗЛИЗА ОТ ЕКРАНА]'))
+            };
+          });
           console.log('BEFORE:', JSON.stringify(before,null,1));
           console.log('AFTER OPEN:', JSON.stringify(after,null,1));
           console.log('PAGEERRORS:', errs.slice(0,4).join(' | ') || 'none');
