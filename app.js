@@ -4598,24 +4598,22 @@ function toggleMapView(){
     var n = live.length;
     if(!n) return;
     var open = document.body.classList.contains('fab-open');
-    // ИСТИНСКО ВЕТРИЛО: равни ъглови стъпки от 90° (нагоре) до 180° (наляво).
-    // Разстоянията между съседите са еднакви, размахът е пълен.
+    // Ветрило 90°→205°: минава под хоризонтала, за да има място за
+    // ЕДРИ бутони (52px) с реален просвет — за работа в движеща се кола.
     var H  = window.innerHeight;
-    var R  = Math.max(140, Math.min(176, H * 0.215));
-    var A0 = 90, A1 = 180;
+    var R  = Math.max(158, Math.min(192, H * 0.235));
+    var A0 = 90, A1 = 205;
     var step = n > 1 ? (A1 - A0) / (n - 1) : 0;
 
-    var pos = [], lab = [];
+    var pos = [];
     live.forEach(function(it, i){
       var a = (A0 + step * i) * Math.PI / 180;
-      var px = Math.round(Math.cos(a) * R), py = Math.round(-Math.sin(a) * R);
-      pos.push({ x: px, y: py });
-      lab.push({ x: px - 24, y: py });     // надписът стои вляво от СВОЯ бутон
+      pos.push({ x: Math.round(Math.cos(a) * R), y: Math.round(-Math.sin(a) * R) });
     });
-    // разместване на надписите по вертикала, ако се застъпват (отдолу нагоре)
-    var MINGAP = 30;
+    // надписите застават вляво от своя бутон; разместваме само при сблъсък
+    var MINGAP = 34, lab = pos.map(function(p){ return p.y; });
     for(var i = lab.length - 2; i >= 0; i--){
-      if(lab[i + 1].y - lab[i].y < MINGAP) lab[i].y = lab[i + 1].y - MINGAP;
+      if(lab[i + 1] - lab[i] < MINGAP) lab[i] = lab[i + 1] - MINGAP;
     }
 
     var lines = '';
@@ -4624,17 +4622,14 @@ function toggleMapView(){
       var dx = open ? pos[i].x : 0, dy = open ? pos[i].y : 0;
       rec.el.style.left = dx + 'px';
       rec.el.style.top  = dy + 'px';
-      // надписът се подравнява вдясно спрямо своята точка → разгъва се наляво
-      var lx = open ? lab[i].x : 0;
-      var ly = open ? lab[i].y : 0;
+      var lx = open ? dx - 32 : 0, ly = open ? lab[i] : 0;
       rec.label.style.left = lx + 'px';
       rec.label.style.top  = ly + 'px';
       if(open){
-        var d = Math.sqrt(dx*dx + dy*dy), k = d ? (1 - 21/d) : 0;
+        var d = Math.sqrt(dx*dx + dy*dy), k = d ? (1 - 28/d) : 0;
         lines += '<line x1="0" y1="0" x2="' + Math.round(dx*k) + '" y2="' + Math.round(dy*k) + '"/>';
-        // къса връзка надпис → бутон, когато надписът е бил изместен
         if(Math.abs(ly - dy) > 6)
-          lines += '<line class="fab-link" x1="' + (lx + 4) + '" y1="' + ly + '" x2="' + (dx - 20) + '" y2="' + dy + '"/>';
+          lines += '<line class="fab-link" x1="' + (lx + 4) + '" y1="' + ly + '" x2="' + (dx - 27) + '" y2="' + dy + '"/>';
       }
     });
     rays.innerHTML = lines;
