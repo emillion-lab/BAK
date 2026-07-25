@@ -13,8 +13,14 @@ BEFORE: {
  "strayFixed": []
 }
 AFTER OPEN: {
+ "karyk": {
+  "active": true,
+  "badge": "block",
+  "mapFilter": "brightness(0.34) saturate(0.28) contrast(1"
+ },
+ "links": 5,
  "open": true,
- "rays": 7,
+ "rays": 12,
  "hubCovered": "fab-hub",
  "sats": [
   {
