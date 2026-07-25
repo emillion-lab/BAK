@@ -21,114 +21,114 @@ AFTER OPEN: {
   "corners": 4,
   "pulse": "karyk-neon"
  },
- "minAdjacent": 40,
- "size": 34,
+ "minAdjacent": 46,
+ "size": 38,
  "align": [
   {
    "id": "karyk-btn",
-   "dy": 0,
-   "gap": 7
+   "dy": -78,
+   "gap": 5
   },
   {
    "id": "karyk-list-btn",
-   "dy": 0,
-   "gap": 7
+   "dy": -54,
+   "gap": 5
   },
   {
    "id": "bakshish-btn",
-   "dy": 0,
-   "gap": 7
+   "dy": -42,
+   "gap": 5
   },
   {
    "id": "next90-btn",
-   "dy": 0,
-   "gap": 7
+   "dy": -34,
+   "gap": 15
   },
   {
    "id": "clean-btn",
-   "dy": 0,
-   "gap": 7
+   "dy": -24,
+   "gap": 23
   },
   {
    "id": "gps-btn",
-   "dy": 0,
-   "gap": 7
+   "dy": -12,
+   "gap": 27
   },
   {
    "id": "fs-btn",
    "dy": 0,
-   "gap": 7
+   "gap": 29
   }
  ],
- "neighbours": 40,
- "satSize": 34,
+ "neighbours": 46,
+ "satSize": 38,
  "n90": {
   "title": "⏱ СЪБИТИЯ — СЛЕДВАЩИТЕ 24 ЧАСА\n    ✕",
   "rows": 48
  },
- "links": 0,
+ "links": 6,
  "topHint": "Топ: 🚌 Централна автогара (4.0) 🚉 пик",
  "bakshishRows": {
   "height": 31,
   "whyLines": 0
  },
  "open": true,
- "rays": 7,
+ "rays": 13,
  "hubCovered": "fab-hub",
  "sats": [
   {
    "id": "karyk-btn",
-   "w": 34,
-   "h": 34,
-   "dist": 187,
+   "w": 38,
+   "h": 38,
+   "dist": 176,
    "onScreen": true,
    "hit": "karyk-btn"
   },
   {
    "id": "karyk-list-btn",
-   "w": 34,
-   "h": 34,
-   "dist": 173,
+   "w": 38,
+   "h": 38,
+   "dist": 176,
    "onScreen": true,
    "hit": "karyk-list-btn"
   },
   {
    "id": "bakshish-btn",
-   "w": 34,
-   "h": 34,
-   "dist": 161,
+   "w": 38,
+   "h": 38,
+   "dist": 176,
    "onScreen": true,
    "hit": "bakshish-btn"
   },
   {
    "id": "next90-btn",
-   "w": 34,
-   "h": 34,
-   "dist": 153,
+   "w": 38,
+   "h": 38,
+   "dist": 175,
    "onScreen": true,
    "hit": "next90-btn"
   },
   {
    "id": "clean-btn",
-   "w": 34,
-   "h": 34,
-   "dist": 150,
+   "w": 38,
+   "h": 38,
+   "dist": 176,
    "onScreen": true,
    "hit": "clean-btn"
   },
   {
    "id": "gps-btn",
-   "w": 34,
-   "h": 34,
-   "dist": 151,
+   "w": 38,
+   "h": 38,
+   "dist": 176,
    "onScreen": true,
    "hit": "gps-btn"
   },
   {
    "id": "fs-btn",
-   "w": 34,
-   "h": 34,
-   "dist": 157,
+   "w": 38,
+   "h": 38,
+   "dist": 176,
    "onScreen": true,
    "hit": "fs-btn"
   }
