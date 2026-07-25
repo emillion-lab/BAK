@@ -16,7 +16,7 @@ AFTER OPEN: {
  "karyk": {
   "active": true,
   "badge": "block",
-  "mapFilter": "brightness(0.85) saturate(0.6)",
+  "mapFilter": "brightness(0.72) saturate(0.55) contrast(1",
   "frame": "7px/7px/7px/7px anim=karyk-neon inset=0px",
   "corners": 4,
   "pulse": "karyk-neon"
@@ -63,18 +63,18 @@ AFTER OPEN: {
  "neighbours": 63,
  "satSize": 52,
  "links": 1,
- "ticker": "✈️ 22:40 W64406 от Barcelona — ИЗЛИЗАТ · ✈️ 22:40 W64406 от Barcelona — ИЗЛИЗАТ · ",
+ "ticker": "✈️ 02:05 FB564 от Lisbon · ✈️ 02:05 FB564 от Lisbon · ",
  "n90": "Няма театри, кина или концерти в следващите 24 часа.Източник: SEV (theatre.art.bg и др.)",
- "topHint": "Топ: 🏨 Хотели Център (2.7)",
+ "topHint": "Топ: 🚌 Централна автогара (3.0) 🚉 пик",
  "topRot": [
-  "Топ: ✈️ Летище София (7.0) ✈ пик",
-  "Топ: 🏨 Хотели Център (2.7)",
-  "Топ: 🌳 Борисова градина (2.3)"
+  "Топ: ✈️ Летище София (4.6) ✈ пик",
+  "Топ: 🚌 Централна автогара (3.0) 🚉 пик",
+  "Топ: 🎓 Студентски град (2.2)"
  ],
  "flights": {
-  "redove": 78,
-  "minali": 78,
-  "chas": "22:58"
+  "redove": 76,
+  "minali": 76,
+  "chas": "23:18"
  },
  "bakshishRows": {
   "height": 31,
