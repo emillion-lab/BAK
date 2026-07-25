@@ -4825,3 +4825,25 @@ function toggleMapView(){
   else mount();
   window.__setTheme = function(t){ try{ localStorage.setItem(KEY, t); }catch(e){} apply(t); };
 })();
+
+// ═══════════════════════════════════════════════
+// OVERLAY: картата се простира под стъклените ленти
+// ═══════════════════════════════════════════════
+(function(){
+  function sync(){
+    var st = document.getElementById('topstack');
+    if(!st) return;
+    var h = st.offsetHeight || 200;
+    document.documentElement.style.setProperty('--stack-h', h + 'px');
+    try{ if(window.map && map.invalidateSize) map.invalidateSize(); }catch(e){}
+  }
+  function boot(){
+    sync();
+    setTimeout(sync, 400); setTimeout(sync, 1200);
+    window.addEventListener('resize', sync);
+    window.addEventListener('orientationchange', function(){ setTimeout(sync, 300); });
+    try{ new ResizeObserver(sync).observe(document.getElementById('topstack')); }catch(e){}
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
