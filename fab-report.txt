@@ -28,7 +28,7 @@ AFTER OPEN: {
   "stackVar": "238px"
  },
  "darkInLight": [
-  ".ticker-bar rgba(6, 16, 28, 0.72)"
+  ".ticker-bar rgba(12, 22, 38, 0.58)"
  ],
  "minAdjacent": 63,
  "size": 52,
@@ -82,8 +82,8 @@ AFTER OPEN: {
  ],
  "flights": {
   "redove": 78,
-  "minali": 77,
-  "chas": "23:48"
+  "minali": 78,
+  "chas": "23:53"
  },
  "bakshishRows": {
   "height": 31,
