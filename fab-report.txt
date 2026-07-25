@@ -26,38 +26,38 @@ AFTER OPEN: {
  "align": [
   {
    "id": "karyk-btn",
-   "dy": -78,
+   "dy": -38,
    "gap": 5
   },
   {
    "id": "karyk-list-btn",
-   "dy": -54,
+   "dy": -14,
    "gap": 5
   },
   {
    "id": "bakshish-btn",
-   "dy": -42,
+   "dy": -2,
    "gap": 5
   },
   {
    "id": "next90-btn",
-   "dy": -34,
-   "gap": 15
+   "dy": 0,
+   "gap": 5
   },
   {
    "id": "clean-btn",
-   "dy": -24,
-   "gap": 23
+   "dy": 0,
+   "gap": 5
   },
   {
    "id": "gps-btn",
-   "dy": -12,
-   "gap": 27
+   "dy": 0,
+   "gap": 5
   },
   {
    "id": "fs-btn",
    "dy": 0,
-   "gap": 29
+   "gap": 5
   }
  ],
  "neighbours": 46,
@@ -66,14 +66,14 @@ AFTER OPEN: {
   "title": "⏱ СЪБИТИЯ — СЛЕДВАЩИТЕ 24 ЧАСА\n    ✕",
   "rows": 48
  },
- "links": 6,
- "topHint": "Топ: 🚌 Централна автогара (4.0) 🚉 пик",
+ "links": 2,
+ "topHint": "Топ: 🛍 Paradise Center (2.0)",
  "bakshishRows": {
   "height": 31,
   "whyLines": 0
  },
  "open": true,
- "rays": 13,
+ "rays": 9,
  "hubCovered": "fab-hub",
  "sats": [
   {
