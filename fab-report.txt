@@ -1,0 +1,58 @@
+BEFORE: {
+ "hub": true,
+ "sats": [
+  "karyk-btn",
+  "bakshish-btn",
+  "next90-btn",
+  "clean-btn",
+  "gps-btn",
+  "fs-btn"
+ ],
+ "karakListBtn": true,
+ "strayFixed": []
+}
+AFTER OPEN: {
+ "open": true,
+ "rays": 6,
+ "positions": [
+  {
+   "id": "karyk-btn",
+   "left": "0px",
+   "top": "-108px"
+  },
+  {
+   "id": "bakshish-btn",
+   "left": "-33px",
+   "top": "-103px"
+  },
+  {
+   "id": "next90-btn",
+   "left": "-63px",
+   "top": "-87px"
+  },
+  {
+   "id": "clean-btn",
+   "left": "-87px",
+   "top": "-63px"
+  },
+  {
+   "id": "gps-btn",
+   "left": "-103px",
+   "top": "-33px"
+  },
+  {
+   "id": "fs-btn",
+   "left": "-108px",
+   "top": "0px"
+  }
+ ],
+ "labels": [
+  "Карък Mode",
+  "Бакшиш радар",
+  "Следващи 90 мин",
+  "Чиста карта",
+  "Моята локация",
+  "Цял екран"
+ ]
+}
+PAGEERRORS: none
