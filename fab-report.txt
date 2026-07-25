@@ -64,10 +64,20 @@ AFTER OPEN: {
  "satSize": 52,
  "n90": {
   "title": "⏱ СЪБИТИЯ — СЛЕДВАЩИТЕ 24 ЧАСА\n    ✕",
-  "rows": 48
+  "rows": 46
  },
  "links": 1,
- "topHint": "Топ: 🛍 Paradise Center (2.0)",
+ "topHint": "Топ: ✈️ Летище София (3.1) ✈ пик",
+ "topRot": [
+  "Топ: 🚌 Централна автогара (4.0) 🚉 пик",
+  "Топ: ✈️ Летище София (3.1) ✈ пик",
+  "Топ: 🏨 Хотели Център (2.7)"
+ ],
+ "flights": {
+  "redove": 14,
+  "minali": 0,
+  "chas": "12:53"
+ },
  "bakshishRows": {
   "height": 31,
   "whyLines": 0
