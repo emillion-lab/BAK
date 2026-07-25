@@ -81,7 +81,25 @@ jobs:
             };
             if(kb) kb.click();
             return {
-              karyk, minAdjacent, size,
+              karyk,
+              layout: (()=>{
+                const st=document.getElementById('topstack'), mp=document.getElementById('map');
+                if(!st||!mp) return 'липсва stage';
+                const s=st.getBoundingClientRect(), m=mp.getBoundingClientRect();
+                return { stackH:Math.round(s.height), mapH:Math.round(m.height),
+                         mapUnderStack: Math.round(m.top) <= Math.round(s.top)+2,
+                         stackVar:getComputedStyle(document.documentElement).getPropertyValue('--stack-h').trim() };})(),
+              darkInLight: (()=>{
+                document.body.classList.remove('theme-night'); document.body.classList.add('theme-day');
+                const bad=[];
+                ['#fab-hub','.fab-label','#weather-bar','.ticker-bar','.header'].forEach(sel=>{
+                  const e=document.querySelector(sel); if(!e) return;
+                  const bg=getComputedStyle(e).backgroundColor;
+                  const m=bg.match(/(\d+),\s*(\d+),\s*(\d+)/);
+                  if(m){ const lum=(+m[1]*0.299 + +m[2]*0.587 + +m[3]*0.114);
+                         if(lum < 110) bad.push(sel+' '+bg); }
+                });
+                return bad;})(), minAdjacent, size,
               align,
               neighbours: minAdjacent,
               satSize: cs.length?Math.round(cs[0].w):0,
