@@ -1,0 +1,47 @@
+name: FAB Test
+on: workflow_dispatch
+permissions:
+  contents: write
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - run: npm install puppeteer@22 --no-save 2>&1 | tail -1
+      - run: |
+          cat > ft.mjs << 'JS'
+          import puppeteer from 'puppeteer';
+          const b = await puppeteer.launch({args:['--no-sandbox']});
+          const p = await b.newPage();
+          await p.setViewport({width:390,height:844});
+          const errs=[]; p.on('pageerror',e=>errs.push(String(e.message||e)));
+          await p.goto('https://emillion-lab.github.io/BAK/?fab='+Date.now(), {waitUntil:'networkidle2', timeout:45000});
+          await new Promise(r=>setTimeout(r,7000));
+          const before = await p.evaluate(() => ({
+            hub: !!document.getElementById('fab-hub'),
+            sats: [...document.querySelectorAll('#fab-wrap .fab-sat')].map(e=>e.id),
+            karakListBtn: !!document.getElementById('toggle-map-btn-k'),
+            strayFixed: [...document.querySelectorAll('#gps-btn,#fs-btn,#bakshish-btn,#next90-btn,#karyk-btn')]
+              .filter(e=>!e.closest('#fab-wrap')).map(e=>e.id)
+          }));
+          await p.click('#fab-hub');
+          await new Promise(r=>setTimeout(r,700));
+          const after = await p.evaluate(() => ({
+            open: document.body.classList.contains('fab-open'),
+            rays: document.querySelectorAll('#fab-rays line').length,
+            positions: [...document.querySelectorAll('#fab-wrap .fab-sat')].map(e=>({
+              id:e.id, left:e.style.left, top:e.style.top
+            })),
+            labels: [...document.querySelectorAll('.fab-label')].map(e=>e.textContent.trim())
+          }));
+          console.log('BEFORE:', JSON.stringify(before,null,1));
+          console.log('AFTER OPEN:', JSON.stringify(after,null,1));
+          console.log('PAGEERRORS:', errs.slice(0,4).join(' | ') || 'none');
+          await b.close();
+          JS
+          node ft.mjs > fab-report.txt 2>&1 || true
+          git config user.name ci; git config user.email ci@fish.taxi
+          git add fab-report.txt && git commit -m "fab test [skip ci]" || true
+          git push
