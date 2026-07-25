@@ -4854,3 +4854,42 @@ function toggleMapView(){
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
 })();
+
+// ═══════════════════════════════════════════════
+// Подреден стек с чиповете долу вляво
+// Всеки модул си създава свой fixed чип с различно bottom —
+// затова се застъпваха. Тук ги събираме в една колона.
+// ═══════════════════════════════════════════════
+(function(){
+  var stack;
+  function ensure(){
+    if(stack) return stack;
+    stack = document.getElementById('chip-stack');
+    if(!stack){
+      stack = document.createElement('div');
+      stack.id = 'chip-stack';
+      document.body.appendChild(stack);
+    }
+    return stack;
+  }
+  function adopt(){
+    var s = ensure();
+    var all = document.querySelectorAll('body > div');
+    for(var i = 0; i < all.length; i++){
+      var el = all[i];
+      if(el === s || el.closest('#chip-stack')) continue;
+      if(el.id === 'chip-stack' || el.id === 'fab-wrap' || el.id === 'topstack') continue;
+      var st = el.style;
+      if(st.position !== 'fixed') continue;
+      // чип = закачен вляво долу, тесен, не е панел
+      if(st.left !== '8px') continue;
+      if(!st.bottom) continue;
+      if(el.offsetHeight > 90) continue;               // панелите остават на място
+      if(el.id && /panel|modal|sidebar/i.test(el.id)) continue;
+      s.appendChild(el);
+    }
+  }
+  function boot(){ adopt(); setInterval(adopt, 1500); }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();

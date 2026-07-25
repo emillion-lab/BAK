@@ -991,6 +991,31 @@ body.theme-night #fab-wrap .fab-sat{
   border-radius:12px !important;
 }
 body.theme-night .map-chip{ box-shadow:var(--card), 0 0 14px rgba(34,211,238,.12) !important; }
+
+/* бакшиш панелът: четими цветове и в двете теми */
+#bakshish-panel .bp-name, #bakshish-panel .bp-rank{ color:var(--text) !important; }
+#bakshish-panel .bp-shift, #bakshish-panel .bp-shift *{ color:var(--gold) !important; }
+#bakshish-panel .bp-item{ border-bottom:1px solid var(--glass-edge) !important; }
+body.theme-day #bakshish-panel .bp-item{ background:rgba(255,255,255,.35) !important; }
+
+/* ═══ подреден стек с чипове долу вляво ═══ */
+#chip-stack{
+  position:fixed; left:8px; bottom:8px; z-index:1500;
+  display:flex; flex-direction:column-reverse; gap:6px;
+  max-width:62vw; pointer-events:none;
+}
+#chip-stack > *{
+  position:static !important; left:auto !important; bottom:auto !important;
+  right:auto !important; top:auto !important;
+  pointer-events:auto; margin:0 !important;
+  background:var(--glass) !important; color:var(--text) !important;
+  border:1px solid var(--glass-edge) !important;
+  backdrop-filter:saturate(175%) blur(14px);
+  -webkit-backdrop-filter:saturate(175%) blur(14px);
+  box-shadow:var(--card) !important;
+}
+/* списъкът да може да се доскролва изпод ветрилото */
+#zone-sidebar, #karyk-sidebar{ padding-bottom:96px; }
 </style>
 <style>
 
@@ -1023,6 +1048,7 @@ body.theme-night .map-chip{ box-shadow:var(--card), 0 0 14px rgba(34,211,238,.12
   --title:linear-gradient(100deg,#0369a1,#0891b2 45%,#6366f1);
   --scrim:rgba(240,245,252,.55);
   --bronze:#b06a1f; --bronze-soft:rgba(176,106,31,.28); --bronze-hot:rgba(217,140,60,.55);
+  --gold:#8a6d12; --gold-edge:rgba(138,109,18,.28);
 }
 body.theme-night {
   --bg:#060b14; --surface:#0e1726; --border:#22334c;
@@ -1046,6 +1072,7 @@ body.theme-night {
   --title:linear-gradient(100deg,#22d3ee,#67e8f9 40%,#a78bfa);
   --scrim:rgba(3,7,18,.55);
   --bronze:#e8a050; --bronze-soft:rgba(205,127,50,.35); --bronze-hot:rgba(255,175,90,.75);
+  --gold:#d4af37; --gold-edge:rgba(212,175,55,.35);
 }
 
 /* плавна смяна на темата */
@@ -1312,19 +1339,23 @@ body.map-fullscreen #bakshish-btn { display:none; }
 
 #bakshish-panel {
   display:none;
-  position:fixed; top:0; left:0; right:0; z-index:2600;
-  background:#0d0e00f8;
-  border-bottom:2px solid #d4af37;
-  max-height:75vh; overflow-y:auto;
-  backdrop-filter:blur(8px);
+  position:fixed; left:8px; right:8px; bottom:12px; top:auto; z-index:2600;
+  background:var(--glass);
+  border:1px solid var(--gold-edge);
+  border-radius:18px;
+  max-height:58vh; overflow-y:auto; overscroll-behavior:contain;
+  backdrop-filter:saturate(180%) blur(18px);
+  -webkit-backdrop-filter:saturate(180%) blur(18px);
+  box-shadow:var(--modal-shadow);
 }
 #bakshish-panel .bp-header {
-  position:sticky; top:0; background:#0d0e00f8; z-index:5;
+  position:sticky; top:0; background:var(--glass); z-index:5;
+  backdrop-filter:saturate(180%) blur(18px);
   display:flex; align-items:center; gap:10px;
   padding:10px 14px;
   font-family:'Courier New',Courier,monospace;
-  font-size:16px; color:#d4af37;
-  border-bottom:1px solid #3a3000;
+  font-size:15px; color:var(--gold);
+  border-bottom:1px solid var(--gold-edge);
   position:sticky; top:0; background:#0d0e00f8; z-index:1;
 }
 #bakshish-panel .bp-shift {
