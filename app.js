@@ -393,11 +393,11 @@ const EVENTS = [
   { zone:"ag_yug",       name:"Нощни автобуси",                 endHour:22.0, boost:1.5, repeat:"daily" },
 
   // Болници — меки вълни
-  { zone:"pirogov",      name:"Пирогов – прегледи",             endHour:9.0,  boost:1.4, repeat:"daily" },
+  { zone:"pirogov",      name:"Пирогов – прегледи",             endHour:9.0,  boost:1.4, repeat:"mon-fri" },
   { zone:"pirogov",      name:"Пирогов – вечерни посещения",    endHour:18.5, boost:1.2, repeat:"daily" },
-  { zone:"alexand",      name:"Александровска – прегледи",      endHour:9.0,  boost:1.3, repeat:"daily" },
-  { zone:"sv_anna",      name:"Св.Анна – прегледи",             endHour:9.0,  boost:1.1, repeat:"daily" },
-  { zone:"isul",         name:"ИСУЛ – прегледи",                endHour:9.0,  boost:1.1, repeat:"daily" },
+  { zone:"alexand",      name:"Александровска – прегледи",      endHour:9.0,  boost:1.3, repeat:"mon-fri" },
+  { zone:"sv_anna",      name:"Св.Анна – прегледи",             endHour:9.0,  boost:1.1, repeat:"mon-fri" },
+  { zone:"isul",         name:"ИСУЛ – прегледи",                endHour:9.0,  boost:1.1, repeat:"mon-fri" },
 
   // Университети
   { zone:"unss",         name:"УНСС – края на лекции",          endHour:13.5, boost:2.0, repeat:"mon-fri" },
@@ -446,13 +446,13 @@ const EVENTS = [
   { zone:"pool_spartak",    name:"Басейн Спартак – лятно изтичане",    endHour:18.5, boost:1.5, repeat:"daily" },
   { zone:"pool_diana",      name:"Басейни Диана – лятно изтичане",     endHour:19.0, boost:1.5, repeat:"daily" },
   { zone:"pool_akademika",  name:"Басейн Академика – лятно изтичане",  endHour:18.0, boost:1.4, repeat:"daily" },
-  { zone:"acibadem_tokuda",  name:"Acibadem Токуда – прегледи",        endHour:9.0,  boost:1.1, repeat:"daily" },
-  { zone:"acibadem_cardio",  name:"Acibadem Сърдечно-съдов – прегледи",endHour:9.0,  boost:1.0, repeat:"daily" },
-  { zone:"acibadem_mladost", name:"Acibadem Младост – прегледи",       endHour:9.0,  boost:1.1, repeat:"daily" },
-  { zone:"sv_ekaterina",     name:"Св.Екатерина – прегледи",           endHour:9.0,  boost:1.1, repeat:"daily" },
-  { zone:"lozenets_h",       name:"УБ Лозенец – прегледи",             endHour:9.0,  boost:1.0, repeat:"daily" },
-  { zone:"kardiologia",      name:"Кардиологична – прегледи",          endHour:9.0,  boost:1.0, repeat:"daily" },
-  { zone:"sv_sofia_h",       name:"МБАЛ Св.София – прегледи",          endHour:9.0,  boost:1.0, repeat:"daily" },
+  { zone:"acibadem_tokuda",  name:"Acibadem Токуда – прегледи",        endHour:9.0,  boost:1.1, repeat:"mon-fri" },
+  { zone:"acibadem_cardio",  name:"Acibadem Сърдечно-съдов – прегледи",endHour:9.0,  boost:1.0, repeat:"mon-fri" },
+  { zone:"acibadem_mladost", name:"Acibadem Младост – прегледи",       endHour:9.0,  boost:1.1, repeat:"mon-fri" },
+  { zone:"sv_ekaterina",     name:"Св.Екатерина – прегледи",           endHour:9.0,  boost:1.1, repeat:"mon-fri" },
+  { zone:"lozenets_h",       name:"УБ Лозенец – прегледи",             endHour:9.0,  boost:1.0, repeat:"mon-fri" },
+  { zone:"kardiologia",      name:"Кардиологична – прегледи",          endHour:9.0,  boost:1.0, repeat:"mon-fri" },
+  { zone:"sv_sofia_h",       name:"МБАЛ Св.София – прегледи",          endHour:9.0,  boost:1.0, repeat:"mon-fri" },
   { zone:"acibadem_tokuda",  name:"Acibadem Токуда – вечерни",         endHour:18.5, boost:1.0, repeat:"daily" },
   { zone:"acibadem_mladost", name:"Acibadem Младост – вечерни",        endHour:18.5, boost:1.0, repeat:"daily" },
 
