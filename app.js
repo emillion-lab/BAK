@@ -2040,38 +2040,6 @@ function toggleMapView(){
 })();
 
 
-// ------ ☔ Прогноза за дъжд (следващите 12ч, Open-Meteo) ------
-// rain-forecast-chip
-(function(){
-  function hm(d){return d.toLocaleTimeString('bg',{hour:'2-digit',minute:'2-digit'});}
-  fetch('https://api.open-meteo.com/v1/forecast?latitude=42.695&longitude=23.406&hourly=precipitation_probability,precipitation&forecast_days=2&timezone=Europe%2FSofia')
-  .then(function(r){return r.json()}).then(function(d){
-    var t=d.hourly.time,p=d.hourly.precipitation,pp=d.hourly.precipitation_probability;
-    var now=Date.now(), hit=null;
-    for(var i=0;i<t.length;i++){
-      var ts=new Date(t[i]+':00+03:00').getTime();
-      if(ts<now-3600000) continue;
-      if(ts>now+12*3600000) break;
-      if((pp[i]>=50&&p[i]>=0.1)||p[i]>=0.4){ hit={ts:ts,pr:pp[i],mm:p[i]}; break; }
-    }
-    var chip=document.createElement('div');
-    chip.style.cssText='position:fixed;left:8px;bottom:112px;z-index:1500;border-radius:10px;padding:6px 10px;font-family:sans-serif;font-size:12px;font-weight:900;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.5)';
-    if(hit){
-      var mins=Math.round((hit.ts-now)/60000);
-      var when=mins<=0?'сега':(mins<60?('след '+mins+' мин'):('след '+Math.floor(mins/60)+'ч '+(mins%60)+'м'));
-      chip.textContent='☔ Дъжд от '+hm(new Date(hit.ts))+' ('+when+')';
-      var urgent=mins<90;
-      chip.style.background=urgent?'#3a2510f0':'#10233af0';
-      chip.style.color=urgent?'#fbbf24':'#93c5fd';
-      chip.style.border='1px solid '+(urgent?'#f59e0b':'#3b82f6');
-    } else {
-      chip.textContent='☀️ Без дъжд 12ч';
-      chip.style.background='#111827d0'; chip.style.color='#9ca3af'; chip.style.border='1px solid #374151';
-    }
-    chip.onclick=function(){ chip.style.display='none'; };
-    document.body.appendChild(chip);
-  }).catch(function(e){});
-})();
 
 // ------ 🛬 Излизат сега: кацане -> изходен прозорец (кацане+15 до +40 мин) ------
 // exit-now-panel exit-now-v2
@@ -2100,9 +2068,14 @@ function toggleMapView(){
         else if(xs>now&&xs<=now+60*60000) soon.push(item);
       });
       out.sort(function(a,b){return a.xe-b.xe}); soon.sort(function(a,b){return a.xs-b.xs});
-      if(!out.length&&!soon.length){ chip.style.display='none'; panel.style.display='none'; return; }
       chip.style.display='block';
-      chip.textContent='🛬 '+(out.length?out.length+' излизат СЕГА':'')+(out.length&&soon.length?' · ':'')+(soon.length?soon.length+' до 1ч':'');
+      if(!out.length&&!soon.length){
+        chip.textContent='🛬 Няма излизащи сега';
+        chip.style.background='#111827e0'; chip.style.color='#94a3b8'; chip.style.borderColor='#334155';
+      } else {
+        chip.style.background='#0f2818f0'; chip.style.color='#86efac'; chip.style.borderColor='#22c55e';
+        chip.textContent='🛬 '+(out.length?out.length+' излизат СЕГА':'')+(out.length&&soon.length?' · ':'')+(soon.length?soon.length+' до 1ч':'');
+      }
       var html='<div style=\"font-weight:900;font-size:14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center\"><span>🛬 Изходи Терминал 1/2</span><span style=\"cursor:pointer;padding:2px 10px;font-size:16px;color:#94a3b8\" onclick=\"this.parentElement.parentElement.style.display=&quot;none&quot;\">✕</span></div>';
       out.forEach(function(f){
         html+='<div style=\"background:#14532d80;border-left:3px solid #22c55e;border-radius:6px;padding:6px 8px;margin:5px 0\">'+
@@ -4373,7 +4346,8 @@ function toggleMapView(){
   var open = false;
 
   var btn = document.createElement('div');
-  btn.textContent = '🥉 КЪРК';
+  btn.id = 'karyk-list-btn';
+  btn.textContent = '🥉 КАРЪК';
   btn.style.cssText = 'position:fixed;right:8px;top:calc(50% + 46px);z-index:1400;'
     + 'background:#2a1a05e8;color:#fbbf24;border:1px solid #b45309;border-radius:9px;'
     + 'padding:6px 9px;font:800 11px system-ui,sans-serif;cursor:pointer;'
@@ -4426,7 +4400,7 @@ function toggleMapView(){
   function render(){
     var rows = build();
     var html = '<div style="display:flex;justify-content:space-between;align-items:center;'
-      + 'margin-bottom:8px"><b style="font-size:14px;color:#fbbf24">🥉 КЪРК — къде да ида</b>'
+      + 'margin-bottom:8px"><b style="font-size:14px;color:#fbbf24">🥉 КАРЪК — къде да ида</b>'
       + '<span id="karyk46-x" style="cursor:pointer;padding:2px 10px;color:#94a3b8;'
       + 'font-size:16px">✕</span></div>';
     if(!rows.length){
@@ -4468,17 +4442,19 @@ function toggleMapView(){
 })();
 
 // ═══════════════════════════════════════════════
-// РАДИАЛНО МЕНЮ (FAB) — събира плаващите бутони
+// РАДИАЛНО МЕНЮ (FAB) v2 — звезда с лъчи
 // ═══════════════════════════════════════════════
 (function(){
-  var R = 108;                 // радиус на орбитата
+  var R = 140, A0 = 78, A1 = 191;   // радиус и дъга (градуси)
+  var LBL_X = -178, LBL_GAP = 30;   // колона с етикети
   var ITEMS = [
-    { id:'karyk-btn',    icon:'🥉', label:'Карък Mode' },
-    { id:'bakshish-btn', icon:'🎩', label:'Бакшиш радар' },
-    { id:'next90-btn',   icon:'⏱', label:'Следващи 90 мин' },
-    { id:'clean-btn',    icon:'👁', label:'Чиста карта' },
-    { id:'gps-btn',      icon:'📍', label:'Моята локация' },
-    { id:'fs-btn',       icon:'⛶', label:'Цял екран' }
+    { id:'karyk-btn',      label:'Карък Mode' },
+    { id:'karyk-list-btn', label:'Карък зони (списък)' },
+    { id:'bakshish-btn',   label:'Бакшиш радар' },
+    { id:'next90-btn',     label:'Следващи 90 мин' },
+    { id:'clean-btn',      label:'Чиста карта' },
+    { id:'gps-btn',        label:'Моята локация' },
+    { id:'fs-btn',         label:'Цял екран' }
   ];
   var wrap, hub, rays, backdrop, built = false, adopted = {};
 
@@ -4503,36 +4479,38 @@ function toggleMapView(){
     hub.textContent = '✚';
     hub.title = 'Инструменти';
     hub.addEventListener('click', function(e){
-      e.stopPropagation();
+      e.stopPropagation(); e.preventDefault();
       setOpen(!document.body.classList.contains('fab-open'));
     });
     wrap.appendChild(hub);
     document.body.appendChild(wrap);
 
     adopt();
-    setInterval(adopt, 1500);   // хваща бутони, създадени по-късно
+    setInterval(adopt, 1200);
   }
 
-  // премества оригиналните бутони в орбитата (handler-ите се пазят)
   function adopt(){
     var changed = false;
     ITEMS.forEach(function(it){
       if(adopted[it.id]) return;
       var el = document.getElementById(it.id);
       if(!el) return;
-      if(it.id === 'karyk-btn') el.innerHTML = it.icon;
+      if(it.id === 'karyk-btn')      el.innerHTML = '🥉';
+      if(it.id === 'karyk-list-btn') el.innerHTML = '📋';
+      if(it.id === 'clean-btn')      el.innerHTML = '👁';
       el.classList.add('fab-sat');
+      el.style.left = '0px'; el.style.top = '0px';
       wrap.appendChild(el);
 
       var lb = document.createElement('div');
       lb.className = 'fab-label';
       lb.setAttribute('data-for', it.id);
       lb.textContent = it.label;
-      lb.addEventListener('click', function(){ el.click(); });
+      lb.addEventListener('click', function(e){ e.stopPropagation(); el.click(); });
       wrap.appendChild(lb);
 
       el.addEventListener('click', function(){
-        setTimeout(function(){ setOpen(false); }, 120);
+        setTimeout(function(){ setOpen(false); }, 140);
       });
       adopted[it.id] = { el: el, label: lb };
       changed = true;
@@ -4545,25 +4523,29 @@ function toggleMapView(){
     var n = live.length;
     if(!n) return;
     var open = document.body.classList.contains('fab-open');
-    var step = n > 1 ? 90 / (n - 1) : 0;
+    var step = n > 1 ? (A1 - A0) / (n - 1) : 0;
     var lines = '';
     live.forEach(function(it, i){
-      var a  = (90 + step * i) * Math.PI / 180;
+      var a  = (A0 + step * i) * Math.PI / 180;
       var dx = open ? Math.round(Math.cos(a) * R) : 0;
       var dy = open ? Math.round(-Math.sin(a) * R) : 0;
       var rec = adopted[it.id];
       rec.el.style.left = dx + 'px';
       rec.el.style.top  = dy + 'px';
-      rec.label.style.left = (dx - 32) + 'px';
-      rec.label.style.top  = dy + 'px';
-      if(open) lines += '<line x1="0" y1="0" x2="' + Math.round(dx*0.76) + '" y2="' + Math.round(dy*0.76) + '"/>';
+      // етикетите: изправена колона, за да не се застъпват
+      var ly = open ? -(n - 1 - i) * LBL_GAP : 0;
+      rec.label.style.left = (open ? LBL_X : 0) + 'px';
+      rec.label.style.top  = ly + 'px';
+      if(open){
+        var k = 1 - (24 / R);
+        lines += '<line x1="0" y1="0" x2="' + Math.round(dx*k) + '" y2="' + Math.round(dy*k) + '"/>';
+      }
     });
     rays.innerHTML = lines;
   }
 
   function setOpen(v){
     document.body.classList.toggle('fab-open', !!v);
-    if(hub) hub.textContent = v ? '✚' : '✚';
     layout();
   }
 
