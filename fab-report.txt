@@ -2,6 +2,7 @@ BEFORE: {
  "hub": true,
  "sats": [
   "karyk-btn",
+  "karyk-list-btn",
   "bakshish-btn",
   "next90-btn",
   "clean-btn",
@@ -13,41 +14,56 @@ BEFORE: {
 }
 AFTER OPEN: {
  "open": true,
- "rays": 6,
- "positions": [
+ "rays": 7,
+ "hubCovered": "fab-hub",
+ "sats": [
   {
    "id": "karyk-btn",
-   "left": "0px",
-   "top": "-108px"
+   "dist": 140,
+   "onScreen": false,
+   "hit": "karyk-btn"
+  },
+  {
+   "id": "karyk-list-btn",
+   "dist": 140,
+   "onScreen": true,
+   "hit": "karyk-list-btn"
   },
   {
    "id": "bakshish-btn",
-   "left": "-33px",
-   "top": "-103px"
+   "dist": 140,
+   "onScreen": true,
+   "hit": "bakshish-btn"
   },
   {
    "id": "next90-btn",
-   "left": "-63px",
-   "top": "-87px"
+   "dist": 140,
+   "onScreen": true,
+   "hit": "next90-btn"
   },
   {
    "id": "clean-btn",
-   "left": "-87px",
-   "top": "-63px"
+   "dist": 140,
+   "onScreen": true,
+   "hit": "clean-btn"
   },
   {
    "id": "gps-btn",
-   "left": "-103px",
-   "top": "-33px"
+   "dist": 140,
+   "onScreen": true,
+   "hit": "gps-btn"
   },
   {
    "id": "fs-btn",
-   "left": "-108px",
-   "top": "0px"
+   "dist": 140,
+   "onScreen": true,
+   "hit": "fs-btn"
   }
  ],
+ "labelOverlaps": 0,
  "labels": [
   "Карък Mode",
+  "Карък зони (списък)",
   "Бакшиш радар",
   "Следващи 90 мин",
   "Чиста карта",
