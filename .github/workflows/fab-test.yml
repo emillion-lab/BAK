@@ -47,6 +47,15 @@ jobs:
             }).sort((a,b)=>a.y-b.y);
             let overlaps=0;
             for(let i=1;i<labs.length;i++) if(labs[i].y < labs[i-1].y+labs[i-1].h) overlaps++;
+            // подравняване: центърът на всеки надпис спрямо центъра на неговия бутон
+            const align = [...document.querySelectorAll('.fab-label')].map(l=>{
+              const b = document.getElementById(l.getAttribute('data-for'));
+              if(!b) return null;
+              const lr = l.getBoundingClientRect(), br = b.getBoundingClientRect();
+              return { id:l.getAttribute('data-for'),
+                       dy: Math.round((lr.y+lr.height/2) - (br.y+br.height/2)),
+                       gap: Math.round(br.x - lr.right) };
+            }).filter(Boolean);
             // карък: включваме и мерим индикацията
             const kb = document.getElementById('karyk-btn'); if(kb) kb.click();
             const karyk = {
@@ -64,6 +73,14 @@ jobs:
             if(kb) kb.click();
             return {
               karyk,
+              align,
+              frame: (()=>{const s=getComputedStyle(document.body,'::after');
+                        return {border:s.borderTopWidth+' '+s.borderLeftWidth+' '+s.borderBottomWidth+' '+s.borderRightWidth,
+                                anim:s.animationName};})(),
+              n90: (()=>{const b=document.getElementById('next90-btn'); if(b) b.click();
+                        const t=(document.querySelector('#next90-panel .n90-header')||{}).textContent||'';
+                        const rows=document.querySelectorAll('#next90-panel .n90-item').length;
+                        if(b) b.click(); return {title:t.trim().slice(0,40), rows};})(),
               links: document.querySelectorAll('#fab-rays line.fab-link').length,
               topHint: (document.getElementById('tl-hint')||{}).textContent,
               bakshishRows: (()=>{const b=document.getElementById('bakshish-btn');
