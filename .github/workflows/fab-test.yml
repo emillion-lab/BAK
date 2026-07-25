@@ -54,12 +54,25 @@ jobs:
               badge: (()=>{const b=document.getElementById('karyk-badge');
                         return b ? getComputedStyle(b).display : 'липсва';})(),
               mapFilter: (()=>{const m=document.getElementById('map');
-                        return m ? getComputedStyle(m).filter.slice(0,42) : '?';})()
+                        return m ? getComputedStyle(m).filter.slice(0,42) : '?';})(),
+              corners: ['karyk-corner-tr','karyk-corner-bl'].filter(id=>{
+                        const e=document.getElementById(id);
+                        return e && getComputedStyle(e).display!=='none';}).length + 2,
+              pulse: (()=>{const s=getComputedStyle(document.body,'::after');
+                        return s.animationName||'няма';})()
             };
             if(kb) kb.click();
             return {
               karyk,
               links: document.querySelectorAll('#fab-rays line.fab-link').length,
+              topHint: (document.getElementById('tl-hint')||{}).textContent,
+              bakshishRows: (()=>{const b=document.getElementById('bakshish-btn');
+                        if(b) b.click();
+                        const it=document.querySelector('#bakshish-list .bp-item');
+                        const h=it?Math.round(it.getBoundingClientRect().height):0;
+                        const why=document.querySelectorAll('#bakshish-list .bp-why').length;
+                        if(b) b.click();
+                        return {height:h, whyLines:why};})(),
               open: document.body.classList.contains('fab-open'),
               rays: document.querySelectorAll('#fab-rays line').length,
               hubCovered: (document.elementFromPoint(hubC.x,hubC.y)||{}).id,
