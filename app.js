@@ -4602,15 +4602,15 @@ function toggleMapView(){
     // Разстоянията между съседите са еднакви, размахът е пълен.
     var H  = window.innerHeight;
     var R  = Math.max(140, Math.min(176, H * 0.215));
-    var LR = R + 48;                       // надписите — радиално навън
     var A0 = 90, A1 = 180;
     var step = n > 1 ? (A1 - A0) / (n - 1) : 0;
 
     var pos = [], lab = [];
     live.forEach(function(it, i){
       var a = (A0 + step * i) * Math.PI / 180;
-      pos.push({ x: Math.round(Math.cos(a) * R),  y: Math.round(-Math.sin(a) * R) });
-      lab.push({ x: Math.round(Math.cos(a) * LR), y: Math.round(-Math.sin(a) * LR) });
+      var px = Math.round(Math.cos(a) * R), py = Math.round(-Math.sin(a) * R);
+      pos.push({ x: px, y: py });
+      lab.push({ x: px - 24, y: py });     // надписът стои вляво от СВОЯ бутон
     });
     // разместване на надписите по вертикала, ако се застъпват (отдолу нагоре)
     var MINGAP = 30;
@@ -4625,7 +4625,7 @@ function toggleMapView(){
       rec.el.style.left = dx + 'px';
       rec.el.style.top  = dy + 'px';
       // надписът се подравнява вдясно спрямо своята точка → разгъва се наляво
-      var lx = open ? Math.min(lab[i].x, dx - 24) : 0;
+      var lx = open ? lab[i].x : 0;
       var ly = open ? lab[i].y : 0;
       rec.label.style.left = lx + 'px';
       rec.label.style.top  = ly + 'px';
