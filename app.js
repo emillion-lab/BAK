@@ -4528,7 +4528,7 @@ function toggleMapView(){
     { id:'bakshish-btn',   label:'Бакшиш радар' },
     { id:'next90-btn',     label:'Събития 24ч' },
     { id:'clean-btn',      label:'Чиста карта' },
-    { id:'gps-btn',        label:'Моята локация' },
+    { id:'gps-btn',        label:'Локация' },
     { id:'fs-btn',         label:'Цял екран' }
   ];
   var wrap, hub, rays, backdrop, built = false, adopted = {};
@@ -4633,6 +4633,17 @@ function toggleMapView(){
       }
     });
     rays.innerHTML = lines;
+    // нито един надпис да не излиза от екрана
+    if(open){
+      live.forEach(function(it){
+        var l = adopted[it.id].label;
+        var r = l.getBoundingClientRect();
+        if(r.x < 6){
+          var cur = parseFloat(l.style.left) || 0;
+          l.style.left = (cur + (6 - r.x)) + 'px';
+        }
+      });
+    }
   }
 
   function setOpen(v){
