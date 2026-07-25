@@ -1909,8 +1909,11 @@ window.addEventListener('resize',()=>{drawSparkline(currentHour); map.invalidate
 window.toggleMapView = toggleMapView;
 function toggleMapView(){
   const listView = document.body.classList.toggle('list-view');
+  const label = listView ? '🗺️ Карта' : '📋 Списък';
   const btn = document.getElementById('toggle-map-btn');
-  if(btn) btn.textContent = listView ? '🗺️ Карта' : '📋 Списък';
+  if(btn) btn.textContent = label;
+  const btnK = document.getElementById('toggle-map-btn-k');
+  if(btnK) btnK.textContent = label;
   if(!listView && window.map) setTimeout(()=>map.invalidateSize(), 100);
 }
 
@@ -4288,6 +4291,7 @@ function toggleMapView(){
   // ═══ бутон за чиста карта ═══
   var clean = false;
   var btn = document.createElement('div');
+  btn.id = 'clean-btn';
   btn.textContent = '👁 чисто';
   btn.style.cssText = 'position:fixed;right:8px;top:50%;z-index:1400;background:#0b1220e0;'
     + 'color:#cbd5e1;border:1px solid #475569;border-radius:9px;padding:6px 9px;'
@@ -4461,4 +4465,112 @@ function toggleMapView(){
     if(open) render();
   };
   setInterval(function(){ if(open) render(); }, 20000);
+})();
+
+// ═══════════════════════════════════════════════
+// РАДИАЛНО МЕНЮ (FAB) — събира плаващите бутони
+// ═══════════════════════════════════════════════
+(function(){
+  var R = 108;                 // радиус на орбитата
+  var ITEMS = [
+    { id:'karyk-btn',    icon:'🥉', label:'Карък Mode' },
+    { id:'bakshish-btn', icon:'🎩', label:'Бакшиш радар' },
+    { id:'next90-btn',   icon:'⏱', label:'Следващи 90 мин' },
+    { id:'clean-btn',    icon:'👁', label:'Чиста карта' },
+    { id:'gps-btn',      icon:'📍', label:'Моята локация' },
+    { id:'fs-btn',       icon:'⛶', label:'Цял екран' }
+  ];
+  var wrap, hub, rays, backdrop, built = false, adopted = {};
+
+  function build(){
+    if(built) return;
+    built = true;
+
+    backdrop = document.createElement('div');
+    backdrop.id = 'fab-backdrop';
+    backdrop.addEventListener('click', function(){ setOpen(false); });
+    document.body.appendChild(backdrop);
+
+    wrap = document.createElement('div');
+    wrap.id = 'fab-wrap';
+
+    rays = document.createElementNS('http://www.w3.org/2000/svg','svg');
+    rays.id = 'fab-rays';
+    wrap.appendChild(rays);
+
+    hub = document.createElement('div');
+    hub.id = 'fab-hub';
+    hub.textContent = '✚';
+    hub.title = 'Инструменти';
+    hub.addEventListener('click', function(e){
+      e.stopPropagation();
+      setOpen(!document.body.classList.contains('fab-open'));
+    });
+    wrap.appendChild(hub);
+    document.body.appendChild(wrap);
+
+    adopt();
+    setInterval(adopt, 1500);   // хваща бутони, създадени по-късно
+  }
+
+  // премества оригиналните бутони в орбитата (handler-ите се пазят)
+  function adopt(){
+    var changed = false;
+    ITEMS.forEach(function(it){
+      if(adopted[it.id]) return;
+      var el = document.getElementById(it.id);
+      if(!el) return;
+      if(it.id === 'karyk-btn') el.innerHTML = it.icon;
+      el.classList.add('fab-sat');
+      wrap.appendChild(el);
+
+      var lb = document.createElement('div');
+      lb.className = 'fab-label';
+      lb.setAttribute('data-for', it.id);
+      lb.textContent = it.label;
+      lb.addEventListener('click', function(){ el.click(); });
+      wrap.appendChild(lb);
+
+      el.addEventListener('click', function(){
+        setTimeout(function(){ setOpen(false); }, 120);
+      });
+      adopted[it.id] = { el: el, label: lb };
+      changed = true;
+    });
+    if(changed) layout();
+  }
+
+  function layout(){
+    var live = ITEMS.filter(function(it){ return adopted[it.id]; });
+    var n = live.length;
+    if(!n) return;
+    var open = document.body.classList.contains('fab-open');
+    var step = n > 1 ? 90 / (n - 1) : 0;
+    var lines = '';
+    live.forEach(function(it, i){
+      var a  = (90 + step * i) * Math.PI / 180;
+      var dx = open ? Math.round(Math.cos(a) * R) : 0;
+      var dy = open ? Math.round(-Math.sin(a) * R) : 0;
+      var rec = adopted[it.id];
+      rec.el.style.left = dx + 'px';
+      rec.el.style.top  = dy + 'px';
+      rec.label.style.left = (dx - 32) + 'px';
+      rec.label.style.top  = dy + 'px';
+      if(open) lines += '<line x1="0" y1="0" x2="' + Math.round(dx*0.76) + '" y2="' + Math.round(dy*0.76) + '"/>';
+    });
+    rays.innerHTML = lines;
+  }
+
+  function setOpen(v){
+    document.body.classList.toggle('fab-open', !!v);
+    if(hub) hub.textContent = v ? '✚' : '✚';
+    layout();
+  }
+
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && document.body.classList.contains('fab-open')) setOpen(false);
+  });
+
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', build);
+  else build();
 })();
