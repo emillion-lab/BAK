@@ -76,7 +76,7 @@ AFTER OPEN: {
    "id": "karyk-btn",
    "w": 40,
    "h": 40,
-   "dist": 375,
+   "dist": 164,
    "onScreen": true,
    "hit": "karyk-btn"
   },
@@ -84,7 +84,7 @@ AFTER OPEN: {
    "id": "karyk-list-btn",
    "w": 40,
    "h": 40,
-   "dist": 325,
+   "dist": 164,
    "onScreen": true,
    "hit": "karyk-list-btn"
   },
@@ -92,7 +92,7 @@ AFTER OPEN: {
    "id": "bakshish-btn",
    "w": 40,
    "h": 40,
-   "dist": 276,
+   "dist": 164,
    "onScreen": true,
    "hit": "bakshish-btn"
   },
@@ -100,7 +100,7 @@ AFTER OPEN: {
    "id": "next90-btn",
    "w": 40,
    "h": 40,
-   "dist": 226,
+   "dist": 164,
    "onScreen": true,
    "hit": "next90-btn"
   },
@@ -108,7 +108,7 @@ AFTER OPEN: {
    "id": "clean-btn",
    "w": 40,
    "h": 40,
-   "dist": 175,
+   "dist": 164,
    "onScreen": true,
    "hit": "clean-btn"
   },
@@ -116,7 +116,7 @@ AFTER OPEN: {
    "id": "gps-btn",
    "w": 40,
    "h": 40,
-   "dist": 122,
+   "dist": 164,
    "onScreen": true,
    "hit": "gps-btn"
   },
@@ -124,7 +124,7 @@ AFTER OPEN: {
    "id": "fs-btn",
    "w": 40,
    "h": 40,
-   "dist": 67,
+   "dist": 164,
    "onScreen": true,
    "hit": "fs-btn"
   }
