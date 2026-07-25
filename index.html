@@ -849,23 +849,24 @@ body.karyk-active .sidebar-title{ color:#e8a050; }
 #airport-modal-box{
   width:100%; max-width:430px; max-height:82vh;
   display:flex; flex-direction:column;
-  background:#0d1524;                     /* ПЛЪТЕН — картата не бива да прозира */
-  color:#e8eef7;
-  border:1.5px solid #22d3ee; border-radius:16px;
-  box-shadow:0 10px 44px rgba(0,0,0,.75), 0 0 26px rgba(34,211,238,.22);
+  background:var(--modal-bg);
+  color:var(--text);
+  border:1.5px solid var(--modal-edge); border-radius:20px;
+  box-shadow:var(--modal-shadow);
+  backdrop-filter:var(--modal-blur);
   overflow:hidden;
 }
 #airport-modal-head{
   flex-shrink:0; display:flex; align-items:center; justify-content:space-between; gap:10px;
-  padding:12px 13px; border-bottom:1px solid rgba(34,211,238,.35);
-  font:900 15.5px system-ui,sans-serif; color:#67e8f9;
-  background:linear-gradient(180deg,#122036,#0d1524);
-  text-shadow:0 0 12px rgba(34,211,238,.45);
+  padding:13px 14px; border-bottom:1px solid var(--modal-edge);
+  font:800 15.5px -apple-system,system-ui,sans-serif; color:var(--cyan);
+  background:var(--modal-head);
+  text-shadow:var(--glow);
 }
 #airport-modal-x{
   width:40px; height:40px; flex-shrink:0; border-radius:50%;
-  background:#0b1220; color:#fff; border:1.5px solid var(--cyan);
-  font-size:20px; font-weight:700; line-height:1; cursor:pointer;
+  background:var(--surface); color:var(--text); border:1.5px solid var(--cyan);
+  font-size:20px; font-weight:600; line-height:1; cursor:pointer;
 }
 #airport-modal-body{
   overflow-y:auto; overscroll-behavior:contain;
@@ -903,6 +904,14 @@ body.karyk-active .sidebar-title{ color:#e8a050; }
   --ring:rgba(3,105,161,.22);
   --sheen:linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,255,255,.55));
   --ease:cubic-bezier(.22,1,.36,1);
+  /* стъклен, iOS-подобен прозорец денем */
+  --modal-bg:rgba(255,255,255,.86);
+  --modal-head:linear-gradient(180deg,rgba(255,255,255,.95),rgba(246,249,253,.86));
+  --modal-edge:rgba(15,27,45,.14);
+  --modal-shadow:0 18px 50px rgba(15,27,45,.22), 0 2px 8px rgba(15,27,45,.10);
+  --modal-blur:saturate(180%) blur(20px);
+  --bar-bg:rgba(255,255,255,.78);
+  --bar-fg:#0f1b2d;
 }
 body.theme-night {
   --bg:#060b14; --surface:#0e1726; --border:#22334c;
@@ -914,6 +923,13 @@ body.theme-night {
   --card:0 2px 8px rgba(0,0,0,.55), 0 0 24px rgba(34,211,238,.09);
   --ring:rgba(34,211,238,.38);
   --sheen:linear-gradient(180deg,rgba(34,211,238,.10),rgba(14,23,38,.65));
+  --modal-bg:#0d1524;
+  --modal-head:linear-gradient(180deg,#122036,#0d1524);
+  --modal-edge:rgba(34,211,238,.35);
+  --modal-shadow:0 10px 44px rgba(0,0,0,.75), 0 0 26px rgba(34,211,238,.22);
+  --modal-blur:none;
+  --bar-bg:#06101c;
+  --bar-fg:#e8eef7;
 }
 
 /* плавна смяна на темата */
@@ -992,10 +1008,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .tl-ticks{display:flex;justify-content:space-between;font-size:16px;color:var(--muted);font-family:'Courier New',Courier,monospace;margin-top:1px;}
 
 /* TICKER */
-.ticker-bar{background:#06101c;border-bottom:1px solid var(--border);padding:0 12px;height:30px;overflow:hidden;flex-shrink:0;display:flex;align-items:center;}
-.ticker-wrap{display:flex;gap:50px;animation:ticker 45s linear infinite;width:max-content;white-space:nowrap;}
+.ticker-bar{background:var(--bar-bg);border-bottom:1px solid var(--border);padding:0 12px;height:30px;overflow:hidden;flex-shrink:0;display:flex;align-items:center;}
+.ticker-wrap{display:flex;gap:50px;animation:ticker 28s linear infinite;width:max-content;white-space:nowrap;}
 @keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-.tick-item{font-family:'Courier New',Courier,monospace;font-size:16px;color:#e8eef7;font-weight:700;text-shadow:0 1px 2px rgba(0,0,0,.6);}
+.tick-item{font-family:'Courier New',Courier,monospace;font-size:16px;color:var(--bar-fg);font-weight:700;}
+body.theme-night .tick-item{text-shadow:0 0 8px rgba(34,211,238,.35);}
 .tick-item .ev-time{color:var(--amber);}
 .tick-item .ev-loc{color:#9fb3c8;}
 
@@ -1525,7 +1542,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260726v76"></script>
+<script src="app.js?v=20260726v77"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">

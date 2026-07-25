@@ -817,7 +817,10 @@ function buildNext90(){
 
 // ═══════════════════════════════════════════════
 const map = L.map('map', {center:[42.698,23.322], zoom:13, zoomControl:true, attributionControl:false});
-L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+window.__TILE_DAY   = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+window.__TILE_NIGHT = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+window.__tileLayer = L.tileLayer(
+  (document.body.classList.contains('theme-night') ? window.__TILE_NIGHT : window.__TILE_DAY), {
   maxZoom:19, subdomains:['a','b','c','d']
 }).addTo(map);
 document.getElementById('map').style.filter='brightness(0.85) saturate(0.6)';
@@ -1047,7 +1050,6 @@ function showAirportSchedule() {
 
   const nowCount = visible.filter(f=>f._state==='now').length;
   if(nowCount){
-    html+=`<div style="background:rgba(239,68,68,.14);border:1px solid #ef4444;border-radius:8px;padding:6px 10px;margin-bottom:8px;font-weight:800;color:#ef4444;font-size:13px">🔴 В момента излизат: ${nowCount} полет${nowCount===1?'':'а'}</div>`;
   } else {
     const next = visible.find(f=>f._state==='future');
     if(next){
@@ -4783,12 +4785,15 @@ function toggleMapView(){
       b.textContent = t === 'night' ? '☀️' : '🌙';
       b.title = t === 'night' ? 'Дневна тема' : 'Нощна тема';
     }
-    // картата също сменя настроението
+    // истинска нощна карта — сменяме слоя, не филтрираме
+    try{
+      if(window.__tileLayer && window.__TILE_NIGHT){
+        window.__tileLayer.setUrl(t === 'night' ? window.__TILE_NIGHT : window.__TILE_DAY);
+      }
+    }catch(e){}
     var m = document.getElementById('map');
     if(m && !document.body.classList.contains('karyk-active')){
-      m.style.filter = t === 'night'
-        ? 'brightness(.72) saturate(.55) contrast(1.06)'
-        : 'brightness(.98) saturate(.85)';
+      m.style.filter = t === 'night' ? 'none' : 'brightness(.97) saturate(.88)';
     }
     try{ if(typeof drawSparkline === 'function') drawSparkline(currentHour); }catch(e){}
   }
