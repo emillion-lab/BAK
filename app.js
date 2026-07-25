@@ -2213,6 +2213,7 @@ function toggleMapView(){
       layer.addTo(window.map);
       var chip=document.createElement('div');
       chip.style.cssText='position:fixed;left:8px;bottom:130px;z-index:1500;background:#1a1029f0;color:#e9d5ff;border:1px solid #a855f7;border-radius:10px;padding:7px 11px;font-family:sans-serif;font-size:13px;font-weight:900;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.5)';
+  chip.classList.add('map-chip');
       chip.textContent='🎭 '+d.events.length+' довечера';
       chip.onclick=function(){
         alert(d.events.map(function(e){return e.target+' → '+e.t+' ('+e.v+')'}).join('\n')+'\n\n🚕 Час = кога да си там (12 мин преди края)');
@@ -2267,6 +2268,7 @@ function toggleMapView(){
       layer.addTo(window.map);
       var chip=document.createElement('div');
       chip.style.cssText='position:fixed;left:8px;bottom:154px;z-index:1500;background:#0c1f2ef0;color:#bae6fd;border:1px solid #38bdf8;border-radius:10px;padding:7px 11px;font-family:sans-serif;font-size:13px;font-weight:900;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.5)';
+  chip.classList.add('map-chip');
       chip.textContent='🎫 '+evs.length+' събития';
       chip.onclick=function(){
         alert(evs.map(function(e){
@@ -2287,10 +2289,12 @@ function toggleMapView(){
   function hm(d){return d.toLocaleTimeString('bg',{hour:'2-digit',minute:'2-digit'});}
   var chip=document.createElement('div');
   chip.style.cssText='position:fixed;left:8px;bottom:70px;z-index:1500;background:#0f2818f0;color:#86efac;border:1px solid #22c55e;border-radius:10px;padding:7px 11px;font-family:sans-serif;font-size:13px;font-weight:900;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.5);display:none';
+  chip.classList.add('map-chip');
   document.body.appendChild(chip);
   var panel=document.createElement('div');
   panel.id='exit-now-panel';
   panel.style.cssText='position:fixed;left:8px;right:8px;bottom:80px;max-height:55vh;overflow-y:auto;overscroll-behavior:contain;z-index:2500;background:#0b1220f8;color:#e5e7eb;border:1px solid #334155;border-radius:14px;padding:12px;font-family:sans-serif;font-size:13px;display:none;box-shadow:0 6px 30px rgba(0,0,0,.7)';
+  panel.classList.add('map-chip');
   document.body.appendChild(panel);
   chip.onclick=function(){ panel.style.display = panel.style.display==='none'?'block':'none'; };
   function refresh(){
@@ -2391,6 +2395,7 @@ function toggleMapView(){
     }
     var chip=document.createElement('div');
     chip.style.cssText='position:fixed;left:8px;bottom:112px;z-index:1500;border-radius:10px;padding:6px 10px;font-family:sans-serif;font-size:12px;font-weight:900;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.5)';
+  chip.classList.add('map-chip');
     var rainingNow = idxNow>=0 && p[idxNow]>=0.15;
     if(rainingNow){
       var j=idxNow; while(j<t.length&&p[j]>=0.15) j++;
@@ -2437,10 +2442,12 @@ function toggleMapView(){
   }
   var chip=document.createElement('div');
   chip.style.cssText='position:fixed;left:8px;bottom:28px;z-index:1500;border-radius:10px;padding:7px 11px;font-family:sans-serif;font-size:13px;font-weight:900;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.5);display:none';
+  chip.classList.add('map-chip');
   document.body.appendChild(chip);
   var panel=document.createElement('div');
   panel.id='exit-now-panel';
   panel.style.cssText='position:fixed;left:8px;right:8px;bottom:80px;max-height:55vh;overflow-y:auto;overscroll-behavior:contain;z-index:2500;background:#0b1220f8;color:#e5e7eb;border:1px solid #334155;border-radius:14px;padding:12px;font-family:sans-serif;font-size:13px;display:none;box-shadow:0 6px 30px rgba(0,0,0,.7)';
+  panel.classList.add('map-chip');
   document.body.appendChild(panel);
   chip.onclick=function(){ panel.style.display=panel.style.display==='none'?'block':'none'; };
   function refresh(){

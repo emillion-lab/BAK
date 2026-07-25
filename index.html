@@ -981,13 +981,16 @@ body.theme-night #fab-wrap .fab-sat{
 #fab-backdrop{ background:var(--scrim) !important; }
 
 /* долните ляви чипове */
-#clean-btn, #karyk-list-btn,
-[id$="-chip"], .map-chip{
+#clean-btn, #karyk-list-btn, .map-chip{
   background:var(--glass) !important;
   color:var(--text) !important;
   border:1px solid var(--glass-edge) !important;
-  backdrop-filter:saturate(170%) blur(14px);
+  backdrop-filter:saturate(170%) blur(14px) !important;
+  -webkit-backdrop-filter:saturate(170%) blur(14px) !important;
+  box-shadow:var(--card) !important;
+  border-radius:12px !important;
 }
+body.theme-night .map-chip{ box-shadow:var(--card), 0 0 14px rgba(34,211,238,.12) !important; }
 </style>
 <style>
 
@@ -1131,7 +1134,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .tl-ticks{display:flex;justify-content:space-between;font-size:16px;color:var(--muted);font-family:'Courier New',Courier,monospace;margin-top:1px;}
 
 /* TICKER */
-.ticker-bar{background:var(--bar-bg);backdrop-filter:saturate(160%) blur(12px);-webkit-backdrop-filter:saturate(160%) blur(12px);border-bottom:1px solid var(--border);padding:0 12px;height:30px;overflow:hidden;flex-shrink:0;display:flex;align-items:center;}
+.ticker-bar{background:var(--glass);backdrop-filter:saturate(160%) blur(12px);-webkit-backdrop-filter:saturate(160%) blur(12px);border-bottom:1px solid var(--border);padding:0 12px;height:30px;overflow:hidden;flex-shrink:0;display:flex;align-items:center;}
 .ticker-wrap{display:flex;gap:50px;animation:ticker 28s linear infinite;width:max-content;white-space:nowrap;}
 @keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 .tick-item{font-family:'Courier New',Courier,monospace;font-size:16px;color:var(--bar-fg);font-weight:700;}
@@ -1675,7 +1678,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260726v79"></script>
+<script src="app.js?v=20260726v80"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">
