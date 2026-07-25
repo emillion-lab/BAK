@@ -85,11 +85,11 @@ jobs:
               align,
               neighbours: minAdjacent,
               satSize: cs.length?Math.round(cs[0].w):0,
-              n90: (()=>{const b=document.getElementById('next90-btn'); if(b) b.click();
-                        const t=(document.querySelector('#next90-panel .n90-header')||{}).textContent||'';
-                        const rows=document.querySelectorAll('#next90-panel .n90-item').length;
-                        if(b) b.click(); return {title:t.trim().slice(0,40), rows};})(),
               links: document.querySelectorAll('#fab-rays line.fab-link').length,
+              ticker: (document.getElementById('ticker')||{}).textContent||'',
+              n90: (()=>{const b=document.getElementById('next90-btn'); if(b) b.click();
+                        const t=(document.getElementById('next90-list')||{}).textContent||'';
+                        if(b) b.click(); return t.replace(/\s+/g,' ').slice(0,150);})(),
               topHint: (document.getElementById('tl-hint')||{}).textContent,
               topRot: (window.__topRot||[]).slice(0,3),
               flights: (()=>{
