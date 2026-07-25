@@ -759,9 +759,12 @@ body.fab-open #fab-backdrop{ opacity:1; pointer-events:auto; }
   transition:left .28s cubic-bezier(.34,1.4,.64,1), top .28s cubic-bezier(.34,1.4,.64,1), opacity .2s;
 }
 body.fab-open #fab-wrap .fab-sat{ opacity:1; pointer-events:auto; }
-#fab-wrap #karyk-btn{
-  transform:none !important; text-orientation:mixed !important;
-  font-size:20px !important;
+#fab-wrap #karyk-btn, #fab-wrap #karyk-list-btn, #fab-wrap #clean-btn{
+  transform:none !important; transform-origin:center center !important;
+  text-orientation:mixed !important; writing-mode:horizontal-tb !important;
+  font-size:17px !important; width:40px !important; height:40px !important;
+  min-width:0 !important; max-width:40px !important;
+  padding:0 !important; box-sizing:border-box !important;
 }
 .fab-label{
   position:absolute; opacity:0; pointer-events:none;
@@ -1347,7 +1350,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260725v50"></script>
+<script src="app.js?v=20260725v51"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">

@@ -34,7 +34,7 @@ jobs:
             const sats = [...document.querySelectorAll('#fab-wrap .fab-sat')].map(e=>{
               const r = e.getBoundingClientRect();
               const c = {x:r.x+r.width/2, y:r.y+r.height/2};
-              return { id:e.id,
+              return { id:e.id, w:Math.round(r.width), h:Math.round(r.height),
                 dist: Math.round(Math.hypot(c.x-hubC.x, c.y-hubC.y)),
                 onScreen: r.x>=0 && r.y>=0 && r.right<=innerWidth && r.bottom<=innerHeight,
                 // кой елемент реално получава допира в центъра на бутона

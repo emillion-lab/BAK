@@ -4445,11 +4445,11 @@ function toggleMapView(){
 // РАДИАЛНО МЕНЮ (FAB) v2 — звезда с лъчи
 // ═══════════════════════════════════════════════
 (function(){
-  var R = 140, A0 = 78, A1 = 191;   // радиус и дъга (градуси)
+  var R = 155, A0 = 90, A1 = 195;   // радиус и дъга (градуси)
   var LBL_X = -178, LBL_GAP = 30;   // колона с етикети
   var ITEMS = [
     { id:'karyk-btn',      label:'Карък Mode' },
-    { id:'karyk-list-btn', label:'Карък зони (списък)' },
+    { id:'karyk-list-btn', label:'Карък списък' },
     { id:'bakshish-btn',   label:'Бакшиш радар' },
     { id:'next90-btn',     label:'Следващи 90 мин' },
     { id:'clean-btn',      label:'Чиста карта' },
