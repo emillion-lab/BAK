@@ -17,6 +17,7 @@ AFTER OPEN: {
   "active": true,
   "badge": "block",
   "mapFilter": "brightness(0.85) saturate(0.6)",
+  "frame": "7px/7px/7px/7px anim=karyk-neon inset=0px",
   "corners": 4,
   "pulse": "karyk-neon"
  },
@@ -57,10 +58,6 @@ AFTER OPEN: {
    "gap": 6
   }
  ],
- "frame": {
-  "border": "0px 0px 0px 0px",
-  "anim": "none"
- },
  "n90": {
   "title": "⏱ СЪБИТИЯ — СЛЕДВАЩИТЕ 24 ЧАСА\n    ✕",
   "rows": 59
