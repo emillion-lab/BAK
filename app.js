@@ -1327,6 +1327,17 @@ karykBtn.addEventListener('click',()=>{
   karykBtn.classList.toggle('active',karykMode);
   document.body.classList.toggle('karyk-active',karykMode);
   document.getElementById('karyk-banner').style.display=karykMode?'block':'none';
+  (function(){
+    var b=document.getElementById('karyk-badge');
+    if(!b){
+      b=document.createElement('div'); b.id='karyk-badge';
+      b.innerHTML='🥉 КАРЪК РЕЖИМ <span style="opacity:.7;font-weight:600">· тихите зони</span>';
+      b.title='Изключи Карък режим';
+      b.addEventListener('click',function(){ document.getElementById('karyk-btn').click(); });
+      document.body.appendChild(b);
+    }
+    b.style.display = karykMode ? 'block' : 'none';
+  })();
   if(karykMode){
     const {scores}=computeScores(currentHour); if(window.__applyLive)window.__applyLive(scores);
     const gems=ZONES.filter(z=>z.type==='karyk'||z.type==='residential_lux'||z.type==='residential'||(window.__liveDemand&&window.__liveDemand.hub&&window.__liveDemand.hub[z.id]!==undefined))
@@ -3323,7 +3334,7 @@ function toggleMapView(){
 
 // ------ ticker-future-v30: само предстоящи точки (напред ~5ч) ------
 (function(){
-  var HORIZON_H = 5;      // колко часа напред показваме
+  var HORIZON_H = 24;     // колко часа напред показваме (концерти/театри/групи — рядко са много)
   var GRACE_MIN = 10;     // толкова минути след часа още се брои за "сега"
 
   function nowMin(){ var d = new Date(); return d.getHours()*60 + d.getMinutes(); }
@@ -4280,7 +4291,9 @@ function toggleMapView(){
     + 'font:700 11px system-ui,sans-serif;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.5)';
   btn.onclick = function(){
     clean = !clean;
-    btn.textContent = clean ? '👁 всичко' : '👁 чисто';
+    btn.textContent = clean ? '👁' : '👁';
+    btn.title = clean ? 'Показва всичко' : 'Чиста карта';
+    document.body.classList.toggle('map-clean', clean);
     btn.style.background = clean ? '#1e3a5fe0' : '#0b1220e0';
     try{
       var map = window.__leafletMap;
@@ -4548,6 +4561,9 @@ function toggleMapView(){
       if(open){
         var k = 1 - (24 / R);
         lines += '<line x1="0" y1="0" x2="' + Math.round(dx*k) + '" y2="' + Math.round(dy*k) + '"/>';
+        // от десния край на етикета до иконата — за да се вижда кое за кое е
+        var lx = LBL_X + 6, ux = dx - 22;
+        if(ux > lx) lines += '<line class="fab-link" x1="' + lx + '" y1="' + ly + '" x2="' + ux + '" y2="' + dy + '"/>';
       }
     });
     rays.innerHTML = lines;
