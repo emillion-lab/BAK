@@ -1,14 +1,147 @@
-node:internal/modules/run_main:123
-    triggerUncaughtException(
-    ^
-
-Error [ReferenceError]: neigh is not defined
-    at evaluate (evaluate at file:///home/runner/work/BAK/BAK/ft.mjs:17:23, <anonymous>:55:16)
-    at #evaluate (file:///home/runner/work/BAK/BAK/node_modules/puppeteer-core/lib/esm/puppeteer/cdp/ExecutionContext.js:383:19)
-    at async ExecutionContext.evaluate (file:///home/runner/work/BAK/BAK/node_modules/puppeteer-core/lib/esm/puppeteer/cdp/ExecutionContext.js:270:16)
-    at async IsolatedWorld.evaluate (file:///home/runner/work/BAK/BAK/node_modules/puppeteer-core/lib/esm/puppeteer/cdp/IsolatedWorld.js:96:16)
-    at async CdpFrame.evaluate (file:///home/runner/work/BAK/BAK/node_modules/puppeteer-core/lib/esm/puppeteer/api/Frame.js:335:20)
-    at async CdpPage.evaluate (file:///home/runner/work/BAK/BAK/node_modules/puppeteer-core/lib/esm/puppeteer/api/Page.js:799:20)
-    at async file:///home/runner/work/BAK/BAK/ft.mjs:17:15
-
-Node.js v20.20.2
+BEFORE: {
+ "hub": true,
+ "sats": [
+  "karyk-btn",
+  "karyk-list-btn",
+  "bakshish-btn",
+  "next90-btn",
+  "clean-btn",
+  "gps-btn",
+  "fs-btn"
+ ],
+ "karakListBtn": true,
+ "strayFixed": []
+}
+AFTER OPEN: {
+ "karyk": {
+  "active": true,
+  "badge": "block",
+  "mapFilter": "brightness(0.85) saturate(0.6)",
+  "frame": "7px/7px/7px/7px anim=karyk-neon inset=0px",
+  "corners": 4,
+  "pulse": "karyk-neon"
+ },
+ "minAdjacent": 40,
+ "size": 34,
+ "align": [
+  {
+   "id": "karyk-btn",
+   "dy": 0,
+   "gap": 7
+  },
+  {
+   "id": "karyk-list-btn",
+   "dy": 0,
+   "gap": 7
+  },
+  {
+   "id": "bakshish-btn",
+   "dy": 0,
+   "gap": 7
+  },
+  {
+   "id": "next90-btn",
+   "dy": 0,
+   "gap": 7
+  },
+  {
+   "id": "clean-btn",
+   "dy": 0,
+   "gap": 7
+  },
+  {
+   "id": "gps-btn",
+   "dy": 0,
+   "gap": 7
+  },
+  {
+   "id": "fs-btn",
+   "dy": 0,
+   "gap": 7
+  }
+ ],
+ "neighbours": 40,
+ "satSize": 34,
+ "n90": {
+  "title": "⏱ СЪБИТИЯ — СЛЕДВАЩИТЕ 24 ЧАСА\n    ✕",
+  "rows": 48
+ },
+ "links": 0,
+ "topHint": "Топ: ✈️ Летище София (3.3) ✈ пик",
+ "bakshishRows": {
+  "height": 31,
+  "whyLines": 0
+ },
+ "open": true,
+ "rays": 7,
+ "hubCovered": "fab-hub",
+ "sats": [
+  {
+   "id": "karyk-btn",
+   "w": 34,
+   "h": 34,
+   "dist": 187,
+   "onScreen": true,
+   "hit": "karyk-btn"
+  },
+  {
+   "id": "karyk-list-btn",
+   "w": 34,
+   "h": 34,
+   "dist": 173,
+   "onScreen": true,
+   "hit": "karyk-list-btn"
+  },
+  {
+   "id": "bakshish-btn",
+   "w": 34,
+   "h": 34,
+   "dist": 161,
+   "onScreen": true,
+   "hit": "bakshish-btn"
+  },
+  {
+   "id": "next90-btn",
+   "w": 34,
+   "h": 34,
+   "dist": 153,
+   "onScreen": true,
+   "hit": "next90-btn"
+  },
+  {
+   "id": "clean-btn",
+   "w": 34,
+   "h": 34,
+   "dist": 150,
+   "onScreen": true,
+   "hit": "clean-btn"
+  },
+  {
+   "id": "gps-btn",
+   "w": 34,
+   "h": 34,
+   "dist": 151,
+   "onScreen": true,
+   "hit": "gps-btn"
+  },
+  {
+   "id": "fs-btn",
+   "w": 34,
+   "h": 34,
+   "dist": 157,
+   "onScreen": true,
+   "hit": "fs-btn"
+  }
+ ],
+ "labelOverlaps": 0,
+ "labels": [
+  "Карък Mode",
+  "Карък списък",
+  "Бакшиш радар",
+  "Събития 24ч",
+  "Чиста карта",
+  "Моята локация",
+  "Цял екран"
+ ]
+}
+PAGEERRORS: none
