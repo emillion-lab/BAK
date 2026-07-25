@@ -67,7 +67,7 @@ AFTER OPEN: {
   "rows": 48
  },
  "links": 0,
- "topHint": "Топ: ✈️ Летище София (3.3) ✈ пик",
+ "topHint": "Топ: 🚌 Централна автогара (4.0) 🚉 пик",
  "bakshishRows": {
   "height": 31,
   "whyLines": 0
