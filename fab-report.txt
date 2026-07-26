@@ -48,6 +48,13 @@ RESULT: {
   "класНаBody": "theme-day full-list",
   "следЗатваряне": 1
  },
+ "airportTap": {
+  "hitId": "dest-airport",
+  "достъпен": true,
+  "прозрачност": 0.55,
+  "модалОтворен": true,
+  "затвориСеСВтори": true
+ },
  "tilesDark": "invert(1) hue-rotate(180deg) brightness(",
  "dirHint": "rgba(255, 255, 255, 0.62) (яркост 255)",
  "destErr": null,
@@ -57,5 +64,5 @@ RESULT: {
  "viewport": 844,
  "fanGone": true
 }
-TILEFAILS: 7
+TILEFAILS: 4
 PAGEERRORS: none
