@@ -43,14 +43,30 @@ jobs:
               const m=getComputedStyle(e).backgroundColor.match(/(\d+),\s*(\d+),\s*(\d+)/);
               if(m && (+m[1]*.299 + +m[2]*.587 + +m[3]*.114) < 110) dark.push(sel);
             });
-            // списъкът
-            const zb=document.getElementById('dest-__zones');
-            let sheet=false;
-            if(zb){ zb.click(); sheet=document.body.classList.contains('sheet-zones'); zb.click(); }
+            // всеки бутон: отваря ли, пълни ли екрана, затваря ли се с втори клик
+            const opens={};
+            ['dest-__zones','dest-airport','dest-cjp','dest-cab_north','dest-cas_intl'].forEach(id=>{
+              const e=document.getElementById(id); if(!e) return;
+              e.click();
+              const full = id==='dest-__zones'
+                ? document.body.classList.contains('full-list')
+                : (document.body.getAttribute('data-full')===id.replace('dest-',''));
+              let visible=false, h=0;
+              if(id==='dest-__zones'){ const s=document.getElementById('zone-sidebar');
+                if(s){ const r=s.getBoundingClientRect(); visible=r.height>100 && r.top<innerHeight; h=Math.round(r.height);} }
+              else if(id==='dest-airport'){ const m=document.getElementById('airport-modal');
+                visible = m && getComputedStyle(m).display!=='none'; }
+              else { visible = !!document.querySelector('.leaflet-popup'); }
+              e.click();
+              const closed = !document.body.getAttribute('data-full');
+              opens[id]={opened:full, visible, h, closedOnSecond:closed};
+            });
+            // може ли страницата да се дърпа под картата
+            const scrollable = document.documentElement.scrollHeight > innerHeight + 4;
             const mp=document.getElementById('map'), st=document.getElementById('topstack');
             return {
               found: boxes.map(x=>x.id), missing: ids.filter(i=>!boxes.find(x=>x.id===i)),
-              overlaps, offscreen, dark, sheet,
+              overlaps, offscreen, dark, opens, scrollable,
               mapH: mp?Math.round(mp.getBoundingClientRect().height):0,
               mapBottom: mp?Math.round(mp.getBoundingClientRect().bottom):0,
               stackH: st?Math.round(st.getBoundingClientRect().height):0,
