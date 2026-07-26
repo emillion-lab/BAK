@@ -1584,6 +1584,18 @@ body.full-list #chip-stack, body[data-full] #chip-stack{ opacity:0 !important; p
 #weather-bar .wb-desc{ display:none !important; }
 #weather-bar{ min-height:44px; }
 #wx-canvas{ opacity:.92 !important; }
+
+/* КАТ индексът в лентата — при висок риск пулсира дискретно */
+#kat-badge{ transition:opacity .2s var(--ease); }
+#kat-badge:active{ opacity:.6; }
+#kat-badge.kat-high{ animation:kat-warn 2.4s ease-in-out infinite; }
+@keyframes kat-warn{
+  0%,100%{ filter:none; }
+  50%    { filter:drop-shadow(0 0 8px currentColor); }
+}
+@media (max-width:380px){
+  #kat-badge span{ display:none; }   /* при тесен екран остава само 7/10 */
+}
 </style>
 <style>
 
@@ -2273,7 +2285,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260726v128"></script>
+<script src="app.js?v=20260726v129"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">

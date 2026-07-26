@@ -5658,3 +5658,67 @@ function toggleMapView(){
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount);
   else mount();
 })();
+
+// ═══════════════════════════════════════════════
+// ⚠️ КАТ индекс в лентата за времето
+// Показва риска за деня до температурата — същият модел
+// като KAT приложението (Kp, налягане, луна, ден, час).
+// ═══════════════════════════════════════════════
+(function(){
+  var WORKER = 'https://mvr-proxy.mihov-emil.workers.dev';
+
+  function advice(score, label){
+    if(score >= 8) return 'карай защитно';
+    if(score >= 6) return 'внимавай';
+    if(score >= 4) return 'нормално';
+    return 'спокойно';
+  }
+  function colorFor(score){
+    if(score >= 8) return '#dc2626';
+    if(score >= 6) return '#ea580c';
+    if(score >= 4) return '#d97706';
+    return '#16a34a';
+  }
+
+  function mount(){
+    var bar = document.getElementById('weather-bar');
+    if(!bar){ setTimeout(mount, 600); return; }
+    var el = document.getElementById('kat-badge');
+    if(!el){
+      el = document.createElement('span');
+      el.id = 'kat-badge';
+      el.style.cssText = 'position:relative;z-index:1;margin-left:10px;font-size:12.5px;'
+        + 'font-weight:800;white-space:nowrap;cursor:pointer;display:none;align-items:center;gap:4px';
+      el.title = 'Пътен риск за деня — докосни за пълния анализ';
+      el.addEventListener('click', function(){
+        window.open('https://emillion-lab.github.io/KAT/', '_blank');
+      });
+      // вмъкваме преди чипа за дъжда, за да е веднага след температурата
+      var rain = document.getElementById('wx-rain-when');
+      if(rain) bar.insertBefore(el, rain); else bar.appendChild(el);
+    }
+    load(el);
+    setInterval(function(){ load(el); }, 30 * 60 * 1000);
+  }
+
+  function load(el){
+    fetch(WORKER + '/risk')
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if(!d || !d.ok) return;
+        var s = d.score || 0;
+        el.style.display = 'inline-flex';
+        el.style.color = colorFor(s);
+        el.innerHTML = '⚠️ <b>' + s + '/10</b> <span style="font-weight:600;opacity:.9">'
+                     + advice(s, d.label) + '</span>';
+        el.title = (d.label || '') + ' · Kp ' + (d.factors && d.factors.kp)
+                 + ' · Δналягане ' + (d.factors && d.factors.pressure_delta)
+                 + ' hPa — докосни за пълния анализ';
+        el.classList.toggle('kat-high', s >= 7);
+      })
+      .catch(function(){});
+  }
+
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount);
+  else mount();
+})();
