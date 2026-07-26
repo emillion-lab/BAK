@@ -1,10 +1,25 @@
-file:///home/runner/work/BAK/BAK/node_modules/puppeteer-core/lib/esm/puppeteer/util/assert.js:15
-        throw new Error(message);
-              ^
-
-Error: No element found for selector: #fab-hub
-    at assert (file:///home/runner/work/BAK/BAK/node_modules/puppeteer-core/lib/esm/puppeteer/util/assert.js:15:15)
-    at CdpFrame.click (file:///home/runner/work/BAK/BAK/node_modules/puppeteer-core/lib/esm/puppeteer/api/Frame.js:728:17)
-    at async file:///home/runner/work/BAK/BAK/ft.mjs:15:1
-
-Node.js v20.20.2
+RESULT: {
+ "found": [
+  "next90-btn",
+  "clean-btn",
+  "gps-btn",
+  "fs-btn",
+  "dest-airport",
+  "dest-cjp",
+  "dest-cab_north",
+  "dest-cas_intl",
+  "dest-__zones"
+ ],
+ "missing": [],
+ "overlaps": [],
+ "offscreen": [],
+ "dark": [],
+ "sheet": true,
+ "mapH": 726,
+ "mapBottom": 726,
+ "stackH": 238,
+ "viewport": 844,
+ "fanGone": true
+}
+TILEFAILS: 0
+PAGEERRORS: none
