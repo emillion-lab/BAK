@@ -85,7 +85,21 @@ jobs:
                         return s.animationName||'няма';})()
             };
             if(kb) kb.click();
+            // застъпване между самите бутони (всички, не само съседни по Y)
+            const bb=[...document.querySelectorAll('#fab-wrap .fab-sat, #next90-btn, #clean-btn, #gps-btn, #fs-btn, #fab-hub')]
+                     .map(e=>({id:e.id, r:e.getBoundingClientRect()}));
+            let btnOverlaps=[];
+            for(let i=0;i<bb.length;i++) for(let j=i+1;j<bb.length;j++){
+              const a=bb[i].r, b=bb[j].r;
+              if(a.left<b.right && b.left<a.right && a.top<b.bottom && b.top<a.bottom)
+                btnOverlaps.push(bb[i].id+'×'+bb[j].id);
+            }
+            const zonesBtn = !!document.getElementById('btn-zones');
+            let sheetWorks = false;
+            const zb = document.getElementById('btn-zones');
+            if(zb){ zb.click(); sheetWorks = document.body.classList.contains('sheet-zones'); zb.click(); }
             return {
+              btnOverlaps, zonesBtn, sheetWorks,
               karyk,
               layout: (()=>{
                 const st=document.getElementById('topstack'), mp=document.getElementById('map');
