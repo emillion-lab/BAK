@@ -55,6 +55,17 @@ RESULT: {
   "модалОтворен": true,
   "затвориСеСВтори": true
  },
+ "bdzCheck": {
+  "имаПанел": true,
+  "реалниВлакове": true,
+  "стариятНадпис": false,
+  "нямаДанни": false,
+  "проба": [
+   "КПВ 50280",
+   "КПВ 20224",
+   "БВ 8610"
+  ]
+ },
  "tilesDark": "invert(1) hue-rotate(180deg) brightness(",
  "dirHint": "rgba(255, 255, 255, 0.62) (яркост 255)",
  "destErr": null,
