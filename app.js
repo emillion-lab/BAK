@@ -4629,7 +4629,7 @@ function toggleMapView(){
     { zone:'cab_north', icon:'🚌', label:'Централна' },
     { zone:'cas_intl',  icon:'🌍', label:'Международна' },
     { zone:'cjp',       icon:'🚂', label:'ЖП гара' },
-    { zone:'__zones',   icon:'📋', label:'Зони по приоритет' }
+    { zone:'__zones',   icon:'📋', label:'Зони' }
   ];
   // ВЪНШЕН пръстен — инструменти (без надписи, иконите са познати)
   var ITEMS = [];   // инструментите вече не са в ветрилото — стоят като чипове
