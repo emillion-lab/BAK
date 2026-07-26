@@ -315,6 +315,7 @@ const ZONES = window.__ZONES = [
   { id:"jam_ndk",        name:"⚠ Задръстване бул.България (при Мол България)",             icon:"🚦", lat:42.6655, lng:23.2895, radius:160, type:"traffic",          wazeName:"булевард България Sofia" },
   { id:"jam_serdika",    name:"⚠ Задръстване бул.Сливница (при Лъвов мост)",   icon:"🚦", lat:42.7049, lng:23.3239, radius:160, type:"traffic",          wazeName:"Сердика бул Сливница Sofia" },
 ];
+window.ZONES = ZONES;   // ползва се от бутоните за дестинации
 
 // ═══════════════════════════════════════════════
 // BASE DEMAND
@@ -4758,7 +4759,7 @@ function toggleMapView(){
   window.closeFull = closeFull;
 
   function goToZone(id){
-    var z = (window.ZONES || ZONES).find(function(x){ return x.id === id; });
+    var z = (window.ZONES||[]).find(function(x){ return x.id === id; });
     if(!z){ window.__destErr = 'няма зона ' + id; return; }
     if(document.body.classList.contains('list-view') && typeof window.toggleMapView === 'function')
       window.toggleMapView();
