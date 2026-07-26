@@ -1341,7 +1341,7 @@ function render(hour) {
         const z=ZONES.find(x=>x.id===zid); if(!z) return '';
         const c=demandColor(score,z.type);
         const sub=(activeEvents[zid]||[])[0]?.name||'';
-        return `<div class="zone-item" onclick="(function(){if(document.body.classList.contains('list-view'))toggleMapView();setTimeout(()=>{window.__focusZone(${z.lat},${z.lng},'${zid}'==='airport'?14:15);'${zid}'==='airport'?showAirportSchedule():showZonePopup('${zid}');},150);})()">
+        return `<div class="zone-item" onclick="(function(){document.body.classList.remove('full-list');document.body.removeAttribute('data-full');document.querySelectorAll('.dest-btn').forEach(function(b){b.classList.remove('on')});if(document.body.classList.contains('list-view'))toggleMapView();setTimeout(()=>{window.__focusZone(${z.lat},${z.lng},'${zid}'==='airport'?14:15);'${zid}'==='airport'?showAirportSchedule():showZonePopup('${zid}');},150);})()">
           <div class="zone-dot" style="background:${c.fill}"></div>
           <div style="flex:1;min-width:0">
             <div class="zone-name">${z.icon} ${z.name}</div>

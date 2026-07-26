@@ -1446,6 +1446,22 @@ body.full-list #next90-btn:active,body[data-full] #next90-btn:active{
 #airport-modal-body{ padding-right:12px !important; }
 /* последната колона с часове да не влиза под бутоните */
 #airport-modal-body .fl-row:last-child{ padding-right:2px; }
+
+/* попъпите на гарите: по-високи, със скрол за бъдещите рейсове */
+.leaflet-popup-content-wrapper{ max-height:66vh !important; }
+.leaflet-popup-content{ max-height:none !important; }
+/* самите списъци вътре получават свой скрол, ако са дълги */
+.leaflet-popup-content [class*="arr-list"],
+.leaflet-popup-content .bus-list,
+.leaflet-popup-content .train-list{
+  max-height:38vh; overflow-y:auto; overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+}
+/* тънка лента за скрол, за да личи че има още */
+.leaflet-popup-content-wrapper::-webkit-scrollbar{ width:6px; }
+.leaflet-popup-content-wrapper::-webkit-scrollbar-thumb{
+  background:var(--cyan); border-radius:3px; opacity:.5;
+}
 </style>
 <style>
 
@@ -2135,7 +2151,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260726v112"></script>
+<script src="app.js?v=20260726v113"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">
