@@ -4808,16 +4808,29 @@ function toggleMapView(){
       }
     });
     rays.innerHTML = lines;
-    // нито един надпис да не излиза от екрана
     if(open){
-      live.concat(dests).forEach(function(it){
-        var l = adopted[it.id].label;
+      var all = live.concat(dests).map(function(it){ return adopted[it.id].label; });
+      // 1) никой надпис да не излиза от екрана
+      all.forEach(function(l){
         var r = l.getBoundingClientRect();
         if(r.x < 6){
           var cur = parseFloat(l.style.left) || 0;
           l.style.left = (cur + (6 - r.x)) + 'px';
         }
       });
+      // 2) ОБЩО разреждане по вертикала — двата пръстена заедно
+      var sorted = all.map(function(l){
+        return { el:l, top: l.getBoundingClientRect().top, h: l.getBoundingClientRect().height };
+      }).sort(function(a,b){ return a.top - b.top; });
+      for(var s = 1; s < sorted.length; s++){
+        var need = sorted[s-1].top + sorted[s-1].h + 6;
+        if(sorted[s].top < need){
+          var shift = need - sorted[s].top;
+          var cy = parseFloat(sorted[s].el.style.top) || 0;
+          sorted[s].el.style.top = (cy + shift) + 'px';
+          sorted[s].top += shift;
+        }
+      }
     }
   }
 
