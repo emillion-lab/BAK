@@ -223,7 +223,7 @@ const ZONES = window.__ZONES = [
 
   { id:"cjp",            name:"Централна ЖП гара",                      icon:"🚂", lat:42.7121, lng:23.3210, radius:240, type:"transit",          wazeName:"Централна жп гара София" },
   { id:"cab_north",      name:"Централна автогара",                     icon:"🚌", lat:42.7103, lng:23.3233, radius:200, type:"transit",          wazeName:"Централна автогара София" },
-  { id:"cas_intl", name:"🌍 Междунар. автогара Сердика / FlixBus", icon:"🌍", lat:42.7108, lng:23.3224, radius:150, type:"transit", wazeName:"Международна автогара Сердика София" },
+  { id:"cas_intl", name:"Междунар. автогара Сердика / FlixBus", icon:"🌍", lat:42.7108, lng:23.3224, radius:150, type:"transit", wazeName:"Международна автогара Сердика София" },
   { id:"ag_yug",         name:"Автогара Юг (бул.Драган Цанков)",        icon:"🚌", lat:42.6689, lng:23.3526, radius:190, type:"transit",          hours:[7.5,18.5], wazeName:"Автогара Юг София" },
   { id:"ag_pod",         name:"Автогара Подуяне",                       icon:"🚌", lat:42.7034, lng:23.3601, radius:190, type:"transit",          wazeName:"Автогара Подуяне София" },
 
@@ -1615,6 +1615,14 @@ function applyFallbackAirport(){
 }
 
 function updateAirportBadge(){
+  try{
+    var _b = document.getElementById('airport-badge');
+    if(_b && typeof flightDetails !== 'undefined' && flightDetails.length){
+      _b.textContent = '🛰 ' + flightDetails.length + ' полета · ЗАРЕДЕН';
+      _b.classList.add('ready');
+      return;
+    }
+  }catch(e){}
   const b=document.getElementById('airport-badge');
   if(airportStatus==='live')        {b.textContent='✈ LIVE';     b.style.color='#22c55e';}
   else if(airportStatus==='fallback'){b.textContent='✈ ПРОГНОЗА';b.style.color='#f59e0b';}
@@ -4639,7 +4647,7 @@ function toggleMapView(){
   var DESTS = [
     { zone:'airport',   icon:'✈️', label:'Летище' },
     { zone:'cab_north', icon:'🚌', label:'Централна' },
-    { zone:'cas_intl',  icon:'🌍', label:'Международна' },
+    { zone:'cas_intl',  icon:'🌐', label:'Международна' },
     { zone:'cjp',       icon:'🚂', label:'ЖП гара' },
     { zone:'__zones',   icon:'📋', label:'Зони' }
   ];
@@ -4793,14 +4801,8 @@ function toggleMapView(){
           if(typeof window.showAirportSchedule === 'function') window.showAirportSchedule();
           else window.__destErr = 'липсва showAirportSchedule';
         } else if(typeof window.showZonePopup === 'function'){
-          // строим съдържанието през попъпа, но го показваме на ЦЯЛ ЕКРАН
+          document.body.classList.remove('full-list');   // списъкът отстъпва на картата
           window.showZonePopup(id);
-          setTimeout(function(){
-            var pc = document.querySelector('.leaflet-popup-content');
-            var html = pc ? pc.innerHTML : '';
-            try{ M.closePopup(); }catch(e){}
-            showFullPanel(z.icon + ' ' + z.name, html);
-          }, 90);
         } else {
           window.__destErr = 'липсва showZonePopup';
         }

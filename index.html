@@ -1321,6 +1321,55 @@ body > #zone-sidebar{ position:fixed !important; }
 }
 #zone-full-body{ overflow-y:auto; overscroll-behavior:contain; padding:12px 14px 20px; }
 #zone-full-body *{ max-width:100%; }
+
+/* ═══════ СПИСЪКЪТ НА ЦЯЛ ЕКРАН — над лентите ═══════ */
+body.full-list #zone-sidebar{
+  top:0 !important; z-index:2600 !important;
+  border-radius:0 !important;
+  padding-top:6px !important;
+}
+body.full-list #zone-sidebar .zone-row,
+body.full-list #zone-sidebar .sidebar-title{ padding-right:62px !important; }
+/* коефициентът да не пада под бутоните */
+body.full-list #zone-sidebar .zone-row [class*="score"],
+body.full-list #zone-sidebar .zone-row > *:last-child{ margin-right:4px; }
+/* колоната остава отгоре и достъпна */
+.tool-btn, #next90-btn, #clean-btn, #gps-btn, #fs-btn{ z-index:2700 !important; }
+body.full-list .tool-btn, body.full-list #next90-btn, body.full-list #clean-btn,
+body.full-list #gps-btn, body.full-list #fs-btn{ opacity:.94; }
+
+/* ═══════ ЛЕТИЩЕТО — цял екран ═══════ */
+#airport-modal-box{
+  margin-top:0 !important; height:100dvh !important; max-height:100dvh !important;
+  border-radius:0 !important;
+}
+
+/* ═══════ Попъпите се връщат: компактни, колкото съдържанието ═══════ */
+.leaflet-popup{ display:block !important; }
+.leaflet-popup-content-wrapper{ max-height:52vh; overflow-y:auto; overscroll-behavior:contain; }
+.leaflet-popup-content{ margin:12px 14px !important; font-size:13.5px; }
+#zone-full{ display:none !important; }
+
+/* ═══════ НОЩ: повече неон и пулс по важното ═══════ */
+body.theme-night .dest-btn{
+  animation:neon-breathe 3.2s ease-in-out infinite;
+}
+@keyframes neon-breathe{
+  0%,100%{ box-shadow:0 6px 18px rgba(0,0,0,.55), 0 0 0 2px var(--dest-ring), 0 0 10px rgba(34,211,238,.20); }
+  50%    { box-shadow:0 6px 18px rgba(0,0,0,.55), 0 0 0 2px var(--dest-ring), 0 0 24px rgba(34,211,238,.55); }
+}
+body.theme-night .dest-btn.on{ animation:none; box-shadow:0 0 0 3px var(--cyan), 0 0 28px rgba(34,211,238,.75) !important; }
+body.theme-night #airport-badge.ready{ color:#34d399; text-shadow:0 0 12px rgba(52,211,153,.6); }
+body.theme-night .zone-row [class*="peak"], body.theme-night .tl-dead{
+  animation:neon-pulse 1.8s ease-in-out infinite;
+}
+@keyframes neon-pulse{ 0%,100%{ filter:none } 50%{ filter:drop-shadow(0 0 8px currentColor) } }
+body.theme-night .header h1{ animation:title-glow 5s ease-in-out infinite; }
+@keyframes title-glow{
+  0%,100%{ filter:drop-shadow(0 0 8px rgba(34,211,238,.30)) }
+  50%    { filter:drop-shadow(0 0 16px rgba(167,139,250,.55)) }
+}
+#airport-badge.ready{ color:var(--green); font-weight:800; }
 </style>
 <style>
 
@@ -2010,7 +2059,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260726v105"></script>
+<script src="app.js?v=20260726v106"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">
