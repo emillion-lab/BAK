@@ -75,5 +75,5 @@ RESULT: {
  "viewport": 844,
  "fanGone": true
 }
-TILEFAILS: 22
+TILEFAILS: 0
 PAGEERRORS: none
