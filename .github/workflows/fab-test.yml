@@ -20,7 +20,28 @@ jobs:
           const failed=[]; p.on('requestfailed',r=>{ if(/tile|\.png/.test(r.url())) failed.push(r.url().slice(0,60)); });
           await p.goto('https://emillion-lab.github.io/BAK/?t='+Date.now(), {waitUntil:'networkidle2', timeout:45000});
           await new Promise(r=>setTimeout(r,8000));
-          const out = await p.evaluate(() => {
+          // проверката на бутоните иска изчакване, попъпът се създава след 180ms
+          const opens = {};
+          for (const id of ['dest-__zones','dest-airport','dest-cjp','dest-cab_north','dest-cas_intl']) {
+            await p.evaluate(i=>{const e=document.getElementById(i); if(e) e.click();}, id);
+            await new Promise(r=>setTimeout(r,650));
+            opens[id] = await p.evaluate((i)=>{
+              const full = i==='dest-__zones'
+                ? document.body.classList.contains('full-list')
+                : (document.body.getAttribute('data-full')===i.replace('dest-',''));
+              let visible=false;
+              if(i==='dest-__zones'){ const s=document.getElementById('zone-sidebar');
+                if(s){const r=s.getBoundingClientRect(); visible=r.height>100 && r.top<innerHeight;} }
+              else if(i==='dest-airport'){ const m=document.getElementById('airport-modal');
+                visible = !!m && getComputedStyle(m).display!=='none'; }
+              else visible = !!document.querySelector('.leaflet-popup');
+              return {opened:full, visible};
+            }, id);
+            await p.evaluate(i=>{const e=document.getElementById(i); if(e) e.click();}, id);
+            await new Promise(r=>setTimeout(r,250));
+            opens[id].closedOnSecond = await p.evaluate(()=>!document.body.getAttribute('data-full'));
+          }
+          const out = await p.evaluate((opensIn) => {
             const ids=['next90-btn','clean-btn','gps-btn','fs-btn',
                        'dest-airport','dest-cjp','dest-cab_north','dest-cas_intl','dest-__zones'];
             const boxes = ids.map(id=>{const e=document.getElementById(id);
@@ -43,24 +64,8 @@ jobs:
               const m=getComputedStyle(e).backgroundColor.match(/(\d+),\s*(\d+),\s*(\d+)/);
               if(m && (+m[1]*.299 + +m[2]*.587 + +m[3]*.114) < 110) dark.push(sel);
             });
-            // всеки бутон: отваря ли, пълни ли екрана, затваря ли се с втори клик
-            const opens={};
-            ['dest-__zones','dest-airport','dest-cjp','dest-cab_north','dest-cas_intl'].forEach(id=>{
-              const e=document.getElementById(id); if(!e) return;
-              e.click();
-              const full = id==='dest-__zones'
-                ? document.body.classList.contains('full-list')
-                : (document.body.getAttribute('data-full')===id.replace('dest-',''));
-              let visible=false, h=0;
-              if(id==='dest-__zones'){ const s=document.getElementById('zone-sidebar');
-                if(s){ const r=s.getBoundingClientRect(); visible=r.height>100 && r.top<innerHeight; h=Math.round(r.height);} }
-              else if(id==='dest-airport'){ const m=document.getElementById('airport-modal');
-                visible = m && getComputedStyle(m).display!=='none'; }
-              else { visible = !!document.querySelector('.leaflet-popup'); }
-              e.click();
-              const closed = !document.body.getAttribute('data-full');
-              opens[id]={opened:full, visible, h, closedOnSecond:closed};
-            });
+            const opens = opensIn;
+            const _unused={};
             // може ли страницата да се дърпа под картата
             const scrollable = document.documentElement.scrollHeight > innerHeight + 4;
             const mp=document.getElementById('map'), st=document.getElementById('topstack');
@@ -73,7 +78,7 @@ jobs:
               viewport: innerHeight,
               fanGone: !document.querySelector('#fab-hub:not([style*="display: none"])')
             };
-          });
+          }, opens);
           console.log('RESULT:', JSON.stringify(out,null,1));
           console.log('TILEFAILS:', failed.length);
           console.log('PAGEERRORS:', errs.slice(0,4).join(' | ')||'none');

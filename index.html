@@ -1265,6 +1265,12 @@ body.theme-night #weather-bar::before{
 @keyframes wx-sheen{ 0%{transform:translateX(-120%)} 55%{transform:translateX(120%)} 100%{transform:translateX(120%)} }
 #weather-bar .wb-icon{ display:inline-block; animation:wx-float 4.5s ease-in-out infinite; }
 @keyframes wx-float{ 0%,100%{transform:translateY(0) rotate(0)} 50%{transform:translateY(-2px) rotate(-6deg)} }
+
+/* всичко след сцената е плаващ слой — нищо не стои в потока под картата */
+#karyk-sidebar{ display:none !important; }
+body > #zone-sidebar{ position:fixed !important; }
+#stage ~ *{ position:fixed !important; }
+#event-alert, #dir-hint, #nav-panel{ position:fixed !important; }
 </style>
 <style>
 
@@ -1954,7 +1960,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260726v100"></script>
+<script src="app.js?v=20260726v101"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">
