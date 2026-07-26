@@ -1440,11 +1440,12 @@ body.full-list #next90-btn:active,body[data-full] #next90-btn:active{
    Летищният прозорец е на слой 3000 и покриваше бутоните.            */
 #next90-btn, #clean-btn, #gps-btn, #fs-btn, .tool-btn{ z-index:3600 !important; }
 /* панелите оставят десния ръб свободен, за да не гълтат докосването */
-#airport-modal, #zone-full{ padding-right:0 !important; }
-#airport-modal-box, #zone-full-box{ padding-right:64px !important; }
-#airport-modal-head, #zone-full-head{ padding-right:8px !important; }
-/* фонът на прозореца не хваща докосване върху колоната */
-#airport-modal{ clip-path:polygon(0 0, calc(100% - 60px) 0, calc(100% - 60px) 100%, 0 100%); }
+
+/* панелите стигат до ръба; бутоните просто плуват отгоре полупрозрачни */
+#airport-modal-box{ padding-right:0 !important; }
+#airport-modal-body{ padding-right:12px !important; }
+/* последната колона с часове да не влиза под бутоните */
+#airport-modal-body .fl-row:last-child{ padding-right:2px; }
 </style>
 <style>
 
@@ -2134,7 +2135,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260726v110"></script>
+<script src="app.js?v=20260726v111"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">
