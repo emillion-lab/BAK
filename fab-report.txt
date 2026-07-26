@@ -61,9 +61,9 @@ RESULT: {
   "стариятНадпис": false,
   "нямаДанни": false,
   "проба": [
-   "КПВ 50280",
-   "КПВ 20224",
-   "БВ 8610"
+   "КПВ 10224",
+   "БВ 8650",
+   "БВ 5614"
   ]
  },
  "tilesDark": "invert(1) hue-rotate(180deg) brightness(",
@@ -75,5 +75,5 @@ RESULT: {
  "viewport": 844,
  "fanGone": true
 }
-TILEFAILS: 0
+TILEFAILS: 22
 PAGEERRORS: none
