@@ -1026,7 +1026,6 @@ body.list-view #zone-sidebar, body.list-view #karyk-sidebar{
 }
 
 /* нощна карта: обръщаме САМО плочките, маркерите остават верни */
-body.karyk-active .leaflet-tile-pane{ filter:none; }
 
 /* ═══ ветрилото с 6 бутона: по-едри надписи ═══ */
 .fab-label{ font:800 16px -apple-system,system-ui,sans-serif !important; padding:10px 15px !important; border-radius:12px !important; }
@@ -1257,7 +1256,7 @@ body.theme-night #weather-bar::before{
 #karyk-sidebar{ display:none !important; }
 body > #zone-sidebar{ position:fixed !important; }
 #stage ~ *{ position:fixed !important; }
-#event-alert, #dir-hint, #nav-panel{ position:fixed !important; }
+#event-alert, #direction-hint, #nav-panel{ position:fixed !important; }
 
 /* вътрешният бутон „Списък" вече няма какво да прави */
 #toggle-map-btn, #toggle-map-btn-k{ display:none !important; }
@@ -1372,7 +1371,7 @@ body.theme-night .header h1{ animation:title-glow 5s ease-in-out infinite; }
 #airport-badge.ready{ color:var(--green); font-weight:800; }
 
 /* ═══ Навигационният панел долу (посока/скор) — по темата ═══ */
-#nav-panel, #dir-hint, #event-alert{
+#nav-panel, #direction-hint, #event-alert{
   background:var(--glass) !important; color:var(--text) !important;
   border:1px solid var(--glass-edge) !important;
   backdrop-filter:saturate(175%) blur(15px);
@@ -1380,7 +1379,7 @@ body.theme-night .header h1{ animation:title-glow 5s ease-in-out infinite; }
   box-shadow:var(--card) !important;
   border-radius:16px !important;
 }
-#nav-panel *, #dir-hint *, #event-alert *{ color:var(--text) !important; }
+#nav-panel *, #direction-hint *, #event-alert *{ color:var(--text) !important; }
 #nav-panel [style*="color:#f8"], #nav-panel [style*="color:#e"]{ color:var(--red) !important; }
 /* стрелката за посока */
 #nav-arrow, .nav-arrow{ background:var(--glass) !important; border:1px solid var(--glass-edge) !important; }
@@ -1388,6 +1387,25 @@ body.theme-night .header h1{ animation:title-glow 5s ease-in-out infinite; }
 /* попъпът никога под лентите */
 .leaflet-popup{ margin-bottom:8px; }
 .leaflet-popup-content-wrapper{ max-height:46vh; }
+
+/* панелът за посока — стъклен и по темата (беше зашит #070d1af8) */
+#direction-hint{
+  background:var(--glass) !important;
+  border-top:2px solid var(--amber) !important;
+  color:var(--text) !important;
+  backdrop-filter:saturate(175%) blur(16px);
+  -webkit-backdrop-filter:saturate(175%) blur(16px);
+  box-shadow:0 -6px 22px rgba(15,27,45,.16) !important;
+}
+#direction-hint .dh-name{ color:var(--text) !important; }
+#direction-hint .dh-addr{ color:var(--muted) !important; }
+#direction-hint .dh-close{ color:var(--muted) !important; }
+body.theme-night #direction-hint{ box-shadow:0 -6px 24px rgba(0,0,0,.6) !important; }
+
+/* нощната карта: филтърът се прилага без изключения */
+body.tiles-dark .leaflet-tile-pane{
+  filter:invert(1) hue-rotate(180deg) brightness(.93) contrast(.92) saturate(.75) !important;
+}
 </style>
 <style>
 
@@ -2077,7 +2095,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260726v107"></script>
+<script src="app.js?v=20260726v108"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">

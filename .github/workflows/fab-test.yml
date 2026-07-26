@@ -72,6 +72,21 @@ jobs:
             return {
               found: boxes.map(x=>x.id), missing: ids.filter(i=>!boxes.find(x=>x.id===i)),
               overlaps, offscreen, dark, opens, scrollable,
+              tilesDark: (()=>{ document.body.classList.remove('theme-day');
+                document.body.classList.add('theme-night','tiles-dark');
+                const p=document.querySelector('.leaflet-tile-pane');
+                const f=p?getComputedStyle(p).filter:'—';
+                document.body.classList.remove('theme-night','tiles-dark');
+                document.body.classList.add('theme-day');
+                return f.slice(0,40);})(),
+              dirHint: (()=>{ const e=document.getElementById('direction-hint');
+                if(!e) return 'липсва';
+                e.style.display='block';
+                const bg=getComputedStyle(e).backgroundColor;
+                e.style.display='';
+                const m=bg.match(/(\d+),\s*(\d+),\s*(\d+)/);
+                const lum=m?Math.round(+m[1]*.299 + +m[2]*.587 + +m[3]*.114):-1;
+                return bg+' (яркост '+lum+')';})(),
               destErr: window.__destErr || null,
               mapH: mp?Math.round(mp.getBoundingClientRect().height):0,
               mapBottom: mp?Math.round(mp.getBoundingClientRect().bottom):0,
