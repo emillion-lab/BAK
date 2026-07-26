@@ -78,9 +78,9 @@ AFTER OPEN: {
   "Топ: 🚂 Централна ЖП гара (1.2) 🚉 пик"
  ],
  "flights": {
-  "redove": 88,
+  "redove": 87,
   "minali": 13,
-  "chas": "7:00"
+  "chas": "7:06"
  },
  "bakshishRows": {
   "height": 0,
