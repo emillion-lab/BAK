@@ -4625,6 +4625,14 @@ function toggleMapView(){
 (function(){
   var R = 155, A0 = 90, A1 = 195;   // радиус и дъга (градуси)
   var LBL_X = -178, LBL_GAP = 30;   // колона с етикети
+  // ВЪТРЕШЕН пръстен — местата, които раждат клиенти (най-близо до палеца)
+  var DESTS = [
+    { zone:'airport',   icon:'✈️', label:'Летище' },
+    { zone:'cab_north', icon:'🚌', label:'Централна автогара' },
+    { zone:'cas_intl',  icon:'🌍', label:'Международна автогара' },
+    { zone:'cjp',       icon:'🚂', label:'ЖП гара' }
+  ];
+  // ВЪНШЕН пръстен — инструменти (без надписи, иконите са познати)
   var ITEMS = [
     { id:'next90-btn',     label:'Събития 24ч' },
     { id:'clean-btn',      label:'Чиста карта' },
@@ -4660,8 +4668,48 @@ function toggleMapView(){
     wrap.appendChild(hub);
     document.body.appendChild(wrap);
 
+    makeDests();
     adopt();
     setInterval(adopt, 1200);
+  }
+
+  function makeDests(){
+    DESTS.forEach(function(d){
+      if(document.getElementById('dest-' + d.zone)) return;
+      var b = document.createElement('button');
+      b.id = 'dest-' + d.zone;
+      b.className = 'fab-sat fab-dest';
+      b.innerHTML = d.icon;
+      b.title = d.label;
+      b.addEventListener('click', function(e){
+        e.stopPropagation();
+        setOpen(false);
+        goToZone(d.zone);
+      });
+      wrap.appendChild(b);
+
+      var lb = document.createElement('div');
+      lb.className = 'fab-label fab-dest-label';
+      lb.setAttribute('data-for', b.id);
+      lb.textContent = d.label;
+      lb.addEventListener('click', function(e){ e.stopPropagation(); b.click(); });
+      wrap.appendChild(lb);
+      adopted[b.id] = { el:b, label:lb, dest:true };
+    });
+  }
+
+  function goToZone(id){
+    try{
+      var z = ZONES.find(function(x){ return x.id === id; });
+      if(!z) return;
+      if(document.body.classList.contains('list-view')) toggleMapView();
+      setTimeout(function(){
+        map.invalidateSize();
+        map.setView([z.lat, z.lng], id === 'airport' ? 14 : 15);
+        if(id === 'airport') showAirportSchedule();
+        else showZonePopup(id);
+      }, 180);
+    }catch(e){}
   }
 
   function adopt(){
@@ -4694,9 +4742,11 @@ function toggleMapView(){
   }
 
   function layout(){
-    var live = ITEMS.filter(function(it){ return adopted[it.id]; });
+    var dests = DESTS.map(function(d){ return { id:'dest-' + d.zone }; })
+                     .filter(function(it){ return adopted[it.id]; });
+    var live  = ITEMS.filter(function(it){ return adopted[it.id]; });
     var n = live.length;
-    if(!n) return;
+    if(!n && !dests.length) return;
     var open = document.body.classList.contains('fab-open');
     // Ветрило 90°→205°: минава под хоризонтала, за да има място за
     // ЕДРИ бутони (52px) с реален просвет — за работа в движеща се кола.
@@ -4732,10 +4782,23 @@ function toggleMapView(){
           lines += '<line class="fab-link" x1="' + (lx + 4) + '" y1="' + ly + '" x2="' + (dx - 27) + '" y2="' + dy + '"/>';
       }
     });
+    // вътрешният пръстен
+    dests.forEach(function(it, i){
+      var rec = adopted[it.id];
+      var dx = open ? posI[i].x : 0, dy = open ? posI[i].y : 0;
+      rec.el.style.left = dx + 'px';
+      rec.el.style.top  = dy + 'px';
+      rec.label.style.left = (open ? dx - 36 : 0) + 'px';
+      rec.label.style.top  = dy + 'px';
+      if(open){
+        var d2 = Math.sqrt(dx*dx + dy*dy), k2 = d2 ? (1 - 30/d2) : 0;
+        lines += '<line class="fab-inner" x1="0" y1="0" x2="' + Math.round(dx*k2) + '" y2="' + Math.round(dy*k2) + '"/>';
+      }
+    });
     rays.innerHTML = lines;
     // нито един надпис да не излиза от екрана
     if(open){
-      live.forEach(function(it){
+      live.concat(dests).forEach(function(it){
         var l = adopted[it.id].label;
         var r = l.getBoundingClientRect();
         if(r.x < 6){

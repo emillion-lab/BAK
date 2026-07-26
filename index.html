@@ -1114,6 +1114,42 @@ body.list-view .sheet-btn{ display:none !important; }
 #karyk-corner-tr, #karyk-corner-bl, #btn-karyk{ display:none !important; }
 body.karyk-active::after{ display:none !important; content:none !important; }
 body.karyk-active #map{ filter:none !important; }
+
+/* ═══ Вътрешен пръстен: дестинациите — по-едри и по-близо до палеца ═══ */
+#fab-wrap .fab-dest{
+  width:64px !important; height:64px !important;
+  margin-left:-32px !important; margin-top:-32px !important;
+  max-width:64px !important; font-size:29px !important;
+  border:2px solid var(--cyan) !important;
+  box-shadow:var(--card), 0 0 18px var(--ring) !important;
+}
+body.theme-night #fab-wrap .fab-dest{
+  background:#12233d !important;
+  box-shadow:0 2px 10px rgba(0,0,0,.6), 0 0 22px var(--ring) !important;
+}
+.fab-dest-label{
+  font:900 15px -apple-system,system-ui,sans-serif !important;
+  padding:9px 13px !important;
+  border-color:var(--cyan) !important;
+}
+/* инструментите отвън — по-дискретни */
+#fab-wrap .fab-sat:not(.fab-dest){
+  width:48px !important; height:48px !important;
+  margin-left:-24px !important; margin-top:-24px !important;
+  max-width:48px !important; font-size:21px !important;
+  opacity:.92;
+}
+.fab-label:not(.fab-dest-label){
+  font:700 12.5px -apple-system,system-ui,sans-serif !important;
+  padding:6px 10px !important; opacity:.9;
+}
+#fab-rays line.fab-inner{ stroke:var(--cyan) !important; stroke-width:2.5; opacity:.65; stroke-dasharray:none; }
+/* лек пулс на дестинациите, за да личи че водят нанякъде */
+@keyframes dest-glow{
+  0%,100%{ box-shadow:var(--card), 0 0 14px var(--ring); }
+  50%    { box-shadow:var(--card), 0 0 26px var(--ring); }
+}
+body.fab-open #fab-wrap .fab-dest{ animation:dest-glow 2.4s ease-in-out infinite; }
 </style>
 <style>
 
