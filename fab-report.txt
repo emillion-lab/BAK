@@ -18,35 +18,30 @@ RESULT: {
   "dest-__zones": {
    "opened": true,
    "visible": true,
-   "h": 606,
    "closedOnSecond": true
   },
   "dest-airport": {
    "opened": true,
-   "visible": null,
-   "h": 0,
+   "visible": false,
    "closedOnSecond": true
   },
   "dest-cjp": {
    "opened": true,
    "visible": false,
-   "h": 0,
    "closedOnSecond": true
   },
   "dest-cab_north": {
    "opened": true,
    "visible": false,
-   "h": 0,
    "closedOnSecond": true
   },
   "dest-cas_intl": {
    "opened": true,
    "visible": false,
-   "h": 0,
    "closedOnSecond": true
   }
  },
- "scrollable": true,
+ "scrollable": false,
  "mapH": 844,
  "mapBottom": 844,
  "stackH": 238,
