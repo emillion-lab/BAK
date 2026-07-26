@@ -1,15 +1,15 @@
 {
-  "updated": "2026-07-27T00:08:58.248717+03:00",
+  "updated": "2026-07-27T01:10:43.406314+03:00",
   "source": "live.bdz.bg",
   "station": "София Централна",
-  "count": 7,
+  "count": 11,
   "far_count": 4,
   "arrivals": [
     {
-      "time": "03:05",
+      "time": "03:21",
       "from": "Димитровград ЖС",
       "train": "МБВ 13141",
-      "delay": 224,
+      "delay": 240,
       "tier": "far",
       "weight": 1.0
     },
@@ -25,15 +25,15 @@
       "time": "05:25",
       "from": "Мездра",
       "train": "КПВ 20200",
-      "delay": 3,
+      "delay": 1,
       "tier": "mid",
       "weight": 0.5
     },
     {
-      "time": "05:48",
+      "time": "05:46",
       "from": "Варна",
       "train": "БВ 2626",
-      "delay": 3,
+      "delay": 1,
       "tier": "far",
       "weight": 1.0
     },
@@ -60,6 +60,38 @@
       "delay": 0,
       "tier": "far",
       "weight": 1.0
+    },
+    {
+      "time": "06:28",
+      "from": "Септември",
+      "train": "ПВ 10120",
+      "delay": 0,
+      "tier": "mid",
+      "weight": 0.55
+    },
+    {
+      "time": "06:45",
+      "from": "Лакатник",
+      "train": "КПВ 20220",
+      "delay": 0,
+      "tier": "near",
+      "weight": 0.35
+    },
+    {
+      "time": "06:45",
+      "from": "Дупница",
+      "train": "КПВ 50230",
+      "delay": 0,
+      "tier": "mid",
+      "weight": 0.5
+    },
+    {
+      "time": "06:50",
+      "from": "Драгоман",
+      "train": "КПВ 10201",
+      "delay": 0,
+      "tier": "mid",
+      "weight": 0.5
     }
   ]
 }
