@@ -27,9 +27,12 @@ AFTER OPEN: {
   "mapUnderStack": true,
   "stackVar": "238px"
  },
- "darkInLight": [
-  ".ticker-bar rgba(12, 22, 38, 0.58)"
- ],
+ "darkInLight": {
+  "bad": [
+   ".ticker-bar rgba(6, 16, 28, 0.72)"
+  ],
+  "bodyClass": "fab-open theme-day"
+ },
  "minAdjacent": 63,
  "size": 52,
  "align": [
@@ -83,7 +86,7 @@ AFTER OPEN: {
  "flights": {
   "redove": 78,
   "minali": 0,
-  "chas": "0:00"
+  "chas": "0:05"
  },
  "bakshishRows": {
   "height": 31,
