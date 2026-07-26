@@ -24,15 +24,13 @@ AFTER OPEN: {
  },
  "layout": {
   "stackH": 238,
-  "mapH": 504,
+  "mapH": 726,
   "mapUnderStack": true,
   "stackVar": "238px"
  },
  "darkInLight": {
-  "bad": [
-   ".ticker-bar rgba(6, 16, 28, 0.72)"
-  ],
-  "bodyClass": "tiles-dark fab-open theme-day"
+  "bad": [],
+  "bodyClass": "theme-day fab-open"
  },
  "minAdjacent": 76,
  "size": 60,
@@ -80,9 +78,9 @@ AFTER OPEN: {
   "Топ: 🚂 Централна ЖП гара (1.2) 🚉 пик"
  ],
  "flights": {
-  "redove": 89,
+  "redove": 88,
   "minali": 13,
-  "chas": "6:55"
+  "chas": "7:00"
  },
  "bakshishRows": {
   "height": 0,
