@@ -1487,6 +1487,15 @@ body.full-list #next90-btn:active,body[data-full] #next90-btn:active{
   background:var(--surface); border:1.5px solid var(--glass-edge);
   box-shadow:var(--card); font-size:17px; cursor:pointer;
 }
+
+/* пулс само за полетите в ТОЧНИЯ прозорец на излизане */
+@keyframes fl-now-pulse{
+  0%,100%{ box-shadow:0 0 0 rgba(239,68,68,0); border-color:#ef4444; }
+  50%    { box-shadow:0 0 16px rgba(239,68,68,.6), inset 0 0 12px rgba(239,68,68,.16); border-color:#ff6b6b; }
+}
+#airport-modal-body [data-now="1"]{ animation:fl-now-pulse 1.8s ease-in-out infinite; }
+/* приключващите не пулсират — само червен ръб */
+#airport-modal-body [data-fading="1"]{ animation:none; }
 </style>
 <style>
 
@@ -2176,7 +2185,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260726v120"></script>
+<script src="app.js?v=20260726v121"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">

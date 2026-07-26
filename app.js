@@ -1074,10 +1074,12 @@ function showAirportSchedule() {
   // Крие излезли преди >2ч; класифицира останалите
   const visible = [];
   all.forEach(f=>{
-    if(f.exitToTs < nowTs - 45*60000) return;       // хората излизат по-бавно — пазим 45 мин назад
-    const graceTs = f.exitToTs + 25*60000; // грейс: пасажерите се точат и след прозореца
-    f._state = (nowTs >= f.exitFromTs && nowTs <= graceTs) ? 'now'
-             : (f.exitToTs < nowTs) ? 'done' : 'future';
+    // ПРИКЛЮЧИЛ: минал е повече от час след края на прозореца → само „???"
+    if(f.exitToTs < nowTs - 60*60000) return;
+    const graceTs = f.exitToTs + 25*60000;   // пасажерите се точат и след прозореца
+    f._state = (nowTs >= f.exitFromTs && nowTs <= graceTs) ? 'now'      // ТОЧНИЯТ диапазон → пулсира
+             : (f.exitToTs < nowTs)                        ? 'fading'   // вероятно още има → червено
+             :                                               'future';
     visible.push(f);
   });
 
@@ -1133,29 +1135,31 @@ function showAirportSchedule() {
         lastHour = f.exitFromH;
         html+=`<div style="font-size:11px;font-weight:800;color:var(--muted);margin:7px 0 3px;padding-left:4px">— ${String(lastHour).padStart(2,'0')}:00 —</div>`;
       }
-      const isNow  = f._state==='now';
-      const isDone = f._state==='done';
-      const bg  = isNow ? 'rgba(239,68,68,.16)' : 'transparent';
-      const brd = isNow ? '1px solid #ef4444'    : '1px solid transparent';
-      const col = isNow ? '#ef4444' : isDone ? 'var(--muted)' : 'var(--amber)';
-      const op  = isDone ? 'opacity:.72;' : '';
+      const isNow    = f._state==='now';      // точният диапазон — ПУЛСИРА
+      const isFading = f._state==='fading';   // вероятно още има пътници — ЧЕРВЕНО
+      const bg  = isNow ? 'rgba(239,68,68,.16)' : isFading ? 'rgba(239,68,68,.06)' : 'transparent';
+      const brd = isNow ? '1px solid #ef4444' : isFading ? '1px solid rgba(239,68,68,.45)' : '1px solid transparent';
+      const col = isNow ? '#ef4444' : isFading ? '#dc2626' : 'var(--amber)';
+      const op  = isFading ? 'opacity:.88;' : '';
+      const isDone = false;
       const anchor = (!anchorSet && (isNow || f._state==='future')) ? (anchorSet=true, ' id="fl-now-anchor"') : '';
-      html+=`<div${anchor}${isNow?' data-now="1"':''} style="display:flex;align-items:center;gap:5px;padding:4px 7px;border-radius:7px;background:${bg};border:${brd};margin-bottom:1px;${op}">
+      html+=`<div${anchor}${isNow?' data-now="1"':(isFading?' data-fading="1"':'')} style="display:flex;align-items:center;gap:5px;padding:4px 7px;border-radius:7px;background:${bg};border:${brd};margin-bottom:1px;${op}">
         <span style="font-weight:800;font-size:14px;min-width:44px;color:var(--text)">${f.fn}</span>
         ${flTerm==='all'?`<span style="font-size:10.5px;font-weight:900;color:var(--cyan);border:1px solid var(--border);border-radius:4px;padding:0 4px">${'Т'+f.term}</span>`:''}
         <span style="flex:1;min-width:0;overflow:hidden">
-          <span style="display:block;font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.25">${(f.depAirport||'').slice(0,20)}</span>
+          <span style="display:block;font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.25">${(f.depAirport||'').slice(0,18)}<span style="font-size:9.5px;opacity:.9"> ${fmt(f.schedH,f.schedM)}${
+            f.delay >= 5  ? `<b style="color:#dc2626">+${f.delay}′</b>` :
+            f.delay <= -5 ? `<b style="color:#16a34a">${f.delay}′</b>` : ''
+          }</span></span>
           <span style="display:block;font-size:10px;color:var(--muted);opacity:.85;white-space:nowrap;line-height:1.2">🛬 ${fmt(f.landH,f.landM)}${
-            f.delay >= 5  ? ` <b style="color:#dc2626">+${f.delay}′</b>` :
-            f.delay <= -5 ? ` <b style="color:#16a34a">${f.delay}′</b>` : ''
-          }${
             /arriv/i.test(f.statusRaw||'')   ? ' <span style="color:#16a34a">кацна</span>' :
             /approach|en.?route/i.test(f.statusRaw||'') ? ' <span style="color:#0369a1">каца</span>' : ''
           }</span>
         </span>
         <span style="font-size:13px">${flag(f)}</span>
         ${isNow?'<span style="font-size:10.5px;font-weight:900;color:#ef4444;white-space:nowrap">ИЗЛИЗА</span>':''}
-        ${isDone?'<span style="font-size:10px;font-weight:800;color:var(--muted);white-space:nowrap">още?</span>':''}
+        ${isFading?'<span style="font-size:11px;font-weight:800;color:#dc2626;white-space:nowrap" title="Прозорецът мина, но е възможно още да излизат">???</span>':''}
+
         <span style="font-weight:800;font-size:13.5px;color:${col};white-space:nowrap">${fmt(f.exitFromH,f.exitFromM)}–${fmt(f.exitToH,f.exitToM)}</span>
       </div>`;
     });
@@ -1733,8 +1737,10 @@ function processFlights(data){
         const dep=(f.departure?.airport||f.departure?.country_name||'').toLowerCase();
         const nonSchengen=dep.match(/tur|istanbul|sabiha|ankar|israel|ben.gurion|dubai|abu.dhabi|egypt|cairo|morocco|casablanca|london|heathrow|gatwick|stansted|luton|manchester|birmingham|usa|jfk|lax|china|beijing|shanghai|russia|moscow|georgia|tbilisi|armenia|yerevan|jordan|amman|serbia|belgrade|ukraine|kyiv|north.mac/);
         // Exit window (наблюдения): ЕС/Шенген ~10 мин, извън ~15–20 мин след кацане
+        // Наблюдение от терена: хората излизат по-бавно от очакваното,
+        // затова краят е разтегнат с 5 мин. Ще се калибрира с още данни.
         const exitFirst = nonSchengen ? 10 : 5;
-        const exitLast  = nonSchengen ? 30 : 15;
+        const exitLast  = nonSchengen ? 35 : 20;
         const tFirst = new Date(t.getTime() + exitFirst*60000);
         const tLast  = new Date(t.getTime() + exitLast*60000);
         const hFirst = (tFirst.getUTCHours()+3)%24;
@@ -1752,6 +1758,8 @@ function processFlights(data){
         flightDetails.push({
           fn, depAirport, nonSchengen:!!nonSchengen,
           delay: f._delay || 0, statusRaw: f._statusRaw || '',
+          schedH: (function(){ try{ var s=new Date(f.arrival.scheduled); return (s.getUTCHours()+3)%24; }catch(e){ return 0; } })(),
+          schedM: (function(){ try{ return new Date(f.arrival.scheduled).getUTCMinutes(); }catch(e){ return 0; } })(),
           term: (f.arrival && f.arrival.terminal) ? String(f.arrival.terminal) : '?',
           exitFromTs: tFirst.getTime(), exitToTs: tLast.getTime(),
           landH:(t.getUTCHours()+3)%24, landM:t.getUTCMinutes(),
