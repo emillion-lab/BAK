@@ -249,10 +249,15 @@ const ZONES = window.__ZONES = [
   { id:"su",             name:"Софийски университет",                   icon:"🎓", lat:42.6936, lng:23.3349, radius:200, type:"university",       wazeName:"Софийски университет Св Климент Охридски" },
   { id:"studentski",     name:"Студентски град",                        icon:"🎓", lat:42.6475, lng:23.3530, radius:380, type:"university",       wazeName:"Студентски град Sofia" },
 
-  { id:"simenovo",       name:"Симеоново / Hill Side",                  icon:"🌲", lat:42.6395, lng:23.3310, radius:380, type:"residential_lux",  wazeName:"Hill Side Sofia Симеоновско шосе 97" },
+    { id:"gradina",        name:"ж.к. Градина",                           icon:"🌳", lat:42.6742, lng:23.2894, radius:280, type:"residential",     wazeName:"жк Градина София" },
+  { id:"simeonovo",      name:"Симеоново",                              icon:"⛰️", lat:42.6272, lng:23.3464, radius:300, type:"residential_lux", wazeName:"Симеоново София" },
+  { id:"dragalevtsi",    name:"Драгалевци",                             icon:"🌲", lat:42.6383, lng:23.3186, radius:300, type:"residential_lux", wazeName:"Драгалевци София" },
+  { id:"boyana",         name:"Бояна",                                  icon:"🏔️", lat:42.6469, lng:23.2647, radius:300, type:"residential_lux", wazeName:"Бояна София" },
+  { id:"krastova_vada",  name:"Кръстова вада",                          icon:"🏙️", lat:42.6573, lng:23.3232, radius:280, type:"residential",     wazeName:"Кръстова вада София" },
+  { id:"malinova",       name:"кв. Малинова долина",                    icon:"🌿", lat:42.6317, lng:23.3571, radius:300, type:"residential_lux", wazeName:"Малинова долина София" },
+  { id:"kv_vitosha",     name:"кв. Витоша",                             icon:"🌄", lat:42.6487, lng:23.3122, radius:280, type:"residential_lux", wazeName:"кв Витоша София" },
   { id:"manast",         name:"Манастирски ливади",                     icon:"🏘", lat:42.6637, lng:23.2910, radius:380, type:"residential_lux",  wazeName:"Манастирски ливади София" },
-  { id:"boyana",         name:"Бояна / Драгалевци",                     icon:"🌳", lat:42.6348, lng:23.2889, radius:430, type:"residential_lux",  wazeName:"Бояна квартал София" },
-  { id:"kambanite",      name:"Камбаните (Околовръстен)",               icon:"⛰️",  lat:42.6155, lng:23.3780, radius:210, type:"residential_lux",  wazeName:"Камбаните София" },
+    { id:"kambanite",      name:"Камбаните (Околовръстен)",               icon:"⛰️",  lat:42.6155, lng:23.3780, radius:210, type:"residential_lux",  wazeName:"Камбаните София" },
 
   { id:"lyulin",         name:"жк Люлин",                               icon:"🏘", lat:42.7050, lng:23.2650, radius:400, type:"residential",      wazeName:"жк Люлин Sofia" },
   { id:"nadezhda",       name:"жк Надежда",                             icon:"🏘", lat:42.7200, lng:23.2900, radius:350, type:"residential",      wazeName:"жк Надежда Sofia" },
@@ -338,7 +343,8 @@ const BASE = {
   acibadem_tokuda:0.8, acibadem_cardio:0.7, acibadem_mladost:0.7, acibadem_ortho:0.6,
   sv_ekaterina:0.7, lozenets_h:0.6, kardiologia:0.6, sv_sofia_h:0.6, isul:0.8,
   unss:0.5, nbu:0.4, tu:0.4, su:0.5, studentski:0.6,
-  simenovo:0.4, manast:0.5, boyana:0.4, kambanite:0.4,
+  simeonovo:0.4, dragalevtsi:0.4, gradina:0.5, krastova_vada:0.5,
+  malinova:0.4, kv_vitosha:0.4, manast:0.5, boyana:0.4, kambanite:0.4,
   lyulin:0.5, nadezhda:0.4, ovcha_kupel:0.4, druzhba:0.4, mladost:0.5,
   k_borovo:0.3, k_krasno:0.3, k_pavlovo:0.3,
   k_izgrev:0.3, k_geo_milev:0.3, k_iztok:0.3,
@@ -408,10 +414,13 @@ const EVENTS = [
 
   // Луксозни жилища
   { zone:"manast",       name:"Ман.ливади – сутрешно тръгване", endHour:8.5,  boost:2.0, repeat:"mon-fri" },
-  { zone:"simenovo",     name:"Симеоново – сутрешно тръгване",  endHour:8.0,  boost:1.8, repeat:"mon-fri" },
+  { zone:"simeonovo",    name:"Симеоново – сутрешно тръгване",  endHour:8.0,  boost:1.8, repeat:"mon-fri" },
+  { zone:"dragalevtsi",  name:"Драгалевци – сутрешно тръгване", endHour:8.0,  boost:1.7, repeat:"mon-fri" },
+  { zone:"kv_vitosha",   name:"кв. Витоша – сутрешно тръгване",  endHour:8.5,  boost:1.6, repeat:"mon-fri" },
   { zone:"boyana",       name:"Бояна – сутрешно тръгване",      endHour:8.5,  boost:1.6, repeat:"mon-fri" },
   { zone:"manast",       name:"Ман.ливади – прибиране",         endHour:22.5, boost:1.6, repeat:"fri-sat" },
-  { zone:"simenovo",     name:"Симеоново – прибиране",          endHour:23.0, boost:1.8, repeat:"fri-sat" },
+  { zone:"simeonovo",    name:"Симеоново – прибиране",          endHour:23.0, boost:1.8, repeat:"fri-sat" },
+  { zone:"dragalevtsi",  name:"Драгалевци – прибиране",         endHour:23.0, boost:1.7, repeat:"fri-sat" },
 
   // Нощен живот
   { zone:"ndk",          name:"НДК / Витоша – след вечеря",     endHour:22.0, boost:1.8, repeat:"daily" },
@@ -706,7 +715,9 @@ const NOMINATIM_QUERIES={
   acibadem_ortho:'Acibadem Ortopedia Okolovrasten 127 Sofia Bulgaria',
   sv_anna:'УМБАЛ Света Анна Sofia Bulgaria', nat_theatre:'Naroden teatar Ivan Vazov Sofia Bulgaria',
   opera:'Natsionalna opera i balet Sofia Bulgaria', unss:'UNSS Sofia Bulgaria',
-  nbu:'Нов Български Университет Sofia Bulgaria', simenovo:'Hill Side Sofia Simeonovsko shose 97 Bulgaria',
+  nbu:'Нов Български Университет Sofia Bulgaria',
+  simeonovo:'Симеоново София', dragalevtsi:'Драгалевци София', gradina:'жк Градина София',
+  krastova_vada:'Кръстова вада София', malinova:'Малинова долина София', kv_vitosha:'кв Витоша София',
   manast:'Manastirski livadi Sofia Bulgaria', boyana:'Boyana Sofia Bulgaria',
   kambanite:'ЖК Камбаните Sofia Bulgaria',
 };
