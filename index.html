@@ -675,7 +675,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
 
 /* MOBILE FIX */
 @media (max-width:768px) {
-  #map { height: calc(100dvh - 340px) !important; min-height:220px !important; }
+  #map { height: calc(100dvh - 118px) !important; min-height:420px !important; }
   #zone-sidebar { max-height:30vh; min-height:60px; display:block !important; }
   body.karyk-active #zone-sidebar { display:none !important; }
   body.karyk-active #karyk-sidebar { display:block !important; max-height:30vh; overflow-y:auto; }
@@ -920,8 +920,8 @@ body.theme-night .header::after, body.theme-night #weather-bar::after{
 }
 #topstack > *{ pointer-events:auto; }
 #map{
-  height:calc(84vh + var(--stack-h, 200px)) !important;
-  min-height:340px;
+  height:calc(100dvh - 118px) !important;
+  min-height:420px;
 }
 /* лентите вече плуват — по-меки ръбове, без плътни линии */
 .header, #weather-bar, .timeline-panel, .ticker-bar{
@@ -1028,7 +1028,6 @@ body.theme-night .tick-item{ color:#e8eef7 !important; }
 
 /* ═══ Списъкът плува над картата: 3 реда, отдолу пак карта ═══ */
 #stage{ min-height:100vh; }
-#map{ height:calc(82vh + var(--stack-h,200px)) !important; }
 #zone-sidebar, #karyk-sidebar{
   position:absolute !important; left:8px; right:8px; bottom:132px; z-index:1150;
   max-height:33vh !important; min-height:0 !important;
@@ -1218,8 +1217,8 @@ body.theme-night .tick-item{text-shadow:0 0 8px rgba(34,211,238,.35);}
 .tick-item .ev-loc{color:#9fb3c8;}
 
 /* MAP — фиксирана височина вместо flex:1 за да се рендира правилно */
-#map{ height:calc(100vh - 340px) !important; min-height:250px !important;
-  height: calc(100vh - 340px);
+#map{ height:calc(100vh - 118px) !important; min-height:420px !important;
+  height: calc(100vh - 118px);
   min-height: 220px;
   z-index:1;
   background:#08111f;
@@ -1602,7 +1601,7 @@ body.map-fullscreen #next90-btn { display:none; }
 
 /* MOBILE FIX */
 @media (max-width:768px) {
-  #map { height: calc(100dvh - 340px) !important; min-height:220px !important; }
+  #map { height: calc(100dvh - 118px) !important; min-height:420px !important; }
   #zone-sidebar { max-height:30vh; min-height:60px; display:block !important; }
   body.karyk-active #zone-sidebar { display:none !important; }
   body.karyk-active #karyk-sidebar { display:block !important; max-height:30vh; overflow-y:auto; }
@@ -1757,7 +1756,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260726v84"></script>
+<script src="app.js?v=20260726v85"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">
