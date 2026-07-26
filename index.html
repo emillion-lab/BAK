@@ -1169,10 +1169,11 @@ body.tiles-dark .leaflet-tile-pane{
   transition:transform .18s var(--ease);
 }
 #next90-btn:active, #clean-btn:active, #gps-btn:active, #fs-btn:active{ transform:scale(.9); }
-#fs-btn    { bottom:236px !important; }
-#gps-btn   { bottom:288px !important; }
-#clean-btn { bottom:340px !important; }
-#next90-btn{ bottom:392px !important; }
+/* горе вдясно, под лентите — извън обсега на палеца и на ветрилото */
+#next90-btn{ top:calc(var(--stack-h,238px) + 12px) !important; bottom:auto !important; }
+#clean-btn { top:calc(var(--stack-h,238px) + 64px) !important; bottom:auto !important; }
+#gps-btn   { top:calc(var(--stack-h,238px) + 116px) !important; bottom:auto !important; }
+#fs-btn    { top:calc(var(--stack-h,238px) + 168px) !important; bottom:auto !important; }
 body.map-fullscreen #next90-btn{ display:none !important; }
 </style>
 <style>
@@ -1867,7 +1868,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260726v92"></script>
+<script src="app.js?v=20260726v93"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">
