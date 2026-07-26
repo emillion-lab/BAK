@@ -52,7 +52,24 @@ jobs:
           await p.evaluate(()=>{const e=document.getElementById('dest-__zones'); if(e) e.click();});
           await new Promise(r=>setTimeout(r,600));
           fadeIn.следЗатваряне = await p.evaluate(()=>+getComputedStyle(document.getElementById('gps-btn')).opacity);
-          const out = await p.evaluate((opensIn, fadeIn) => {
+          // при отворено летище: достъпен ли е бутонът за докосване
+          await p.evaluate(()=>{const e=document.getElementById('dest-airport'); if(e) e.click();});
+          await new Promise(r=>setTimeout(r,700));
+          const airportTap = await p.evaluate(()=>{
+            const b=document.getElementById('dest-airport');
+            const r=b.getBoundingClientRect();
+            const hit=document.elementFromPoint(r.x+r.width/2, r.y+r.height/2);
+            return { hitId: hit?(hit.id||hit.className||hit.tagName):'?',
+                     достъпен: hit===b || (hit&&b.contains(hit)),
+                     прозрачност:+getComputedStyle(b).opacity,
+                     модалОтворен: getComputedStyle(document.getElementById('airport-modal')).display!=='none' };
+          });
+          await p.evaluate(()=>{const e=document.getElementById('dest-airport'); if(e) e.click();});
+          await new Promise(r=>setTimeout(r,500));
+          airportTap.затвориСеСВтори = await p.evaluate(()=>{
+            const m=document.getElementById('airport-modal');
+            return !m || getComputedStyle(m).display==='none';});
+          const out = await p.evaluate((opensIn, fadeIn, airportTapIn) => {
             const ids=['next90-btn','clean-btn','gps-btn','fs-btn',
                        'dest-airport','dest-cjp','dest-cab_north','dest-cas_intl','dest-__zones'];
             const boxes = ids.map(id=>{const e=document.getElementById(id);
@@ -83,7 +100,7 @@ jobs:
             return {
               found: boxes.map(x=>x.id), missing: ids.filter(i=>!boxes.find(x=>x.id===i)),
               overlaps, offscreen, dark, opens, scrollable,
-              fadeCheck: fadeIn,
+              fadeCheck: fadeIn, airportTap: airportTapIn,
               tilesDark: (()=>{ document.body.classList.remove('theme-day');
                 document.body.classList.add('theme-night','tiles-dark');
                 const p=document.querySelector('.leaflet-tile-pane');
@@ -106,7 +123,7 @@ jobs:
               viewport: innerHeight,
               fanGone: !document.querySelector('#fab-hub:not([style*="display: none"])')
             };
-          }, opens, fadeIn);
+          }, opens, fadeIn, airportTap);
           console.log('RESULT:', JSON.stringify(out,null,1));
           console.log('TILEFAILS:', failed.length);
           console.log('PAGEERRORS:', errs.slice(0,4).join(' | ')||'none');
