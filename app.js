@@ -1144,10 +1144,10 @@ function showAirportSchedule() {
       const isDone = false;
       const anchor = (!anchorSet && (isNow || f._state==='future')) ? (anchorSet=true, ' id="fl-now-anchor"') : '';
       html+=`<div${anchor}${isNow?' data-now="1"':(isFading?' data-fading="1"':'')} style="display:flex;align-items:center;gap:5px;padding:4px 7px;border-radius:7px;background:${bg};border:${brd};margin-bottom:1px;${op}">
-        <span style="font-weight:800;font-size:14px;min-width:44px;color:var(--text)">${f.fn}</span>
+        <span style="font-weight:800;font-size:12.5px;min-width:40px;color:var(--text)">${f.fn}</span>
         ${flTerm==='all'?`<span style="font-size:10.5px;font-weight:900;color:var(--cyan);border:1px solid var(--border);border-radius:4px;padding:0 4px">${'Т'+f.term}</span>`:''}
         <span style="flex:1;min-width:0;overflow:hidden">
-          <span style="display:block;font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.25">${(f.depAirport||'').slice(0,18)}<span style="font-size:9.5px;opacity:.9"> ${fmt(f.schedH,f.schedM)}${
+          <span style="display:block;font-size:11.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.25">${(f.depAirport||'').slice(0,18)}<span style="font-size:9.5px;opacity:.9"> ${fmt(f.schedH,f.schedM)}${
             f.delay >= 5  ? `<b style="color:#dc2626">+${f.delay}′</b>` :
             f.delay <= -5 ? `<b style="color:#16a34a">${f.delay}′</b>` : ''
           }</span></span>
@@ -1160,7 +1160,7 @@ function showAirportSchedule() {
         ${isNow?'<span style="font-size:10.5px;font-weight:900;color:#ef4444;white-space:nowrap">ИЗЛИЗА</span>':''}
         ${isFading?'<span style="font-size:11px;font-weight:800;color:#dc2626;white-space:nowrap" title="Прозорецът мина, но е възможно още да излизат">???</span>':''}
 
-        <span style="font-weight:800;font-size:13.5px;color:${col};white-space:nowrap">${fmt(f.exitFromH,f.exitFromM)}–${fmt(f.exitToH,f.exitToM)}</span>
+        <span style="font-weight:800;font-size:12.5px;color:${col};white-space:nowrap">${fmt(f.exitFromH,f.exitFromM)}–${fmt(f.exitToH,f.exitToM)}</span>
       </div>`;
     });
     if(!grp.length) html+='<div style="color:var(--muted);text-align:center;padding:14px 0;font-size:13px">Няма полети за този терминал</div>';
@@ -2437,7 +2437,8 @@ function toggleMapView(){
         chip.style.background='#111827e0'; chip.style.color='#94a3b8'; chip.style.borderColor='#334155';
       } else {
         chip.style.background='#0f2818f0'; chip.style.color='#86efac'; chip.style.borderColor='#22c55e';
-        chip.textContent='🛬 '+(out.length?out.length+' излизат СЕГА':'')+(out.length&&soon.length?' · ':'')+(soon.length?soon.length+' до 1ч':'');
+        chip.textContent='✈️ ' + (out.length||0) + '+' + (soon.length||0);
+        chip.title = out.length + ' излизат сега · ' + soon.length + ' до 1ч';
       }
       var html='<div style=\"position:sticky;top:-12px;z-index:3;background:#0b1220f8;padding:6px 0 6px;margin:-6px 0 6px;font-weight:900;font-size:13px;display:flex;justify-content:space-between;align-items:center;gap:8px\">'+
         '<span>🛬 Изходи Т1/Т2</span>'+
@@ -2536,7 +2537,7 @@ function toggleMapView(){
         chip.style.color=urgent?'#fbbf24':'#93c5fd';
         chip.style.border='1px solid '+(urgent?'#f59e0b':'#3b82f6');
       } else {
-        chip.textContent='☀️ Без дъжд 12ч';
+        chip.remove(); return;   // информацията вече е в лентата за времето
         chip.style.background='#111827d0'; chip.style.color='#9ca3af'; chip.style.border='1px solid #374151';
       }
     }
@@ -2582,7 +2583,8 @@ function toggleMapView(){
       var hot=list.filter(function(x){return x.diff>=-20&&x.diff<=20}).length;
       if(!list.length){ chip.style.display='none'; panel.style.display='none'; return; }
       chip.style.display='block';
-      chip.textContent='🚌 '+list.length+' до 2ч'+(hot?' · '+hot+' СЕГА':'');
+      chip.textContent='🚌 ' + (hot||0) + '+' + list.length;
+      chip.title = (hot||0) + ' сега · ' + list.length + ' до 2ч';
       if(hot){ chip.style.background='#3a2510f0'; chip.style.color='#fb923c'; chip.style.border='1px solid #ea580c'; }
       else { chip.style.background='#10233af0'; chip.style.color='#93c5fd'; chip.style.border='1px solid #3b82f6'; }
       var html='<div style=\"font-weight:900;font-size:14px;margin-bottom:8px;display:flex;justify-content:space-between\"><span>🚌 Входящи автобуси</span><span style=\"cursor:pointer;padding:2px 10px;color:#94a3b8\" onclick=\"this.parentElement.parentElement.style.display=&quot;none&quot;\">✕</span></div>';
@@ -5294,4 +5296,237 @@ function toggleMapView(){
     reloaded = true;
     location.reload();
   });
+})();
+
+// ═══════════════════════════════════════════════
+// 🌤 ЖИВА ЛЕНТА ЗА ВРЕМЕТО
+// Мъничък анимиран пейзаж в банера: слънце/луна, звезди,
+// облаци, дъжд, сняг, вятър, хълмове — и от време на време
+// минава таксито. Показва и кога се очаква дъжд.
+// ═══════════════════════════════════════════════
+(function(){
+  var cv, ctx, W = 0, H = 0, t = 0, raf = null;
+  var state = { rain:0, snow:0, cloud:0.3, wind:0.2, night:false, rainAt:null };
+
+  function mount(){
+    var bar = document.getElementById('weather-bar');
+    if(!bar){ setTimeout(mount, 500); return; }
+    if(document.getElementById('wx-canvas')) return;
+    bar.style.position = 'relative';
+    cv = document.createElement('canvas');
+    cv.id = 'wx-canvas';
+    cv.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.85';
+    bar.insertBefore(cv, bar.firstChild);
+    Array.prototype.forEach.call(bar.children, function(c){
+      if(c !== cv){ c.style.position = 'relative'; c.style.zIndex = '1'; }
+    });
+    ctx = cv.getContext('2d');
+    resize();
+    window.addEventListener('resize', resize);
+    pullWeather();
+    setInterval(pullWeather, 15 * 60 * 1000);
+    loop();
+  }
+
+  function resize(){
+    if(!cv) return;
+    var r = cv.getBoundingClientRect();
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = Math.max(200, r.width); H = Math.max(30, r.height);
+    cv.width = W * dpr; cv.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function pullWeather(){
+    var url = 'https://api.open-meteo.com/v1/forecast?latitude=42.6977&longitude=23.3219'
+            + '&current=temperature_2m,precipitation,cloud_cover,wind_speed_10m,is_day,weather_code'
+            + '&hourly=precipitation_probability,precipitation,snowfall&forecast_days=1&timezone=Europe%2FSofia';
+    fetch(url).then(function(r){ return r.json(); }).then(function(d){
+      var c = d.current || {};
+      state.night = c.is_day === 0;
+      state.cloud = Math.min(1, (c.cloud_cover || 0) / 100);
+      state.wind  = Math.min(1, (c.wind_speed_10m || 0) / 40);
+      state.rain  = (c.precipitation || 0) > 0 ? Math.min(1, c.precipitation / 3) : 0;
+      var code = c.weather_code || 0;
+      state.snow  = (code >= 71 && code <= 77) || (code >= 85 && code <= 86) ? 0.7 : 0;
+
+      // кога се очаква дъжд
+      state.rainAt = null;
+      try{
+        var times = d.hourly.time, prob = d.hourly.precipitation_probability, mm = d.hourly.precipitation;
+        var now = Date.now();
+        for(var i = 0; i < times.length; i++){
+          var ts = new Date(times[i]).getTime();
+          if(ts < now) continue;
+          if((prob[i] >= 55) || (mm[i] > 0.2)){
+            state.rainAt = { time: times[i].slice(11,16), prob: prob[i] };
+            break;
+          }
+        }
+      }catch(e){}
+      updateLabel();
+    }).catch(function(){});
+  }
+
+  function updateLabel(){
+    var el = document.getElementById('wb-boost') || document.getElementById('wb-desc');
+    if(!el) return;
+    var chip = document.getElementById('wx-rain-when');
+    if(!chip){
+      chip = document.createElement('span');
+      chip.id = 'wx-rain-when';
+      chip.style.cssText = 'margin-left:auto;font-size:12.5px;font-weight:800;white-space:nowrap;position:relative;z-index:1';
+      var bar = document.getElementById('weather-bar');
+      if(bar) bar.appendChild(chip);
+    }
+    if(state.rain > 0){
+      chip.textContent = '☔ вали сега';
+      chip.style.color = '#0284c7';
+    } else if(state.rainAt){
+      chip.textContent = '🌧 ' + state.rainAt.time + ' · ' + state.rainAt.prob + '%';
+      chip.style.color = 'var(--amber)';
+    } else {
+      chip.textContent = '☀️ без дъжд 12ч';
+      chip.style.color = 'var(--muted)';
+    }
+  }
+
+  // ── частици ──
+  var drops = [], flakes = [], stars = [], clouds = [];
+  function seed(){
+    drops = []; flakes = []; stars = []; clouds = [];
+    for(var i=0;i<70;i++) drops.push({x:Math.random()*W, y:Math.random()*H, v:2+Math.random()*2.5});
+    for(var j=0;j<40;j++) flakes.push({x:Math.random()*W, y:Math.random()*H, v:.3+Math.random()*.6, r:1+Math.random()*1.5, p:Math.random()*6});
+    for(var k=0;k<40;k++) stars.push({x:Math.random()*W, y:Math.random()*H*.6, r:Math.random()*1.1, tw:Math.random()*6});
+    for(var m=0;m<5;m++) clouds.push({x:Math.random()*W, y:3+Math.random()*(H*.4), s:.5+Math.random()*.8, v:.08+Math.random()*.12});
+  }
+
+  var taxi = { x: -80, active:false, next: 260 };
+
+  function loop(){
+    if(!ctx){ return; }
+    if(!drops.length || drops[0].x > W) seed();
+    t++;
+    ctx.clearRect(0,0,W,H);
+
+    // небе
+    var g = ctx.createLinearGradient(0,0,0,H);
+    if(state.night){ g.addColorStop(0,'rgba(8,16,34,.55)'); g.addColorStop(1,'rgba(14,26,48,.30)'); }
+    else { g.addColorStop(0,'rgba(150,205,255,.30)'); g.addColorStop(1,'rgba(220,240,255,.12)'); }
+    ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+
+    // звезди нощем
+    if(state.night){
+      stars.forEach(function(s){
+        var a = .35 + .45*Math.sin((t+s.tw*30)/40);
+        ctx.fillStyle = 'rgba(255,255,255,' + a.toFixed(2) + ')';
+        ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 6.28); ctx.fill();
+      });
+    }
+
+    // слънце / луна
+    var cx = W*.13, cy = H*.42, R = Math.min(9, H*.28);
+    if(state.night){
+      ctx.fillStyle = 'rgba(226,232,240,.85)';
+      ctx.beginPath(); ctx.arc(cx, cy, R, 0, 6.28); ctx.fill();
+      ctx.fillStyle = state.night ? 'rgba(10,20,38,.9)' : 'rgba(255,255,255,0)';
+      ctx.beginPath(); ctx.arc(cx + R*.42, cy - R*.24, R*.85, 0, 6.28); ctx.fill();
+    } else {
+      var pulse = 1 + .06*Math.sin(t/28);
+      ctx.fillStyle = 'rgba(253,196,60,.95)';
+      ctx.beginPath(); ctx.arc(cx, cy, R*pulse, 0, 6.28); ctx.fill();
+      ctx.strokeStyle = 'rgba(253,196,60,.35)'; ctx.lineWidth = 1.2;
+      for(var i=0;i<8;i++){
+        var a = t/90 + i*.785;
+        ctx.beginPath();
+        ctx.moveTo(cx + Math.cos(a)*(R+3), cy + Math.sin(a)*(R+3));
+        ctx.lineTo(cx + Math.cos(a)*(R+6), cy + Math.sin(a)*(R+6));
+        ctx.stroke();
+      }
+    }
+
+    // хълмове
+    ctx.fillStyle = state.night ? 'rgba(18,42,32,.55)' : 'rgba(74,140,90,.35)';
+    ctx.beginPath(); ctx.moveTo(0,H);
+    for(var x=0;x<=W;x+=8) ctx.lineTo(x, H - 6 - 5*Math.sin(x/60) - 3*Math.sin(x/23));
+    ctx.lineTo(W,H); ctx.closePath(); ctx.fill();
+    if(state.snow > 0){
+      ctx.fillStyle = 'rgba(255,255,255,.5)';
+      ctx.beginPath(); ctx.moveTo(0,H);
+      for(var x2=0;x2<=W;x2+=8) ctx.lineTo(x2, H - 8 - 5*Math.sin(x2/60) - 3*Math.sin(x2/23));
+      ctx.lineTo(W,H); ctx.closePath(); ctx.fill();
+    }
+
+    // облаци
+    if(state.cloud > .12){
+      clouds.forEach(function(c){
+        c.x += c.v * (1 + state.wind*3);
+        if(c.x > W + 40) c.x = -40;
+        var a = .18 + state.cloud * .5;
+        ctx.fillStyle = state.night ? 'rgba(148,163,184,' + (a*.7).toFixed(2) + ')'
+                                    : 'rgba(255,255,255,' + a.toFixed(2) + ')';
+        var s = c.s * Math.min(1, H/34);
+        ctx.beginPath();
+        ctx.arc(c.x, c.y, 6*s, 0, 6.28);
+        ctx.arc(c.x + 7*s, c.y + 1*s, 8*s, 0, 6.28);
+        ctx.arc(c.x + 15*s, c.y, 5.5*s, 0, 6.28);
+        ctx.fill();
+      });
+    }
+
+    // вятър
+    if(state.wind > .35){
+      ctx.strokeStyle = state.night ? 'rgba(203,213,225,.22)' : 'rgba(255,255,255,.45)';
+      ctx.lineWidth = 1;
+      for(var w=0;w<3;w++){
+        var wy = H*.3 + w*6, off = (t*(1.5+state.wind*3) + w*70) % (W+90) - 45;
+        ctx.beginPath(); ctx.moveTo(off, wy); ctx.lineTo(off+18, wy); ctx.stroke();
+      }
+    }
+
+    // дъжд
+    if(state.rain > 0){
+      ctx.strokeStyle = 'rgba(120,190,255,.65)'; ctx.lineWidth = 1;
+      drops.forEach(function(d){
+        d.y += d.v * (1 + state.rain);
+        d.x += state.wind * 1.6;
+        if(d.y > H){ d.y = -4; d.x = Math.random()*W; }
+        ctx.beginPath(); ctx.moveTo(d.x, d.y); ctx.lineTo(d.x - state.wind*2, d.y + 4); ctx.stroke();
+      });
+    }
+
+    // сняг
+    if(state.snow > 0){
+      ctx.fillStyle = 'rgba(255,255,255,.85)';
+      flakes.forEach(function(f){
+        f.y += f.v; f.x += Math.sin((t + f.p*30)/40) * .5 + state.wind;
+        if(f.y > H){ f.y = -3; f.x = Math.random()*W; }
+        ctx.beginPath(); ctx.arc(f.x, f.y, f.r, 0, 6.28); ctx.fill();
+      });
+    }
+
+    // 🚕 от време на време минава такси
+    if(!taxi.active && t > taxi.next){ taxi.active = true; taxi.x = -30; }
+    if(taxi.active){
+      taxi.x += 1.6;
+      var ty = H - 7;
+      ctx.save();
+      ctx.globalAlpha = .95;
+      ctx.font = Math.round(Math.min(15, H*.5)) + 'px system-ui';
+      ctx.textBaseline = 'alphabetic';
+      ctx.fillText('🚕', taxi.x, ty);
+      ctx.restore();
+      if(taxi.x > W + 24){ taxi.active = false; taxi.next = t + 900 + Math.random()*900; }
+    }
+
+    raf = requestAnimationFrame(loop);
+  }
+
+  document.addEventListener('visibilitychange', function(){
+    if(document.hidden){ if(raf) cancelAnimationFrame(raf); raf = null; }
+    else if(!raf) loop();
+  });
+
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount);
+  else mount();
 })();

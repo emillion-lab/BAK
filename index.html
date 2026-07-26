@@ -1519,6 +1519,21 @@ body.full-list #next90-btn:active,body[data-full] #next90-btn:active{
     text-overflow:clip !important; line-height:1.15 !important;
   }
 }
+
+/* ═══ Чиповете: полупрозрачни и винаги ПОД изваденото ═══ */
+#chip-stack{ z-index:1100 !important; }
+#chip-stack > *{
+  opacity:.65 !important;
+  font-size:12.5px !important; padding:7px 11px !important;
+  transition:opacity .2s var(--ease);
+}
+#chip-stack > *:active{ opacity:1 !important; }
+/* при отворен панел изчезват напълно */
+body.full-list #chip-stack, body[data-full] #chip-stack{ opacity:0 !important; pointer-events:none !important; }
+
+/* лентата за времето е малко по-висока, за да има място за пейзажа */
+#weather-bar{ min-height:40px; padding:6px 14px !important; }
+#weather-bar .wb-icon, #weather-bar .wb-temp, #weather-bar .wb-desc{ position:relative; z-index:1; }
 </style>
 <style>
 
@@ -2208,7 +2223,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260726v122"></script>
+<script src="app.js?v=20260726v123"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">
