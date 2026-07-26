@@ -3,14 +3,15 @@ BEFORE: {
  "sats": [
   "karyk-btn",
   "karyk-list-btn",
-  "bakshish-btn",
   "next90-btn",
   "clean-btn",
   "gps-btn",
   "fs-btn"
  ],
  "karakListBtn": true,
- "strayFixed": []
+ "strayFixed": [
+  "bakshish-btn"
+ ]
 }
 AFTER OPEN: {
  "karyk": {
@@ -31,76 +32,71 @@ AFTER OPEN: {
   "bad": [
    ".ticker-bar rgba(6, 16, 28, 0.72)"
   ],
-  "bodyClass": "fab-open theme-day"
+  "bodyClass": "tiles-dark fab-open theme-day"
  },
- "minAdjacent": 63,
+ "minAdjacent": 75,
  "size": 52,
  "align": [
   {
    "id": "karyk-btn",
-   "dy": -27,
-   "gap": 6
+   "dy": -17,
+   "gap": 4
   },
   {
    "id": "karyk-list-btn",
-   "dy": -4,
-   "gap": 6
-  },
-  {
-   "id": "bakshish-btn",
-   "dy": 0,
-   "gap": 6
+   "dy": 2,
+   "gap": 4
   },
   {
    "id": "next90-btn",
    "dy": 0,
-   "gap": 6
+   "gap": 4
   },
   {
    "id": "clean-btn",
-   "dy": 0,
-   "gap": 6
+   "dy": 2,
+   "gap": 4
   },
   {
    "id": "gps-btn",
    "dy": 0,
-   "gap": 6
+   "gap": 4
   },
   {
    "id": "fs-btn",
    "dy": 0,
-   "gap": 6
+   "gap": 4
   }
  ],
- "neighbours": 63,
+ "neighbours": 75,
  "satSize": 52,
  "links": 1,
- "ticker": "✈️ 02:05 FB564 от Lisbon · ✈️ 02:05 FB564 от Lisbon · ",
+ "ticker": "✈️ 06:35 FR3400 от Bergamo — ИЗЛИЗАТ · ✈️ 06:50 FR5036 от Catania — ИЗЛИЗАТ · ✈️ 06:50 U24911 от Paris — ИЗЛИЗАТ · ✈️ 07:30 FR956 от Palma De Mallorc · ✈️ 07:35 FR5473 от Nápoli · ✈️ 07:50 FR6428 от Treviso · ✈️ 07:55 W64340 от Memmingen · ✈️ 08:15 W64352 от Bergamo · ✈️ 08:45 OS771 от Vienna · ✈️ 08:45 FR5160 от Edinburgh · ✈️ 09:05 W64428 от Tel Aviv Yafo · ✈️ 09:05 W64452 от Alghero · ✈️ 06:35 FR3400 от Bergamo — ИЗЛИЗАТ · ✈️ 06:50 FR5036 от Catania — ИЗЛИЗАТ · ✈️ 06:50 U24911 от Paris — ИЗЛИЗАТ · ✈️ 07:30 FR956 от Palma De Mallorc · ✈️ 07:35 FR5473 от Nápoli · ✈️ 07:50 FR6428 от Treviso · ✈️ 07:55 W64340 от Memmingen · ✈️ 08:15 W64352 от Bergamo · ✈️ 08:45 OS771 от Vienna · ✈️ 08:45 FR5160 от Edinburgh · ✈️ 09:05 W64428 от Tel Aviv Yafo · ✈️ 09:05 W64452 от Alghero · ",
  "n90": "Няма театри, кина или концерти в следващите 24 часа.Източник: SEV (theatre.art.bg и др.)",
- "topHint": "Топ: ✈️ Летище София (1.9) ✈ пик",
+ "topHint": "Топ: 🎓 Студентски град (1.5)",
  "topRot": [
-  "Топ: 🌍 🌍 Междунар. автогара Сердика / FlixBus (2.1) 🚉 пик",
-  "Топ: ✈️ Летище София (1.9) ✈ пик",
-  "Топ: 🏨 Хотели Център (0.9)"
+  "Топ: ✈️ Летище София (2.6) ✈ пик",
+  "Топ: 🎓 Студентски град (1.5)",
+  "Топ: 🚂 Централна ЖП гара (1.2) 🚉 пик"
  ],
  "flights": {
-  "redove": 78,
-  "minali": 0,
-  "chas": "0:05"
+  "redove": 89,
+  "minali": 13,
+  "chas": "6:51"
  },
  "bakshishRows": {
-  "height": 31,
+  "height": 0,
   "whyLines": 0
  },
  "open": true,
- "rays": 8,
+ "rays": 7,
  "hubCovered": "",
  "sats": [
   {
    "id": "karyk-btn",
    "w": 52,
    "h": 52,
-   "dist": 192,
+   "dist": 194,
    "onScreen": true,
    "hit": "karyk-btn"
   },
@@ -108,22 +104,14 @@ AFTER OPEN: {
    "id": "karyk-list-btn",
    "w": 52,
    "h": 52,
-   "dist": 192,
+   "dist": 195,
    "onScreen": true,
    "hit": "karyk-list-btn"
   },
   {
-   "id": "bakshish-btn",
-   "w": 52,
-   "h": 52,
-   "dist": 192,
-   "onScreen": true,
-   "hit": "bakshish-btn"
-  },
-  {
    "id": "next90-btn",
-   "w": 52,
-   "h": 52,
+   "w": 56,
+   "h": 56,
    "dist": 192,
    "onScreen": true,
    "hit": "next90-btn"
@@ -132,22 +120,22 @@ AFTER OPEN: {
    "id": "clean-btn",
    "w": 52,
    "h": 52,
-   "dist": 192,
+   "dist": 194,
    "onScreen": true,
    "hit": "clean-btn"
   },
   {
    "id": "gps-btn",
-   "w": 52,
-   "h": 52,
+   "w": 56,
+   "h": 56,
    "dist": 192,
    "onScreen": true,
    "hit": "gps-btn"
   },
   {
    "id": "fs-btn",
-   "w": 52,
-   "h": 52,
+   "w": 56,
+   "h": 56,
    "dist": 192,
    "onScreen": true,
    "hit": "fs-btn"
@@ -157,7 +145,6 @@ AFTER OPEN: {
  "labels": [
   "Карък Mode",
   "Карък списък",
-  "Бакшиш радар",
   "Събития 24ч",
   "Чиста карта",
   "Локация",
