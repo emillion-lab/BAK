@@ -4761,7 +4761,7 @@ function toggleMapView(){
       pos.push({ x: Math.round(Math.cos(a) * R), y: Math.round(-Math.sin(a) * R) });
     });
     // ВЪТРЕШЕН пръстен: по-малък радиус, изместен на половин стъпка
-    var Ri = Math.round(R * 0.78);
+    var Ri = Math.round(R * 0.88);
     var stepI = dests.length > 1 ? (A1 - A0) / (dests.length - 1) : 0;
     var posI = dests.map(function(it, i){
       var a = (A0 + 7 + stepI * i) * Math.PI / 180;

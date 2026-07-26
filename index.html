@@ -1191,6 +1191,14 @@ body.map-fullscreen #next90-btn{ display:none !important; }
 #exit-now-panel{ color:var(--text) !important; }
 #exit-now-panel > div:first-child{ color:var(--cyan) !important; }
 #exit-now-panel b{ color:var(--text) !important; }
+
+/* по-висока специфичност — по-ранните правила за .fab-sat го надвиваха */
+#fab-wrap button.fab-dest, #fab-wrap .fab-dest{
+  width:56px !important; height:56px !important;
+  min-width:56px !important; max-width:56px !important;
+  margin-left:-28px !important; margin-top:-28px !important;
+  font-size:25px !important; padding:0 !important;
+}
 </style>
 <style>
 
@@ -1888,7 +1896,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260726v94"></script>
+<script src="app.js?v=20260726v95"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">
