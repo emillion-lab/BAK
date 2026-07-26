@@ -4,7 +4,8 @@ BEFORE: {
   "dest-airport",
   "dest-cab_north",
   "dest-cas_intl",
-  "dest-cjp"
+  "dest-cjp",
+  "dest-__zones"
  ],
  "karakListBtn": true,
  "strayFixed": [
@@ -16,7 +17,10 @@ BEFORE: {
  ]
 }
 AFTER OPEN: {
- "btnOverlaps": [],
+ "btnOverlaps": [
+  "dest-cab_north×dest-cas_intl"
+ ],
+ "labelVsBtn": [],
  "zonesBtn": true,
  "sheetWorks": true,
  "karyk": {
@@ -37,85 +41,98 @@ AFTER OPEN: {
   "bad": [],
   "bodyClass": "theme-day fab-open"
  },
- "minAdjacent": 85,
- "size": 64,
+ "minAdjacent": 74,
+ "size": 58,
  "align": [
   {
    "id": "dest-airport",
-   "dy": 0,
-   "gap": 8
+   "dy": -7,
+   "gap": 149
   },
   {
    "id": "dest-cab_north",
-   "dy": 6,
-   "gap": 8
+   "dy": 4,
+   "gap": 79
   },
   {
    "id": "dest-cas_intl",
    "dy": 0,
-   "gap": 8
+   "gap": 29
   },
   {
    "id": "dest-cjp",
    "dy": 0,
-   "gap": 8
+   "gap": 17
+  },
+  {
+   "id": "dest-__zones",
+   "dy": 0,
+   "gap": 11
   }
  ],
- "neighbours": 85,
- "satSize": 64,
- "links": 0,
+ "neighbours": 74,
+ "satSize": 58,
+ "links": 5,
  "ticker": "✈️ 07:50 FR6428 от Treviso — ИЗЛИЗАТ · ✈️ 07:55 W64340 от Memmingen — ИЗЛИЗАТ · ✈️ 08:15 W64352 от Bergamo · ✈️ 08:45 OS771 от Vienna · ✈️ 08:45 FR5160 от Edinburgh · ✈️ 09:05 W64452 от Alghero · ✈️ 09:05 W64428 от Tel Aviv Yafo · ✈️ 09:15 LH1702 от Munich · ✈️ 09:20 W64332 от Dortmund · ✈️ 09:25 TK1127 от Istanbul · ✈️ 09:30 W64416 от Nice · ✈️ 09:35 FR2690 от London · ✈️ 07:50 FR6428 от Treviso — ИЗЛИЗАТ · ✈️ 07:55 W64340 от Memmingen — ИЗЛИЗАТ · ✈️ 08:15 W64352 от Bergamo · ✈️ 08:45 OS771 от Vienna · ✈️ 08:45 FR5160 от Edinburgh · ✈️ 09:05 W64452 от Alghero · ✈️ 09:05 W64428 от Tel Aviv Yafo · ✈️ 09:15 LH1702 от Munich · ✈️ 09:20 W64332 от Dortmund · ✈️ 09:25 TK1127 от Istanbul · ✈️ 09:30 W64416 от Nice · ✈️ 09:35 FR2690 от London · ",
  "n90": "Няма театри, кина или концерти в следващите 24 часа.Източник: SEV (theatre.art.bg и др.)",
- "topHint": "Топ: 🚌 Централна автогара (3.0) 🚉 пик",
+ "topHint": "Топ: ✈️ Летище София (3.5) ✈ пик",
  "topRot": [
+  "Топ: 🚌 Централна автогара (4.0) 🚉 пик",
   "Топ: ✈️ Летище София (3.5) ✈ пик",
-  "Топ: 🚌 Централна автогара (3.0) 🚉 пик",
   "Топ: 🎓 Студентски град (1.5)"
  ],
  "flights": {
-  "redove": 83,
+  "redove": 81,
   "minali": 13,
-  "chas": "7:57"
+  "chas": "8:06"
  },
  "bakshishRows": {
   "height": 0,
   "whyLines": 0
  },
  "open": true,
- "rays": 4,
+ "rays": 10,
  "hubCovered": "",
  "sats": [
   {
    "id": "dest-airport",
-   "w": 64,
-   "h": 64,
-   "dist": 131,
+   "w": 58,
+   "h": 58,
+   "dist": 150,
    "onScreen": true,
    "hit": "dest-airport"
   },
   {
    "id": "dest-cab_north",
-   "w": 64,
-   "h": 64,
-   "dist": 131,
+   "w": 58,
+   "h": 58,
+   "dist": 150,
    "onScreen": true,
    "hit": "dest-cab_north"
   },
   {
    "id": "dest-cas_intl",
-   "w": 64,
-   "h": 64,
-   "dist": 131,
+   "w": 58,
+   "h": 58,
+   "dist": 150,
    "onScreen": true,
    "hit": "dest-cas_intl"
   },
   {
    "id": "dest-cjp",
-   "w": 64,
-   "h": 64,
-   "dist": 131,
+   "w": 58,
+   "h": 58,
+   "dist": 150,
    "onScreen": true,
    "hit": "dest-cjp"
+  },
+  {
+   "id": "dest-__zones",
+   "w": 58,
+   "h": 58,
+   "dist": 150,
+   "onScreen": true,
+   "hit": "dest-__zones"
   }
  ],
  "labelOverlaps": 0,
@@ -123,7 +140,8 @@ AFTER OPEN: {
   "Летище",
   "Централна",
   "Международна",
-  "ЖП гара"
+  "ЖП гара",
+  "Зони по приоритет"
  ]
 }
 PAGEERRORS: none
