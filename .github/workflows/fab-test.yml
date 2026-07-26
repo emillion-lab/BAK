@@ -34,7 +34,7 @@ jobs:
                 if(s){const r=s.getBoundingClientRect(); visible=r.height>100 && r.top<innerHeight;} }
               else if(i==='dest-airport'){ const m=document.getElementById('airport-modal');
                 visible = !!m && getComputedStyle(m).display!=='none'; }
-              else visible = !!document.querySelector('.leaflet-popup');
+              else { const zf=document.getElementById('zone-full'); visible = !!zf && getComputedStyle(zf).display!=='none'; }
               return {opened:full, visible};
             }, id);
             await p.evaluate(i=>{const e=document.getElementById(i); if(e) e.click();}, id);

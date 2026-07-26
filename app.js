@@ -4451,7 +4451,7 @@ function toggleMapView(){
   var clean = false;
   var btn = document.createElement('div');
   btn.id = 'clean-btn';
-  btn.textContent = '👁 чисто';
+  btn.textContent = '👁';
   btn.style.cssText = 'position:fixed;right:8px;top:50%;z-index:1400;background:#0b1220e0;'
     + 'color:#cbd5e1;border:1px solid #475569;border-radius:9px;padding:6px 9px;'
     + 'font:700 11px system-ui,sans-serif;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.5)';
@@ -4749,7 +4749,28 @@ function toggleMapView(){
     goToZone(zone);
   }
 
+  // Общ прозорец на цял екран за гари/автогари
+  function showFullPanel(title, html){
+    var w = document.getElementById('zone-full');
+    if(!w){
+      w = document.createElement('div');
+      w.id = 'zone-full';
+      w.innerHTML = '<div id="zone-full-box">'
+        + '<div id="zone-full-head"><span id="zone-full-title"></span>'
+        + '<button id="zone-full-x" aria-label="Затвори">✕</button></div>'
+        + '<div id="zone-full-body"></div></div>';
+      document.body.appendChild(w);
+      w.addEventListener('click', function(e){ if(e.target === w) closeFull(); });
+      w.querySelector('#zone-full-x').addEventListener('click', closeFull);
+    }
+    w.querySelector('#zone-full-title').textContent = title;
+    w.querySelector('#zone-full-body').innerHTML = html || '<div style="padding:16px;color:var(--muted)">Няма данни за тази локация.</div>';
+    w.style.display = 'flex';
+  }
+
   function closeFull(silent){
+    var zf = document.getElementById('zone-full');
+    if(zf) zf.style.display = 'none';
     document.body.removeAttribute('data-full');
     document.body.classList.remove('full-list');
     document.querySelectorAll('.dest-btn').forEach(function(x){ x.classList.remove('on'); });
@@ -4772,7 +4793,14 @@ function toggleMapView(){
           if(typeof window.showAirportSchedule === 'function') window.showAirportSchedule();
           else window.__destErr = 'липсва showAirportSchedule';
         } else if(typeof window.showZonePopup === 'function'){
+          // строим съдържанието през попъпа, но го показваме на ЦЯЛ ЕКРАН
           window.showZonePopup(id);
+          setTimeout(function(){
+            var pc = document.querySelector('.leaflet-popup-content');
+            var html = pc ? pc.innerHTML : '';
+            try{ M.closePopup(); }catch(e){}
+            showFullPanel(z.icon + ' ' + z.name, html);
+          }, 90);
         } else {
           window.__destErr = 'липсва showZonePopup';
         }

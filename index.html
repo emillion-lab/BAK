@@ -1271,6 +1271,69 @@ body.theme-night #weather-bar::before{
 body > #zone-sidebar{ position:fixed !important; }
 #stage ~ *{ position:fixed !important; }
 #event-alert, #dir-hint, #nav-panel{ position:fixed !important; }
+
+/* вътрешният бутон „Списък" вече няма какво да прави */
+#toggle-map-btn, #toggle-map-btn-k{ display:none !important; }
+
+/* ═══ Колоната се закотвя ОТДОЛУ — така нищо не изпада под екрана,
+       независимо колко висока е шапката (в инсталираното приложение
+       заглавието се пренася на два реда).                            ═══ */
+#next90-btn, #clean-btn, #gps-btn, #fs-btn, .tool-btn{
+  top:auto !important;
+  width:44px !important; height:44px !important;
+  min-width:44px !important; max-width:44px !important;
+  font-size:20px !important; border-radius:14px !important;
+  overflow:hidden !important; white-space:nowrap !important;
+}
+#dest-__zones   { bottom:14px  !important; }
+#dest-cas_intl  { bottom:66px  !important; }
+#dest-cab_north { bottom:118px !important; }
+#dest-cjp       { bottom:170px !important; }
+#dest-airport   { bottom:222px !important; }
+#fs-btn         { bottom:288px !important; }
+#gps-btn        { bottom:340px !important; }
+#clean-btn      { bottom:392px !important; }
+#next90-btn     { bottom:444px !important; }
+
+/* чиповете долу вляво да не се качват върху колоната */
+#chip-stack{ max-width:56vw !important; }
+
+/* всичко се отваря на цял екран */
+#airport-modal-box{
+  margin-top:var(--stack-h,238px) !important;
+  max-height:calc(100dvh - var(--stack-h,238px)) !important;
+  height:calc(100dvh - var(--stack-h,238px)) !important;
+}
+.leaflet-popup{ display:none !important; }        /* попъпите отстъпват на цял екран */
+
+/* ═══ Прозорец на цял екран за гарите и автогарите ═══ */
+#zone-full{
+  display:none; position:fixed; inset:0; z-index:3000;
+  background:var(--scrim); backdrop-filter:blur(3px);
+  align-items:stretch; justify-content:center;
+}
+#zone-full-box{
+  width:100%; margin-top:var(--stack-h,238px);
+  height:calc(100dvh - var(--stack-h,238px));
+  display:flex; flex-direction:column;
+  background:var(--modal-bg); color:var(--text);
+  border:1px solid var(--modal-edge); border-radius:20px 20px 0 0;
+  box-shadow:var(--modal-shadow); backdrop-filter:var(--modal-blur);
+  overflow:hidden; animation:rise .3s var(--ease) both;
+}
+#zone-full-head{
+  flex-shrink:0; display:flex; align-items:center; justify-content:space-between; gap:10px;
+  padding:13px 14px; border-bottom:1px solid var(--modal-edge);
+  font:800 15.5px -apple-system,system-ui,sans-serif; color:var(--cyan);
+  background:var(--modal-head); text-shadow:var(--glow);
+}
+#zone-full-x{
+  width:40px; height:40px; flex-shrink:0; border-radius:50%;
+  background:var(--surface); color:var(--text); border:1.5px solid var(--cyan);
+  font-size:20px; line-height:1; cursor:pointer;
+}
+#zone-full-body{ overflow-y:auto; overscroll-behavior:contain; padding:12px 14px 20px; }
+#zone-full-body *{ max-width:100%; }
 </style>
 <style>
 
@@ -1960,7 +2023,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260726v103"></script>
+<script src="app.js?v=20260726v104"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">
