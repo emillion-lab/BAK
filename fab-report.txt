@@ -17,10 +17,10 @@ BEFORE: {
  ]
 }
 AFTER OPEN: {
- "btnOverlaps": [
-  "dest-cab_north×dest-cas_intl"
+ "btnOverlaps": [],
+ "labelVsBtn": [
+  "dest-__zones→dest-__zones"
  ],
- "labelVsBtn": [],
  "zonesBtn": true,
  "sheetWorks": true,
  "karyk": {
@@ -41,39 +41,39 @@ AFTER OPEN: {
   "bad": [],
   "bodyClass": "theme-day fab-open"
  },
- "minAdjacent": 74,
- "size": 58,
+ "minAdjacent": 84,
+ "size": 56,
  "align": [
   {
    "id": "dest-airport",
-   "dy": -7,
-   "gap": 149
+   "dy": -3,
+   "gap": 166
   },
   {
    "id": "dest-cab_north",
    "dy": 4,
-   "gap": 79
+   "gap": 88
   },
   {
    "id": "dest-cas_intl",
    "dy": 0,
-   "gap": 29
+   "gap": 12
   },
   {
    "id": "dest-cjp",
    "dy": 0,
-   "gap": 17
+   "gap": 18
   },
   {
    "id": "dest-__zones",
    "dy": 0,
-   "gap": 11
+   "gap": -4
   }
  ],
- "neighbours": 74,
- "satSize": 58,
+ "neighbours": 84,
+ "satSize": 56,
  "links": 5,
- "ticker": "✈️ 07:50 FR6428 от Treviso — ИЗЛИЗАТ · ✈️ 07:55 W64340 от Memmingen — ИЗЛИЗАТ · ✈️ 08:15 W64352 от Bergamo · ✈️ 08:45 OS771 от Vienna · ✈️ 08:45 FR5160 от Edinburgh · ✈️ 09:05 W64452 от Alghero · ✈️ 09:05 W64428 от Tel Aviv Yafo · ✈️ 09:15 LH1702 от Munich · ✈️ 09:20 W64332 от Dortmund · ✈️ 09:25 TK1127 от Istanbul · ✈️ 09:30 W64416 от Nice · ✈️ 09:35 FR2690 от London · ✈️ 07:50 FR6428 от Treviso — ИЗЛИЗАТ · ✈️ 07:55 W64340 от Memmingen — ИЗЛИЗАТ · ✈️ 08:15 W64352 от Bergamo · ✈️ 08:45 OS771 от Vienna · ✈️ 08:45 FR5160 от Edinburgh · ✈️ 09:05 W64452 от Alghero · ✈️ 09:05 W64428 от Tel Aviv Yafo · ✈️ 09:15 LH1702 от Munich · ✈️ 09:20 W64332 от Dortmund · ✈️ 09:25 TK1127 от Istanbul · ✈️ 09:30 W64416 от Nice · ✈️ 09:35 FR2690 от London · ",
+ "ticker": "✈️ 07:55 W64340 от Memmingen — ИЗЛИЗАТ · ✈️ 08:15 W64352 от Bergamo · ✈️ 08:45 OS771 от Vienna · ✈️ 08:45 FR5160 от Edinburgh · ✈️ 09:05 W64452 от Alghero · ✈️ 09:05 W64428 от Tel Aviv Yafo · ✈️ 09:15 LH1702 от Munich · ✈️ 09:20 W64332 от Dortmund · ✈️ 09:25 TK1127 от Istanbul · ✈️ 09:30 W64416 от Nice · ✈️ 09:35 FR2690 от London · ✈️ 09:55 FB976 от Varna · ✈️ 07:55 W64340 от Memmingen — ИЗЛИЗАТ · ✈️ 08:15 W64352 от Bergamo · ✈️ 08:45 OS771 от Vienna · ✈️ 08:45 FR5160 от Edinburgh · ✈️ 09:05 W64452 от Alghero · ✈️ 09:05 W64428 от Tel Aviv Yafo · ✈️ 09:15 LH1702 от Munich · ✈️ 09:20 W64332 от Dortmund · ✈️ 09:25 TK1127 от Istanbul · ✈️ 09:30 W64416 от Nice · ✈️ 09:35 FR2690 от London · ✈️ 09:55 FB976 от Varna · ",
  "n90": "Няма театри, кина или концерти в следващите 24 часа.Източник: SEV (theatre.art.bg и др.)",
  "topHint": "Топ: ✈️ Летище София (3.5) ✈ пик",
  "topRot": [
@@ -84,7 +84,7 @@ AFTER OPEN: {
  "flights": {
   "redove": 81,
   "minali": 13,
-  "chas": "8:06"
+  "chas": "8:11"
  },
  "bakshishRows": {
   "height": 0,
@@ -96,41 +96,41 @@ AFTER OPEN: {
  "sats": [
   {
    "id": "dest-airport",
-   "w": 58,
-   "h": 58,
-   "dist": 150,
+   "w": 56,
+   "h": 56,
+   "dist": 169,
    "onScreen": true,
    "hit": "dest-airport"
   },
   {
    "id": "dest-cab_north",
-   "w": 58,
-   "h": 58,
-   "dist": 150,
+   "w": 56,
+   "h": 56,
+   "dist": 169,
    "onScreen": true,
    "hit": "dest-cab_north"
   },
   {
    "id": "dest-cas_intl",
-   "w": 58,
-   "h": 58,
-   "dist": 150,
+   "w": 56,
+   "h": 56,
+   "dist": 170,
    "onScreen": true,
    "hit": "dest-cas_intl"
   },
   {
    "id": "dest-cjp",
-   "w": 58,
-   "h": 58,
-   "dist": 150,
+   "w": 56,
+   "h": 56,
+   "dist": 169,
    "onScreen": true,
    "hit": "dest-cjp"
   },
   {
    "id": "dest-__zones",
-   "w": 58,
-   "h": 58,
-   "dist": 150,
+   "w": 56,
+   "h": 56,
+   "dist": 169,
    "onScreen": true,
    "hit": "dest-__zones"
   }
