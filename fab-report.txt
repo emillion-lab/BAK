@@ -60,23 +60,23 @@ AFTER OPEN: {
   },
   {
    "id": "next90-btn",
-   "dy": 172,
-   "gap": 8
+   "dy": -502,
+   "gap": 328
   },
   {
    "id": "clean-btn",
-   "dy": 193,
-   "gap": 8
+   "dy": -557,
+   "gap": 209
   },
   {
    "id": "gps-btn",
-   "dy": 242,
-   "gap": 8
+   "dy": -650,
+   "gap": 141
   },
   {
    "id": "fs-btn",
-   "dy": 277,
-   "gap": 8
+   "dy": -775,
+   "gap": 154
   }
  ],
  "neighbours": 71,
@@ -93,7 +93,7 @@ AFTER OPEN: {
  "flights": {
   "redove": 83,
   "minali": 13,
-  "chas": "7:35"
+  "chas": "7:39"
  },
  "bakshishRows": {
   "height": 0,
@@ -168,16 +168,16 @@ AFTER OPEN: {
    "hit": "fs-btn"
   }
  ],
- "labelOverlaps": 3,
+ "labelOverlaps": 0,
  "labels": [
-  "Летище",
-  "Централна",
   "Събития 24ч",
   "Чиста карта",
-  "Международна",
-  "ЖП гара",
   "Локация",
-  "Цял екран"
+  "Цял екран",
+  "Летище",
+  "Централна",
+  "Международна",
+  "ЖП гара"
  ]
 }
 PAGEERRORS: none
