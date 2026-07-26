@@ -1406,6 +1406,35 @@ body.theme-night #direction-hint{ box-shadow:0 -6px 24px rgba(0,0,0,.6) !importa
 body.tiles-dark .leaflet-tile-pane{
   filter:invert(1) hue-rotate(180deg) brightness(.93) contrast(.92) saturate(.75) !important;
 }
+
+/* ═══ Когато нещо е отворено: колоната избледнява, активният остава видим ═══
+   Така панелът се прибира с една ръка — палецът натиска същия бутон,
+   вместо да търсиш Х-а горе.                                              */
+#next90-btn, #clean-btn, #gps-btn, #fs-btn, .tool-btn{
+  transition:opacity .25s var(--ease), transform .16s var(--ease), box-shadow .2s var(--ease);
+}
+body.full-list #next90-btn, body.full-list #clean-btn,
+body.full-list #gps-btn,    body.full-list #fs-btn,
+body.full-list .tool-btn,
+body[data-full] #next90-btn, body[data-full] #clean-btn,
+body[data-full] #gps-btn,    body[data-full] #fs-btn,
+body[data-full] .tool-btn{
+  opacity:.10 !important;
+}
+/* активният — на половин прозрачност и с ясен пръстен */
+body.full-list .dest-btn.on,
+body[data-full] .dest-btn.on{
+  opacity:.55 !important;
+  box-shadow:0 0 0 3px var(--cyan), 0 6px 20px rgba(15,27,45,.30) !important;
+}
+/* при докосване се показва напълно, за да си сигурен къде натискаш */
+body.full-list .tool-btn:active, body[data-full] .tool-btn:active,
+body.full-list #gps-btn:active,  body[data-full] #gps-btn:active,
+body.full-list #fs-btn:active,   body[data-full] #fs-btn:active,
+body.full-list #clean-btn:active,body[data-full] #clean-btn:active,
+body.full-list #next90-btn:active,body[data-full] #next90-btn:active{
+  opacity:1 !important;
+}
 </style>
 <style>
 
@@ -2095,7 +2124,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260726v108"></script>
+<script src="app.js?v=20260726v109"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">

@@ -72,6 +72,15 @@ jobs:
             return {
               found: boxes.map(x=>x.id), missing: ids.filter(i=>!boxes.find(x=>x.id===i)),
               overlaps, offscreen, dark, opens, scrollable,
+              fadeCheck: (()=>{
+                const zb=document.getElementById('dest-__zones');
+                if(!zb) return 'липсва';
+                zb.click();
+                const act=+getComputedStyle(zb).opacity;
+                const other=+getComputedStyle(document.getElementById('gps-btn')).opacity;
+                zb.click();
+                const back=+getComputedStyle(document.getElementById('gps-btn')).opacity;
+                return {активен:act, останали:other, следЗатваряне:back};})(),
               tilesDark: (()=>{ document.body.classList.remove('theme-day');
                 document.body.classList.add('theme-night','tiles-dark');
                 const p=document.querySelector('.leaflet-tile-pane');
