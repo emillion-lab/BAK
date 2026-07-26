@@ -1641,7 +1641,7 @@ function updateAirportBadge(){
   try{
     var _b = document.getElementById('airport-badge');
     if(_b && typeof flightDetails !== 'undefined' && flightDetails.length){
-      _b.textContent = '🛰 ' + flightDetails.length + ' полета · ЗАРЕДЕН';
+      _b.textContent = '🛰 ' + flightDetails.length + ' полета · ' + (window.__flightSource || 'ЗАРЕДЕН');
       _b.classList.add('ready');
       return;
     }
@@ -1653,9 +1653,46 @@ function updateAirportBadge(){
 }
 
 function loadFlights(){
+  // ЖИВО от Worker-а (кеш 15 мин), а качденият файл е само резерва.
+  // Разписаните задачи в GitHub се бавят до 2 часа и данните остаряваха.
+  var LIVE = 'https://mvr-proxy.mihov-emil.workers.dev/flights/SOF';
+  fetch(LIVE, { cache:'no-store' })
+    .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+    .then(function(live){
+      if(!live || !live.arrivals || !live.arrivals.length) throw 0;
+      // привеждаме към формата, който приложението вече разбира
+      var data = { data: live.arrivals.map(function(a){
+        var t = (a.revised || a.scheduled || '').replace(' ', 'T');
+        return {
+          flight:   { iata: String(a.number || '').replace(/\s+/g,'') },
+          airline:  { name: a.airline || '' },
+          arrival:  { scheduled: t, estimated: t, terminal: a.terminal || null },
+          departure:{ airport: a.from || '' },
+          flight_status: (a.status || '').toLowerCase()
+        };
+      })};
+      window.__flightSource = 'живо · ' + data.data.length;
+      processFlights(data);
+    })
+    .catch(function(){
+      window.__flightSource = 'кеш';
+      loadFlightsFromCache();
+    });
+}
+
+function loadFlightsFromCache(){
   fetch('flight-cache.json?v='+Date.now())
     .then(r=>{if(!r.ok)throw 0;return r.json();})
-    .then(data=>{
+    .then(processFlights)
+    .catch(e=>{
+      window.__flErr = String(e && (e.stack||e.message) || e).slice(0,160);
+      applyFallbackAirport(); updateAirportBadge();
+      buildCurve(); buildTicker(); render(currentHour);
+    });
+}
+
+function processFlights(data){
+  return (function(){
       const fl=data.data||[]; if(!fl.length) throw 0;
       flightHours=Array(24).fill(0); flightDetails=[];
       fl.forEach(f=>{
@@ -1694,14 +1731,9 @@ function loadFlights(){
       airportStatus='live';
       injectAirportEvents(); updateAirportBadge();
       buildCurve(); buildTicker(); render(currentHour);
-    })
-    .catch(e=>{
-      window.__flErr = (e && (e.stack||e.message)) ? String(e.stack||e.message).slice(0,160) : ('код '+String(e));
-      console.error('[SOF] flights failed:', e);
-      applyFallbackAirport(); updateAirportBadge();
-      buildCurve(); buildTicker(); render(currentHour);
-    });
+  })();
 }
+
 
 // ═══════════════════════════════════════════════
 // WEATHER
@@ -5191,4 +5223,12 @@ function toggleMapView(){
   }
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount);
   else mount();
+})();
+
+// живите полети се опресняват на всеки 10 минути, докато приложението е отворено
+(function(){
+  setInterval(function(){ try{ loadFlights(); }catch(e){} }, 10 * 60 * 1000);
+  document.addEventListener('visibilitychange', function(){
+    if(!document.hidden){ try{ loadFlights(); }catch(e){} }
+  });
 })();
