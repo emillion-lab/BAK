@@ -292,7 +292,7 @@ const ZONES = window.__ZONES = [
 
   // ── РЕСТОРАНТИ / НОЩЕН ЖИВОТ ──
   { id:"vitosha_bar",    name:"Бул.Витоша – ресторанти/барове",         icon:"🍷", lat:42.6890, lng:23.3220, radius:250, type:"nightlife",        wazeName:"булевард Витоша ресторанти София" },
-  { id:"lozenets_rest",  name:"Ресторанти Лозенец",        icon:"🍽", lat:42.6713, lng:23.3382, radius:220, type:"nightlife",        wazeName:"ресторанти Лозенец Водна кула София" },
+  { id:"lozenets_rest",  name:"Ресторанти Лозенец",        icon:"🍽", lat:42.6713, lng:23.3382, radius:220, type:"nightlife",        wazeName:"ресторанти Лозенец София" },
   { id:"center_bars",    name:"Барове / клубове Център (ул.Раковски)",  icon:"🍺", lat:42.6960, lng:23.3310, radius:200, type:"nightlife",        wazeName:"улица Раковски Sofia" },
 
   // ── ДОПЪЛНИТЕЛНИ БОЛНИЦИ ──
