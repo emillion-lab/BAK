@@ -4,19 +4,24 @@ BEFORE: {
   "dest-airport",
   "dest-cab_north",
   "dest-cas_intl",
-  "dest-cjp",
-  "next90-btn",
-  "clean-btn",
-  "gps-btn",
-  "fs-btn"
+  "dest-cjp"
  ],
  "karakListBtn": true,
  "strayFixed": [
+  "next90-btn",
+  "gps-btn",
   "bakshish-btn",
-  "karyk-btn"
+  "karyk-btn",
+  "fs-btn"
  ]
 }
 AFTER OPEN: {
+ "btnOverlaps": [
+  "gps-btn×dest-airport",
+  "fs-btn×dest-airport"
+ ],
+ "zonesBtn": true,
+ "sheetWorks": true,
  "karyk": {
   "active": false,
   "badge": "none",
@@ -35,79 +40,59 @@ AFTER OPEN: {
   "bad": [],
   "bodyClass": "theme-day fab-open"
  },
- "minAdjacent": 71,
- "size": 48,
+ "minAdjacent": 85,
+ "size": 64,
  "align": [
   {
    "id": "dest-airport",
-   "dy": -7,
+   "dy": 0,
    "gap": 8
   },
   {
    "id": "dest-cab_north",
-   "dy": 44,
+   "dy": 6,
    "gap": 8
   },
   {
    "id": "dest-cas_intl",
-   "dy": 88,
+   "dy": 0,
    "gap": 8
   },
   {
    "id": "dest-cjp",
-   "dy": 132,
+   "dy": 0,
    "gap": 8
-  },
-  {
-   "id": "next90-btn",
-   "dy": -502,
-   "gap": 328
-  },
-  {
-   "id": "clean-btn",
-   "dy": -557,
-   "gap": 209
-  },
-  {
-   "id": "gps-btn",
-   "dy": -650,
-   "gap": 141
-  },
-  {
-   "id": "fs-btn",
-   "dy": -775,
-   "gap": 154
   }
  ],
- "neighbours": 71,
- "satSize": 48,
+ "neighbours": 85,
+ "satSize": 64,
  "links": 0,
- "ticker": "✈️ 07:50 FR6428 от Treviso · ✈️ 07:55 W64340 от Memmingen · ✈️ 08:15 W64352 от Bergamo · ✈️ 08:45 OS771 от Vienna · ✈️ 08:45 FR5160 от Edinburgh · ✈️ 09:05 W64452 от Alghero · ✈️ 09:05 W64428 от Tel Aviv Yafo · ✈️ 09:15 LH1702 от Munich · ✈️ 09:20 W64332 от Dortmund · ✈️ 09:25 TK1127 от Istanbul · ✈️ 09:30 W64416 от Nice · ✈️ 09:35 FR2690 от London · ✈️ 07:50 FR6428 от Treviso · ✈️ 07:55 W64340 от Memmingen · ✈️ 08:15 W64352 от Bergamo · ✈️ 08:45 OS771 от Vienna · ✈️ 08:45 FR5160 от Edinburgh · ✈️ 09:05 W64452 от Alghero · ✈️ 09:05 W64428 от Tel Aviv Yafo · ✈️ 09:15 LH1702 от Munich · ✈️ 09:20 W64332 от Dortmund · ✈️ 09:25 TK1127 от Istanbul · ✈️ 09:30 W64416 от Nice · ✈️ 09:35 FR2690 от London · ",
+ "ticker": "✈️ 07:50 FR6428 от Treviso — ИЗЛИЗАТ · ✈️ 07:55 W64340 от Memmingen · ✈️ 08:15 W64352 от Bergamo · ✈️ 08:45 OS771 от Vienna · ✈️ 08:45 FR5160 от Edinburgh · ✈️ 09:05 W64452 от Alghero · ✈️ 09:05 W64428 от Tel Aviv Yafo · ✈️ 09:15 LH1702 от Munich · ✈️ 09:20 W64332 от Dortmund · ✈️ 09:25 TK1127 от Istanbul · ✈️ 09:30 W64416 от Nice · ✈️ 09:35 FR2690 от London · ✈️ 07:50 FR6428 от Treviso — ИЗЛИЗАТ · ✈️ 07:55 W64340 от Memmingen · ✈️ 08:15 W64352 от Bergamo · ✈️ 08:45 OS771 от Vienna · ✈️ 08:45 FR5160 от Edinburgh · ✈️ 09:05 W64452 от Alghero · ✈️ 09:05 W64428 от Tel Aviv Yafo · ✈️ 09:15 LH1702 от Munich · ✈️ 09:20 W64332 от Dortmund · ✈️ 09:25 TK1127 от Istanbul · ✈️ 09:30 W64416 от Nice · ✈️ 09:35 FR2690 от London · ",
  "n90": "Няма театри, кина или концерти в следващите 24 часа.Източник: SEV (theatre.art.bg и др.)",
  "topHint": "Топ: 🚌 Централна автогара (2.7) 🚉 пик",
  "topRot": [
-  "Топ: ✈️ Летище София (2.7) ✈ пик",
+  "Топ: ✈️ Летище София (3.5) ✈ пик",
   "Топ: 🚌 Централна автогара (2.7) 🚉 пик",
   "Топ: 🎓 Студентски град (1.5)"
  ],
  "flights": {
   "redove": 83,
   "minali": 13,
-  "chas": "7:44"
+  "chas": "7:52"
  },
  "bakshishRows": {
   "height": 0,
   "whyLines": 0
  },
  "open": true,
- "rays": 8,
+ "rays": 4,
  "hubCovered": "",
  "sats": [
   {
    "id": "dest-airport",
    "w": 64,
    "h": 64,
-   "dist": 108,
+   "dist": 131,
    "onScreen": true,
    "hit": "dest-airport"
   },
@@ -115,7 +100,7 @@ AFTER OPEN: {
    "id": "dest-cab_north",
    "w": 64,
    "h": 64,
-   "dist": 108,
+   "dist": 131,
    "onScreen": true,
    "hit": "dest-cab_north"
   },
@@ -123,7 +108,7 @@ AFTER OPEN: {
    "id": "dest-cas_intl",
    "w": 64,
    "h": 64,
-   "dist": 108,
+   "dist": 131,
    "onScreen": true,
    "hit": "dest-cas_intl"
   },
@@ -131,49 +116,13 @@ AFTER OPEN: {
    "id": "dest-cjp",
    "w": 64,
    "h": 64,
-   "dist": 108,
+   "dist": 131,
    "onScreen": true,
    "hit": "dest-cjp"
-  },
-  {
-   "id": "next90-btn",
-   "w": 48,
-   "h": 48,
-   "dist": 192,
-   "onScreen": true,
-   "hit": "next90-btn"
-  },
-  {
-   "id": "clean-btn",
-   "w": 76,
-   "h": 76,
-   "dist": 173,
-   "onScreen": true,
-   "hit": "clean-btn"
-  },
-  {
-   "id": "gps-btn",
-   "w": 48,
-   "h": 48,
-   "dist": 192,
-   "onScreen": true,
-   "hit": "gps-btn"
-  },
-  {
-   "id": "fs-btn",
-   "w": 48,
-   "h": 48,
-   "dist": 192,
-   "onScreen": true,
-   "hit": "fs-btn"
   }
  ],
  "labelOverlaps": 0,
  "labels": [
-  "Събития 24ч",
-  "Чиста карта",
-  "Локация",
-  "Цял екран",
   "Летище",
   "Централна",
   "Международна",
