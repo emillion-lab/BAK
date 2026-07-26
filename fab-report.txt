@@ -1,6 +1,10 @@
 BEFORE: {
  "hub": true,
  "sats": [
+  "dest-airport",
+  "dest-cab_north",
+  "dest-cas_intl",
+  "dest-cjp",
   "next90-btn",
   "clean-btn",
   "gps-btn",
@@ -31,32 +35,52 @@ AFTER OPEN: {
   "bad": [],
   "bodyClass": "theme-day fab-open"
  },
- "minAdjacent": 126,
- "size": 76,
+ "minAdjacent": 0,
+ "size": 48,
  "align": [
+  {
+   "id": "dest-airport",
+   "dy": 0,
+   "gap": -32
+  },
+  {
+   "id": "dest-cab_north",
+   "dy": 0,
+   "gap": -32
+  },
+  {
+   "id": "dest-cas_intl",
+   "dy": 0,
+   "gap": -32
+  },
+  {
+   "id": "dest-cjp",
+   "dy": 0,
+   "gap": -32
+  },
   {
    "id": "next90-btn",
    "dy": 0,
-   "gap": -6
+   "gap": 8
   },
   {
    "id": "clean-btn",
-   "dy": 0,
-   "gap": -6
+   "dy": -14,
+   "gap": 8
   },
   {
    "id": "gps-btn",
    "dy": 0,
-   "gap": -6
+   "gap": 8
   },
   {
    "id": "fs-btn",
    "dy": 0,
-   "gap": -6
+   "gap": 8
   }
  ],
- "neighbours": 126,
- "satSize": 76,
+ "neighbours": 0,
+ "satSize": 48,
  "links": 0,
  "ticker": "✈️ 07:30 FR956 от Palma De Mallorc · ✈️ 07:35 FR5473 от Nápoli · ✈️ 07:50 FR6428 от Treviso · ✈️ 07:55 W64340 от Memmingen · ✈️ 08:15 W64352 от Bergamo · ✈️ 08:45 OS771 от Vienna · ✈️ 08:45 FR5160 от Edinburgh · ✈️ 09:05 W64428 от Tel Aviv Yafo · ✈️ 09:05 W64452 от Alghero · ✈️ 09:15 LH1702 от Munich · ✈️ 09:20 W64332 от Dortmund · ✈️ 09:25 TK1127 от Istanbul · ✈️ 07:30 FR956 от Palma De Mallorc · ✈️ 07:35 FR5473 от Nápoli · ✈️ 07:50 FR6428 от Treviso · ✈️ 07:55 W64340 от Memmingen · ✈️ 08:15 W64352 от Bergamo · ✈️ 08:45 OS771 от Vienna · ✈️ 08:45 FR5160 от Edinburgh · ✈️ 09:05 W64428 от Tel Aviv Yafo · ✈️ 09:05 W64452 от Alghero · ✈️ 09:15 LH1702 от Munich · ✈️ 09:20 W64332 от Dortmund · ✈️ 09:25 TK1127 от Istanbul · ",
  "n90": "Няма театри, кина или концерти в следващите 24 часа.Източник: SEV (theatre.art.bg и др.)",
@@ -67,22 +91,54 @@ AFTER OPEN: {
   "Топ: 🚂 Централна ЖП гара (1.2) 🚉 пик"
  ],
  "flights": {
-  "redove": 87,
+  "redove": 86,
   "minali": 13,
-  "chas": "7:16"
+  "chas": "7:22"
  },
  "bakshishRows": {
   "height": 0,
   "whyLines": 0
  },
  "open": true,
- "rays": 4,
+ "rays": 0,
  "hubCovered": "",
  "sats": [
   {
+   "id": "dest-airport",
+   "w": 64,
+   "h": 64,
+   "dist": 0,
+   "onScreen": true,
+   "hit": "dest-cjp"
+  },
+  {
+   "id": "dest-cab_north",
+   "w": 64,
+   "h": 64,
+   "dist": 0,
+   "onScreen": true,
+   "hit": "dest-cjp"
+  },
+  {
+   "id": "dest-cas_intl",
+   "w": 64,
+   "h": 64,
+   "dist": 0,
+   "onScreen": true,
+   "hit": "dest-cjp"
+  },
+  {
+   "id": "dest-cjp",
+   "w": 64,
+   "h": 64,
+   "dist": 0,
+   "onScreen": true,
+   "hit": "dest-cjp"
+  },
+  {
    "id": "next90-btn",
-   "w": 76,
-   "h": 76,
+   "w": 48,
+   "h": 48,
    "dist": 192,
    "onScreen": true,
    "hit": "next90-btn"
@@ -91,33 +147,38 @@ AFTER OPEN: {
    "id": "clean-btn",
    "w": 76,
    "h": 76,
-   "dist": 192,
+   "dist": 173,
    "onScreen": true,
    "hit": "clean-btn"
   },
   {
    "id": "gps-btn",
-   "w": 76,
-   "h": 76,
+   "w": 48,
+   "h": 48,
    "dist": 192,
    "onScreen": true,
    "hit": "gps-btn"
   },
   {
    "id": "fs-btn",
-   "w": 76,
-   "h": 76,
+   "w": 48,
+   "h": 48,
    "dist": 192,
    "onScreen": true,
    "hit": "fs-btn"
   }
  ],
- "labelOverlaps": 0,
+ "labelOverlaps": 3,
  "labels": [
   "Събития 24ч",
   "Чиста карта",
   "Локация",
+  "Летище",
+  "Централна автогара",
+  "Международна автогара",
+  "ЖП гара",
   "Цял екран"
  ]
 }
-PAGEERRORS: none
+PAGEERRORS: posI is not defined
+https://emillion-lab.github.io/BAK/app.js?v=20260726v86:4788:23
