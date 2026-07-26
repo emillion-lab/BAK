@@ -1052,13 +1052,7 @@ body.list-view #zone-sidebar, body.list-view #karyk-sidebar{
 }
 
 /* нощна карта: обръщаме САМО плочките, маркерите остават верни */
-body.tiles-dark .leaflet-tile-pane{
-  filter:invert(1) hue-rotate(180deg) brightness(.94) contrast(.90) saturate(.78);
-}
 body.karyk-active .leaflet-tile-pane{ filter:none; }
-body.karyk-active.tiles-dark .leaflet-tile-pane{
-  filter:invert(1) hue-rotate(180deg) brightness(.94) contrast(.90) saturate(.78);
-}
 
 /* ═══ ветрилото с 6 бутона: по-едри надписи ═══ */
 .fab-label{ font:800 16px -apple-system,system-ui,sans-serif !important; padding:10px 15px !important; border-radius:12px !important; }
@@ -1846,7 +1840,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260726v90"></script>
+<script src="app.js?v=20260726v91"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">

@@ -820,10 +820,11 @@ const map = L.map('map', {center:[42.698,23.322], zoom:13, zoomControl:true, att
 // OSM стандарт: най-подробният свободен слой — еднопосочни стрелки,
 // пешеходни зони, всички обекти. Нощем се обръща с филтър САМО върху
 // плочките, за да останат маркерите и кръговете с истинските си цветове.
-window.__TILE_DAY   = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
-window.__TILE_NIGHT = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
-window.__tileLayer = L.tileLayer(window.__TILE_DAY, {
-  maxZoom:19, crossOrigin:true
+window.__TILE_DAY   = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+window.__TILE_NIGHT = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+window.__tileLayer = L.tileLayer(
+  (document.body.classList.contains('theme-night') ? window.__TILE_NIGHT : window.__TILE_DAY), {
+  maxZoom:20, subdomains:['a','b','c','d']
 }).addTo(map);
 document.getElementById('map').style.filter='brightness(0.85) saturate(0.6)';
 setTimeout(()=>map.invalidateSize(), 300);
@@ -4886,7 +4887,10 @@ function toggleMapView(){
       b.textContent = t === 'night' ? '☀️' : '🌙';
       b.title = t === 'night' ? 'Дневна тема' : 'Нощна тема';
     }
-    document.body.classList.toggle('tiles-dark', t === 'night');
+    try{
+      if(window.__tileLayer && window.__TILE_NIGHT)
+        window.__tileLayer.setUrl(t === 'night' ? window.__TILE_NIGHT : window.__TILE_DAY);
+    }catch(e){}
     // лентата: задаваме я директно, за да не зависи от реда на CSS правилата
     var tb = document.querySelector('.ticker-bar');
     if(tb){
