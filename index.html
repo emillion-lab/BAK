@@ -1150,6 +1150,9 @@ body.theme-night #fab-wrap .fab-dest{
   50%    { box-shadow:var(--card), 0 0 26px var(--ring); }
 }
 body.fab-open #fab-wrap .fab-dest{ animation:dest-glow 2.4s ease-in-out infinite; }
+
+/* инструментите остават само с иконки — осем надписа претрупват екрана */
+.fab-label:not(.fab-dest-label){ display:none !important; }
 </style>
 <style>
 
@@ -1843,7 +1846,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260726v89"></script>
+<script src="app.js?v=20260726v90"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">
