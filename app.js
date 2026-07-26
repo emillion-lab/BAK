@@ -1809,7 +1809,7 @@ async function loadWeather(){
     const boost=w.main==='Rain'?2.0:w.main==='Thunderstorm'?2.8:w.main==='Snow'?1.8:w.main==='Drizzle'?1.2:wind>10?0.5:0;
     weatherBoost=boost;
     bar.style.display='flex';
-    document.getElementById('wb-icon').textContent=wIcon;
+    // иконата се управлява от пейзажа (нощем луна с фаза) — не я пипаме тук
     document.getElementById('wb-temp').textContent=`${temp}°C`;
     document.getElementById('wb-desc').textContent=w.description;
     document.getElementById('wb-boost').textContent=boost>0?`+${boost.toFixed(1)} demand 🌧`:'';
@@ -5388,6 +5388,31 @@ function toggleMapView(){
     }).catch(function(){});
   }
 
+  // Фаза на луната по алгоритъм на Conway — 0 новолуние … 4 пълнолуние
+  function moonPhase(d){
+    d = d || new Date();
+    var y = d.getFullYear(), m = d.getMonth() + 1, day = d.getDate();
+    if(m < 3){ y--; m += 12; }
+    var k1 = Math.floor(365.25 * (y + 4712));
+    var k2 = Math.floor(30.6 * (m + 1));
+    var jd = k1 + k2 + day - 59.5;
+    if(jd > 2299160) jd += 2 - Math.floor(y/100) + Math.floor(Math.floor(y/100)/4);
+    var ip = (jd - 2451550.1) / 29.530588853;
+    ip = ip - Math.floor(ip);
+    if(ip < 0) ip += 1;
+    return ip;                       // 0 … 1
+  }
+  function moonEmoji(p){
+    if(p < .0625 || p >= .9375) return '🌑';
+    if(p < .1875) return '🌒';
+    if(p < .3125) return '🌓';
+    if(p < .4375) return '🌔';
+    if(p < .5625) return '🌕';
+    if(p < .6875) return '🌖';
+    if(p < .8125) return '🌗';
+    return '🌘';
+  }
+
   function wmoText(c){
     if(c === 0) return 'ясно небе';
     if(c === 1) return 'предимно ясно';
@@ -5430,11 +5455,14 @@ function toggleMapView(){
     // иконата вляво следва реалното време, а не статична емоджи
     var ic = document.getElementById('wb-icon');
     if(ic){
-      ic.textContent = state.rain > 0 ? '🌧'
+      ic.textContent = state.storm ? '⛈'
+                     : state.fog   ? '🌫'
                      : state.snow > 0 ? '🌨'
-                     : state.cloud > .75 ? (state.night ? '☁️' : '☁️')
+                     : state.rain > 0 ? '🌧'
+                     : state.cloud > .75 ? '☁️'
                      : state.cloud > .35 ? (state.night ? '🌥' : '⛅')
-                     : (state.night ? '🌙' : '☀️');
+                     : (state.night ? moonEmoji(moonPhase()) : '☀️');
+      ic.title = state.night ? ('Лунна фаза ' + Math.round(moonPhase()*100) + '%') : '';
     }
   }
 
@@ -5474,10 +5502,21 @@ function toggleMapView(){
     // слънце / луна
     var cx = W*.13, cy = H*.42, R = Math.min(9, H*.28);
     if(state.night){
-      ctx.fillStyle = 'rgba(226,232,240,.85)';
+      var ph = moonPhase();                      // 0 новолуние … .5 пълнолуние
+      ctx.fillStyle = 'rgba(226,232,240,.9)';
       ctx.beginPath(); ctx.arc(cx, cy, R, 0, 6.28); ctx.fill();
-      ctx.fillStyle = state.night ? 'rgba(10,20,38,.9)' : 'rgba(255,255,255,0)';
-      ctx.beginPath(); ctx.arc(cx + R*.42, cy - R*.24, R*.85, 0, 6.28); ctx.fill();
+      // сянката се мести според фазата — вляво/вдясно, пълна при новолуние
+      if(ph < .48 || ph > .52){
+        var illum = Math.abs(.5 - ph) * 2;        // 0 пълнолуние … 1 новолуние
+        var shiftDir = ph < .5 ? -1 : 1;          // растяща вдясно, намаляваща вляво
+        ctx.fillStyle = 'rgba(10,20,38,.94)';
+        ctx.beginPath();
+        ctx.arc(cx + shiftDir * R * illum * 1.05, cy, R * (0.96 + illum*0.1), 0, 6.28);
+        ctx.fill();
+      }
+      // мек ореол
+      ctx.strokeStyle = 'rgba(226,232,240,.18)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.arc(cx, cy, R + 2.5, 0, 6.28); ctx.stroke();
     } else {
       var pulse = 1 + .06*Math.sin(t/28);
       ctx.fillStyle = 'rgba(253,196,60,.95)';
@@ -5578,22 +5617,27 @@ function toggleMapView(){
     }
 
     // 🚕 от време на време минава такси
-    if(!taxi.active && t > taxi.next){ taxi.active = true; taxi.x = -30; }
+    if(!taxi.active && t > taxi.next){ taxi.active = true; taxi.x = W + 30; }
     if(taxi.active){
-      taxi.x += 0.75;                       // бавно, за да се чете надписът
+      taxi.x -= 0.75;                       // отдясно наляво, за да води надписа
       var ty = H - 6;
       ctx.save();
       ctx.globalAlpha = .96;
       var fs = Math.round(Math.min(15, H*.46));
       ctx.font = fs + 'px system-ui';
       ctx.textBaseline = 'alphabetic';
-      ctx.fillText('🚕', taxi.x, ty);
-      // описанието на времето пътува зад колата
+      // огледално, за да гледа накъдето се движи
+      ctx.save();
+      ctx.translate(taxi.x + fs, ty);
+      ctx.scale(-1, 1);
+      ctx.fillText('🚕', 0, 0);
+      ctx.restore();
+      // описанието се тегли ЗАД колата (вдясно, тъй като върви наляво)
       var label = state.desc || '';
       if(label){
         ctx.font = '600 ' + Math.round(fs*0.72) + 'px system-ui,-apple-system,sans-serif';
         var tw = ctx.measureText(label).width;
-        var bx = taxi.x - tw - 12, by = ty - fs*0.62;
+        var bx = taxi.x + fs + 12, by = ty - fs*0.62;
         ctx.fillStyle = state.night ? 'rgba(8,16,32,.55)' : 'rgba(255,255,255,.55)';
         ctx.beginPath();
         if(ctx.roundRect) ctx.roundRect(bx-6, by-9, tw+12, fs*0.92, 6);
@@ -5603,7 +5647,7 @@ function toggleMapView(){
         ctx.fillText(label, bx, by);
       }
       ctx.restore();
-      if(taxi.x > W + 200){ taxi.active = false; taxi.next = t + 600; }   // ~10 сек пауза
+      if(taxi.x < -(200)){ taxi.active = false; taxi.next = t + 600; }   // ~10 сек пауза
     }
 
     raf = requestAnimationFrame(loop);
