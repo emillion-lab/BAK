@@ -4760,6 +4760,13 @@ function toggleMapView(){
       var a = (A0 + step * i) * Math.PI / 180;
       pos.push({ x: Math.round(Math.cos(a) * R), y: Math.round(-Math.sin(a) * R) });
     });
+    // ВЪТРЕШЕН пръстен: по-малък радиус, изместен на половин стъпка
+    var Ri = Math.round(R * 0.56);
+    var stepI = dests.length > 1 ? (A1 - A0) / (dests.length - 1) : 0;
+    var posI = dests.map(function(it, i){
+      var a = (A0 + 7 + stepI * i) * Math.PI / 180;
+      return { x: Math.round(Math.cos(a) * Ri), y: Math.round(-Math.sin(a) * Ri) };
+    });
     // надписите застават вляво от своя бутон; разместваме само при сблъсък
     var MINGAP = 34, lab = pos.map(function(p){ return p.y; });
     for(var i = lab.length - 2; i >= 0; i--){
@@ -4782,14 +4789,19 @@ function toggleMapView(){
           lines += '<line class="fab-link" x1="' + (lx + 4) + '" y1="' + ly + '" x2="' + (dx - 27) + '" y2="' + dy + '"/>';
       }
     });
+    // надписите на вътрешния пръстен — разместване при сблъсък
+    var labI = posI.map(function(p){ return p.y; });
+    for(var q = labI.length - 2; q >= 0; q--){
+      if(labI[q + 1] - labI[q] < 38) labI[q] = labI[q + 1] - 38;
+    }
     // вътрешният пръстен
     dests.forEach(function(it, i){
       var rec = adopted[it.id];
       var dx = open ? posI[i].x : 0, dy = open ? posI[i].y : 0;
       rec.el.style.left = dx + 'px';
       rec.el.style.top  = dy + 'px';
-      rec.label.style.left = (open ? dx - 36 : 0) + 'px';
-      rec.label.style.top  = dy + 'px';
+      rec.label.style.left = (open ? dx - 40 : 0) + 'px';
+      rec.label.style.top  = (open ? labI[i] : 0) + 'px';
       if(open){
         var d2 = Math.sqrt(dx*dx + dy*dy), k2 = d2 ? (1 - 30/d2) : 0;
         lines += '<line class="fab-inner" x1="0" y1="0" x2="' + Math.round(dx*k2) + '" y2="' + Math.round(dy*k2) + '"/>';
