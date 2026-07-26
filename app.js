@@ -1145,7 +1145,13 @@ function showAirportSchedule() {
         ${flTerm==='all'?`<span style="font-size:10.5px;font-weight:900;color:var(--cyan);border:1px solid var(--border);border-radius:4px;padding:0 4px">${'Т'+f.term}</span>`:''}
         <span style="flex:1;min-width:0;overflow:hidden">
           <span style="display:block;font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.25">${(f.depAirport||'').slice(0,20)}</span>
-          <span style="display:block;font-size:10px;color:var(--muted);opacity:.8;white-space:nowrap;line-height:1.2">🛬 ${fmt(f.landH,f.landM)}</span>
+          <span style="display:block;font-size:10px;color:var(--muted);opacity:.85;white-space:nowrap;line-height:1.2">🛬 ${fmt(f.landH,f.landM)}${
+            f.delay >= 5  ? ` <b style="color:#dc2626">+${f.delay}′</b>` :
+            f.delay <= -5 ? ` <b style="color:#16a34a">${f.delay}′</b>` : ''
+          }${
+            /arriv/i.test(f.statusRaw||'')   ? ' <span style="color:#16a34a">кацна</span>' :
+            /approach|en.?route/i.test(f.statusRaw||'') ? ' <span style="color:#0369a1">каца</span>' : ''
+          }</span>
         </span>
         <span style="font-size:13px">${flag(f)}</span>
         ${isNow?'<span style="font-size:10.5px;font-weight:900;color:#ef4444;white-space:nowrap">ИЗЛИЗА</span>':''}
@@ -1157,7 +1163,15 @@ function showAirportSchedule() {
   }
   // легендата е ВЪТРЕ в скрола, за да не се наслагва върху редовете
   html+='<div style="font-size:10.5px;color:var(--muted);margin-top:10px;padding-top:7px;border-top:1px solid var(--border);line-height:1.5">🇪🇺 Шенген +5–15 мин · 🛂 Извън +10–30 мин · 🔴 излизат сега · бледите още се точат</div>';
-  html+=`<div style="font-size:10.5px;color:var(--muted);margin-top:5px;line-height:1.45">Източник: AeroDataBox · ${flightDetails.length} пристигания за денонощието</div>`;
+  (function(){
+    var late = flightDetails.filter(function(x){ return (x.delay||0) >= 15; });
+    if(late.length){
+      var worst = late.slice().sort(function(a,b){ return b.delay - a.delay; })[0];
+      html = `<div style="background:rgba(220,38,38,.10);border:1px solid rgba(220,38,38,.45);border-radius:10px;padding:7px 10px;margin-bottom:8px;font-size:12.5px;font-weight:700;color:#dc2626">
+        ⏱ ${late.length} ${late.length===1?'полет закъснява':'полета закъсняват'} · най-много ${worst.fn} с +${worst.delay} мин</div>` + html;
+    }
+  })();
+  html+=`<div style="font-size:10.5px;color:var(--muted);margin-top:5px;line-height:1.45">Източник: AeroDataBox · ${flightDetails.length} пристигания · обновено ${new Date().toLocaleTimeString('bg',{hour:'2-digit',minute:'2-digit'})}</div>`;
   html+='</div>';
   html+='</div>';
 
@@ -1662,13 +1676,21 @@ function loadFlights(){
       if(!live || !live.arrivals || !live.arrivals.length) throw 0;
       // привеждаме към формата, който приложението вече разбира
       var data = { data: live.arrivals.map(function(a){
-        var t = (a.revised || a.scheduled || '').replace(' ', 'T');
+        var sch = (a.scheduled || '').replace(' ', 'T');
+        var rev = (a.revised  || '').replace(' ', 'T');
+        var t   = rev || sch;
+        var dmin = 0;
+        if(sch && rev){
+          try{ dmin = Math.round((new Date(rev) - new Date(sch)) / 60000); }catch(e){}
+        }
         return {
           flight:   { iata: String(a.number || '').replace(/\s+/g,'') },
           airline:  { name: a.airline || '' },
-          arrival:  { scheduled: t, estimated: t, terminal: a.terminal || null },
+          arrival:  { scheduled: sch || t, estimated: t, terminal: a.terminal || null },
           departure:{ airport: a.from || '' },
-          flight_status: (a.status || '').toLowerCase()
+          flight_status: (a.status || '').toLowerCase(),
+          _delay: dmin,
+          _statusRaw: a.status || ''
         };
       })};
       window.__flightSource = 'живо · ' + data.data.length;
@@ -1729,6 +1751,7 @@ function processFlights(data){
         const depAirport = f.departure?.airport||dep;
         flightDetails.push({
           fn, depAirport, nonSchengen:!!nonSchengen,
+          delay: f._delay || 0, statusRaw: f._statusRaw || '',
           term: (f.arrival && f.arrival.terminal) ? String(f.arrival.terminal) : '?',
           exitFromTs: tFirst.getTime(), exitToTs: tLast.getTime(),
           landH:(t.getUTCHours()+3)%24, landM:t.getUTCMinutes(),
