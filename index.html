@@ -11,6 +11,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>🚕 BakshishApp — Sofia</title>
 <style>
+html{ -webkit-text-size-adjust:100%; text-size-adjust:100%; }
+
 /* required styles */
 
 .leaflet-pane,
@@ -1496,6 +1498,27 @@ body.full-list #next90-btn:active,body[data-full] #next90-btn:active{
 #airport-modal-body [data-now="1"]{ animation:fl-now-pulse 1.8s ease-in-out infinite; }
 /* приключващите не пулсират — само червен ръб */
 #airport-modal-body [data-fading="1"]{ animation:none; }
+
+/* ═══ Полетният ред устоява на едър системен шрифт ═══ */
+#airport-modal-body .fl-row, #fl-scroll > div[style*="display:flex"]{
+  align-items:flex-start !important;
+}
+/* градът получава цялото свободно място и се свива честно */
+#airport-modal-body span[style*="flex:1"]{
+  min-width:0 !important; flex:1 1 auto !important;
+}
+/* номерът и часовете не се свиват, но и не заемат излишно */
+#airport-modal-body span[style*="min-width:44px"]{
+  flex:0 0 auto !important; min-width:38px !important;
+}
+#airport-modal-body span[style*="white-space:nowrap"]{ flex:0 0 auto !important; }
+/* при много едър шрифт градът може на два реда, вместо да се реже */
+@media (max-width:430px){
+  #airport-modal-body span[style*="text-overflow:ellipsis"]{
+    white-space:normal !important; overflow:visible !important;
+    text-overflow:clip !important; line-height:1.15 !important;
+  }
+}
 </style>
 <style>
 
@@ -2185,7 +2208,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260726v121"></script>
+<script src="app.js?v=20260726v122"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">

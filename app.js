@@ -5272,3 +5272,26 @@ function toggleMapView(){
     if(!document.hidden){ try{ loadFlights(); }catch(e){} }
   });
 })();
+
+// ═══════════════════════════════════════════════
+// Автоматично обновяване на инсталираното приложение
+// Без нужда от преинсталиране: щом излезе нова версия,
+// service worker-ът се сменя и страницата се презарежда.
+// ═══════════════════════════════════════════════
+(function(){
+  if(!('serviceWorker' in navigator)) return;
+  var reloaded = false;
+  navigator.serviceWorker.ready.then(function(reg){
+    // проверка при отваряне и на всеки 15 минути
+    reg.update();
+    setInterval(function(){ reg.update(); }, 15 * 60 * 1000);
+    document.addEventListener('visibilitychange', function(){
+      if(!document.hidden) reg.update();
+    });
+  }).catch(function(){});
+  navigator.serviceWorker.addEventListener('controllerchange', function(){
+    if(reloaded) return;
+    reloaded = true;
+    location.reload();
+  });
+})();
