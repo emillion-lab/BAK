@@ -69,7 +69,21 @@ jobs:
           airportTap.затвориСеСВтори = await p.evaluate(()=>{
             const m=document.getElementById('airport-modal');
             return !m || getComputedStyle(m).display==='none';});
-          const out = await p.evaluate((opensIn, fadeIn, airportTapIn) => {
+          // ЖП гара: показва ли реални влакове
+          await p.evaluate(()=>{const e=document.getElementById('dest-cjp'); if(e) e.click();});
+          await new Promise(r=>setTimeout(r,1400));
+          const bdz = await p.evaluate(()=>{
+            const p=document.querySelector('.leaflet-popup-content');
+            const t=p?p.textContent:'';
+            return { имаПанел:!!p,
+                     реалниВлакове:/Пристигащи влакове/.test(t),
+                     стариятНадпис:/предстои/.test(t),
+                     нямаДанни:/Няма данни от БДЖ/.test(t),
+                     проба:(t.match(/(КПВ|БВ)\s*\d+/g)||[]).slice(0,3) };
+          });
+          await p.evaluate(()=>{const e=document.getElementById('dest-cjp'); if(e) e.click();});
+          await new Promise(r=>setTimeout(r,300));
+          const out = await p.evaluate((opensIn, fadeIn, airportTapIn, bdzIn) => {
             const ids=['next90-btn','clean-btn','gps-btn','fs-btn',
                        'dest-airport','dest-cjp','dest-cab_north','dest-cas_intl','dest-__zones'];
             const boxes = ids.map(id=>{const e=document.getElementById(id);
@@ -100,7 +114,7 @@ jobs:
             return {
               found: boxes.map(x=>x.id), missing: ids.filter(i=>!boxes.find(x=>x.id===i)),
               overlaps, offscreen, dark, opens, scrollable,
-              fadeCheck: fadeIn, airportTap: airportTapIn,
+              fadeCheck: fadeIn, airportTap: airportTapIn, bdzCheck: bdzIn,
               tilesDark: (()=>{ document.body.classList.remove('theme-day');
                 document.body.classList.add('theme-night','tiles-dark');
                 const p=document.querySelector('.leaflet-tile-pane');
@@ -123,7 +137,7 @@ jobs:
               viewport: innerHeight,
               fanGone: !document.querySelector('#fab-hub:not([style*="display: none"])')
             };
-          }, opens, fadeIn, airportTap);
+          }, opens, fadeIn, airportTap, bdz);
           console.log('RESULT:', JSON.stringify(out,null,1));
           console.log('TILEFAILS:', failed.length);
           console.log('PAGEERRORS:', errs.slice(0,4).join(' | ')||'none');

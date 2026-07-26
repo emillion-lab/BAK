@@ -2575,18 +2575,6 @@ function toggleMapView(){
   var _origTransit = showTransitPopup;
   showTransitPopup = function(zid){
     var r = _origTransit(zid);
-    if(zid==='cjp'){
-      setTimeout(function(){
-        var pops=document.querySelectorAll('.leaflet-popup-content');
-        if(!pops.length) return;
-        var p=pops[pops.length-1];
-        if(p.innerHTML.indexOf('bdz-note')>=0) return;
-        p.innerHTML += '<div class="bdz-note" style="margin-top:8px;padding:7px 9px;border-radius:7px;'+
-          'background:rgba(56,189,248,.08);border-left:3px solid #38bdf8;font-size:12px;color:#94a3b8">'+
-          '🚂 Живо разписание на БДЖ — предстои.<br>Засега: пиковете са ~07:30, 13:00, 18:30, 21:40 '+
-          '(пристигания от Пловдив/Варна/Бургас).</div>';
-      }, 200);
-    }
     return r;
   };
 })();
@@ -3020,7 +3008,13 @@ function toggleMapView(){
     }).catch(function(){});
   }
   function pullTrains(){
-    fetch('train-arrivals.json?v='+Date.now()).then(function(r){return r.json()})
+    fetch('train-arrivals.json?v='+Date.now()).then(function(r){
+        setTimeout(function(){
+          document.querySelectorAll('.leaflet-popup-content').forEach(function(p){
+            if(p.dataset) delete p.dataset.eta18;   // позволяваме повторно обогатяване
+            try{ enrich(p); }catch(e){}
+          });
+        }, 60);return r.json()})
       .then(function(d){ TRAINS = d; }).catch(function(){});
   }
   pullLive(); pullTrains();
