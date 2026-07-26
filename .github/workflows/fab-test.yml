@@ -17,157 +17,53 @@ jobs:
           const p = await b.newPage();
           await p.setViewport({width:390,height:844});
           const errs=[]; p.on('pageerror',e=>errs.push(String(e.message||e)));
-          await p.goto('https://emillion-lab.github.io/BAK/?fab='+Date.now(), {waitUntil:'networkidle2', timeout:45000});
-          await new Promise(r=>setTimeout(r,7000));
-          const before = await p.evaluate(() => ({
-            hub: !!document.getElementById('fab-hub'),
-            sats: [...document.querySelectorAll('#fab-wrap .fab-sat')].map(e=>e.id),
-            karakListBtn: !!document.getElementById('toggle-map-btn-k'),
-            strayFixed: [...document.querySelectorAll('#gps-btn,#fs-btn,#bakshish-btn,#next90-btn,#karyk-btn')]
-              .filter(e=>!e.closest('#fab-wrap')).map(e=>e.id)
-          }));
-          await p.click('#fab-hub');
-          await new Promise(r=>setTimeout(r,700));
-          const after = await p.evaluate(() => {
-            const hubR = document.getElementById('fab-hub').getBoundingClientRect();
-            const hubC = {x:hubR.x+hubR.width/2, y:hubR.y+hubR.height/2};
-            const sats = [...document.querySelectorAll('#fab-wrap .fab-sat')].map(e=>{
-              const r = e.getBoundingClientRect();
-              const c = {x:r.x+r.width/2, y:r.y+r.height/2};
-              return { id:e.id, w:Math.round(r.width), h:Math.round(r.height),
-                dist: Math.round(Math.hypot(c.x-hubC.x, c.y-hubC.y)),
-                onScreen: r.x>=0 && r.y>=0 && r.right<=innerWidth && r.bottom<=innerHeight,
-                // кой елемент реално получава допира в центъра на бутона
-                hit: (document.elementFromPoint(c.x,c.y)||{}).id || '?' };
+          const failed=[]; p.on('requestfailed',r=>{ if(/tile|\.png/.test(r.url())) failed.push(r.url().slice(0,60)); });
+          await p.goto('https://emillion-lab.github.io/BAK/?t='+Date.now(), {waitUntil:'networkidle2', timeout:45000});
+          await new Promise(r=>setTimeout(r,8000));
+          const out = await p.evaluate(() => {
+            const ids=['next90-btn','clean-btn','gps-btn','fs-btn',
+                       'dest-airport','dest-cjp','dest-cab_north','dest-cas_intl','dest-__zones'];
+            const boxes = ids.map(id=>{const e=document.getElementById(id);
+              return e?{id, r:e.getBoundingClientRect()}:null;}).filter(Boolean);
+            let overlaps=[], offscreen=[];
+            for(let i=0;i<boxes.length;i++){
+              const r=boxes[i].r;
+              if(r.right>innerWidth+1 || r.bottom>innerHeight+1 || r.top<0) offscreen.push(boxes[i].id);
+              for(let j=i+1;j<boxes.length;j++){
+                const a=r,c=boxes[j].r;
+                if(a.left<c.right&&c.left<a.right&&a.top<c.bottom&&c.top<a.bottom)
+                  overlaps.push(boxes[i].id+'×'+boxes[j].id);
+              }
+            }
+            // тъмни повърхности в дневната тема
+            document.body.classList.remove('theme-night'); document.body.classList.add('theme-day');
+            const dark=[];
+            ['#next90-panel','#exit-now-panel','#dest-airport','.ticker-bar','#weather-bar'].forEach(sel=>{
+              const e=document.querySelector(sel); if(!e) return;
+              const m=getComputedStyle(e).backgroundColor.match(/(\d+),\s*(\d+),\s*(\d+)/);
+              if(m && (+m[1]*.299 + +m[2]*.587 + +m[3]*.114) < 110) dark.push(sel);
             });
-            const labs = [...document.querySelectorAll('.fab-label')].map(e=>{
-              const r=e.getBoundingClientRect();
-              return { t:e.textContent.trim(), y:Math.round(r.y), h:Math.round(r.height),
-                       fits: r.x>=0 && r.right<=innerWidth };
-            }).sort((a,b)=>a.y-b.y);
-            const cs = [...document.querySelectorAll('#fab-wrap .fab-sat')].map(e=>{
-              const r=e.getBoundingClientRect(); return {x:r.x+r.width/2, y:r.y+r.height/2, w:r.width};
-            }).sort((a,b)=>a.y-b.y);
-            let minAdjacent = 9999, size = cs.length?Math.round(cs[0].w):0;
-            for(let i=1;i<cs.length;i++)
-              minAdjacent = Math.min(minAdjacent, Math.round(Math.hypot(cs[i].x-cs[i-1].x, cs[i].y-cs[i-1].y)));
-            // истинско застъпване: пресичане И по двете оси
-            const boxes=[...document.querySelectorAll('.fab-label')].map(e=>e.getBoundingClientRect());
-            let overlaps=0;
-            for(let i=0;i<boxes.length;i++) for(let j=i+1;j<boxes.length;j++){
-              const a=boxes[i], b=boxes[j];
-              if(a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom) overlaps++;
-            }
-            // подравняване: центърът на всеки надпис спрямо центъра на неговия бутон
-            const align = [...document.querySelectorAll('.fab-label')].map(l=>{
-              const b = document.getElementById(l.getAttribute('data-for'));
-              if(!b) return null;
-              const lr = l.getBoundingClientRect(), br = b.getBoundingClientRect();
-              return { id:l.getAttribute('data-for'),
-                       dy: Math.round((lr.y+lr.height/2) - (br.y+br.height/2)),
-                       gap: Math.round(br.x - lr.right) };
-            }).filter(Boolean);
-            // карък: включваме и мерим индикацията
-            const kb = document.getElementById('karyk-btn'); if(kb) kb.click();
-            const karyk = {
-              active: document.body.classList.contains('karyk-active'),
-              badge: (()=>{const b=document.getElementById('karyk-badge');
-                        return b ? getComputedStyle(b).display : 'липсва';})(),
-              mapFilter: (()=>{const m=document.getElementById('map');
-                        return m ? getComputedStyle(m).filter.slice(0,42) : '?';})(),
-              frame: (()=>{const s=getComputedStyle(document.body,'::after');
-                        return s.borderTopWidth+'/'+s.borderRightWidth+'/'+s.borderBottomWidth+'/'+s.borderLeftWidth
-                               +' anim='+s.animationName+' inset='+s.inset;})(),
-              corners: ['karyk-corner-tr','karyk-corner-bl'].filter(id=>{
-                        const e=document.getElementById(id);
-                        return e && getComputedStyle(e).display!=='none';}).length + 2,
-              pulse: (()=>{const s=getComputedStyle(document.body,'::after');
-                        return s.animationName||'няма';})()
-            };
-            if(kb) kb.click();
-            // застъпване между самите бутони (всички, не само съседни по Y)
-            const bb=[...document.querySelectorAll('#fab-wrap .fab-sat, #next90-btn, #clean-btn, #gps-btn, #fs-btn, #fab-hub')]
-                     .map(e=>({id:e.id, r:e.getBoundingClientRect()}));
-            let btnOverlaps=[];
-            for(let i=0;i<bb.length;i++) for(let j=i+1;j<bb.length;j++){
-              const a=bb[i].r, b=bb[j].r;
-              if(a.left<b.right && b.left<a.right && a.top<b.bottom && b.top<a.bottom)
-                btnOverlaps.push(bb[i].id+'×'+bb[j].id);
-            }
-            // НОВО: надпис срещу бутон — това ни убягваше
-            const lb=[...document.querySelectorAll('.fab-label')].map(e=>({id:e.getAttribute('data-for'), r:e.getBoundingClientRect()}));
-            let labelVsBtn=[];
-            lb.forEach(L=>bb.forEach(B=>{
-              const a=L.r, b=B.r;
-              if(a.left<b.right && b.left<a.right && a.top<b.bottom && b.top<a.bottom)
-                labelVsBtn.push(L.id+'→'+B.id);
-            }));
-            const zonesBtn = !!document.getElementById('btn-zones');
-            let sheetWorks = false;
-            const zb = document.getElementById('btn-zones');
-            if(zb){ zb.click(); sheetWorks = document.body.classList.contains('sheet-zones'); zb.click(); }
+            // списъкът
+            const zb=document.getElementById('dest-__zones');
+            let sheet=false;
+            if(zb){ zb.click(); sheet=document.body.classList.contains('sheet-zones'); zb.click(); }
+            const mp=document.getElementById('map'), st=document.getElementById('topstack');
             return {
-              btnOverlaps, labelVsBtn, zonesBtn, sheetWorks,
-              karyk,
-              layout: (()=>{
-                const st=document.getElementById('topstack'), mp=document.getElementById('map');
-                if(!st||!mp) return 'липсва stage';
-                const s=st.getBoundingClientRect(), m=mp.getBoundingClientRect();
-                return { stackH:Math.round(s.height), mapH:Math.round(m.height),
-                         mapUnderStack: Math.round(m.top) <= Math.round(s.top)+2,
-                         stackVar:getComputedStyle(document.documentElement).getPropertyValue('--stack-h').trim() };})(),
-              darkInLight: (()=>{
-                document.body.classList.remove('theme-night'); document.body.classList.add('theme-day');
-                const bad=[];
-                ['#fab-hub','.fab-label','#weather-bar','.ticker-bar','.header'].forEach(sel=>{
-                  const e=document.querySelector(sel); if(!e) return;
-                  const bg=getComputedStyle(e).backgroundColor;
-                  const m=bg.match(/(\d+),\s*(\d+),\s*(\d+)/);
-                  if(m){ const lum=(+m[1]*0.299 + +m[2]*0.587 + +m[3]*0.114);
-                         if(lum < 110) bad.push(sel+' '+bg); }
-                });
-                return {bad, bodyClass:document.body.className};})(), minAdjacent, size,
-              align,
-              neighbours: minAdjacent,
-              satSize: cs.length?Math.round(cs[0].w):0,
-              links: document.querySelectorAll('#fab-rays line.fab-link').length,
-              ticker: (document.getElementById('ticker')||{}).textContent||'',
-              n90: (()=>{const b=document.getElementById('next90-btn'); if(b) b.click();
-                        const t=(document.getElementById('next90-list')||{}).textContent||'';
-                        if(b) b.click(); return t.replace(/\s+/g,' ').slice(0,150);})(),
-              topHint: (document.getElementById('tl-hint')||{}).textContent,
-              topRot: (window.__topRot||[]).slice(0,3),
-              flights: (()=>{
-                if(typeof showAirportSchedule!=='function') return 'функцията не е глобална!';
-                showAirportSchedule();
-                const txt=document.body.innerText||'';
-                const now=new Date(); const nowMin=now.getHours()*60+now.getMinutes();
-                // всички часове, показани в панела
-                const times=[...txt.matchAll(/(\d{2}):(\d{2})–(\d{2}):(\d{2})/g)]
-                  .map(m=>({from:+m[1]*60 + +m[2], to:+m[3]*60 + +m[4]}));
-                const past=times.filter(t=>t.to < nowMin-20).length;
-                return {redove:times.length, minali:past, chas:now.getHours()+':'+String(now.getMinutes()).padStart(2,'0')};
-              })(),
-              bakshishRows: (()=>{const b=document.getElementById('bakshish-btn');
-                        if(b) b.click();
-                        const it=document.querySelector('#bakshish-list .bp-item');
-                        const h=it?Math.round(it.getBoundingClientRect().height):0;
-                        const why=document.querySelectorAll('#bakshish-list .bp-why').length;
-                        if(b) b.click();
-                        return {height:h, whyLines:why};})(),
-              open: document.body.classList.contains('fab-open'),
-              rays: document.querySelectorAll('#fab-rays line').length,
-              hubCovered: (document.elementFromPoint(hubC.x,hubC.y)||{}).id,
-              sats, labelOverlaps: overlaps,
-              labels: labs.map(l=>l.t+(l.fits?'':' [ИЗЛИЗА ОТ ЕКРАНА]'))
+              found: boxes.map(x=>x.id), missing: ids.filter(i=>!boxes.find(x=>x.id===i)),
+              overlaps, offscreen, dark, sheet,
+              mapH: mp?Math.round(mp.getBoundingClientRect().height):0,
+              mapBottom: mp?Math.round(mp.getBoundingClientRect().bottom):0,
+              stackH: st?Math.round(st.getBoundingClientRect().height):0,
+              viewport: innerHeight,
+              fanGone: !document.querySelector('#fab-hub:not([style*="display: none"])')
             };
           });
-          console.log('BEFORE:', JSON.stringify(before,null,1));
-          console.log('AFTER OPEN:', JSON.stringify(after,null,1));
-          console.log('PAGEERRORS:', errs.slice(0,4).join(' | ') || 'none');
+          console.log('RESULT:', JSON.stringify(out,null,1));
+          console.log('TILEFAILS:', failed.length);
+          console.log('PAGEERRORS:', errs.slice(0,4).join(' | ')||'none');
           await b.close();
           JS
           node ft.mjs > fab-report.txt 2>&1 || true
           git config user.name ci; git config user.email ci@fish.taxi
-          git add fab-report.txt && git commit -m "fab test [skip ci]" || true
+          git add fab-report.txt && git commit -m "test [skip ci]" || true
           git push
