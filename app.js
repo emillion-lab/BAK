@@ -5388,19 +5388,13 @@ function toggleMapView(){
     }).catch(function(){});
   }
 
-  // Фаза на луната по алгоритъм на Conway — 0 новолуние … 4 пълнолуние
+  // Фаза на луната спрямо референтно новолуние (6 ян 2000, 18:14 UTC).
+  // Алгоритъмът на Conway грешеше с до 3 дни — тази сметка е точна до часове.
+  var MOON_REF = Date.UTC(2000, 0, 6, 18, 14);
+  var MOON_SYN = 29.530588853 * 86400000;      // синодичен месец
   function moonPhase(d){
-    d = d || new Date();
-    var y = d.getFullYear(), m = d.getMonth() + 1, day = d.getDate();
-    if(m < 3){ y--; m += 12; }
-    var k1 = Math.floor(365.25 * (y + 4712));
-    var k2 = Math.floor(30.6 * (m + 1));
-    var jd = k1 + k2 + day - 59.5;
-    if(jd > 2299160) jd += 2 - Math.floor(y/100) + Math.floor(Math.floor(y/100)/4);
-    var ip = (jd - 2451550.1) / 29.530588853;
-    ip = ip - Math.floor(ip);
-    if(ip < 0) ip += 1;
-    return ip;                       // 0 … 1
+    var x = (((d || new Date()).getTime() - MOON_REF) % MOON_SYN) / MOON_SYN;
+    return x < 0 ? x + 1 : x;                  // 0 новолуние … .5 пълнолуние … 1
   }
   function moonEmoji(p){
     if(p < .0625 || p >= .9375) return '🌑';
@@ -5503,17 +5497,20 @@ function toggleMapView(){
     var cx = W*.13, cy = H*.42, R = Math.min(9, H*.28);
     if(state.night){
       var ph = moonPhase();                      // 0 новолуние … .5 пълнолуние
-      ctx.fillStyle = 'rgba(226,232,240,.9)';
+      var waxing = ph < .5;                      // расте ли
+      var k = Math.cos(ph * 2 * Math.PI);         // 1 при новолуние, -1 при пълнолуние
+      // светлият диск
+      ctx.fillStyle = 'rgba(226,232,240,.92)';
       ctx.beginPath(); ctx.arc(cx, cy, R, 0, 6.28); ctx.fill();
-      // сянката се мести според фазата — вляво/вдясно, пълна при новолуние
-      if(ph < .48 || ph > .52){
-        var illum = Math.abs(.5 - ph) * 2;        // 0 пълнолуние … 1 новолуние
-        var shiftDir = ph < .5 ? -1 : 1;          // растяща вдясно, намаляваща вляво
-        ctx.fillStyle = 'rgba(10,20,38,.94)';
-        ctx.beginPath();
-        ctx.arc(cx + shiftDir * R * illum * 1.05, cy, R * (0.96 + illum*0.1), 0, 6.28);
-        ctx.fill();
-      }
+      // терминаторът: полукръг + елипса, чиято ширина следва фазата
+      ctx.fillStyle = 'rgba(10,20,38,.95)';
+      ctx.beginPath();
+      var s = waxing ? -1 : 1;                   // тъмната страна
+      ctx.ellipse(cx, cy, R, R, 0, s>0 ? -Math.PI/2 : Math.PI/2, s>0 ? Math.PI/2 : 3*Math.PI/2);
+      ctx.ellipse(cx, cy, Math.abs(k) * R, R, 0,
+                  (k*s > 0) ? Math.PI/2 : -Math.PI/2,
+                  (k*s > 0) ? 3*Math.PI/2 : Math.PI/2, true);
+      ctx.fill();
       // мек ореол
       ctx.strokeStyle = 'rgba(226,232,240,.18)'; ctx.lineWidth = 1;
       ctx.beginPath(); ctx.arc(cx, cy, R + 2.5, 0, 6.28); ctx.stroke();
