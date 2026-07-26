@@ -4628,8 +4628,8 @@ function toggleMapView(){
   // ВЪТРЕШЕН пръстен — местата, които раждат клиенти (най-близо до палеца)
   var DESTS = [
     { zone:'airport',   icon:'✈️', label:'Летище' },
-    { zone:'cab_north', icon:'🚌', label:'Централна автогара' },
-    { zone:'cas_intl',  icon:'🌍', label:'Международна автогара' },
+    { zone:'cab_north', icon:'🚌', label:'Централна' },
+    { zone:'cas_intl',  icon:'🌍', label:'Международна' },
     { zone:'cjp',       icon:'🚂', label:'ЖП гара' }
   ];
   // ВЪНШЕН пръстен — инструменти (без надписи, иконите са познати)

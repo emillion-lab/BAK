@@ -51,8 +51,13 @@ jobs:
             let minAdjacent = 9999, size = cs.length?Math.round(cs[0].w):0;
             for(let i=1;i<cs.length;i++)
               minAdjacent = Math.min(minAdjacent, Math.round(Math.hypot(cs[i].x-cs[i-1].x, cs[i].y-cs[i-1].y)));
+            // истинско застъпване: пресичане И по двете оси
+            const boxes=[...document.querySelectorAll('.fab-label')].map(e=>e.getBoundingClientRect());
             let overlaps=0;
-            for(let i=1;i<labs.length;i++) if(labs[i].y < labs[i-1].y+labs[i-1].h) overlaps++;
+            for(let i=0;i<boxes.length;i++) for(let j=i+1;j<boxes.length;j++){
+              const a=boxes[i], b=boxes[j];
+              if(a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom) overlaps++;
+            }
             // подравняване: центърът на всеки надпис спрямо центъра на неговия бутон
             const align = [...document.querySelectorAll('.fab-label')].map(l=>{
               const b = document.getElementById(l.getAttribute('data-for'));
