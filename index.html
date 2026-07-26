@@ -1022,6 +1022,50 @@ body.theme-day  .ticker-bar{ background:rgba(255,255,255,.72) !important; }
 body.theme-day  .tick-item{ color:#0f1b2d !important; }
 body.theme-night .ticker-bar{ background:rgba(6,16,28,.72) !important; }
 body.theme-night .tick-item{ color:#e8eef7 !important; }
+
+/* Бакшиш радарът е излишен — дублира долния списък */
+#bakshish-btn, #bakshish-panel{ display:none !important; }
+
+/* ═══ Списъкът плува над картата: 3 реда, отдолу пак карта ═══ */
+#stage{ min-height:100vh; }
+#map{ height:calc(82vh + var(--stack-h,200px)) !important; }
+#zone-sidebar, #karyk-sidebar{
+  position:absolute !important; left:8px; right:8px; bottom:112px; z-index:1150;
+  max-height:33vh !important; min-height:0 !important;
+  overflow-y:auto; overscroll-behavior:contain;
+  padding:0 0 6px !important;
+  background:var(--glass) !important;
+  border:1px solid var(--glass-edge) !important;
+  border-radius:18px;
+  backdrop-filter:saturate(180%) blur(18px);
+  -webkit-backdrop-filter:saturate(180%) blur(18px);
+  box-shadow:var(--modal-shadow);
+}
+#zone-sidebar .sidebar-title, #karyk-sidebar .sidebar-title{
+  position:sticky; top:0; z-index:3;
+  background:var(--glass); backdrop-filter:saturate(180%) blur(18px);
+  border-bottom:1px solid var(--glass-edge);
+  border-radius:18px 18px 0 0;
+}
+/* в режим „списък" заема целия екран както преди */
+body.list-view #zone-sidebar, body.list-view #karyk-sidebar{
+  position:static !important; max-height:none !important; border-radius:0; bottom:auto;
+}
+
+/* нощна карта: обръщаме САМО плочките, маркерите остават верни */
+body.tiles-dark .leaflet-tile-pane{
+  filter:invert(1) hue-rotate(180deg) brightness(.94) contrast(.90) saturate(.78);
+}
+body.karyk-active .leaflet-tile-pane{ filter:none; }
+body.karyk-active.tiles-dark .leaflet-tile-pane{
+  filter:invert(1) hue-rotate(180deg) brightness(.94) contrast(.90) saturate(.78);
+}
+
+/* ═══ ветрилото с 6 бутона: по-едри надписи ═══ */
+.fab-label{ font:800 14.5px -apple-system,system-ui,sans-serif !important; padding:8px 12px !important; }
+#fab-wrap .fab-sat{ width:56px !important; height:56px !important;
+  margin-left:-28px !important; margin-top:-28px !important;
+  max-width:56px !important; font-size:25px !important; }
 </style>
 <style>
 
@@ -1715,7 +1759,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260726v82"></script>
+<script src="app.js?v=20260726v83"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">

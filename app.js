@@ -817,11 +817,13 @@ function buildNext90(){
 
 // ═══════════════════════════════════════════════
 const map = L.map('map', {center:[42.698,23.322], zoom:13, zoomControl:true, attributionControl:false});
-window.__TILE_DAY   = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
-window.__TILE_NIGHT = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
-window.__tileLayer = L.tileLayer(
-  (document.body.classList.contains('theme-night') ? window.__TILE_NIGHT : window.__TILE_DAY), {
-  maxZoom:19, subdomains:['a','b','c','d']
+// OSM стандарт: най-подробният свободен слой — еднопосочни стрелки,
+// пешеходни зони, всички обекти. Нощем се обръща с филтър САМО върху
+// плочките, за да останат маркерите и кръговете с истинските си цветове.
+window.__TILE_DAY   = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+window.__TILE_NIGHT = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+window.__tileLayer = L.tileLayer(window.__TILE_DAY, {
+  maxZoom:19, crossOrigin:true
 }).addTo(map);
 document.getElementById('map').style.filter='brightness(0.85) saturate(0.6)';
 setTimeout(()=>map.invalidateSize(), 300);
@@ -4625,7 +4627,6 @@ function toggleMapView(){
   var ITEMS = [
     { id:'karyk-btn',      label:'Карък Mode' },
     { id:'karyk-list-btn', label:'Карък списък' },
-    { id:'bakshish-btn',   label:'Бакшиш радар' },
     { id:'next90-btn',     label:'Събития 24ч' },
     { id:'clean-btn',      label:'Чиста карта' },
     { id:'gps-btn',        label:'Локация' },
@@ -4798,6 +4799,7 @@ function toggleMapView(){
       b.textContent = t === 'night' ? '☀️' : '🌙';
       b.title = t === 'night' ? 'Дневна тема' : 'Нощна тема';
     }
+    document.body.classList.toggle('tiles-dark', t === 'night');
     // лентата: задаваме я директно, за да не зависи от реда на CSS правилата
     var tb = document.querySelector('.ticker-bar');
     if(tb){
@@ -4807,16 +4809,8 @@ function toggleMapView(){
     document.querySelectorAll('.tick-item').forEach(function(x){
       x.style.color = (t === 'night') ? '#e8eef7' : '#0f1b2d';
     });
-    // истинска нощна карта — сменяме слоя, не филтрираме
-    try{
-      if(window.__tileLayer && window.__TILE_NIGHT){
-        window.__tileLayer.setUrl(t === 'night' ? window.__TILE_NIGHT : window.__TILE_DAY);
-      }
-    }catch(e){}
     var m = document.getElementById('map');
-    if(m && !document.body.classList.contains('karyk-active')){
-      m.style.filter = t === 'night' ? 'none' : 'brightness(.97) saturate(.88)';
-    }
+    if(m) m.style.filter = 'none';           // филтърът вече е само върху плочките
     try{ if(typeof drawSparkline === 'function') drawSparkline(currentHour); }catch(e){}
   }
 
