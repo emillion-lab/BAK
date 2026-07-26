@@ -5352,7 +5352,23 @@ function toggleMapView(){
       state.wind  = Math.min(1, (c.wind_speed_10m || 0) / 40);
       state.rain  = (c.precipitation || 0) > 0 ? Math.min(1, c.precipitation / 3) : 0;
       var code = c.weather_code || 0;
-      state.snow  = (code >= 71 && code <= 77) || (code >= 85 && code <= 86) ? 0.7 : 0;
+      state.code  = code;
+      // WMO кодове → какво реално рисуваме
+      state.fog   = (code === 45 || code === 48) ? 1 : 0;
+      state.snow  = ((code >= 71 && code <= 77) || (code >= 85 && code <= 86)) ? 0.8 : 0;
+      state.storm = (code >= 95) ? 1 : 0;
+      var drizzle = (code >= 51 && code <= 57);
+      var rainy   = (code >= 61 && code <= 67) || (code >= 80 && code <= 82);
+      if(state.snow > 0) state.rain = 0;
+      else if(state.storm) state.rain = 1;
+      else if(rainy)   state.rain = Math.max(state.rain, code >= 65 ? 1 : 0.6);
+      else if(drizzle) state.rain = Math.max(state.rain, 0.3);
+      // облачността от кода надделява, ако сензорът мълчи
+      if(code === 0) state.cloud = Math.min(state.cloud, 0.05);
+      else if(code === 1) state.cloud = Math.max(state.cloud, 0.25);
+      else if(code === 2) state.cloud = Math.max(state.cloud, 0.55);
+      else if(code === 3) state.cloud = Math.max(state.cloud, 0.9);
+      state.desc = (c.weather_code !== undefined) ? wmoText(code) : '';
 
       // кога се очаква дъжд
       state.rainAt = null;
@@ -5370,6 +5386,22 @@ function toggleMapView(){
       }catch(e){}
       updateLabel();
     }).catch(function(){});
+  }
+
+  function wmoText(c){
+    if(c === 0) return 'ясно небе';
+    if(c === 1) return 'предимно ясно';
+    if(c === 2) return 'разкъсана облачност';
+    if(c === 3) return 'облачно';
+    if(c === 45 || c === 48) return 'мъгла';
+    if(c >= 51 && c <= 57) return 'ръмеж';
+    if(c >= 61 && c <= 65) return 'дъжд';
+    if(c === 66 || c === 67) return 'леден дъжд';
+    if(c >= 71 && c <= 77) return 'сняг';
+    if(c >= 80 && c <= 82) return 'превалявания';
+    if(c === 85 || c === 86) return 'снеговалеж';
+    if(c >= 95) return 'гръмотевична буря';
+    return '';
   }
 
   function updateLabel(){
@@ -5416,7 +5448,7 @@ function toggleMapView(){
     for(var m=0;m<5;m++) clouds.push({x:Math.random()*W, y:3+Math.random()*(H*.4), s:.5+Math.random()*.8, v:.08+Math.random()*.12});
   }
 
-  var taxi = { x: -80, active:false, next: 260 };
+  var taxi = { x: -80, active:false, next: 120 };   // първото минаване скоро
 
   function loop(){
     if(!ctx){ return; }
@@ -5520,18 +5552,58 @@ function toggleMapView(){
       });
     }
 
+    // мъгла
+    if(state.fog > 0){
+      for(var fg=0; fg<3; fg++){
+        var fy = H*0.45 + fg*7;
+        var fo = (t*0.25 + fg*90) % (W+160) - 80;
+        var fgrad = ctx.createLinearGradient(fo, 0, fo+160, 0);
+        fgrad.addColorStop(0,'rgba(226,232,240,0)');
+        fgrad.addColorStop(.5,'rgba(226,232,240,' + (state.night?.22:.42) + ')');
+        fgrad.addColorStop(1,'rgba(226,232,240,0)');
+        ctx.fillStyle = fgrad;
+        ctx.fillRect(fo, fy, 160, 5);
+      }
+    }
+
+    // светкавица при буря
+    if(state.storm && Math.random() < 0.012){
+      ctx.fillStyle = 'rgba(255,255,255,.55)';
+      ctx.fillRect(0,0,W,H);
+      var lx = W*0.35 + Math.random()*W*0.3;
+      ctx.strokeStyle = 'rgba(255,255,210,.95)'; ctx.lineWidth = 1.6;
+      ctx.beginPath(); ctx.moveTo(lx, 2);
+      ctx.lineTo(lx-4, H*.45); ctx.lineTo(lx+3, H*.5); ctx.lineTo(lx-2, H-8);
+      ctx.stroke();
+    }
+
     // 🚕 от време на време минава такси
     if(!taxi.active && t > taxi.next){ taxi.active = true; taxi.x = -30; }
     if(taxi.active){
-      taxi.x += 1.6;
-      var ty = H - 7;
+      taxi.x += 0.75;                       // бавно, за да се чете надписът
+      var ty = H - 6;
       ctx.save();
-      ctx.globalAlpha = .95;
-      ctx.font = Math.round(Math.min(15, H*.5)) + 'px system-ui';
+      ctx.globalAlpha = .96;
+      var fs = Math.round(Math.min(15, H*.46));
+      ctx.font = fs + 'px system-ui';
       ctx.textBaseline = 'alphabetic';
       ctx.fillText('🚕', taxi.x, ty);
+      // описанието на времето пътува зад колата
+      var label = state.desc || '';
+      if(label){
+        ctx.font = '600 ' + Math.round(fs*0.72) + 'px system-ui,-apple-system,sans-serif';
+        var tw = ctx.measureText(label).width;
+        var bx = taxi.x - tw - 12, by = ty - fs*0.62;
+        ctx.fillStyle = state.night ? 'rgba(8,16,32,.55)' : 'rgba(255,255,255,.55)';
+        ctx.beginPath();
+        if(ctx.roundRect) ctx.roundRect(bx-6, by-9, tw+12, fs*0.92, 6);
+        else ctx.rect(bx-6, by-9, tw+12, fs*0.92);
+        ctx.fill();
+        ctx.fillStyle = state.night ? 'rgba(233,239,248,.95)' : 'rgba(15,27,45,.92)';
+        ctx.fillText(label, bx, by);
+      }
       ctx.restore();
-      if(taxi.x > W + 24){ taxi.active = false; taxi.next = t + 900 + Math.random()*900; }
+      if(taxi.x > W + 200){ taxi.active = false; taxi.next = t + 600; }   // ~10 сек пауза
     }
 
     raf = requestAnimationFrame(loop);
