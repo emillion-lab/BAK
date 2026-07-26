@@ -746,8 +746,8 @@ body.fab-open #fab-backdrop{ opacity:1; pointer-events:auto; }
 #fab-wrap .fab-sat{
   position:absolute !important;
   right:auto !important; bottom:auto !important;
-  width:52px !important; height:52px !important;
-  margin-left:-26px !important; margin-top:-26px !important;
+  width:60px !important; height:60px !important;
+  margin-left:-30px !important; margin-top:-30px !important;
   border-radius:50% !important;
   display:flex !important; align-items:center; justify-content:center;
   font-size:15px !important; line-height:1 !important;
@@ -762,8 +762,8 @@ body.fab-open #fab-wrap .fab-sat{ opacity:1; pointer-events:auto; }
 #fab-wrap #karyk-btn, #fab-wrap #karyk-list-btn, #fab-wrap #clean-btn{
   transform:none !important; transform-origin:center center !important;
   text-orientation:mixed !important; writing-mode:horizontal-tb !important;
-  font-size:15px !important; width:52px !important; height:52px !important;
-  min-width:0 !important; max-width:52px !important;
+  font-size:26px !important; width:60px !important; height:60px !important;
+  min-width:0 !important; max-width:60px !important;
   padding:0 !important; box-sizing:border-box !important;
 }
 .fab-label{
@@ -920,7 +920,7 @@ body.theme-night .header::after, body.theme-night #weather-bar::after{
 }
 #topstack > *{ pointer-events:auto; }
 #map{
-  height:calc(46vh + var(--stack-h, 200px)) !important;
+  height:calc(84vh + var(--stack-h, 200px)) !important;
   min-height:340px;
 }
 /* лентите вече плуват — по-меки ръбове, без плътни линии */
@@ -1030,7 +1030,7 @@ body.theme-night .tick-item{ color:#e8eef7 !important; }
 #stage{ min-height:100vh; }
 #map{ height:calc(82vh + var(--stack-h,200px)) !important; }
 #zone-sidebar, #karyk-sidebar{
-  position:absolute !important; left:8px; right:8px; bottom:112px; z-index:1150;
+  position:absolute !important; left:8px; right:8px; bottom:132px; z-index:1150;
   max-height:33vh !important; min-height:0 !important;
   overflow-y:auto; overscroll-behavior:contain;
   padding:0 0 6px !important;
@@ -1063,9 +1063,7 @@ body.karyk-active.tiles-dark .leaflet-tile-pane{
 
 /* ═══ ветрилото с 6 бутона: по-едри надписи ═══ */
 .fab-label{ font:800 14.5px -apple-system,system-ui,sans-serif !important; padding:8px 12px !important; }
-#fab-wrap .fab-sat{ width:56px !important; height:56px !important;
-  margin-left:-28px !important; margin-top:-28px !important;
-  max-width:56px !important; font-size:25px !important; }
+
 </style>
 <style>
 
@@ -1759,7 +1757,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260726v83"></script>
+<script src="app.js?v=20260726v84"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">
