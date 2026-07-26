@@ -1107,6 +1107,13 @@ body.list-view #zone-sidebar, body.list-view #karyk-sidebar{
   transform:none !important; opacity:1 !important; pointer-events:auto !important;
 }
 body.list-view .sheet-btn{ display:none !important; }
+
+/* ═══ КАРЪК РЕЖИМЪТ Е ПРЕМАХНАТ ═══
+   Претоварваше картата и подвеждаше. Кодът остава, но нищо не се показва. */
+#karyk-btn, #karyk-list-btn, #karyk-sidebar, #karyk-banner, #karyk-badge,
+#karyk-corner-tr, #karyk-corner-bl, #btn-karyk{ display:none !important; }
+body.karyk-active::after{ display:none !important; content:none !important; }
+body.karyk-active #map{ filter:none !important; }
 </style>
 <style>
 

@@ -1486,7 +1486,8 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&isFullscreen)docume
 const karykBtn=document.getElementById('karyk-btn');
 karykBtn.addEventListener('click',()=>{
   karykMode=!karykMode;
-  karykBtn.classList.toggle('active',karykMode);
+  karykMode = false;                       // Карък режимът е премахнат
+  karykBtn.classList.toggle('active',false);
   document.body.classList.toggle('karyk-active',karykMode);
   document.getElementById('karyk-banner').style.display=karykMode?'block':'none';
   (function(){
@@ -4625,8 +4626,6 @@ function toggleMapView(){
   var R = 155, A0 = 90, A1 = 195;   // радиус и дъга (градуси)
   var LBL_X = -178, LBL_GAP = 30;   // колона с етикети
   var ITEMS = [
-    { id:'karyk-btn',      label:'Карък Mode' },
-    { id:'karyk-list-btn', label:'Карък списък' },
     { id:'next90-btn',     label:'Събития 24ч' },
     { id:'clean-btn',      label:'Чиста карта' },
     { id:'gps-btn',        label:'Локация' },
