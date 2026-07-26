@@ -94,12 +94,20 @@ jobs:
               if(a.left<b.right && b.left<a.right && a.top<b.bottom && b.top<a.bottom)
                 btnOverlaps.push(bb[i].id+'×'+bb[j].id);
             }
+            // НОВО: надпис срещу бутон — това ни убягваше
+            const lb=[...document.querySelectorAll('.fab-label')].map(e=>({id:e.getAttribute('data-for'), r:e.getBoundingClientRect()}));
+            let labelVsBtn=[];
+            lb.forEach(L=>bb.forEach(B=>{
+              const a=L.r, b=B.r;
+              if(a.left<b.right && b.left<a.right && a.top<b.bottom && b.top<a.bottom)
+                labelVsBtn.push(L.id+'→'+B.id);
+            }));
             const zonesBtn = !!document.getElementById('btn-zones');
             let sheetWorks = false;
             const zb = document.getElementById('btn-zones');
             if(zb){ zb.click(); sheetWorks = document.body.classList.contains('sheet-zones'); zb.click(); }
             return {
-              btnOverlaps, zonesBtn, sheetWorks,
+              btnOverlaps, labelVsBtn, zonesBtn, sheetWorks,
               karyk,
               layout: (()=>{
                 const st=document.getElementById('topstack'), mp=document.getElementById('map');

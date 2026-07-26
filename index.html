@@ -1111,21 +1111,33 @@ body.karyk-active #map{ filter:none !important; }
 
 /* ═══ Вътрешен пръстен: дестинациите — по-едри и по-близо до палеца ═══ */
 #fab-wrap .fab-dest{
-  width:64px !important; height:64px !important;
-  margin-left:-32px !important; margin-top:-32px !important;
-  max-width:64px !important; font-size:29px !important;
-  border:2px solid var(--cyan) !important;
-  box-shadow:var(--card), 0 0 18px var(--ring) !important;
+  width:58px !important; height:58px !important;
+  margin-left:-29px !important; margin-top:-29px !important;
+  max-width:58px !important; font-size:26px !important;
+  border:0 !important;
+  background:var(--dest-bg) !important;
+  box-shadow:
+    0 6px 16px rgba(15,27,45,.22),
+    0 1px 0 rgba(255,255,255,.85) inset,
+    0 0 0 2px var(--dest-ring) !important;
 }
+#fab-wrap .fab-dest:active{ transform:scale(.92) !important; }
 body.theme-night #fab-wrap .fab-dest{
-  background:#12233d !important;
-  box-shadow:0 2px 10px rgba(0,0,0,.6), 0 0 22px var(--ring) !important;
+  box-shadow:
+    0 6px 18px rgba(0,0,0,.6),
+    0 1px 0 rgba(255,255,255,.10) inset,
+    0 0 0 2px var(--dest-ring),
+    0 0 22px var(--ring) !important;
 }
 .fab-dest-label{
-  font:900 15px -apple-system,system-ui,sans-serif !important;
-  padding:9px 13px !important;
-  border-color:var(--cyan) !important;
+  font:800 14px -apple-system,system-ui,sans-serif !important;
+  padding:8px 13px !important;
+  border:0 !important;
+  border-radius:12px !important;
+  box-shadow:0 4px 14px rgba(15,27,45,.18), 0 0 0 1px var(--glass-edge) !important;
 }
+body.theme-night .fab-dest-label{ box-shadow:0 4px 16px rgba(0,0,0,.55), 0 0 0 1px var(--dest-ring) !important; }
+#fab-rays line.fab-link{ stroke:var(--cyan) !important; stroke-width:1.4; opacity:.45; stroke-dasharray:3 4; }
 /* инструментите отвън — по-дискретни */
 #fab-wrap .fab-sat:not(.fab-dest){
   width:48px !important; height:48px !important;
@@ -1175,6 +1187,10 @@ body.tiles-dark .leaflet-tile-pane{
 #gps-btn   { top:calc(var(--stack-h,238px) + 116px) !important; bottom:auto !important; }
 #fs-btn    { top:calc(var(--stack-h,238px) + 168px) !important; bottom:auto !important; }
 body.map-fullscreen #next90-btn{ display:none !important; }
+
+#exit-now-panel{ color:var(--text) !important; }
+#exit-now-panel > div:first-child{ color:var(--cyan) !important; }
+#exit-now-panel b{ color:var(--text) !important; }
 </style>
 <style>
 
@@ -1208,6 +1224,8 @@ body.map-fullscreen #next90-btn{ display:none !important; }
   --scrim:rgba(240,245,252,.55);
   --bronze:#b06a1f; --bronze-soft:rgba(176,106,31,.28); --bronze-hot:rgba(217,140,60,.55);
   --gold:#8a6d12; --gold-edge:rgba(138,109,18,.28);
+  --dest-bg:linear-gradient(160deg,#ffffff,#eaf2fb 70%,#dceaf8);
+  --dest-ring:rgba(3,105,161,.55);
 }
 body.theme-night {
   --bg:#060b14; --surface:#0e1726; --border:#22334c;
@@ -1232,6 +1250,8 @@ body.theme-night {
   --scrim:rgba(3,7,18,.55);
   --bronze:#e8a050; --bronze-soft:rgba(205,127,50,.35); --bronze-hot:rgba(255,175,90,.75);
   --gold:#d4af37; --gold-edge:rgba(212,175,55,.35);
+  --dest-bg:linear-gradient(160deg,#1b3050,#132540 70%,#0e1b30);
+  --dest-ring:rgba(34,211,238,.60);
 }
 
 /* плавна смяна на темата */
@@ -1868,7 +1888,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260726v93"></script>
+<script src="app.js?v=20260726v94"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">

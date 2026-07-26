@@ -4628,7 +4628,8 @@ function toggleMapView(){
     { zone:'airport',   icon:'✈️', label:'Летище' },
     { zone:'cab_north', icon:'🚌', label:'Централна' },
     { zone:'cas_intl',  icon:'🌍', label:'Международна' },
-    { zone:'cjp',       icon:'🚂', label:'ЖП гара' }
+    { zone:'cjp',       icon:'🚂', label:'ЖП гара' },
+    { zone:'__zones',   icon:'📋', label:'Зони по приоритет' }
   ];
   // ВЪНШЕН пръстен — инструменти (без надписи, иконите са познати)
   var ITEMS = [];   // инструментите вече не са в ветрилото — стоят като чипове
@@ -4677,6 +4678,12 @@ function toggleMapView(){
       b.addEventListener('click', function(e){
         e.stopPropagation();
         setOpen(false);
+        if(d.zone === '__zones'){
+          document.body.classList.add('sheet-zones');
+          var s = document.getElementById('zone-sidebar');
+          if(s) s.scrollTop = 0;
+          return;
+        }
         goToZone(d.zone);
       });
       wrap.appendChild(b);
@@ -4754,7 +4761,7 @@ function toggleMapView(){
       pos.push({ x: Math.round(Math.cos(a) * R), y: Math.round(-Math.sin(a) * R) });
     });
     // ВЪТРЕШЕН пръстен: по-малък радиус, изместен на половин стъпка
-    var Ri = Math.round(R * 0.68);
+    var Ri = Math.round(R * 0.78);
     var stepI = dests.length > 1 ? (A1 - A0) / (dests.length - 1) : 0;
     var posI = dests.map(function(it, i){
       var a = (A0 + 7 + stepI * i) * Math.PI / 180;
@@ -4782,10 +4789,12 @@ function toggleMapView(){
           lines += '<line class="fab-link" x1="' + (lx + 4) + '" y1="' + ly + '" x2="' + (dx - 27) + '" y2="' + dy + '"/>';
       }
     });
-    // надписите на вътрешния пръстен — разместване при сблъсък
+    // Надписите застават в изправена колона ВЛЯВО ОТ ЦЯЛАТА дъга,
+    // иначе се покриват с бутоните под тях. Свързваме ги с тънка линия.
+    var LX = -(Ri + 46);
     var labI = posI.map(function(p){ return p.y; });
     for(var q = labI.length - 2; q >= 0; q--){
-      if(labI[q + 1] - labI[q] < 38) labI[q] = labI[q + 1] - 38;
+      if(labI[q + 1] - labI[q] < 34) labI[q] = labI[q + 1] - 34;
     }
     // вътрешният пръстен
     dests.forEach(function(it, i){
@@ -4793,11 +4802,12 @@ function toggleMapView(){
       var dx = open ? posI[i].x : 0, dy = open ? posI[i].y : 0;
       rec.el.style.left = dx + 'px';
       rec.el.style.top  = dy + 'px';
-      rec.label.style.left = (open ? dx - 40 : 0) + 'px';
+      rec.label.style.left = (open ? LX : 0) + 'px';
       rec.label.style.top  = (open ? labI[i] : 0) + 'px';
       if(open){
         var d2 = Math.sqrt(dx*dx + dy*dy), k2 = d2 ? (1 - 30/d2) : 0;
         lines += '<line class="fab-inner" x1="0" y1="0" x2="' + Math.round(dx*k2) + '" y2="' + Math.round(dy*k2) + '"/>';
+        lines += '<line class="fab-link" x1="' + (LX + 6) + '" y1="' + labI[i] + '" x2="' + (dx - 30) + '" y2="' + dy + '"/>';
       }
     });
     rays.innerHTML = lines;
