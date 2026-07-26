@@ -1121,10 +1121,6 @@ body.tiles-dark .leaflet-tile-pane{
 }
 #next90-btn:active, #clean-btn:active, #gps-btn:active, #fs-btn:active{ transform:scale(.9); }
 /* горе вдясно, под лентите — извън обсега на палеца и на ветрилото */
-#next90-btn{ top:calc(var(--stack-h,238px) + 12px) !important; bottom:auto !important; }
-#clean-btn { top:calc(var(--stack-h,238px) + 64px) !important; bottom:auto !important; }
-#gps-btn   { top:calc(var(--stack-h,238px) + 116px) !important; bottom:auto !important; }
-#fs-btn    { top:calc(var(--stack-h,238px) + 168px) !important; bottom:auto !important; }
 body.map-fullscreen #next90-btn{ display:none !important; }
 
 #exit-now-panel{ color:var(--text) !important; }
@@ -1170,15 +1166,6 @@ body.theme-night #gps-btn, body.theme-night #fs-btn, body.theme-night .tool-btn{
     0 0 0 2px var(--dest-ring) !important; }
 
 /* подредба: инструменти, после дестинации, накрая списък */
-#next90-btn          { top:calc(var(--stack-h,238px) + 10px) !important; }
-#clean-btn           { top:calc(var(--stack-h,238px) + 66px) !important; }
-#gps-btn             { top:calc(var(--stack-h,238px) + 122px) !important; }
-#fs-btn              { top:calc(var(--stack-h,238px) + 178px) !important; }
-#dest-airport        { top:calc(var(--stack-h,238px) + 242px) !important; }
-#dest-cjp            { top:calc(var(--stack-h,238px) + 298px) !important; }
-#dest-cab_north      { top:calc(var(--stack-h,238px) + 354px) !important; }
-#dest-cas_intl       { top:calc(var(--stack-h,238px) + 410px) !important; }
-#dest-__zones        { top:calc(var(--stack-h,238px) + 474px) !important; }
 
 /* ═══ картата стига до долу ═══ */
 #map{ height:100dvh !important; min-height:420px !important; }
@@ -2023,7 +2010,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260726v104"></script>
+<script src="app.js?v=20260726v105"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">
