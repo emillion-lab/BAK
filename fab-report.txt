@@ -1,8 +1,6 @@
 BEFORE: {
  "hub": true,
  "sats": [
-  "karyk-btn",
-  "karyk-list-btn",
   "next90-btn",
   "clean-btn",
   "gps-btn",
@@ -10,17 +8,18 @@ BEFORE: {
  ],
  "karakListBtn": true,
  "strayFixed": [
-  "bakshish-btn"
+  "bakshish-btn",
+  "karyk-btn"
  ]
 }
 AFTER OPEN: {
  "karyk": {
-  "active": true,
-  "badge": "block",
+  "active": false,
+  "badge": "none",
   "mapFilter": "none",
-  "frame": "7px/7px/7px/7px anim=karyk-neon inset=0px",
-  "corners": 4,
-  "pulse": "karyk-neon"
+  "frame": "0px/0px/0px/0px anim=none inset=auto",
+  "corners": 2,
+  "pulse": "none"
  },
  "layout": {
   "stackH": 238,
@@ -32,19 +31,9 @@ AFTER OPEN: {
   "bad": [],
   "bodyClass": "theme-day fab-open"
  },
- "minAdjacent": 76,
+ "minAdjacent": 126,
  "size": 60,
  "align": [
-  {
-   "id": "karyk-btn",
-   "dy": -19,
-   "gap": 2
-  },
-  {
-   "id": "karyk-list-btn",
-   "dy": 0,
-   "gap": 2
-  },
   {
    "id": "next90-btn",
    "dy": 0,
@@ -66,10 +55,10 @@ AFTER OPEN: {
    "gap": 2
   }
  ],
- "neighbours": 76,
+ "neighbours": 126,
  "satSize": 60,
- "links": 1,
- "ticker": "✈️ 06:50 FR5036 от Catania — ИЗЛИЗАТ · ✈️ 06:50 U24911 от Paris — ИЗЛИЗАТ · ✈️ 07:30 FR956 от Palma De Mallorc · ✈️ 07:35 FR5473 от Nápoli · ✈️ 07:50 FR6428 от Treviso · ✈️ 07:55 W64340 от Memmingen · ✈️ 08:15 W64352 от Bergamo · ✈️ 08:45 OS771 от Vienna · ✈️ 08:45 FR5160 от Edinburgh · ✈️ 09:05 W64428 от Tel Aviv Yafo · ✈️ 09:05 W64452 от Alghero · ✈️ 09:15 LH1702 от Munich · ✈️ 06:50 FR5036 от Catania — ИЗЛИЗАТ · ✈️ 06:50 U24911 от Paris — ИЗЛИЗАТ · ✈️ 07:30 FR956 от Palma De Mallorc · ✈️ 07:35 FR5473 от Nápoli · ✈️ 07:50 FR6428 от Treviso · ✈️ 07:55 W64340 от Memmingen · ✈️ 08:15 W64352 от Bergamo · ✈️ 08:45 OS771 от Vienna · ✈️ 08:45 FR5160 от Edinburgh · ✈️ 09:05 W64428 от Tel Aviv Yafo · ✈️ 09:05 W64452 от Alghero · ✈️ 09:15 LH1702 от Munich · ",
+ "links": 0,
+ "ticker": "✈️ 07:30 FR956 от Palma De Mallorc · ✈️ 07:35 FR5473 от Nápoli · ✈️ 07:50 FR6428 от Treviso · ✈️ 07:55 W64340 от Memmingen · ✈️ 08:15 W64352 от Bergamo · ✈️ 08:45 OS771 от Vienna · ✈️ 08:45 FR5160 от Edinburgh · ✈️ 09:05 W64428 от Tel Aviv Yafo · ✈️ 09:05 W64452 от Alghero · ✈️ 09:15 LH1702 от Munich · ✈️ 09:20 W64332 от Dortmund · ✈️ 09:25 TK1127 от Istanbul · ✈️ 07:30 FR956 от Palma De Mallorc · ✈️ 07:35 FR5473 от Nápoli · ✈️ 07:50 FR6428 от Treviso · ✈️ 07:55 W64340 от Memmingen · ✈️ 08:15 W64352 от Bergamo · ✈️ 08:45 OS771 от Vienna · ✈️ 08:45 FR5160 от Edinburgh · ✈️ 09:05 W64428 от Tel Aviv Yafo · ✈️ 09:05 W64452 от Alghero · ✈️ 09:15 LH1702 от Munich · ✈️ 09:20 W64332 от Dortmund · ✈️ 09:25 TK1127 от Istanbul · ",
  "n90": "Няма театри, кина или концерти в следващите 24 часа.Източник: SEV (theatre.art.bg и др.)",
  "topHint": "Топ: 🎓 Студентски град (1.5)",
  "topRot": [
@@ -80,32 +69,16 @@ AFTER OPEN: {
  "flights": {
   "redove": 87,
   "minali": 13,
-  "chas": "7:06"
+  "chas": "7:11"
  },
  "bakshishRows": {
   "height": 0,
   "whyLines": 0
  },
  "open": true,
- "rays": 7,
+ "rays": 4,
  "hubCovered": "",
  "sats": [
-  {
-   "id": "karyk-btn",
-   "w": 60,
-   "h": 60,
-   "dist": 192,
-   "onScreen": true,
-   "hit": "karyk-btn"
-  },
-  {
-   "id": "karyk-list-btn",
-   "w": 60,
-   "h": 60,
-   "dist": 192,
-   "onScreen": true,
-   "hit": "karyk-list-btn"
-  },
   {
    "id": "next90-btn",
    "w": 60,
@@ -141,8 +114,6 @@ AFTER OPEN: {
  ],
  "labelOverlaps": 0,
  "labels": [
-  "Карък Mode",
-  "Карък списък",
   "Събития 24ч",
   "Чиста карта",
   "Локация",
