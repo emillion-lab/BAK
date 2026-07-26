@@ -15,11 +15,11 @@ RESULT: {
  "offscreen": [],
  "dark": [],
  "sheet": true,
- "mapH": 726,
- "mapBottom": 726,
+ "mapH": 844,
+ "mapBottom": 844,
  "stackH": 238,
  "viewport": 844,
  "fanGone": true
 }
-TILEFAILS: 0
+TILEFAILS: 2
 PAGEERRORS: none
