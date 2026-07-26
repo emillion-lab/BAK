@@ -4661,13 +4661,7 @@ function toggleMapView(){
       b.title = d.label;
       b.addEventListener('click', function(e){
         e.stopPropagation();
-        if(d.zone === '__zones'){
-          document.body.classList.toggle('sheet-zones');
-          var s = document.getElementById('zone-sidebar');
-          if(s) s.scrollTop = 0;
-          return;
-        }
-        goToZone(d.zone);
+        openFull(d.zone, b);
       });
       document.body.appendChild(b);
     });
@@ -4734,6 +4728,34 @@ function toggleMapView(){
     });
   }
 
+  // Всеки избор заема екрана; втори клик по същия бутон го скрива.
+  function openFull(zone, btn){
+    var cur = document.body.getAttribute('data-full') || '';
+    if(cur === zone){ closeFull(); return; }
+    closeFull(true);
+    document.body.setAttribute('data-full', zone);
+    document.querySelectorAll('.dest-btn').forEach(function(x){ x.classList.remove('on'); });
+    if(btn) btn.classList.add('on');
+
+    if(zone === '__zones'){
+      document.body.classList.add('full-list');
+      var s = document.getElementById('zone-sidebar');
+      if(s) s.scrollTop = 0;
+      return;
+    }
+    if(zone === 'airport'){ goToZone('airport'); return; }
+    goToZone(zone);
+  }
+
+  function closeFull(silent){
+    document.body.removeAttribute('data-full');
+    document.body.classList.remove('full-list');
+    document.querySelectorAll('.dest-btn').forEach(function(x){ x.classList.remove('on'); });
+    try{ if(typeof closeAirportModal === 'function') closeAirportModal(); }catch(e){}
+    try{ if(window.map) map.closePopup(); }catch(e){}
+  }
+  window.closeFull = closeFull;
+
   function goToZone(id){
     try{
       var z = ZONES.find(function(x){ return x.id === id; });
@@ -4743,7 +4765,8 @@ function toggleMapView(){
         map.invalidateSize();
         map.setView([z.lat, z.lng], id === 'airport' ? 14 : 15);
         if(id === 'airport') showAirportSchedule();
-        else showZonePopup(id);
+        else if(typeof showZonePopup === 'function') showZonePopup(id);
+        else if(typeof showTransitPopup === 'function') showTransitPopup(id);
       }, 180);
     }catch(e){}
   }
