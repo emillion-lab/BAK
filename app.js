@@ -1572,6 +1572,8 @@ function buildTicker(){
   const half  = Math.max(400, el.scrollWidth / 2);
   el.style.animation = 'none'; el.offsetHeight;
   el.style.animation = `ticker ${Math.round(half / SPEED)}s linear infinite`;
+  var night = document.body.classList.contains('theme-night');
+  el.querySelectorAll('.tick-item').forEach(function(x){ x.style.color = night ? '#e8eef7' : '#0f1b2d'; });
 }
 
 // ═══════════════════════════════════════════════
@@ -4796,6 +4798,15 @@ function toggleMapView(){
       b.textContent = t === 'night' ? '☀️' : '🌙';
       b.title = t === 'night' ? 'Дневна тема' : 'Нощна тема';
     }
+    // лентата: задаваме я директно, за да не зависи от реда на CSS правилата
+    var tb = document.querySelector('.ticker-bar');
+    if(tb){
+      tb.style.background = (t === 'night') ? 'rgba(6,16,28,.72)' : 'rgba(255,255,255,.72)';
+      tb.style.color      = (t === 'night') ? '#e8eef7' : '#0f1b2d';
+    }
+    document.querySelectorAll('.tick-item').forEach(function(x){
+      x.style.color = (t === 'night') ? '#e8eef7' : '#0f1b2d';
+    });
     // истинска нощна карта — сменяме слоя, не филтрираме
     try{
       if(window.__tileLayer && window.__TILE_NIGHT){
