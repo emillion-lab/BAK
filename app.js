@@ -1697,7 +1697,16 @@ function processFlights(data){
       flightHours=Array(24).fill(0); flightDetails=[];
       fl.forEach(f=>{
         if(!f.arrival?.scheduled) return;
-        if(!f.arrival?.terminal) return; // без терминал = частни/военни/карго — без пътници за такси
+        // Липсващ терминал НЕ значи частен полет — Sky Express и някои чартъри
+        // също идват без него. Отсяваме по превозвач, не по липсваща стойност.
+        if(!f.arrival?.terminal){
+          const al = ((f.airline && f.airline.name) || '').toLowerCase();
+          const num = ((f.flight && f.flight.iata) || '').toUpperCase();
+          const PRIVATE = /vistajet|netjets|luxaviation|globeair|jet aviation|hahn air|private|executive|cargo|dhl|fedex|ups|swiftair|asl airlines/;
+          if(PRIVATE.test(al)) return;                       // частни и карго — вън
+          if(/^(VJT|NJE|LXA|GAC|HLR|RHH)/.test(num)) return;  // техните кодове — вън
+          // останалите остават: пътнически полет без обявен терминал
+        }
         const t=new Date(f.arrival.estimated||f.arrival.scheduled);
         const dep=(f.departure?.airport||f.departure?.country_name||'').toLowerCase();
         const nonSchengen=dep.match(/tur|istanbul|sabiha|ankar|israel|ben.gurion|dubai|abu.dhabi|egypt|cairo|morocco|casablanca|london|heathrow|gatwick|stansted|luton|manchester|birmingham|usa|jfk|lax|china|beijing|shanghai|russia|moscow|georgia|tbilisi|armenia|yerevan|jordan|amman|serbia|belgrade|ukraine|kyiv|north.mac/);

@@ -1462,6 +1462,31 @@ body.full-list #next90-btn:active,body[data-full] #next90-btn:active{
 .leaflet-popup-content-wrapper::-webkit-scrollbar-thumb{
   background:var(--cyan); border-radius:3px; opacity:.5;
 }
+
+/* известието долу: Х вляво, защото вдясно е колоната с бутоните */
+#event-alert{
+  padding-left:46px !important; padding-right:14px !important;
+  right:74px !important;
+}
+#event-alert .ea-close, #ea-close{
+  position:absolute !important; left:8px !important; right:auto !important;
+  top:50% !important; transform:translateY(-50%) !important;
+  width:32px !important; height:32px !important; border-radius:50% !important;
+  display:flex !important; align-items:center; justify-content:center;
+  background:var(--surface) !important; color:var(--text) !important;
+  border:1.5px solid var(--glass-edge) !important;
+  font-size:17px !important; line-height:1 !important; cursor:pointer;
+  box-shadow:var(--card) !important; z-index:5;
+}
+#direction-hint{ padding-left:46px !important; right:74px !important; }
+#direction-hint .dh-close{
+  position:absolute !important; left:8px !important; right:auto !important;
+  top:50%; transform:translateY(-50%);
+  width:32px; height:32px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--surface); border:1.5px solid var(--glass-edge);
+  box-shadow:var(--card); font-size:17px; cursor:pointer;
+}
 </style>
 <style>
 
@@ -2151,7 +2176,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260726v118"></script>
+<script src="app.js?v=20260726v119"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">
