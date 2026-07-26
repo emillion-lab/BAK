@@ -4898,3 +4898,52 @@ function toggleMapView(){
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
 })();
+
+// ═══════════════════════════════════════════════
+// Сгъваеми листове: зони и карък — отделни бутони, отделен скрол
+// ═══════════════════════════════════════════════
+(function(){
+  function stack(){
+    var s = document.getElementById('chip-stack');
+    if(!s){
+      s = document.createElement('div');
+      s.id = 'chip-stack';
+      document.body.appendChild(s);
+    }
+    return s;
+  }
+  function mk(id, label, cls){
+    if(document.getElementById(id)) return document.getElementById(id);
+    var b = document.createElement('div');
+    b.id = id;
+    b.className = 'sheet-btn ' + (cls || '');
+    b.innerHTML = label + ' <span class="caret">▲</span>';
+    stack().appendChild(b);
+    return b;
+  }
+  function count(sel){
+    try{ return document.querySelectorAll(sel).length; }catch(e){ return 0; }
+  }
+  function refresh(){
+    var z = document.getElementById('btn-zones');
+    if(z){
+      var n = count('#zone-sidebar .zone-row');
+      z.firstChild.textContent = '📋 Зони' + (n ? ' (' + n + ')' : '') + ' ';
+    }
+  }
+  function boot(){
+    var bz = mk('btn-zones', '📋 Зони');
+    bz.addEventListener('click', function(){
+      document.body.classList.toggle('sheet-zones');
+      setTimeout(function(){ try{ map.invalidateSize(); }catch(e){} }, 400);
+    });
+    var bk = mk('btn-karyk', '🥉 Карък зони');
+    bk.addEventListener('click', function(){
+      document.body.classList.toggle('sheet-karyk');
+    });
+    refresh();
+    setInterval(refresh, 3000);
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
