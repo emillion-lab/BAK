@@ -817,6 +817,7 @@ function buildNext90(){
 
 // ═══════════════════════════════════════════════
 const map = L.map('map', {center:[42.698,23.322], zoom:13, zoomControl:true, attributionControl:false});
+window.map = map;   // достъпна за модулите отдолу
 // OSM стандарт: най-подробният свободен слой — еднопосочни стрелки,
 // пешеходни зони, всички обекти. Нощем се обръща с филтър САМО върху
 // плочките, за да останат маркерите и кръговете с истинските си цветове.
@@ -4757,18 +4758,25 @@ function toggleMapView(){
   window.closeFull = closeFull;
 
   function goToZone(id){
-    try{
-      var z = ZONES.find(function(x){ return x.id === id; });
-      if(!z) return;
-      if(document.body.classList.contains('list-view')) toggleMapView();
-      setTimeout(function(){
-        map.invalidateSize();
-        map.setView([z.lat, z.lng], id === 'airport' ? 14 : 15);
-        if(id === 'airport') showAirportSchedule();
-        else if(typeof showZonePopup === 'function') showZonePopup(id);
-        else if(typeof showTransitPopup === 'function') showTransitPopup(id);
-      }, 180);
-    }catch(e){}
+    var z = (window.ZONES || ZONES).find(function(x){ return x.id === id; });
+    if(!z){ window.__destErr = 'няма зона ' + id; return; }
+    if(document.body.classList.contains('list-view') && typeof window.toggleMapView === 'function')
+      window.toggleMapView();
+    setTimeout(function(){
+      try{
+        var M = window.map || map;
+        M.invalidateSize();
+        M.setView([z.lat, z.lng], id === 'airport' ? 14 : 15);
+        if(id === 'airport'){
+          if(typeof window.showAirportSchedule === 'function') window.showAirportSchedule();
+          else window.__destErr = 'липсва showAirportSchedule';
+        } else if(typeof window.showZonePopup === 'function'){
+          window.showZonePopup(id);
+        } else {
+          window.__destErr = 'липсва showZonePopup';
+        }
+      }catch(e){ window.__destErr = String(e && e.message || e); }
+    }, 180);
   }
 
   function adopt(){

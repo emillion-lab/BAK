@@ -72,6 +72,7 @@ jobs:
             return {
               found: boxes.map(x=>x.id), missing: ids.filter(i=>!boxes.find(x=>x.id===i)),
               overlaps, offscreen, dark, opens, scrollable,
+              destErr: window.__destErr || null,
               mapH: mp?Math.round(mp.getBoundingClientRect().height):0,
               mapBottom: mp?Math.round(mp.getBoundingClientRect().bottom):0,
               stackH: st?Math.round(st.getBoundingClientRect().height):0,
