@@ -249,7 +249,8 @@ const ZONES = window.__ZONES = [
   { id:"su",             name:"Софийски университет",                   icon:"🎓", lat:42.6936, lng:23.3349, radius:200, type:"university",       wazeName:"Софийски университет Св Климент Охридски" },
   { id:"studentski",     name:"Студентски град",                        icon:"🎓", lat:42.6475, lng:23.3530, radius:380, type:"university",       wazeName:"Студентски град Sofia" },
 
-    { id:"zoo",            name:"Зоопарк София",                          icon:"🦁", lat:42.6608, lng:23.3433, radius:260, type:"attraction",      hours:[9,19], wazeName:"Зоопарк София" },
+    { id:"loven_park",     name:"Ловен парк (Вила Виктория)",             icon:"🍽️", lat:42.6626, lng:23.3401, radius:240, type:"nightlife",       wazeName:"Ловен парк София" },
+  { id:"zoo",            name:"Зоопарк София",                          icon:"🦁", lat:42.6608, lng:23.3433, radius:260, type:"attraction",      hours:[9,19], wazeName:"Зоопарк София" },
   { id:"gradina",        name:"ж.к. Градина",                           icon:"🌳", lat:42.6742, lng:23.2894, radius:280, type:"residential",     wazeName:"жк Градина София" },
   { id:"simeonovo",      name:"Симеоново",                              icon:"⛰️", lat:42.6272, lng:23.3464, radius:300, type:"residential_lux", wazeName:"Симеоново София" },
   { id:"dragalevtsi",    name:"Драгалевци",                             icon:"🌲", lat:42.6383, lng:23.3186, radius:300, type:"residential_lux", wazeName:"Драгалевци София" },
@@ -291,7 +292,7 @@ const ZONES = window.__ZONES = [
 
   // ── РЕСТОРАНТИ / НОЩЕН ЖИВОТ ──
   { id:"vitosha_bar",    name:"Бул.Витоша – ресторанти/барове",         icon:"🍷", lat:42.6890, lng:23.3220, radius:250, type:"nightlife",        wazeName:"булевард Витоша ресторанти София" },
-  { id:"lozenets_rest",  name:"Ресторанти Лозенец (Водна кула)",        icon:"🍽", lat:42.6713, lng:23.3382, radius:220, type:"nightlife",        wazeName:"ресторанти Лозенец Водна кула София" },
+  { id:"lozenets_rest",  name:"Ресторанти Лозенец",        icon:"🍽", lat:42.6713, lng:23.3382, radius:220, type:"nightlife",        wazeName:"ресторанти Лозенец Водна кула София" },
   { id:"center_bars",    name:"Барове / клубове Център (ул.Раковски)",  icon:"🍺", lat:42.6960, lng:23.3310, radius:200, type:"nightlife",        wazeName:"улица Раковски Sofia" },
 
   // ── ДОПЪЛНИТЕЛНИ БОЛНИЦИ ──
@@ -344,7 +345,7 @@ const BASE = {
   acibadem_tokuda:0.8, acibadem_cardio:0.7, acibadem_mladost:0.7, acibadem_ortho:0.6,
   sv_ekaterina:0.7, lozenets_h:0.6, kardiologia:0.6, sv_sofia_h:0.6, isul:0.8,
   unss:0.5, nbu:0.4, tu:0.4, su:0.5, studentski:0.6,
-  zoo:0.6, simeonovo:0.4, dragalevtsi:0.4, gradina:0.5, krastova_vada:0.5,
+  loven_park:0.7, zoo:0.6, simeonovo:0.4, dragalevtsi:0.4, gradina:0.5, krastova_vada:0.5,
   malinova:0.4, kv_vitosha:0.4, manast:0.5, boyana:0.4, kambanite:0.4,
   lyulin:0.5, nadezhda:0.4, ovcha_kupel:0.4, druzhba:0.4, mladost:0.5,
   k_borovo:0.3, k_krasno:0.3, k_pavlovo:0.3,
@@ -415,6 +416,9 @@ const EVENTS = [
 
   // Луксозни жилища
   { zone:"manast",       name:"Ман.ливади – сутрешно тръгване", endHour:8.5,  boost:2.0, repeat:"mon-fri" },
+  { zone:"loven_park",   name:"Ловен парк – след вечеря",        endHour:23.0, boost:2.0, repeat:"daily" },
+  { zone:"loven_park",   name:"Ловен парк – късна вечер",        endHour:1.0,  boost:1.7, repeat:"fri-sat" },
+  { zone:"loven_park",   name:"Ловен парк – неделен обяд",       endHour:16.0, boost:1.5, repeat:"tue-sun" },
   { zone:"zoo",          name:"Зоопарк – затваряне, семейства",  endHour:19.0, boost:2.2, repeat:"daily" },
   { zone:"zoo",          name:"Зоопарк – следобеден пик",         endHour:16.0, boost:1.6, repeat:"fri-sat" },
   { zone:"zoo",          name:"Зоопарк – неделно излизане",       endHour:18.0, boost:1.9, repeat:"tue-sun" },
@@ -725,7 +729,7 @@ const NOMINATIM_QUERIES={
   opera:'Natsionalna opera i balet Sofia Bulgaria', unss:'UNSS Sofia Bulgaria',
   nbu:'Нов Български Университет Sofia Bulgaria',
   simeonovo:'Симеоново София', dragalevtsi:'Драгалевци София', gradina:'жк Градина София',
-  zoo:'Зоопарк София Bulgaria', krastova_vada:'Кръстова вада София', malinova:'Малинова долина София', kv_vitosha:'кв Витоша София',
+  loven_park:'Ловен парк София Bulgaria', zoo:'Зоопарк София Bulgaria', krastova_vada:'Кръстова вада София', malinova:'Малинова долина София', kv_vitosha:'кв Витоша София',
   manast:'Manastirski livadi Sofia Bulgaria', boyana:'Boyana Sofia Bulgaria',
   kambanite:'ЖК Камбаните Sofia Bulgaria',
 };
