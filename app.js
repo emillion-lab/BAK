@@ -820,12 +820,9 @@ const map = L.map('map', {center:[42.698,23.322], zoom:13, zoomControl:true, att
 // OSM стандарт: най-подробният свободен слой — еднопосочни стрелки,
 // пешеходни зони, всички обекти. Нощем се обръща с филтър САМО върху
 // плочките, за да останат маркерите и кръговете с истинските си цветове.
-window.__TILE_DAY   = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
-window.__TILE_NIGHT = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
-window.__tileLayer = L.tileLayer(
-  (document.body.classList.contains('theme-night') ? window.__TILE_NIGHT : window.__TILE_DAY), {
-  maxZoom:20, subdomains:['a','b','c','d']
-}).addTo(map);
+window.__TILE_DAY   = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+window.__TILE_NIGHT = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+window.__tileLayer = L.tileLayer(window.__TILE_DAY, { maxZoom:19 }).addTo(map);
 document.getElementById('map').style.filter='brightness(0.85) saturate(0.6)';
 setTimeout(()=>map.invalidateSize(), 300);
 setTimeout(()=>map.invalidateSize(), 800);
@@ -4634,12 +4631,7 @@ function toggleMapView(){
     { zone:'cjp',       icon:'🚂', label:'ЖП гара' }
   ];
   // ВЪНШЕН пръстен — инструменти (без надписи, иконите са познати)
-  var ITEMS = [
-    { id:'next90-btn',     label:'Събития 24ч' },
-    { id:'clean-btn',      label:'Чиста карта' },
-    { id:'gps-btn',        label:'Локация' },
-    { id:'fs-btn',         label:'Цял екран' }
-  ];
+  var ITEMS = [];   // инструментите вече не са в ветрилото — стоят като чипове
   var wrap, hub, rays, backdrop, built = false, adopted = {};
 
   function build(){
@@ -4762,7 +4754,7 @@ function toggleMapView(){
       pos.push({ x: Math.round(Math.cos(a) * R), y: Math.round(-Math.sin(a) * R) });
     });
     // ВЪТРЕШЕН пръстен: по-малък радиус, изместен на половин стъпка
-    var Ri = Math.round(R * 0.56);
+    var Ri = Math.round(R * 0.68);
     var stepI = dests.length > 1 ? (A1 - A0) / (dests.length - 1) : 0;
     var posI = dests.map(function(it, i){
       var a = (A0 + 7 + stepI * i) * Math.PI / 180;
@@ -4887,10 +4879,7 @@ function toggleMapView(){
       b.textContent = t === 'night' ? '☀️' : '🌙';
       b.title = t === 'night' ? 'Дневна тема' : 'Нощна тема';
     }
-    try{
-      if(window.__tileLayer && window.__TILE_NIGHT)
-        window.__tileLayer.setUrl(t === 'night' ? window.__TILE_NIGHT : window.__TILE_DAY);
-    }catch(e){}
+    document.body.classList.toggle('tiles-dark', t === 'night');
     // лентата: задаваме я директно, за да не зависи от реда на CSS правилата
     var tb = document.querySelector('.ticker-bar');
     if(tb){
@@ -5037,4 +5026,29 @@ function toggleMapView(){
   }
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
+})();
+
+// ═══════════════════════════════════════════════
+// Бутон за списъка със зоните (долу вляво)
+// ═══════════════════════════════════════════════
+(function(){
+  function mount(){
+    if(document.getElementById('btn-zones')) return;
+    var stack = document.getElementById('chip-stack');
+    if(!stack){ setTimeout(mount, 400); return; }
+    var b = document.createElement('div');
+    b.id = 'btn-zones';
+    b.className = 'sheet-btn';
+    b.innerHTML = '📋 Зони <span class="caret">▲</span>';
+    b.addEventListener('click', function(){
+      document.body.classList.toggle('sheet-zones');
+      if(document.body.classList.contains('sheet-zones')){
+        var s = document.getElementById('zone-sidebar');
+        if(s) s.scrollTop = 0;
+      }
+    });
+    stack.appendChild(b);
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount);
+  else mount();
 })();
