@@ -720,27 +720,16 @@ body.list-view #toggle-map-btn {
   -webkit-tap-highlight-color:transparent; user-select:none;
 }
 #fab-hub:active{ transform:scale(.92); }
-body.fab-open #fab-hub{
-  transform:rotate(135deg);
-  border-color:#f59e0b; color:#f59e0b;
-  box-shadow:0 4px 22px rgba(0,0,0,.7), 0 0 20px rgba(245,158,11,.35);
-}
 #fab-rays{
   position:absolute; left:0; top:0; width:1px; height:1px;
   overflow:visible; pointer-events:none;
   opacity:0; transition:opacity .22s;
-}
-body.fab-open #fab-rays{ opacity:1; }
-#fab-rays line{
-  stroke:var(--cyan); stroke-width:2; stroke-linecap:round;
-  opacity:.45; stroke-dasharray:3 5;
 }
 #fab-backdrop{
   position:fixed; inset:0; z-index:1590;
   background:rgba(3,7,18,.45); backdrop-filter:blur(1.5px);
   opacity:0; pointer-events:none; transition:opacity .22s;
 }
-body.fab-open #fab-backdrop{ opacity:1; pointer-events:auto; }
 
 /* сателитите — оригиналните бутони, преместени в орбита */
 #fab-wrap .fab-sat{
@@ -758,7 +747,6 @@ body.fab-open #fab-backdrop{ opacity:1; pointer-events:auto; }
   transform:none !important;
   transition:left .28s cubic-bezier(.34,1.4,.64,1), top .28s cubic-bezier(.34,1.4,.64,1), opacity .2s;
 }
-body.fab-open #fab-wrap .fab-sat{ opacity:1; pointer-events:auto; }
 #fab-wrap #karyk-btn, #fab-wrap #karyk-list-btn, #fab-wrap #clean-btn{
   transform:none !important; transform-origin:center center !important;
   text-orientation:mixed !important; writing-mode:horizontal-tb !important;
@@ -775,7 +763,6 @@ body.fab-open #fab-wrap .fab-sat{ opacity:1; pointer-events:auto; }
   transition:opacity .2s, left .28s cubic-bezier(.34,1.4,.64,1), top .28s cubic-bezier(.34,1.4,.64,1);
   box-shadow:0 2px 10px rgba(0,0,0,.5);
 }
-body.fab-open .fab-label{ opacity:1; }
 /* в fullscreen скриваме само тези, които и преди се скриваха */
 body.map-fullscreen #fab-wrap #bakshish-btn,
 body.map-fullscreen #fab-wrap #next90-btn,
@@ -815,12 +802,10 @@ body.karyk-active::after{
   white-space:nowrap;
 }
 body.karyk-active #fab-hub{ border-color:var(--bronze) !important; color:var(--bronze) !important; }
-body.karyk-active #fab-rays line{ stroke:var(--bronze) !important; }
-/* зоните в карък: бронз вместо злато */
+body.karyk-active /* зоните в карък: бронз вместо злато */
 body.karyk-active .sidebar-title{ color:#e8a050; }
 
 /* връзка етикет → икона в радиалното меню */
-#fab-rays line.fab-link{ stroke:#94a3b8; stroke-width:1.2; opacity:.32; stroke-dasharray:2 4; }
 
 /* бакшиш: компактни редове (като карък списъка) */
 #bakshish-panel .bp-item{ padding:6px 12px !important; gap:8px !important; }
@@ -977,7 +962,6 @@ body.theme-night .header{ box-shadow:0 6px 22px rgba(0,0,0,.5), 0 0 24px rgba(34
 body.theme-night #fab-wrap .fab-sat{
   background:#12203a !important; border-color:rgba(34,211,238,.3) !important;
 }
-#fab-rays line{ stroke:var(--cyan) !important; }
 #fab-backdrop{ background:var(--scrim) !important; }
 
 /* долните ляви чипове */
@@ -1003,16 +987,6 @@ body.theme-day #bakshish-panel .bp-item{ background:rgba(255,255,255,.35) !impor
   position:fixed; left:8px; bottom:8px; z-index:1500;
   display:flex; flex-direction:column-reverse; gap:6px;
   max-width:62vw; pointer-events:none;
-}
-#chip-stack > *{
-  position:static !important; left:auto !important; bottom:auto !important;
-  right:auto !important; top:auto !important;
-  pointer-events:auto; margin:0 !important;
-  background:var(--glass) !important; color:var(--text) !important;
-  border:1px solid var(--glass-edge) !important;
-  backdrop-filter:saturate(175%) blur(14px);
-  -webkit-backdrop-filter:saturate(175%) blur(14px);
-  box-shadow:var(--card) !important;
 }
 /* списъкът да може да се доскролва изпод ветрилото */
 #zone-sidebar, #karyk-sidebar{ padding-bottom:96px; }
@@ -1110,35 +1084,8 @@ body.karyk-active::after{ display:none !important; content:none !important; }
 body.karyk-active #map{ filter:none !important; }
 
 /* ═══ Вътрешен пръстен: дестинациите — по-едри и по-близо до палеца ═══ */
-#fab-wrap .fab-dest{
-  width:58px !important; height:58px !important;
-  margin-left:-29px !important; margin-top:-29px !important;
-  max-width:58px !important; font-size:26px !important;
-  border:0 !important;
-  background:var(--dest-bg) !important;
-  box-shadow:
-    0 6px 16px rgba(15,27,45,.22),
-    0 1px 0 rgba(255,255,255,.85) inset,
-    0 0 0 2px var(--dest-ring) !important;
-}
 #fab-wrap .fab-dest:active{ transform:scale(.92) !important; }
-body.theme-night #fab-wrap .fab-dest{
-  box-shadow:
-    0 6px 18px rgba(0,0,0,.6),
-    0 1px 0 rgba(255,255,255,.10) inset,
-    0 0 0 2px var(--dest-ring),
-    0 0 22px var(--ring) !important;
-}
-.fab-dest-label{
-  font:800 14px -apple-system,system-ui,sans-serif !important;
-  padding:8px 13px !important;
-  border:0 !important;
-  border-radius:12px !important;
-  box-shadow:0 4px 14px rgba(15,27,45,.18), 0 0 0 1px var(--glass-edge) !important;
-}
-body.theme-night .fab-dest-label{ box-shadow:0 4px 16px rgba(0,0,0,.55), 0 0 0 1px var(--dest-ring) !important; }
-#fab-rays line.fab-link{ stroke:var(--cyan) !important; stroke-width:1.4; opacity:.45; stroke-dasharray:3 4; }
-/* инструментите отвън — по-дискретни */
+body.theme-night body.theme-night /* инструментите отвън — по-дискретни */
 #fab-wrap .fab-sat:not(.fab-dest){
   width:48px !important; height:48px !important;
   margin-left:-24px !important; margin-top:-24px !important;
@@ -1149,16 +1096,8 @@ body.theme-night .fab-dest-label{ box-shadow:0 4px 16px rgba(0,0,0,.55), 0 0 0 1
   font:700 12.5px -apple-system,system-ui,sans-serif !important;
   padding:6px 10px !important; opacity:.9;
 }
-#fab-rays line.fab-inner{ stroke:var(--cyan) !important; stroke-width:2.5; opacity:.65; stroke-dasharray:none; }
 /* лек пулс на дестинациите, за да личи че водят нанякъде */
-@keyframes dest-glow{
-  0%,100%{ box-shadow:var(--card), 0 0 14px var(--ring); }
-  50%    { box-shadow:var(--card), 0 0 26px var(--ring); }
 }
-body.fab-open #fab-wrap .fab-dest{ animation:dest-glow 2.4s ease-in-out infinite; }
-
-/* инструментите остават само с иконки — осем надписа претрупват екрана */
-.fab-label:not(.fab-dest-label){ display:none !important; }
 
 /* нощна карта върху подробните OSM плочки — обръщаме само тях */
 body.tiles-dark .leaflet-tile-pane{
@@ -1193,15 +1132,6 @@ body.map-fullscreen #next90-btn{ display:none !important; }
 #exit-now-panel b{ color:var(--text) !important; }
 
 /* по-висока специфичност — по-ранните правила за .fab-sat го надвиваха */
-#fab-wrap button.fab-dest, #fab-wrap .fab-dest{
-  width:56px !important; height:56px !important;
-  min-width:56px !important; max-width:56px !important;
-  margin-left:-28px !important; margin-top:-28px !important;
-  font-size:25px !important; padding:0 !important;
-}
-
-/* ═══════ ВЕТРИЛОТО Е ПРЕМАХНАТО ═══════ */
-#fab-wrap, #fab-hub, #fab-backdrop, #fab-rays, .fab-label{ display:none !important; }
 
 /* ═══════ Една стъклена колона вдясно ═══════
    Ред: инструменти → дестинации → списък                      */
@@ -1362,15 +1292,7 @@ body.theme-night #next90-panel{
   transition:left .34s var(--ease), top .34s var(--ease),
              opacity .22s linear, filter .3s var(--ease);
 }
-body.fab-open #fab-wrap .fab-sat{ filter:blur(0); }
-body.fab-open #fab-wrap .fab-sat:nth-child(2){ transition-delay:.02s }
-body.fab-open #fab-wrap .fab-sat:nth-child(4){ transition-delay:.05s }
-body.fab-open #fab-wrap .fab-sat:nth-child(6){ transition-delay:.08s }
-body.fab-open #fab-wrap .fab-sat:nth-child(8){ transition-delay:.11s }
-body.fab-open #fab-wrap .fab-sat:nth-child(10){ transition-delay:.14s }
-body.fab-open #fab-wrap .fab-sat:nth-child(12){ transition-delay:.17s }
 #fab-hub{ transform-style:preserve-3d; }
-body.fab-open #fab-hub{ transform:rotate3d(0,0,1,135deg) scale(1.04); }
 body.theme-night #fab-hub{ box-shadow:0 4px 18px rgba(0,0,0,.7), 0 0 22px var(--ring); }
 
 /* ── превключвател на темата ── */
@@ -1967,7 +1889,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260726v97"></script>
+<script src="app.js?v=20260726v98"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">

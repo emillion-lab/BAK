@@ -824,6 +824,16 @@ window.__TILE_DAY   = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 window.__TILE_NIGHT = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 window.__tileLayer = L.tileLayer(window.__TILE_DAY, { maxZoom:19 }).addTo(map);
 document.getElementById('map').style.filter='brightness(0.85) saturate(0.6)';
+// начален изглед: цяла София заедно с летището
+setTimeout(function(){
+  try{
+    map.invalidateSize();
+    var sofia = L.latLngBounds([[42.6300,23.2300],[42.7450,23.4300]]);
+    var ap = ZONES.find(function(z){ return z.id==='airport'; });
+    if(ap) sofia.extend([ap.lat, ap.lng]);
+    map.fitBounds(sofia, { padding:[24,24] });
+  }catch(e){}
+}, 320);
 setTimeout(()=>map.invalidateSize(), 300);
 setTimeout(()=>map.invalidateSize(), 800);
 
