@@ -1016,6 +1016,12 @@ body.theme-day #bakshish-panel .bp-item{ background:rgba(255,255,255,.35) !impor
 }
 /* списъкът да може да се доскролва изпод ветрилото */
 #zone-sidebar, #karyk-sidebar{ padding-bottom:96px; }
+
+/* лентата — изрично по тема, за да не зависи от реда на правилата */
+body.theme-day  .ticker-bar{ background:rgba(255,255,255,.72) !important; }
+body.theme-day  .tick-item{ color:#0f1b2d !important; }
+body.theme-night .ticker-bar{ background:rgba(6,16,28,.72) !important; }
+body.theme-night .tick-item{ color:#e8eef7 !important; }
 </style>
 <style>
 
@@ -1709,7 +1715,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260726v80"></script>
+<script src="app.js?v=20260726v81"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">
