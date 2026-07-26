@@ -223,7 +223,7 @@ const ZONES = window.__ZONES = [
 
   { id:"cjp",            name:"Централна ЖП гара",                      icon:"🚂", lat:42.7121, lng:23.3210, radius:240, type:"transit",          wazeName:"Централна жп гара София" },
   { id:"cab_north",      name:"Централна автогара",                     icon:"🚌", lat:42.7103, lng:23.3233, radius:200, type:"transit",          wazeName:"Централна автогара София" },
-  { id:"cas_intl", name:"Междунар. автогара Сердика / FlixBus", icon:"🌍", lat:42.7108, lng:23.3224, radius:150, type:"transit", wazeName:"Международна автогара Сердика София" },
+  { id:"cas_intl", name:"Международна автогара Сердика", icon:"🌍", lat:42.7108, lng:23.3224, radius:150, type:"transit", wazeName:"Международна автогара Сердика София" },
   { id:"ag_yug",         name:"Автогара Юг (бул.Драган Цанков)",        icon:"🚌", lat:42.6689, lng:23.3526, radius:190, type:"transit",          hours:[7.5,18.5], wazeName:"Автогара Юг София" },
   { id:"ag_pod",         name:"Автогара Подуяне",                       icon:"🚌", lat:42.7034, lng:23.3601, radius:190, type:"transit",          wazeName:"Автогара Подуяне София" },
 
@@ -1143,11 +1143,13 @@ function showAirportSchedule() {
       const op  = isFading ? 'opacity:.88;' : '';
       const isDone = false;
       const anchor = (!anchorSet && (isNow || f._state==='future')) ? (anchorSet=true, ' id="fl-now-anchor"') : '';
-      html+=`<div${anchor}${isNow?' data-now="1"':(isFading?' data-fading="1"':'')} style="display:flex;align-items:center;gap:5px;padding:4px 7px;border-radius:7px;background:${bg};border:${brd};margin-bottom:1px;${op}">
-        <span style="font-weight:800;font-size:12.5px;min-width:40px;color:var(--text)">${f.fn}</span>
-        ${flTerm==='all'?`<span style="font-size:10.5px;font-weight:900;color:var(--cyan);border:1px solid var(--border);border-radius:4px;padding:0 4px">${'Т'+f.term}</span>`:''}
-        <span style="flex:1;min-width:0;overflow:hidden">
-          <span style="display:block;font-size:11.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.25">${(f.depAirport||'').slice(0,18)}<span style="font-size:9.5px;opacity:.9"> ${fmt(f.schedH,f.schedM)}${
+      html+=`<div${anchor}${isNow?' data-now="1"':(isFading?' data-fading="1"':'')} style="display:grid;grid-template-columns:46px 1fr auto;align-items:center;gap:7px;padding:4px 7px;border-radius:7px;background:${bg};border:${brd};margin-bottom:1px;${op}">
+        <span style="display:flex;flex-direction:column;line-height:1.05">
+          <b style="font-size:11.5px;color:var(--text);white-space:nowrap">${f.fn}</b>
+          <span style="font-size:9px;font-weight:800;color:var(--cyan);opacity:.85">Т${f.term}</span>
+        </span>
+        <span style="min-width:0;overflow:hidden">
+          <span style="display:block;font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.25">${(f.depAirport||'').slice(0,18)}<span style="font-size:9.5px;opacity:.9"> ${fmt(f.schedH,f.schedM)}${
             f.delay >= 5  ? `<b style="color:#dc2626">+${f.delay}′</b>` :
             f.delay <= -5 ? `<b style="color:#16a34a">${f.delay}′</b>` : ''
           }</span></span>
@@ -1156,11 +1158,13 @@ function showAirportSchedule() {
             /approach|en.?route/i.test(f.statusRaw||'') ? ' <span style="color:#0369a1">каца</span>' : ''
           }</span>
         </span>
-        <span style="font-size:13px">${flag(f)}</span>
-        ${isNow?'<span style="font-size:10.5px;font-weight:900;color:#ef4444;white-space:nowrap">ИЗЛИЗА</span>':''}
-        ${isFading?'<span style="font-size:11px;font-weight:800;color:#dc2626;white-space:nowrap" title="Прозорецът мина, но е възможно още да излизат">???</span>':''}
+        <span style="display:flex;align-items:center;gap:5px;white-space:nowrap">
+          <span style="font-size:12px">${flag(f)}</span>
+          ${isNow?'<span style="font-size:9.5px;font-weight:900;color:#ef4444">ИЗЛИЗА</span>':''}
+          ${isFading?'<span style="font-size:10px;font-weight:800;color:#dc2626" title="Прозорецът мина, но е възможно още да излизат">???</span>':''}
 
-        <span style="font-weight:800;font-size:12.5px;color:${col};white-space:nowrap">${fmt(f.exitFromH,f.exitFromM)}–${fmt(f.exitToH,f.exitToM)}</span>
+          <span style="font-weight:800;font-size:11.5px;color:${col}">${fmt(f.exitFromH,f.exitFromM)}–${fmt(f.exitToH,f.exitToM)}</span>
+        </span>
       </div>`;
     });
     if(!grp.length) html+='<div style="color:var(--muted);text-align:center;padding:14px 0;font-size:13px">Няма полети за този терминал</div>';
@@ -3645,7 +3649,7 @@ function toggleMapView(){
          + (urgent ? 'rgba(234,88,12,.14)' : 'rgba(56,189,248,.10)')
          + ';border-left:3px solid ' + (urgent ? '#ea580c' : '#38bdf8') + ';font-size:12px">'
          + '<b>🌍 Международни пристигания</b>' + rows
-         + '<div style="opacity:.55;font-size:11px;margin-top:5px">Дълъг път + багаж = почти сигурен курс<br>'
+         + ''
          + '● живо от ЦАС · ≈ по разписание на превозвача</div></div>';
   }
 
@@ -4740,7 +4744,7 @@ function toggleMapView(){
   var DESTS = [
     { zone:'airport',   icon:'✈️', label:'Летище' },
     { zone:'cab_north', icon:'🚌', label:'Централна' },
-    { zone:'cas_intl',  icon:'🌐', label:'Международна' },
+    { zone:'cas_intl',  icon:'🌐', label:'Международна автогара' },
     { zone:'cjp',       icon:'🚂', label:'ЖП гара' },
     { zone:'__zones',   icon:'📋', label:'Зони' }
   ];
@@ -5090,7 +5094,7 @@ function toggleMapView(){
     document.body.classList.toggle('theme-day',   t === 'day');
     var b = document.getElementById('theme-btn');
     if(b){
-      b.textContent = t === 'night' ? '☀️' : '🌙';
+      b.textContent = t === 'night' ? '◐' : '◑';
       b.title = t === 'night' ? 'Дневна тема' : 'Нощна тема';
     }
     document.body.classList.toggle('tiles-dark', t === 'night');
@@ -5380,14 +5384,25 @@ function toggleMapView(){
       if(bar) bar.appendChild(chip);
     }
     if(state.rain > 0){
-      chip.textContent = '☔ вали сега';
+      chip.textContent = 'вали';
       chip.style.color = '#0284c7';
     } else if(state.rainAt){
-      chip.textContent = '🌧 ' + state.rainAt.time + ' · ' + state.rainAt.prob + '%';
+      chip.textContent = '🌧 ' + state.rainAt.time;
+      chip.title = 'Очакван дъжд · ' + state.rainAt.prob + '% вероятност';
       chip.style.color = 'var(--amber)';
     } else {
-      chip.textContent = '☀️ без дъжд 12ч';
-      chip.style.color = 'var(--muted)';
+      chip.textContent = '';        // няма дъжд — пейзажът го показва
+      chip.title = 'Без дъжд в следващите 12 часа';
+    }
+
+    // иконата вляво следва реалното време, а не статична емоджи
+    var ic = document.getElementById('wb-icon');
+    if(ic){
+      ic.textContent = state.rain > 0 ? '🌧'
+                     : state.snow > 0 ? '🌨'
+                     : state.cloud > .75 ? (state.night ? '☁️' : '☁️')
+                     : state.cloud > .35 ? (state.night ? '🌥' : '⛅')
+                     : (state.night ? '🌙' : '☀️');
     }
   }
 
