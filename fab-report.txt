@@ -22,22 +22,22 @@ RESULT: {
   },
   "dest-airport": {
    "opened": true,
-   "visible": false,
+   "visible": true,
    "closedOnSecond": true
   },
   "dest-cjp": {
    "opened": true,
-   "visible": false,
+   "visible": true,
    "closedOnSecond": true
   },
   "dest-cab_north": {
    "opened": true,
-   "visible": false,
+   "visible": true,
    "closedOnSecond": true
   },
   "dest-cas_intl": {
    "opened": true,
-   "visible": false,
+   "visible": true,
    "closedOnSecond": true
   }
  },
@@ -50,4 +50,4 @@ RESULT: {
  "fanGone": true
 }
 TILEFAILS: 0
-PAGEERRORS: ZONES is not defined | ZONES is not defined | ZONES is not defined | ZONES is not defined
+PAGEERRORS: none
