@@ -11,7 +11,11 @@ RESULT: {
   "dest-__zones"
  ],
  "missing": [],
- "overlaps": [],
+ "overlaps": [
+  "gps-btn×dest-airport",
+  "fs-btn×dest-airport",
+  "fs-btn×dest-cjp"
+ ],
  "offscreen": [],
  "dark": [],
  "opens": {
