@@ -42,6 +42,7 @@ RESULT: {
   }
  },
  "scrollable": false,
+ "destErr": null,
  "mapH": 844,
  "mapBottom": 844,
  "stackH": 238,
@@ -49,4 +50,4 @@ RESULT: {
  "fanGone": true
 }
 TILEFAILS: 0
-PAGEERRORS: none
+PAGEERRORS: ZONES is not defined | ZONES is not defined | ZONES is not defined | ZONES is not defined
