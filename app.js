@@ -4638,6 +4638,32 @@ function toggleMapView(){
   function build(){
     if(built) return;
     built = true;
+    return buildColumn();   // ветрилото е премахнато — вертикална колона вдясно
+  }
+
+  function buildColumn(){
+    DESTS.forEach(function(d){
+      if(document.getElementById('dest-' + d.zone)) return;
+      var b = document.createElement('button');
+      b.id = 'dest-' + d.zone;
+      b.className = 'tool-btn dest-btn';
+      b.innerHTML = d.icon;
+      b.title = d.label;
+      b.addEventListener('click', function(e){
+        e.stopPropagation();
+        if(d.zone === '__zones'){
+          document.body.classList.toggle('sheet-zones');
+          var s = document.getElementById('zone-sidebar');
+          if(s) s.scrollTop = 0;
+          return;
+        }
+        goToZone(d.zone);
+      });
+      document.body.appendChild(b);
+    });
+  }
+
+  function buildOld(){
 
     backdrop = document.createElement('div');
     backdrop.id = 'fab-backdrop';

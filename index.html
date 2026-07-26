@@ -1199,6 +1199,77 @@ body.map-fullscreen #next90-btn{ display:none !important; }
   margin-left:-28px !important; margin-top:-28px !important;
   font-size:25px !important; padding:0 !important;
 }
+
+/* ═══════ ВЕТРИЛОТО Е ПРЕМАХНАТО ═══════ */
+#fab-wrap, #fab-hub, #fab-backdrop, #fab-rays, .fab-label{ display:none !important; }
+
+/* ═══════ Една стъклена колона вдясно ═══════
+   Ред: инструменти → дестинации → списък                      */
+#next90-btn, #clean-btn, #gps-btn, #fs-btn, .tool-btn{
+  position:fixed !important; right:12px !important; left:auto !important; bottom:auto !important;
+  width:48px !important; height:48px !important; max-width:48px !important; min-width:48px !important;
+  border-radius:16px !important; padding:0 !important;
+  display:flex !important; align-items:center !important; justify-content:center !important;
+  font-size:22px !important; line-height:1 !important;
+  color:var(--text) !important;
+  background:var(--glass) !important;
+  border:0 !important;
+  box-shadow:
+    0 6px 18px rgba(15,27,45,.20),
+    0 1px 0 rgba(255,255,255,.75) inset,
+    0 0 0 1px var(--glass-edge) !important;
+  backdrop-filter:saturate(180%) blur(16px);
+  -webkit-backdrop-filter:saturate(180%) blur(16px);
+  z-index:1500 !important; writing-mode:horizontal-tb !important;
+  transition:transform .16s var(--ease), box-shadow .2s var(--ease);
+  cursor:pointer;
+}
+body.theme-night #next90-btn, body.theme-night #clean-btn,
+body.theme-night #gps-btn, body.theme-night #fs-btn, body.theme-night .tool-btn{
+  box-shadow:
+    0 6px 20px rgba(0,0,0,.55),
+    0 1px 0 rgba(255,255,255,.08) inset,
+    0 0 0 1px var(--dest-ring) !important;
+}
+.tool-btn:active, #gps-btn:active, #fs-btn:active,
+#clean-btn:active, #next90-btn:active{ transform:scale(.9) !important; }
+/* дестинациите — с циан пръстен, за да личат от инструментите */
+.dest-btn{ box-shadow:
+    0 6px 18px rgba(15,27,45,.22),
+    0 1px 0 rgba(255,255,255,.8) inset,
+    0 0 0 2px var(--dest-ring) !important; }
+
+/* подредба: инструменти, после дестинации, накрая списък */
+#next90-btn          { top:calc(var(--stack-h,238px) + 10px) !important; }
+#clean-btn           { top:calc(var(--stack-h,238px) + 66px) !important; }
+#gps-btn             { top:calc(var(--stack-h,238px) + 122px) !important; }
+#fs-btn              { top:calc(var(--stack-h,238px) + 178px) !important; }
+#dest-airport        { top:calc(var(--stack-h,238px) + 242px) !important; }
+#dest-cjp            { top:calc(var(--stack-h,238px) + 298px) !important; }
+#dest-cab_north      { top:calc(var(--stack-h,238px) + 354px) !important; }
+#dest-cas_intl       { top:calc(var(--stack-h,238px) + 410px) !important; }
+#dest-__zones        { top:calc(var(--stack-h,238px) + 474px) !important; }
+
+/* ═══ картата стига до долу ═══ */
+#map{ height:calc(100dvh - var(--stack-h,238px)) !important; min-height:400px !important; }
+#stage{ min-height:100dvh; }
+#zone-sidebar, #karyk-sidebar{ bottom:14px !important; max-height:42vh !important; }
+
+/* ═══ панелите: светли в дневната тема ═══ */
+#next90-panel, #next90-panel .n90-header, #exit-now-panel{
+  background:var(--glass) !important; color:var(--text) !important;
+  border:1px solid var(--glass-edge) !important;
+  backdrop-filter:saturate(180%) blur(18px);
+  -webkit-backdrop-filter:saturate(180%) blur(18px);
+}
+#next90-panel .n90-header{ color:var(--cyan) !important; }
+/* Waze / Google бутоните в попъпа */
+.leaflet-popup-content a, .leaflet-popup-content button,
+.zp-nav, .zp-nav a, .zp-nav button{
+  background:var(--glass) !important; color:var(--text) !important;
+  border:1px solid var(--glass-edge) !important;
+  backdrop-filter:saturate(170%) blur(12px);
+}
 </style>
 <style>
 
@@ -1896,7 +1967,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260726v96"></script>
+<script src="app.js?v=20260726v97"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">
