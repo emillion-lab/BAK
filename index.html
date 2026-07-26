@@ -1370,6 +1370,24 @@ body.theme-night .header h1{ animation:title-glow 5s ease-in-out infinite; }
   50%    { filter:drop-shadow(0 0 16px rgba(167,139,250,.55)) }
 }
 #airport-badge.ready{ color:var(--green); font-weight:800; }
+
+/* ═══ Навигационният панел долу (посока/скор) — по темата ═══ */
+#nav-panel, #dir-hint, #event-alert{
+  background:var(--glass) !important; color:var(--text) !important;
+  border:1px solid var(--glass-edge) !important;
+  backdrop-filter:saturate(175%) blur(15px);
+  -webkit-backdrop-filter:saturate(175%) blur(15px);
+  box-shadow:var(--card) !important;
+  border-radius:16px !important;
+}
+#nav-panel *, #dir-hint *, #event-alert *{ color:var(--text) !important; }
+#nav-panel [style*="color:#f8"], #nav-panel [style*="color:#e"]{ color:var(--red) !important; }
+/* стрелката за посока */
+#nav-arrow, .nav-arrow{ background:var(--glass) !important; border:1px solid var(--glass-edge) !important; }
+
+/* попъпът никога под лентите */
+.leaflet-popup{ margin-bottom:8px; }
+.leaflet-popup-content-wrapper{ max-height:46vh; }
 </style>
 <style>
 
@@ -2059,7 +2077,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260726v106"></script>
+<script src="app.js?v=20260726v107"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">

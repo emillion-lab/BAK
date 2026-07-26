@@ -252,7 +252,7 @@ const ZONES = window.__ZONES = [
   { id:"simenovo",       name:"Симеоново / Hill Side",                  icon:"🌲", lat:42.6395, lng:23.3310, radius:380, type:"residential_lux",  wazeName:"Hill Side Sofia Симеоновско шосе 97" },
   { id:"manast",         name:"Манастирски ливади",                     icon:"🏘", lat:42.6637, lng:23.2910, radius:380, type:"residential_lux",  wazeName:"Манастирски ливади София" },
   { id:"boyana",         name:"Бояна / Драгалевци",                     icon:"🌳", lat:42.6348, lng:23.2889, radius:430, type:"residential_lux",  wazeName:"Бояна квартал София" },
-  { id:"kambanite",      name:"ЖК Камбаните / Малинова долина",         icon:"⛰️",  lat:42.6155, lng:23.3780, radius:380, type:"residential_lux",  wazeName:"ЖК Камбаните Sofia" },
+  { id:"kambanite",      name:"Камбаните (Околовръстен)",               icon:"⛰️",  lat:42.6155, lng:23.3780, radius:210, type:"residential_lux",  wazeName:"Камбаните София" },
 
   { id:"lyulin",         name:"жк Люлин",                               icon:"🏘", lat:42.7050, lng:23.2650, radius:400, type:"residential",      wazeName:"жк Люлин Sofia" },
   { id:"nadezhda",       name:"жк Надежда",                             icon:"🏘", lat:42.7200, lng:23.2900, radius:350, type:"residential",      wazeName:"жк Надежда Sofia" },
@@ -3562,6 +3562,8 @@ function toggleMapView(){
     try{
       if(!el || (el.dataset && el.dataset.intl29)) return;
       var txt = el.textContent || '';
+      // само в собствения си панел — не в Централна автогара
+      if(/Централна автогара/i.test(txt)) return;
       if(/Междунар|Сердика \/ FlixBus|FlixBus/i.test(txt)){
         if(el.dataset) el.dataset.intl29 = '1';
         el.insertAdjacentHTML('beforeend', intlHTML());
@@ -4803,6 +4805,19 @@ function toggleMapView(){
         } else if(typeof window.showZonePopup === 'function'){
           document.body.classList.remove('full-list');   // списъкът отстъпва на картата
           window.showZonePopup(id);
+          // изместваме картата надолу, за да не потъне попъпът под горните ленти
+          setTimeout(function(){
+            try{
+              var stack = parseInt(getComputedStyle(document.documentElement)
+                            .getPropertyValue('--stack-h')) || 238;
+              var pop = document.querySelector('.leaflet-popup');
+              var need = stack + 24;
+              if(pop){
+                var r = pop.getBoundingClientRect();
+                if(r.top < need) M.panBy([0, r.top - need], {animate:true});
+              }
+            }catch(e){}
+          }, 220);
         } else {
           window.__destErr = 'липсва showZonePopup';
         }
