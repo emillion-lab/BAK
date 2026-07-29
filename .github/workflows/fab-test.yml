@@ -83,8 +83,16 @@ jobs:
           });
           await p.evaluate(()=>{const e=document.getElementById('dest-cjp'); if(e) e.click();});
           await new Promise(r=>setTimeout(r,300));
-          // пейзажът: рисува ли се колата и има ли грешки в canvas-а
-          await new Promise(r=>setTimeout(r,3000));
+          // изчакваме колата ДА ВЛЕЗЕ в кадъра, чак тогава мерим
+          await p.evaluate(()=>{ document.body.classList.add('theme-night'); });
+          for(let i=0;i<80;i++){
+            const inFrame = await p.evaluate(()=>{
+              const d=window.__taxiDebug;
+              return d && d.x > 30 && d.x < d.W - 30;
+            });
+            if(inFrame) break;
+            await new Promise(r=>setTimeout(r,250));
+          }
           const taxiCheck = await p.evaluate(()=>{
             const cv=document.getElementById('wx-canvas');
             if(!cv) return {canvas:false};
