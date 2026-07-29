@@ -72,16 +72,16 @@ RESULT: {
   "canvas": true,
   "w": 390,
   "h": 50,
-  "yellowPx": 555,
-  "litPx": 119,
-  "roadPx": 294,
+  "yellowPx": 594,
+  "litPx": 104,
+  "roadPx": 527,
   "brightest": [
    255,
    253,
    240
   ],
   "taxiState": {
-   "x": 358,
+   "x": 356,
    "dir": -1,
    "night": false,
    "W": 390
