@@ -1705,6 +1705,14 @@ body.theme-night{ --capsule:rgba(10,18,32,.62); --capsule-edge:rgba(34,211,238,.
 }
 /* известието се крие честно, когато няма какво да каже */
 #event-alert[data-dismissed="1"]{ display:none !important; }
+
+/* КАТ капсулата: числото винаги, думата само ако има място */
+#kat-badge{ display:inline-flex !important; align-items:center; gap:4px; }
+#kat-badge .kat-word{ font-weight:600; opacity:.85; }
+@media (max-width:430px){ #kat-badge .kat-word{ display:none; } }
+@media (display-mode: standalone), (display-mode: fullscreen){
+  #kat-badge .kat-word{ display:none; }     /* в приложението само числото */
+}
 </style>
 <style>
 
@@ -2394,7 +2402,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260729v138"></script>
+<script src="app.js?v=20260729v139"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">

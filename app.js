@@ -1056,17 +1056,50 @@ window.showAirportSchedule = showAirportSchedule;   // вика се от inline
 window.openWaze = function(name, lat, lng){
   var hasLL = isFinite(lat) && isFinite(lng);
   var q   = encodeURIComponent(name || '');
-  var web = hasLL ? 'https://waze.com/ul?ll=' + lat + ',' + lng + '&navigate=yes'
-                  : 'https://waze.com/ul?q=' + q + '&navigate=yes';
-  openExternal(web);
+  // Схемата на самото приложение — не минава през waze.com, който
+  // пренасочва към intent:// и чупи инсталираното PWA.
+  var app = hasLL ? 'waze://?ll=' + lat + ',' + lng + '&navigate=yes'
+                  : 'waze://?q=' + q + '&navigate=yes';
+  var web = hasLL ? 'https://ul.waze.com/ul?ll=' + lat + '%2C' + lng + '&navigate=yes'
+                  : 'https://ul.waze.com/ul?q=' + q + '&navigate=yes';
+  openApp(app, web);
 };
 
 window.openGoogleMaps = function(name, lat, lng){
-  var web = (isFinite(lat) && isFinite(lng))
+  var hasLL = isFinite(lat) && isFinite(lng);
+  var app = hasLL ? 'geo:' + lat + ',' + lng + '?q=' + lat + ',' + lng
+                  : 'geo:0,0?q=' + encodeURIComponent(name || '');
+  var web = hasLL
     ? 'https://www.google.com/maps/dir/?api=1&destination=' + lat + ',' + lng + '&travelmode=driving'
     : 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(name || '');
-  openExternal(web);
+  openApp(app, web);
 };
+
+// Пробва схемата на приложението; ако нищо не се отвори за 1.2 сек,
+// пада към уеб адреса. Работи и в браузър, и в инсталирано PWA.
+function openApp(appUrl, webUrl){
+  var t0 = Date.now(), fired = false;
+  function fallback(){
+    if(fired) return;
+    fired = true;
+    if(Date.now() - t0 < 1600 && !document.hidden) openExternal(webUrl);
+  }
+  var timer = setTimeout(fallback, 1200);
+  document.addEventListener('visibilitychange', function once(){
+    if(document.hidden){ fired = true; clearTimeout(timer); }
+    document.removeEventListener('visibilitychange', once);
+  });
+  try{
+    var f = document.createElement('iframe');
+    f.style.display = 'none';
+    f.src = appUrl;
+    document.body.appendChild(f);
+    setTimeout(function(){ try{ f.remove(); }catch(e){} }, 1500);
+  }catch(e){
+    try{ location.href = appUrl; }catch(e2){ fallback(); }
+  }
+}
+window.openApp = openApp;
 
 // В инсталирано приложение (standalone) схемата intent:// се блокира от
 // WebView-то с ERR_UNKNOWN_URL_SCHEME. Обикновен https линк в нов таб
@@ -1907,6 +1940,10 @@ function checkEventAlerts(){
   if(!upcoming.length){panel.style.display='none';return;}
   const ev=upcoming[0], z=ZONES.find(x=>x.id===ev.zone);
   if(!z) return;
+  // затвореното известие не се отваря наново до края на сесията
+  if(panel.dataset.dismissed === '1'){ panel.style.display='none'; return; }
+  // събитие без име не носи информация
+  if(!ev.name || String(ev.name).trim().length < 3){ panel.style.display='none'; return; }
   const min=Math.round((ev.endHour-h)*60);
   document.getElementById('ea-icon').textContent=z.icon;
   document.getElementById('ea-title').textContent=`${ev.name} — след ${min} мин!`;
@@ -5892,10 +5929,10 @@ function toggleMapView(){
 (function(){
   var WORKER = 'https://mvr-proxy.mihov-emil.workers.dev';
 
-  function advice(score, label){
-    if(score >= 8) return 'карай защитно';
-    if(score >= 6) return 'внимавай';
-    if(score >= 4) return 'нормално';
+  function advice(score){
+    if(score >= 8) return 'опасно';
+    if(score >= 6) return 'напрегнато';
+    if(score >= 4) return 'умерено';
     return 'спокойно';
   }
   function colorFor(score){
@@ -5934,11 +5971,12 @@ function toggleMapView(){
         var s = d.score || 0;
         el.style.display = 'inline-flex';
         el.style.color = colorFor(s);
-        el.innerHTML = '⚠️ <b>' + s + '/10</b> <span style="font-weight:600;opacity:.9">'
-                     + advice(s, d.label) + '</span>';
-        el.title = (d.label || '') + ' · Kp ' + (d.factors && d.factors.kp)
+        el.innerHTML = '<b>' + s + '</b><span style="opacity:.55">/10</span>'
+                     + '<span class="kat-word">' + advice(s) + '</span>';
+        el.title = 'Пътно напрежение ' + s + '/10 — ' + advice(s)
+                 + ' · Kp ' + (d.factors && d.factors.kp)
                  + ' · Δналягане ' + (d.factors && d.factors.pressure_delta)
-                 + ' hPa — докосни за пълния анализ';
+                 + ' hPa. Докосни за пълния анализ.';
         el.classList.toggle('kat-high', s >= 7);
       })
       .catch(function(){});
