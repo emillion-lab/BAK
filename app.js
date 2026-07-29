@@ -5489,12 +5489,23 @@ function toggleMapView(){
     else { g.addColorStop(0,'rgba(150,205,255,.30)'); g.addColorStop(1,'rgba(220,240,255,.12)'); }
     ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
 
-    // звезди нощем
-    if(state.night){
+    // звезди нощем — колкото по-малко облаци, толкова по-ярки;
+    // при разкъсана облачност надничат между тях
+    if(state.night && state.cloud < 0.92){
+      var starVis = 1 - state.cloud * 0.85;
       stars.forEach(function(s){
-        var a = .35 + .45*Math.sin((t+s.tw*30)/40);
+        var a = (.3 + .5*Math.sin((t + s.tw*30)/40)) * starVis;
+        if(a <= 0.04) return;
         ctx.fillStyle = 'rgba(255,255,255,' + a.toFixed(2) + ')';
         ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 6.28); ctx.fill();
+        if(s.r > .9 && a > .5){          // лек блясък на по-едрите
+          ctx.strokeStyle = 'rgba(255,255,255,' + (a*.4).toFixed(2) + ')';
+          ctx.lineWidth = .6;
+          ctx.beginPath();
+          ctx.moveTo(s.x - s.r*2.4, s.y); ctx.lineTo(s.x + s.r*2.4, s.y);
+          ctx.moveTo(s.x, s.y - s.r*2.4); ctx.lineTo(s.x, s.y + s.r*2.4);
+          ctx.stroke();
+        }
       });
     }
 
@@ -5618,42 +5629,118 @@ function toggleMapView(){
       ctx.stroke();
     }
 
-    // 🚕 от време на време минава такси
-    if(!taxi.active && t > taxi.next){ taxi.active = true; taxi.dir = (taxi.dir === 1 ? -1 : 1); taxi.x = taxi.dir === -1 ? W + 30 : -30; }
+    // ═══ 🚕 ТАКСИТО: път, светеща табела, фарове и стопове ═══
+    var roadY = H - 4;
+    // асфалт
+    ctx.fillStyle = state.night ? 'rgba(20,26,38,.85)' : 'rgba(90,96,110,.55)';
+    ctx.fillRect(0, roadY - 1, W, 5);
+    // прекъсната осева линия
+    ctx.strokeStyle = state.night ? 'rgba(255,214,110,.45)' : 'rgba(255,255,255,.7)';
+    ctx.lineWidth = 1; ctx.setLineDash([7, 7]);
+    ctx.beginPath(); ctx.moveTo(0, roadY + 1.5); ctx.lineTo(W, roadY + 1.5); ctx.stroke();
+    ctx.setLineDash([]);
+
+    if(!taxi.active && t > taxi.next){
+      taxi.active = true;
+      taxi.dir = (taxi.dir === 1 ? -1 : 1);
+      taxi.x = taxi.dir === -1 ? W + 40 : -40;
+    }
     if(taxi.active){
-      taxi.x += 0.75 * taxi.dir;            // сменя посоката при всяко минаване
-      var ty = H - 6;
+      taxi.x += 0.75 * taxi.dir;
+      var cw = Math.min(30, H * 0.62);          // ширина на колата
+      var ch = cw * 0.46;
+      var by2 = roadY - 2;                       // колелата стъпват на пътя
+      var d = taxi.dir;
+
       ctx.save();
-      ctx.globalAlpha = .96;
-      var fs = Math.round(Math.min(15, H*.46));
-      ctx.font = fs + 'px system-ui';
-      ctx.textBaseline = 'alphabetic';
-      // огледално само когато върви наляво
-      ctx.save();
-      if(taxi.dir === -1){
-        ctx.translate(taxi.x + fs, ty); ctx.scale(-1, 1); ctx.fillText('🚕', 0, 0);
-      } else {
-        ctx.fillText('🚕', taxi.x, ty);
-      }
-      ctx.restore();
-      // описанието се тегли ЗАД колата (вдясно, тъй като върви наляво)
+      ctx.globalAlpha = 1;                       // плътна, без прозрачност
+
+      // ── табелата с времето, влачена ЗАД колата ──
       var label = state.desc || '';
       if(label){
-        ctx.font = '600 ' + Math.round(fs*0.72) + 'px system-ui,-apple-system,sans-serif';
+        var fsz = Math.max(8, Math.round(Math.min(11, H * 0.24)));
+        ctx.font = '700 ' + fsz + 'px system-ui,-apple-system,sans-serif';
         var tw = ctx.measureText(label).width;
-        // надписът винаги ЗАД колата спрямо посоката
-        var bx = taxi.dir === -1 ? (taxi.x + fs + 12) : (taxi.x - tw - 12);
-        var by = ty - fs*0.62;
-        ctx.fillStyle = state.night ? 'rgba(8,16,32,.55)' : 'rgba(255,255,255,.55)';
+        var padX = 7, boxW = tw + padX * 2, boxH = fsz + 8;
+        var boxX = d === -1 ? (taxi.x + cw + 10) : (taxi.x - cw - 10 - boxW);
+        var boxY = by2 - ch - boxH - 3;
+        // теглич
+        ctx.strokeStyle = state.night ? 'rgba(200,210,225,.8)' : 'rgba(70,80,95,.8)';
+        ctx.lineWidth = 1.2;
         ctx.beginPath();
-        if(ctx.roundRect) ctx.roundRect(bx-6, by-9, tw+12, fs*0.92, 6);
-        else ctx.rect(bx-6, by-9, tw+12, fs*0.92);
+        ctx.moveTo(d === -1 ? taxi.x + cw : taxi.x - cw, by2 - ch * 0.55);
+        ctx.lineTo(d === -1 ? boxX : boxX + boxW, boxY + boxH * 0.75);
+        ctx.stroke();
+        // самата табела — свети нощем
+        if(state.night){
+          ctx.shadowColor = 'rgba(255,214,90,.85)'; ctx.shadowBlur = 9;
+          ctx.fillStyle = 'rgba(58,46,12,.96)';
+        } else {
+          ctx.shadowColor = 'rgba(0,0,0,.25)'; ctx.shadowBlur = 4;
+          ctx.fillStyle = 'rgba(255,255,255,.97)';
+        }
+        ctx.beginPath();
+        if(ctx.roundRect) ctx.roundRect(boxX, boxY, boxW, boxH, 4);
+        else ctx.rect(boxX, boxY, boxW, boxH);
         ctx.fill();
-        ctx.fillStyle = state.night ? 'rgba(233,239,248,.95)' : 'rgba(15,27,45,.92)';
-        ctx.fillText(label, bx, by);
+        ctx.shadowBlur = 0;
+        ctx.strokeStyle = state.night ? 'rgba(255,206,80,.9)' : 'rgba(60,70,90,.35)';
+        ctx.lineWidth = 1; ctx.stroke();
+        ctx.fillStyle = state.night ? 'rgba(255,224,140,.98)' : 'rgba(20,28,44,.95)';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(label, boxX + padX, boxY + boxH / 2);
+        ctx.textBaseline = 'alphabetic';
       }
+
+      // ── каросерия ──
+      var bodyY = by2 - ch;
+      ctx.fillStyle = '#f5c518';                 // таксиметрово жълто
+      ctx.beginPath();
+      if(ctx.roundRect) ctx.roundRect(taxi.x - cw/2, bodyY, cw, ch, 3);
+      else ctx.rect(taxi.x - cw/2, bodyY, cw, ch);
+      ctx.fill();
+      // покрив
+      ctx.beginPath();
+      if(ctx.roundRect) ctx.roundRect(taxi.x - cw*0.26, bodyY - ch*0.52, cw*0.54, ch*0.56, 2);
+      else ctx.rect(taxi.x - cw*0.26, bodyY - ch*0.52, cw*0.54, ch*0.56);
+      ctx.fill();
+      // стъкла
+      ctx.fillStyle = state.night ? 'rgba(120,170,220,.55)' : 'rgba(150,200,240,.8)';
+      ctx.fillRect(taxi.x - cw*0.21, bodyY - ch*0.42, cw*0.44, ch*0.4);
+      // покривна табела TAXI — свети нощем
+      if(state.night){ ctx.shadowColor = 'rgba(255,220,120,.9)'; ctx.shadowBlur = 7; }
+      ctx.fillStyle = state.night ? '#ffd75e' : '#fff4c2';
+      ctx.fillRect(taxi.x - cw*0.12, bodyY - ch*0.72, cw*0.24, ch*0.2);
+      ctx.shadowBlur = 0;
+      // колела
+      ctx.fillStyle = state.night ? '#0b0f18' : '#1b2130';
+      var wr = Math.max(1.6, ch*0.2);
+      ctx.beginPath(); ctx.arc(taxi.x - cw*0.28, by2, wr, 0, 6.28); ctx.fill();
+      ctx.beginPath(); ctx.arc(taxi.x + cw*0.28, by2, wr, 0, 6.28); ctx.fill();
+
+      // ── фарове напред и стопове назад ──
+      var frontX = taxi.x + d * (cw/2);
+      var backX  = taxi.x - d * (cw/2);
+      if(state.night){
+        var lg = ctx.createLinearGradient(frontX, 0, frontX + d*26, 0);
+        lg.addColorStop(0, 'rgba(255,247,200,.75)');
+        lg.addColorStop(1, 'rgba(255,247,200,0)');
+        ctx.fillStyle = lg;
+        ctx.beginPath();
+        ctx.moveTo(frontX, bodyY + ch*0.35);
+        ctx.lineTo(frontX + d*26, bodyY + ch*0.05);
+        ctx.lineTo(frontX + d*26, bodyY + ch*0.85);
+        ctx.closePath(); ctx.fill();
+      }
+      ctx.fillStyle = state.night ? 'rgba(255,250,210,.98)' : 'rgba(255,252,225,.9)';
+      ctx.fillRect(frontX - (d>0?2:0), bodyY + ch*0.3, 2, ch*0.24);
+      ctx.fillStyle = state.night ? 'rgba(255,70,60,.95)' : 'rgba(210,60,50,.85)';
+      ctx.fillRect(backX - (d>0?0:2), bodyY + ch*0.3, 2, ch*0.24);
+
       ctx.restore();
-      if((taxi.dir === -1 && taxi.x < -220) || (taxi.dir === 1 && taxi.x > W + 220)){ taxi.active = false; taxi.next = t + 600; }
+      if((d === -1 && taxi.x < -260) || (d === 1 && taxi.x > W + 260)){
+        taxi.active = false; taxi.next = t + 600;
+      }
     }
 
     raf = requestAnimationFrame(loop);
