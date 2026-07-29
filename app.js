@@ -1941,7 +1941,9 @@ function checkEventAlerts(){
   const ev=upcoming[0], z=ZONES.find(x=>x.id===ev.zone);
   if(!z) return;
   // затвореното известие не се отваря наново до края на сесията
-  if(panel.dataset.dismissed === '1'){ panel.style.display='none'; return; }
+  var off = false;
+  try{ off = sessionStorage.getItem('ea_off') === '1'; }catch(e){}
+  if(panel.dataset.dismissed === '1' || off){ panel.style.display='none'; return; }
   // събитие без име не носи информация
   if(!ev.name || String(ev.name).trim().length < 3){ panel.style.display='none'; return; }
   const min=Math.round((ev.endHour-h)*60);
@@ -1954,11 +1956,10 @@ function checkEventAlerts(){
 }
 setInterval(checkEventAlerts,60000);
 document.getElementById('event-alert').querySelector('.ea-close').addEventListener('click',()=>{
-  const h=currentHour;
-  EVENTS.filter(ev=>dayMatches(ev)&&!ev._fromFlight).filter(ev=>{
-    const diff=ev.endHour-h; return diff>=0.25&&diff<=0.5&&ev.boost>=2.0;
-  }).forEach(ev=>alertedEvents.add(ev.name+ev.endHour));
-  document.getElementById('event-alert').style.display='none';
+  const p=document.getElementById('event-alert');
+  p.style.display='none';
+  p.dataset.dismissed='1';           // повече не се отваря в тази сесия
+  try{ sessionStorage.setItem('ea_off','1'); }catch(e){}
 });
 
 // ═══════════════════════════════════════════════
@@ -5554,6 +5555,7 @@ function toggleMapView(){
   }
 
   var taxi = { x: -80, active:false, next: 120, dir: -1 };   // редува посоката
+  var plane = { x: -40, y: 8, active:false, next: 400 };
 
   function loop(){
     if(!ctx){ return; }
@@ -5572,8 +5574,8 @@ function toggleMapView(){
     if(state.night && state.cloud < 0.92){
       var starVis = 1 - state.cloud * 0.85;
       stars.forEach(function(s){
-        var a = (.3 + .5*Math.sin((t + s.tw*30)/40)) * starVis;
-        if(a <= 0.04) return;
+        var a = (.55 + .4*Math.sin((t + s.tw*30)/40)) * starVis;
+        if(a <= 0.06) return;
         ctx.fillStyle = 'rgba(255,255,255,' + a.toFixed(2) + ')';
         ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 6.28); ctx.fill();
         if(s.r > .9 && a > .5){          // лек блясък на по-едрите
@@ -5588,7 +5590,7 @@ function toggleMapView(){
     }
 
     // слънце / луна
-    var cx = W*.09, cy = H*.26, R = Math.min(8, H*.20);
+    var cx = W*.045, cy = H*.26, R = Math.min(8, H*.20);
     if(state.night){
       var ph = moonPhase();                      // 0 новолуние … .5 пълнолуние
       var waxing = ph < .5;                      // расте ли
@@ -5680,6 +5682,51 @@ function toggleMapView(){
         if(f.y > H){ f.y = -3; f.x = Math.random()*W; }
         ctx.beginPath(); ctx.arc(f.x, f.y, f.r, 0, 6.28); ctx.fill();
       });
+    }
+
+    // ── птици денем ──
+    if(!state.night && state.rain === 0 && state.snow === 0){
+      ctx.strokeStyle = state.cloud > .6 ? 'rgba(70,80,95,.5)' : 'rgba(50,60,75,.55)';
+      ctx.lineWidth = 1.1;
+      for(var bi = 0; bi < 3; bi++){
+        var bx = ((t * 0.35) + bi * 130) % (W + 120) - 60;
+        var byv = H * 0.22 + Math.sin((t + bi * 60) / 55) * 3 + bi * 5;
+        var wing = 2.6 + Math.sin((t + bi * 40) / 9) * 1.8;   // махане с крила
+        ctx.beginPath();
+        ctx.moveTo(bx - 4, byv);
+        ctx.quadraticCurveTo(bx - 2, byv - wing, bx, byv);
+        ctx.quadraticCurveTo(bx + 2, byv - wing, bx + 4, byv);
+        ctx.stroke();
+      }
+    }
+
+    // ── самолет от време на време ──
+    if(!plane.active && t > plane.next){ plane.active = true; plane.x = -30; plane.y = H*0.16 + Math.random()*H*0.1; }
+    if(plane.active){
+      plane.x += 0.55;
+      ctx.save();
+      ctx.globalAlpha = state.night ? .85 : .7;
+      // следа
+      var tg = ctx.createLinearGradient(plane.x - 34, 0, plane.x, 0);
+      tg.addColorStop(0, 'rgba(255,255,255,0)');
+      tg.addColorStop(1, state.night ? 'rgba(200,220,255,.5)' : 'rgba(255,255,255,.75)');
+      ctx.strokeStyle = tg; ctx.lineWidth = 1.4;
+      ctx.beginPath(); ctx.moveTo(plane.x - 34, plane.y); ctx.lineTo(plane.x, plane.y); ctx.stroke();
+      // корпус
+      ctx.fillStyle = state.night ? 'rgba(226,232,240,.95)' : 'rgba(70,84,105,.9)';
+      ctx.beginPath();
+      ctx.moveTo(plane.x + 5, plane.y);
+      ctx.lineTo(plane.x - 3, plane.y - 1.6);
+      ctx.lineTo(plane.x - 3, plane.y + 1.6);
+      ctx.closePath(); ctx.fill();
+      ctx.fillRect(plane.x - 1.5, plane.y - 3.2, 1.4, 6.4);   // крила
+      // мигаща светлина нощем
+      if(state.night && (t % 40) < 8){
+        ctx.fillStyle = 'rgba(255,80,70,.95)';
+        ctx.beginPath(); ctx.arc(plane.x - 3, plane.y, 1.1, 0, 6.28); ctx.fill();
+      }
+      ctx.restore();
+      if(plane.x > W + 40){ plane.active = false; plane.next = t + 1400 + Math.random()*1600; }
     }
 
     // мъгла
@@ -5952,9 +5999,7 @@ function toggleMapView(){
       el.style.cssText = 'position:relative;z-index:1;margin-left:10px;font-size:12.5px;'
         + 'font-weight:800;white-space:nowrap;cursor:pointer;display:none;align-items:center;gap:4px';
       el.title = 'Пътен риск за деня — докосни за пълния анализ';
-      el.addEventListener('click', function(){
-        window.open('https://emillion-lab.github.io/KAT/', '_blank');
-      });
+      el.addEventListener('click', function(){ showKatPopup(); });
       // вмъкваме преди чипа за дъжда, за да е веднага след температурата
       var rain = document.getElementById('wx-rain-when');
       if(rain) bar.insertBefore(el, rain); else bar.appendChild(el);
@@ -5971,13 +6016,15 @@ function toggleMapView(){
         var s = d.score || 0;
         el.style.display = 'inline-flex';
         el.style.color = colorFor(s);
-        el.innerHTML = '<b>' + s + '</b><span style="opacity:.55">/10</span>'
-                     + '<span class="kat-word">' + advice(s) + '</span>';
+        el.innerHTML = '<span class="kat-ic">⚠️</span><b>' + s + '</b>'
+                     + '<span class="kat-slash">/10</span>';
         el.title = 'Пътно напрежение ' + s + '/10 — ' + advice(s)
                  + ' · Kp ' + (d.factors && d.factors.kp)
                  + ' · Δналягане ' + (d.factors && d.factors.pressure_delta)
                  + ' hPa. Докосни за пълния анализ.';
         el.classList.toggle('kat-high', s >= 7);
+        el.style.setProperty('--kat-col', colorFor(s));
+        window.__katData = d;
       })
       .catch(function(){});
   }
@@ -6031,3 +6078,39 @@ window.closeEventAlert = function(){
   setInterval(guard, 1200);
   document.addEventListener('DOMContentLoaded', guard);
 })();
+
+
+// ═══════════════════════════════════════════════
+// Кратко обяснение на пътното напрежение
+// ═══════════════════════════════════════════════
+window.showKatPopup = function(){
+  var d = window.__katData;
+  var w = document.getElementById('kat-pop');
+  if(!w){
+    w = document.createElement('div');
+    w.id = 'kat-pop';
+    document.body.appendChild(w);
+    w.addEventListener('click', function(e){ if(e.target === w) w.style.display='none'; });
+  }
+  if(!d){ return; }
+  var s = d.score || 0;
+  var word = s >= 8 ? 'опасно' : s >= 6 ? 'напрегнато' : s >= 4 ? 'умерено' : 'спокойно';
+  var col  = s >= 8 ? '#dc2626' : s >= 6 ? '#ea580c' : s >= 4 ? '#d97706' : '#16a34a';
+  var why  = [];
+  var f = d.factors || {};
+  if(f.kp >= 5)            why.push('силна геомагнитна активност (Kp ' + f.kp + ')');
+  else if(f.kp >= 3)       why.push('повишена геомагнитна активност (Kp ' + f.kp + ')');
+  if(Math.abs(f.pressure_delta || 0) >= 4) why.push('рязка промяна в налягането (' + f.pressure_delta + ' hPa)');
+  if(f.rush)               why.push('час пик');
+  if(!why.length)          why.push('спокойни условия');
+
+  w.innerHTML = '<div id="kat-pop-box">'
+    + '<button id="kat-pop-x" aria-label="Затвори">✕</button>'
+    + '<div id="kat-pop-score" style="color:' + col + '">' + s + '<span>/10</span></div>'
+    + '<div id="kat-pop-word" style="color:' + col + '">' + word + '</div>'
+    + '<div id="kat-pop-why">' + why.join(' · ') + '</div>'
+    + '<a id="kat-pop-link" href="https://emillion-lab.github.io/KAT/" target="_blank" rel="noopener">Пълен анализ →</a>'
+    + '</div>';
+  w.querySelector('#kat-pop-x').addEventListener('click', function(){ w.style.display='none'; });
+  w.style.display = 'flex';
+};

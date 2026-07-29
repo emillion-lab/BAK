@@ -1713,6 +1713,43 @@ body.theme-night{ --capsule:rgba(10,18,32,.62); --capsule-edge:rgba(34,211,238,.
 @media (display-mode: standalone), (display-mode: fullscreen){
   #kat-badge .kat-word{ display:none; }     /* в приложението само числото */
 }
+
+/* КАТ капсула: компактна, число с цвят според напрежението */
+#kat-badge{ display:inline-flex !important; align-items:center; gap:3px; padding:3px 8px !important; }
+#kat-badge .kat-ic{ font-size:.9em; }
+#kat-badge b{ font-size:1.05em; }
+#kat-badge .kat-slash{ opacity:.5; font-weight:600; font-size:.85em; }
+#kat-badge .kat-word{ display:none !important; }
+
+/* попъп с кратко обяснение */
+#kat-pop{
+  display:none; position:fixed; inset:0; z-index:3200;
+  background:var(--scrim); backdrop-filter:blur(3px);
+  align-items:center; justify-content:center; padding:24px;
+}
+#kat-pop-box{
+  position:relative; width:100%; max-width:300px; text-align:center;
+  background:var(--modal-bg); color:var(--text);
+  border:1px solid var(--modal-edge); border-radius:20px;
+  box-shadow:var(--modal-shadow); backdrop-filter:var(--modal-blur);
+  padding:22px 18px 18px;
+  animation:rise .26s var(--ease) both;
+}
+#kat-pop-x{
+  position:absolute; top:8px; right:8px;
+  width:32px; height:32px; border-radius:50%;
+  background:var(--surface); color:var(--text);
+  border:1px solid var(--glass-edge); font-size:16px; cursor:pointer;
+}
+#kat-pop-score{ font:800 42px/1 system-ui,sans-serif; }
+#kat-pop-score span{ font-size:20px; opacity:.5; }
+#kat-pop-word{ font:800 16px system-ui,sans-serif; margin-top:4px; }
+#kat-pop-why{ font-size:13px; color:var(--muted); margin:12px 0 16px; line-height:1.5; }
+#kat-pop-link{
+  display:inline-block; font-size:13px; font-weight:700; color:var(--cyan);
+  text-decoration:none; padding:8px 16px; border-radius:10px;
+  background:var(--glass); border:1px solid var(--glass-edge);
+}
 </style>
 <style>
 
@@ -2402,7 +2439,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260729v139"></script>
+<script src="app.js?v=20260729v140"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">
