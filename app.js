@@ -5637,8 +5637,8 @@ function toggleMapView(){
     // ═══ 🚕 ТАКСИТО: път, светеща табела, фарове и стопове ═══
     var roadY = H - 4;
     // асфалт
-    ctx.fillStyle = state.night ? 'rgba(20,26,38,.85)' : 'rgba(90,96,110,.55)';
-    ctx.fillRect(0, roadY - 1, W, 5);
+    ctx.fillStyle = state.night ? 'rgba(16,22,34,.95)' : 'rgba(78,84,98,.75)';
+    ctx.fillRect(0, roadY - 2, W, 7);
     // прекъсната осева линия
     ctx.strokeStyle = state.night ? 'rgba(255,214,110,.45)' : 'rgba(255,255,255,.7)';
     ctx.lineWidth = 1; ctx.setLineDash([7, 7]);
@@ -5652,7 +5652,7 @@ function toggleMapView(){
     }
     if(taxi.active){
       taxi.x += 0.75 * taxi.dir;
-      var cw = Math.min(46, H * 0.92);          // ширина на колата
+      var cw = Math.min(34, H * 0.68);          // ширина на колата
       var ch = cw * 0.42;
       var by2 = roadY - 2;                       // колелата стъпват на пътя
       var d = taxi.dir;
@@ -5710,12 +5710,13 @@ function toggleMapView(){
       var frontX = taxi.x + d * (cw * 0.5);
       var backX  = taxi.x - d * (cw * 0.5);
       var lampY  = by2 - ch * 0.42;
-      if(state.night){
+      var nightGlow = state.night ? 1 : 0.42;      // денем по-меко, но видимо
+      {
         // конус светлина напред
         ctx.globalCompositeOperation = 'lighter';
         var lg = ctx.createLinearGradient(frontX, lampY, frontX + d * 44, lampY);
-        lg.addColorStop(0,   'rgba(255,244,190,.85)');
-        lg.addColorStop(.45, 'rgba(255,240,170,.30)');
+        lg.addColorStop(0,   'rgba(255,240,150,' + (0.9*nightGlow).toFixed(2) + ')');
+        lg.addColorStop(.45, 'rgba(255,236,140,' + (0.4*nightGlow).toFixed(2) + ')');
         lg.addColorStop(1,   'rgba(255,240,170,0)');
         ctx.fillStyle = lg;
         ctx.beginPath();
@@ -5726,13 +5727,13 @@ function toggleMapView(){
         ctx.closePath(); ctx.fill();
         // отблясък по асфалта
         var rg = ctx.createRadialGradient(frontX + d*16, by2, 0, frontX + d*16, by2, 22);
-        rg.addColorStop(0, 'rgba(255,240,180,.35)');
+        rg.addColorStop(0, 'rgba(255,235,150,' + (0.45*nightGlow).toFixed(2) + ')');
         rg.addColorStop(1, 'rgba(255,240,180,0)');
         ctx.fillStyle = rg;
         ctx.fillRect(frontX + d*16 - 22, by2 - 6, 44, 10);
         // червено зарево отзад
         var rr = ctx.createRadialGradient(backX, lampY, 0, backX, lampY, 16);
-        rr.addColorStop(0, 'rgba(255,60,50,.65)');
+        rr.addColorStop(0, 'rgba(255,45,35,' + (0.8*nightGlow).toFixed(2) + ')');
         rr.addColorStop(1, 'rgba(255,60,50,0)');
         ctx.fillStyle = rr;
         ctx.fillRect(backX - 16, lampY - 16, 32, 32);
@@ -5788,10 +5789,10 @@ function toggleMapView(){
 
       // ── ПОКРИВНА ТАБЕЛА със сияние ──
       var sgW = cw*0.30, sgH = ch*0.26, sgX = taxi.x - sgW/2, sgY = bodyY - ch*0.48 - sgH;
-      if(state.night){
+      {
         ctx.globalCompositeOperation = 'lighter';
         var sg = ctx.createRadialGradient(taxi.x, sgY + sgH/2, 0, taxi.x, sgY + sgH/2, sgW*1.6);
-        sg.addColorStop(0, 'rgba(255,220,110,.8)');
+        sg.addColorStop(0, 'rgba(255,215,90,' + (0.85*nightGlow).toFixed(2) + ')');
         sg.addColorStop(1, 'rgba(255,220,110,0)');
         ctx.fillStyle = sg;
         ctx.fillRect(taxi.x - sgW*1.6, sgY - sgW*0.9, sgW*3.2, sgH + sgW*1.8);
@@ -5813,10 +5814,10 @@ function toggleMapView(){
       });
 
       // ── самите лампи отгоре ──
-      ctx.fillStyle = state.night ? '#fffdf0' : '#fff8dc';
+      ctx.fillStyle = '#fffdf0';
       ctx.beginPath();
       ctx.ellipse(frontX - d*1.5, lampY, 2.2, ch*0.15, 0, 0, 6.28); ctx.fill();
-      ctx.fillStyle = state.night ? '#ff4a3d' : '#d94336';
+      ctx.fillStyle = '#ff3b2d';
       ctx.beginPath();
       ctx.ellipse(backX + d*1.5, lampY, 1.8, ch*0.13, 0, 0, 6.28); ctx.fill();
 
