@@ -1937,6 +1937,10 @@ function checkEventAlerts(){
     return diff>=0.25&&diff<=0.5&&ev.boost>=2.0&&!alertedEvents.has(ev.name+ev.endHour);
   }).sort((a,b)=>a.endHour-b.endHour);
   const panel=document.getElementById('event-alert');
+  // затворено веднъж — не се връща
+  var _off = false;
+  try{ _off = sessionStorage.getItem('ea_off') === '1'; }catch(e){}
+  if(_off || panel.dataset.dismissed === '1'){ panel.style.display='none'; return; }
   if(!upcoming.length){panel.style.display='none';return;}
   const ev=upcoming[0], z=ZONES.find(x=>x.id===ev.zone);
   if(!z) return;
