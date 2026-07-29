@@ -61,17 +61,25 @@ RESULT: {
   "стариятНадпис": false,
   "нямаДанни": false,
   "проба": [
-   "КПВ 10224",
-   "БВ 8650",
-   "БВ 5614"
+   "КПВ 20238",
+   "КПВ 10222",
+   "КПВ 20240"
   ]
+ },
+ "taxi": {
+  "canvas": true,
+  "w": 390,
+  "h": 50,
+  "yellowPx": 231,
+  "litPx": 0,
+  "roadPx": 10
  },
  "tilesDark": "invert(1) hue-rotate(180deg) brightness(",
  "dirHint": "rgba(255, 255, 255, 0.62) (яркост 255)",
  "destErr": null,
  "mapH": 844,
  "mapBottom": 844,
- "stackH": 238,
+ "stackH": 248,
  "viewport": 844,
  "fanGone": true
 }
