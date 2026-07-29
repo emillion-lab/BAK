@@ -1693,6 +1693,18 @@ body.theme-night{ --capsule:rgba(10,18,32,.62); --capsule-edge:rgba(34,211,238,.
   #event-alert .ea-title{ font-size:11.5px !important; }
   .zone-item{ font-size:clamp(10px, 2.9vw, 12px) !important; }
 }
+
+/* Топ заглавието: по-дребно и с многоточие вместо отрязване */
+.tl-hint{
+  font-size:clamp(11px, 3.2vw, 13.5px) !important;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  max-width:100%;
+}
+@media (display-mode: standalone), (display-mode: fullscreen){
+  .tl-hint{ font-size:clamp(10px, 2.8vw, 12px) !important; }
+}
+/* известието се крие честно, когато няма какво да каже */
+#event-alert[data-dismissed="1"]{ display:none !important; }
 </style>
 <style>
 
@@ -2382,7 +2394,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260729v137"></script>
+<script src="app.js?v=20260729v138"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">

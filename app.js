@@ -64,7 +64,7 @@ function isIntlBus(o){
     }catch(err){}
     return false;
   }
-  var N = ["closeDirHint", "closeEventAlert", "closeNav", ];
+  var N = ["closeDirHint", "closeNav", ];
   N.forEach(function(n){
     if(typeof window[n] === 'function') return;
     window[n] = hideOwner;
@@ -1055,26 +1055,39 @@ window.showAirportSchedule = showAirportSchedule;   // вика се от inline
 // ------ Waze: отваря ПРИЛОЖЕНИЕТО, не уеб страницата ------
 window.openWaze = function(name, lat, lng){
   var hasLL = isFinite(lat) && isFinite(lng);
-  var q     = encodeURIComponent(name || '');
-  var web   = hasLL ? 'https://waze.com/ul?ll=' + lat + ',' + lng + '&navigate=yes'
-                    : 'https://waze.com/ul?q=' + q + '&navigate=yes';
-  var isAndroid = /android/i.test(navigator.userAgent);
-  if(isAndroid){
-    // intent:// е най-надеждният начин — Android отваря Waze, а ако липсва, пада към уеб
-    var payload = hasLL ? ('?ll=' + lat + ',' + lng + '&navigate=yes') : ('?q=' + q + '&navigate=yes');
-    // ВАЖНО: въпросителната остава — иначе става waze://ll=… и приложението не навигира
-    window.location.href = 'intent://' + payload +
-      '#Intent;scheme=waze;package=com.waze;S.browser_fallback_url=' +
-      encodeURIComponent(web) + ';end';
-    return;
-  }
-  // iOS и останалите: пробваме схемата, после уеб
-  var deep = hasLL ? ('waze://?ll=' + lat + ',' + lng + '&navigate=yes')
-                   : ('waze://?q=' + q + '&navigate=yes');
-  var t = Date.now();
-  window.location.href = deep;
-  setTimeout(function(){ if(Date.now() - t < 1800) window.open(web, '_blank'); }, 1100);
+  var q   = encodeURIComponent(name || '');
+  var web = hasLL ? 'https://waze.com/ul?ll=' + lat + ',' + lng + '&navigate=yes'
+                  : 'https://waze.com/ul?q=' + q + '&navigate=yes';
+  openExternal(web);
 };
+
+window.openGoogleMaps = function(name, lat, lng){
+  var web = (isFinite(lat) && isFinite(lng))
+    ? 'https://www.google.com/maps/dir/?api=1&destination=' + lat + ',' + lng + '&travelmode=driving'
+    : 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(name || '');
+  openExternal(web);
+};
+
+// В инсталирано приложение (standalone) схемата intent:// се блокира от
+// WebView-то с ERR_UNKNOWN_URL_SCHEME. Обикновен https линк в нов таб
+// работи навсякъде — Android сам предлага съответното приложение.
+function openExternal(url){
+  try{
+    var w = window.open(url, '_blank', 'noopener');
+    if(w) return;
+  }catch(e){}
+  // резерва: временна връзка с истински клик
+  try{
+    var a = document.createElement('a');
+    a.href = url; a.target = '_blank'; a.rel = 'noopener';
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ a.remove(); }, 300);
+    return;
+  }catch(e){}
+  location.href = url;
+}
+window.openExternal = openExternal;
+
 
 function showAirportSchedule() {
   const now = new Date();
@@ -1268,7 +1281,7 @@ function showZonePopup(zid) {
     <div style="display:flex;gap:5px;margin-top:5px">
       <a href="#" onclick="event.preventDefault();openWaze('${(z.wazeName||z.name).replace(/'/g,"\\'")}',${z.lat},${z.lng});return false;"
          style="flex:1;text-align:center;font-size:14px;color:#00e5ff;padding:4px;background:#0d1929;border:1px solid #182d47;border-radius:4px;text-decoration:none">🚗 Waze</a>
-      <a href="https://www.google.com/maps?q=${z.lat},${z.lng}" target="_blank"
+      <a href="#" onclick="event.preventDefault();openGoogleMaps('${(z.name||'').replace(/'/g,"\\'")}',${z.lat},${z.lng});return false;"
          style="flex:1;text-align:center;font-size:14px;color:#4a6080;padding:4px;background:#0d1929;border:1px solid #182d47;border-radius:4px;text-decoration:none">📍 Google</a>
     </div>`:''}
   `).openOn(map);
@@ -5949,4 +5962,34 @@ function toggleMapView(){
       else fetch(W + '/track', {method:'POST', headers:{'Content-Type':'application/json'}, body: body, keepalive:true});
     }
   }catch(e){}
+})();
+
+
+// ═══════════════════════════════════════════════
+// Затваряне на известието — истинска реализация.
+// Досега беше защитна заглушка, която криеше грешен елемент,
+// затова Х-ът не вършеше нищо.
+// ═══════════════════════════════════════════════
+window.closeEventAlert = function(){
+  var el = document.getElementById('event-alert');
+  if(el){
+    el.style.display = 'none';
+    el.dataset.dismissed = '1';
+    try{ sessionStorage.setItem('ea_dismissed', String(Date.now())); }catch(e){}
+  }
+};
+
+// Известие без смислен текст не се показва изобщо
+(function(){
+  function guard(){
+    var el = document.getElementById('event-alert');
+    if(!el) return;
+    if(el.dataset.dismissed === '1'){ el.style.display = 'none'; return; }
+    var title = (document.getElementById('ea-title') || {}).textContent || '';
+    var sub   = (document.getElementById('ea-sub')   || {}).textContent || '';
+    var text  = (title + ' ' + sub).replace(/[\s\u2013\u2014·—-]/g, '').trim();
+    if(text.length < 3) el.style.display = 'none';
+  }
+  setInterval(guard, 1200);
+  document.addEventListener('DOMContentLoaded', guard);
 })();
