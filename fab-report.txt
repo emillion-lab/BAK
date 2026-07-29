@@ -70,9 +70,9 @@ RESULT: {
   "canvas": true,
   "w": 390,
   "h": 50,
-  "yellowPx": 231,
+  "yellowPx": 240,
   "litPx": 0,
-  "roadPx": 10
+  "roadPx": 395
  },
  "tilesDark": "invert(1) hue-rotate(180deg) brightness(",
  "dirHint": "rgba(255, 255, 255, 0.62) (яркост 255)",
@@ -83,5 +83,5 @@ RESULT: {
  "viewport": 844,
  "fanGone": true
 }
-TILEFAILS: 0
+TILEFAILS: 8
 PAGEERRORS: none
