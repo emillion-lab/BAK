@@ -5348,7 +5348,7 @@ function toggleMapView(){
   function pullWeather(){
     var url = 'https://api.open-meteo.com/v1/forecast?latitude=42.6977&longitude=23.3219'
             + '&current=temperature_2m,precipitation,cloud_cover,wind_speed_10m,is_day,weather_code'
-            + '&hourly=precipitation_probability,precipitation,snowfall&forecast_days=1&timezone=Europe%2FSofia';
+            + '&hourly=precipitation_probability,precipitation,snowfall&forecast_days=2&timezone=Europe%2FSofia';
     fetch(url).then(function(r){ return r.json(); }).then(function(d){
       var c = d.current || {};
       state.night = c.is_day === 0;
@@ -5376,14 +5376,17 @@ function toggleMapView(){
 
       // кога се очаква дъжд
       state.rainAt = null;
+      state.rainHorizon = 12;                     // гледаме само смяната напред
       try{
         var times = d.hourly.time, prob = d.hourly.precipitation_probability, mm = d.hourly.precipitation;
-        var now = Date.now();
+        var now = Date.now(), limit = now + state.rainHorizon * 3600000;
         for(var i = 0; i < times.length; i++){
           var ts = new Date(times[i]).getTime();
           if(ts < now) continue;
-          if((prob[i] >= 55) || (mm[i] > 0.2)){
-            state.rainAt = { time: times[i].slice(11,16), prob: prob[i] };
+          if(ts > limit) break;                   // отвъд 12ч не ни засяга
+          if((prob[i] >= 50) || (mm[i] > 0.15)){
+            var inH = Math.round((ts - now) / 3600000);
+            state.rainAt = { time: times[i].slice(11,16), prob: prob[i], inH: inH };
             break;
           }
         }
@@ -5442,12 +5445,14 @@ function toggleMapView(){
       chip.textContent = 'вали';
       chip.style.color = '#0284c7';
     } else if(state.rainAt){
-      chip.textContent = '🌧 ' + state.rainAt.time;
-      chip.title = 'Очакван дъжд · ' + state.rainAt.prob + '% вероятност';
-      chip.style.color = 'var(--amber)';
+      var a = state.rainAt;
+      chip.textContent = '🌧 ' + a.time + (a.inH <= 3 ? ' (след ' + a.inH + 'ч)' : '');
+      chip.title = 'Очакван дъжд в ' + a.time + ' · ' + a.prob + '% вероятност';
+      chip.style.color = a.inH <= 3 ? '#dc2626' : 'var(--amber)';
     } else {
-      chip.textContent = '';        // няма дъжд — пейзажът го показва
-      chip.title = 'Без дъжд в следващите 12 часа';
+      chip.textContent = '☂️ сухо';
+      chip.title = 'Без дъжд в следващите ' + (state.rainHorizon || 12) + ' часа';
+      chip.style.color = 'var(--muted)';
     }
 
     // иконата вляво следва реалното време, а не статична емоджи
@@ -5647,16 +5652,25 @@ function toggleMapView(){
     }
     if(taxi.active){
       taxi.x += 0.75 * taxi.dir;
-      var cw = Math.min(30, H * 0.62);          // ширина на колата
-      var ch = cw * 0.46;
+      var cw = Math.min(46, H * 0.92);          // ширина на колата
+      var ch = cw * 0.42;
       var by2 = roadY - 2;                       // колелата стъпват на пътя
       var d = taxi.dir;
 
       ctx.save();
       ctx.globalAlpha = 1;                       // плътна, без прозрачност
 
-      // ── табелата с времето, влачена ЗАД колата ──
-      var label = state.desc || '';
+      // ── табелата: в едната посока условията, в другата прогнозата за дъжд ──
+      var label;
+      if(d === -1){
+        label = state.desc || '';
+      } else {
+        var a = state.rainAt;
+        if(state.rain > 0)      label = 'вали сега';
+        else if(a && a.inH <= 1) label = 'дъжд до час';
+        else if(a)               label = 'дъжд към ' + a.time;
+        else                     label = (state.rainHorizon || 12) + 'ч без дъжд';
+      }
       if(label){
         var fsz = Math.max(8, Math.round(Math.min(11, H * 0.24)));
         ctx.font = '700 ' + fsz + 'px system-ui,-apple-system,sans-serif';
@@ -5692,50 +5706,119 @@ function toggleMapView(){
         ctx.textBaseline = 'alphabetic';
       }
 
-      // ── каросерия ──
-      var bodyY = by2 - ch;
-      ctx.fillStyle = '#f5c518';                 // таксиметрово жълто
-      ctx.beginPath();
-      if(ctx.roundRect) ctx.roundRect(taxi.x - cw/2, bodyY, cw, ch, 3);
-      else ctx.rect(taxi.x - cw/2, bodyY, cw, ch);
-      ctx.fill();
-      // покрив
-      ctx.beginPath();
-      if(ctx.roundRect) ctx.roundRect(taxi.x - cw*0.26, bodyY - ch*0.52, cw*0.54, ch*0.56, 2);
-      else ctx.rect(taxi.x - cw*0.26, bodyY - ch*0.52, cw*0.54, ch*0.56);
-      ctx.fill();
-      // стъкла
-      ctx.fillStyle = state.night ? 'rgba(120,170,220,.55)' : 'rgba(150,200,240,.8)';
-      ctx.fillRect(taxi.x - cw*0.21, bodyY - ch*0.42, cw*0.44, ch*0.4);
-      // покривна табела TAXI — свети нощем
-      if(state.night){ ctx.shadowColor = 'rgba(255,220,120,.9)'; ctx.shadowBlur = 7; }
-      ctx.fillStyle = state.night ? '#ffd75e' : '#fff4c2';
-      ctx.fillRect(taxi.x - cw*0.12, bodyY - ch*0.72, cw*0.24, ch*0.2);
-      ctx.shadowBlur = 0;
-      // колела
-      ctx.fillStyle = state.night ? '#0b0f18' : '#1b2130';
-      var wr = Math.max(1.6, ch*0.2);
-      ctx.beginPath(); ctx.arc(taxi.x - cw*0.28, by2, wr, 0, 6.28); ctx.fill();
-      ctx.beginPath(); ctx.arc(taxi.x + cw*0.28, by2, wr, 0, 6.28); ctx.fill();
-
-      // ── фарове напред и стопове назад ──
-      var frontX = taxi.x + d * (cw/2);
-      var backX  = taxi.x - d * (cw/2);
+      // ── ФАРОВЕ И СТОПОВЕ (първо сиянията, после колата отгоре) ──
+      var frontX = taxi.x + d * (cw * 0.5);
+      var backX  = taxi.x - d * (cw * 0.5);
+      var lampY  = by2 - ch * 0.42;
       if(state.night){
-        var lg = ctx.createLinearGradient(frontX, 0, frontX + d*26, 0);
-        lg.addColorStop(0, 'rgba(255,247,200,.75)');
-        lg.addColorStop(1, 'rgba(255,247,200,0)');
+        // конус светлина напред
+        ctx.globalCompositeOperation = 'lighter';
+        var lg = ctx.createLinearGradient(frontX, lampY, frontX + d * 44, lampY);
+        lg.addColorStop(0,   'rgba(255,244,190,.85)');
+        lg.addColorStop(.45, 'rgba(255,240,170,.30)');
+        lg.addColorStop(1,   'rgba(255,240,170,0)');
         ctx.fillStyle = lg;
         ctx.beginPath();
-        ctx.moveTo(frontX, bodyY + ch*0.35);
-        ctx.lineTo(frontX + d*26, bodyY + ch*0.05);
-        ctx.lineTo(frontX + d*26, bodyY + ch*0.85);
+        ctx.moveTo(frontX, lampY - ch*0.12);
+        ctx.lineTo(frontX + d*44, lampY - ch*1.05);
+        ctx.lineTo(frontX + d*44, by2 + 2);
+        ctx.lineTo(frontX, lampY + ch*0.2);
         ctx.closePath(); ctx.fill();
+        // отблясък по асфалта
+        var rg = ctx.createRadialGradient(frontX + d*16, by2, 0, frontX + d*16, by2, 22);
+        rg.addColorStop(0, 'rgba(255,240,180,.35)');
+        rg.addColorStop(1, 'rgba(255,240,180,0)');
+        ctx.fillStyle = rg;
+        ctx.fillRect(frontX + d*16 - 22, by2 - 6, 44, 10);
+        // червено зарево отзад
+        var rr = ctx.createRadialGradient(backX, lampY, 0, backX, lampY, 16);
+        rr.addColorStop(0, 'rgba(255,60,50,.65)');
+        rr.addColorStop(1, 'rgba(255,60,50,0)');
+        ctx.fillStyle = rr;
+        ctx.fillRect(backX - 16, lampY - 16, 32, 32);
+        ctx.globalCompositeOperation = 'source-over';
       }
-      ctx.fillStyle = state.night ? 'rgba(255,250,210,.98)' : 'rgba(255,252,225,.9)';
-      ctx.fillRect(frontX - (d>0?2:0), bodyY + ch*0.3, 2, ch*0.24);
-      ctx.fillStyle = state.night ? 'rgba(255,70,60,.95)' : 'rgba(210,60,50,.85)';
-      ctx.fillRect(backX - (d>0?0:2), bodyY + ch*0.3, 2, ch*0.24);
+
+      // ── КАРОСЕРИЯ: заоблена форма с преден и заден капак ──
+      var bodyY = by2 - ch;
+      var grad = ctx.createLinearGradient(0, bodyY - ch*0.5, 0, by2);
+      grad.addColorStop(0, '#ffd94a');
+      grad.addColorStop(.55, '#f5c518');
+      grad.addColorStop(1, '#d9a800');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      var x0 = taxi.x - cw/2, x1 = taxi.x + cw/2;
+      ctx.moveTo(x0, by2);
+      ctx.lineTo(x0, bodyY + ch*0.35);
+      ctx.quadraticCurveTo(x0 + cw*0.06, bodyY + ch*0.1, x0 + cw*0.2, bodyY + ch*0.06);
+      ctx.lineTo(x1 - cw*0.2, bodyY + ch*0.06);
+      ctx.quadraticCurveTo(x1 - cw*0.06, bodyY + ch*0.1, x1, bodyY + ch*0.35);
+      ctx.lineTo(x1, by2);
+      ctx.closePath(); ctx.fill();
+
+      // кабина
+      ctx.beginPath();
+      ctx.moveTo(taxi.x - cw*0.30, bodyY + ch*0.08);
+      ctx.lineTo(taxi.x - cw*0.20, bodyY - ch*0.48);
+      ctx.lineTo(taxi.x + cw*0.20, bodyY - ch*0.48);
+      ctx.lineTo(taxi.x + cw*0.30, bodyY + ch*0.08);
+      ctx.closePath(); ctx.fill();
+
+      // стъкла
+      ctx.fillStyle = state.night ? 'rgba(90,140,190,.75)' : 'rgba(160,210,245,.9)';
+      ctx.beginPath();
+      ctx.moveTo(taxi.x - cw*0.25, bodyY + ch*0.02);
+      ctx.lineTo(taxi.x - cw*0.17, bodyY - ch*0.40);
+      ctx.lineTo(taxi.x - cw*0.02, bodyY - ch*0.40);
+      ctx.lineTo(taxi.x - cw*0.02, bodyY + ch*0.02);
+      ctx.closePath(); ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(taxi.x + cw*0.02, bodyY + ch*0.02);
+      ctx.lineTo(taxi.x + cw*0.02, bodyY - ch*0.40);
+      ctx.lineTo(taxi.x + cw*0.17, bodyY - ch*0.40);
+      ctx.lineTo(taxi.x + cw*0.25, bodyY + ch*0.02);
+      ctx.closePath(); ctx.fill();
+
+      // шахматна лента отстрани
+      ctx.fillStyle = 'rgba(30,36,50,.85)';
+      for(var sq = 0; sq < 5; sq++){
+        if(sq % 2) continue;
+        ctx.fillRect(taxi.x - cw*0.34 + sq*cw*0.14, bodyY + ch*0.42, cw*0.14, ch*0.16);
+      }
+
+      // ── ПОКРИВНА ТАБЕЛА със сияние ──
+      var sgW = cw*0.30, sgH = ch*0.26, sgX = taxi.x - sgW/2, sgY = bodyY - ch*0.48 - sgH;
+      if(state.night){
+        ctx.globalCompositeOperation = 'lighter';
+        var sg = ctx.createRadialGradient(taxi.x, sgY + sgH/2, 0, taxi.x, sgY + sgH/2, sgW*1.6);
+        sg.addColorStop(0, 'rgba(255,220,110,.8)');
+        sg.addColorStop(1, 'rgba(255,220,110,0)');
+        ctx.fillStyle = sg;
+        ctx.fillRect(taxi.x - sgW*1.6, sgY - sgW*0.9, sgW*3.2, sgH + sgW*1.8);
+        ctx.globalCompositeOperation = 'source-over';
+      }
+      ctx.fillStyle = state.night ? '#fff0a8' : '#fffbe0';
+      ctx.beginPath();
+      if(ctx.roundRect) ctx.roundRect(sgX, sgY, sgW, sgH, 1.5); else ctx.rect(sgX, sgY, sgW, sgH);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(60,50,10,.5)'; ctx.lineWidth = .6; ctx.stroke();
+
+      // ── КОЛЕЛА с джанти ──
+      var wr = Math.max(2, ch*0.24);
+      [-cw*0.27, cw*0.27].forEach(function(wx){
+        ctx.fillStyle = '#12161f';
+        ctx.beginPath(); ctx.arc(taxi.x + wx, by2 - wr*0.15, wr, 0, 6.28); ctx.fill();
+        ctx.fillStyle = state.night ? '#5b6577' : '#c3cbd8';
+        ctx.beginPath(); ctx.arc(taxi.x + wx, by2 - wr*0.15, wr*0.42, 0, 6.28); ctx.fill();
+      });
+
+      // ── самите лампи отгоре ──
+      ctx.fillStyle = state.night ? '#fffdf0' : '#fff8dc';
+      ctx.beginPath();
+      ctx.ellipse(frontX - d*1.5, lampY, 2.2, ch*0.15, 0, 0, 6.28); ctx.fill();
+      ctx.fillStyle = state.night ? '#ff4a3d' : '#d94336';
+      ctx.beginPath();
+      ctx.ellipse(backX + d*1.5, lampY, 1.8, ch*0.13, 0, 0, 6.28); ctx.fill();
 
       ctx.restore();
       if((d === -1 && taxi.x < -260) || (d === 1 && taxi.x > W + 260)){
