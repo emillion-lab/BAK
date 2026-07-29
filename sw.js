@@ -1,7 +1,7 @@
 // BakshishApp Service Worker
 // Кешира файловете за офлайн работа
 
-const CACHE_NAME = 'bakshishapp-bak-v91';
+const CACHE_NAME = 'bakshishapp-bak-v92';
 const STATIC_FILES = [
   '/BAK/',
   '/BAK/index.html',

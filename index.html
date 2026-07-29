@@ -1614,6 +1614,46 @@ body.full-list #chip-stack, body[data-full] #chip-stack{ opacity:0 !important; p
 }
 /* пейзажът има нужда от малко повече височина за пътя */
 #weather-bar{ min-height:52px; }
+
+/* ═══ Лентата за времето: подредена мрежа, нищо не се застъпва ═══
+   [температура] [КАТ] ......... [дъжд] | бутон тема отвън          */
+#weather-bar{
+  display:grid !important;
+  grid-template-columns:auto auto 1fr auto;
+  align-items:center;
+  gap:10px;
+  padding-right:56px !important;      /* място за бутона на темата */
+}
+#weather-bar .wb-icon{ display:none !important; }   /* пейзажът рисува светилото */
+
+/* стъклени капсули около всяка стойност */
+#weather-bar .wb-temp,
+#kat-badge,
+#wx-rain-when{
+  position:relative; z-index:2;
+  padding:3px 9px !important;
+  border-radius:999px;
+  background:var(--capsule);
+  border:1px solid var(--capsule-edge);
+  backdrop-filter:saturate(180%) blur(10px);
+  -webkit-backdrop-filter:saturate(180%) blur(10px);
+  box-shadow:0 1px 3px rgba(15,27,45,.10);
+  line-height:1.5;
+}
+#wx-rain-when{ justify-self:end; margin-left:0 !important; }
+#kat-badge{ margin-left:0 !important; }
+
+/* бутонът за темата стои над лентата, вдясно, без да пипа нищо */
+#theme-btn{ top:52px !important; right:8px !important; z-index:2650 !important; }
+
+/* тъмната тема: по-плътни капсули */
+body.theme-day{ --capsule:rgba(255,255,255,.72); --capsule-edge:rgba(15,27,45,.12); }
+body.theme-night{ --capsule:rgba(10,18,32,.62); --capsule-edge:rgba(34,211,238,.28); }
+
+@media (max-width:400px){
+  #weather-bar{ gap:6px; padding-right:50px !important; }
+  #weather-bar .wb-temp, #kat-badge, #wx-rain-when{ padding:2px 7px !important; }
+}
 </style>
 <style>
 
@@ -2303,7 +2343,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260729v135"></script>
+<script src="app.js?v=20260729v136"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">

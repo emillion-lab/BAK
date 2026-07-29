@@ -1364,7 +1364,12 @@ function render(hour) {
     document.getElementById('tl-hint').textContent='— мъртва зона, почини';
     window.__topRot = null;
   } else {
-    window.__topRot = sorted
+    // Топ винаги отразява текущия момент, а не позицията на плъзгача
+    var nowH = new Date().getHours() + new Date().getMinutes()/60;
+    var liveScores = (Math.abs(nowH - hour) > 0.5)
+      ? computeScores(Math.round(nowH*2)/2).scores : scores;
+    var sortedLive = Object.entries(liveScores).sort((a,b)=>b[1]-a[1]);
+    window.__topRot = sortedLive
       .filter(function(e){
         var zz = ZONES.find(function(x){ return x.id === e[0]; });
         if(!zz) return true;
@@ -5450,7 +5455,7 @@ function toggleMapView(){
       chip.title = 'Очакван дъжд в ' + a.time + ' · ' + a.prob + '% вероятност';
       chip.style.color = a.inH <= 3 ? '#dc2626' : 'var(--amber)';
     } else {
-      chip.textContent = '☂️ сухо';
+      chip.textContent = '🌂 сухо';
       chip.title = 'Без дъжд в следващите ' + (state.rainHorizon || 12) + ' часа';
       chip.style.color = 'var(--muted)';
     }
