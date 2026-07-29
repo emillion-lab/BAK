@@ -70,9 +70,20 @@ RESULT: {
   "canvas": true,
   "w": 390,
   "h": 50,
-  "yellowPx": 228,
+  "yellowPx": 280,
   "litPx": 0,
-  "roadPx": 395
+  "roadPx": 395,
+  "brightest": [
+   215,
+   235,
+   255
+  ],
+  "taxiState": {
+   "x": 651,
+   "dir": 1,
+   "night": false,
+   "W": 390
+  }
  },
  "tilesDark": "invert(1) hue-rotate(180deg) brightness(",
  "dirHint": "rgba(255, 255, 255, 0.62) (яркост 255)",
@@ -83,5 +94,5 @@ RESULT: {
  "viewport": 844,
  "fanGone": true
 }
-TILEFAILS: 7
+TILEFAILS: 0
 PAGEERRORS: none
