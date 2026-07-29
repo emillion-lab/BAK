@@ -83,7 +83,24 @@ jobs:
           });
           await p.evaluate(()=>{const e=document.getElementById('dest-cjp'); if(e) e.click();});
           await new Promise(r=>setTimeout(r,300));
-          const out = await p.evaluate((opensIn, fadeIn, airportTapIn, bdzIn) => {
+          // пейзажът: рисува ли се колата и има ли грешки в canvas-а
+          await new Promise(r=>setTimeout(r,3000));
+          const taxiCheck = await p.evaluate(()=>{
+            const cv=document.getElementById('wx-canvas');
+            if(!cv) return {canvas:false};
+            const ctx=cv.getContext('2d');
+            const d=ctx.getImageData(0,0,cv.width,cv.height).data;
+            let yellow=0, lit=0, road=0;
+            for(let i=0;i<d.length;i+=4){
+              const r=d[i],g=d[i+1],b=d[i+2],a=d[i+3];
+              if(a<20) continue;
+              if(r>200&&g>160&&b<110) yellow++;         // жълто на колата
+              if(r>240&&g>230&&b>170) lit++;            // светли лампи
+              if(Math.abs(r-g)<12&&Math.abs(g-b)<14&&r>70&&r<130) road++;
+            }
+            return {canvas:true, w:cv.width, h:cv.height, yellowPx:yellow, litPx:lit, roadPx:road};
+          });
+          const out = await p.evaluate((opensIn, fadeIn, airportTapIn, bdzIn, taxiIn) => {
             const ids=['next90-btn','clean-btn','gps-btn','fs-btn',
                        'dest-airport','dest-cjp','dest-cab_north','dest-cas_intl','dest-__zones'];
             const boxes = ids.map(id=>{const e=document.getElementById(id);
@@ -114,7 +131,7 @@ jobs:
             return {
               found: boxes.map(x=>x.id), missing: ids.filter(i=>!boxes.find(x=>x.id===i)),
               overlaps, offscreen, dark, opens, scrollable,
-              fadeCheck: fadeIn, airportTap: airportTapIn, bdzCheck: bdzIn,
+              fadeCheck: fadeIn, airportTap: airportTapIn, bdzCheck: bdzIn, taxi: taxiIn,
               tilesDark: (()=>{ document.body.classList.remove('theme-day');
                 document.body.classList.add('theme-night','tiles-dark');
                 const p=document.querySelector('.leaflet-tile-pane');
@@ -137,7 +154,7 @@ jobs:
               viewport: innerHeight,
               fanGone: !document.querySelector('#fab-hub:not([style*="display: none"])')
             };
-          }, opens, fadeIn, airportTap, bdz);
+          }, opens, fadeIn, airportTap, bdz, taxiCheck);
           console.log('RESULT:', JSON.stringify(out,null,1));
           console.log('TILEFAILS:', failed.length);
           console.log('PAGEERRORS:', errs.slice(0,4).join(' | ')||'none');
