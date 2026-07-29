@@ -547,6 +547,16 @@ function deadZoneFactor(h) {
 // ------ ден от седмицата × час: коригира типовете зони ------
 // Болниците са амбулаторни в делнична сутрин; в събота/неделя работи само спешното.
 // Летището и гарите имат свои пик часове и в уикенда те са водещи.
+// Учебна година: 15 септ — 30 юни. Юли и август университетите са празни,
+// сесията през януари е с намален поток.
+function academicFactor(){
+  var d = new Date(), m = d.getMonth() + 1, day = d.getDate();
+  if(m === 7 || m === 8) return 0.10;             // ваканция
+  if(m === 9 && day < 15) return 0.15;            // преди началото
+  if(m === 1 || (m === 6 && day > 20)) return 0.55; // сесия
+  return 1.0;
+}
+
 function dayTypeFactor(type, hour){
   var dow = new Date().getDay();            // 0=нд, 6=сб
   var wknd = (dow === 0 || dow === 6);
@@ -574,6 +584,9 @@ function dayTypeFactor(type, hour){
       if(dow === 0 && hour >= 15) tr *= 1.35;          // неделя вечер — връщащи се
       if(fri && hour >= 14) tr *= 1.20;                // петък следобед — тръгващи
       return wknd ? tr * 1.10 : tr;
+    case 'university': case 'school':
+      if(wknd) return 0.15;
+      return academicFactor() * ((hour >= 8 && hour <= 19) ? 1.0 : 0.3);
     case 'attraction':
       // атракциите живеят от уикенда и от топлите месеци; вечер са мъртви
       if(hour < 9 || hour > 19) return 0.15;
@@ -613,6 +626,11 @@ function computeScores(hour) {
   if (dz<1) ZONES.forEach(z => { if(z.id!=='airport') scores[z.id]*=(0.7+0.3*dz); });
   // ден от седмицата × час
   ZONES.forEach(z => { scores[z.id] *= dayTypeFactor(z.type, hour); });
+  // университетските събития не важат във ваканция
+  const acad = academicFactor();
+  if(acad < 0.5){
+    ZONES.forEach(z => { if(z.type === 'university' || z.type === 'school') scores[z.id] *= acad; });
+  }
   // работно време: затворен обект не ражда клиенти, каквото и да казва базовата крива
   ZONES.forEach(z => {
     if(!z.hours) return;
@@ -5520,7 +5538,7 @@ function toggleMapView(){
     }
 
     // слънце / луна
-    var cx = W*.13, cy = H*.42, R = Math.min(9, H*.28);
+    var cx = W*.09, cy = H*.26, R = Math.min(8, H*.20);
     if(state.night){
       var ph = moonPhase();                      // 0 новолуние … .5 пълнолуние
       var waxing = ph < .5;                      // расте ли
