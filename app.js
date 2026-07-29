@@ -1367,7 +1367,9 @@ function render(hour) {
     window.__topRot = sorted
       .filter(function(e){
         var zz = ZONES.find(function(x){ return x.id === e[0]; });
-        return !zz || zz.type !== 'hospital';   // болници не влизат в ротацията
+        if(!zz) return true;
+        // болниците и задръстванията не са източник на клиенти
+        return zz.type !== 'hospital' && zz.type !== 'traffic';
       })
       .slice(0,3).map(function(e){
       var zz=ZONES.find(x=>x.id===e[0]);
@@ -1381,7 +1383,9 @@ function render(hour) {
   const zList=document.getElementById('zone-list');
   if (zList && !karykMode) {
     zList.innerHTML=sorted
-      .filter(([zid])=>{ const z=ZONES.find(x=>x.id===zid); return z&&z.type!=='karyk'; })
+      .filter(([zid])=>{ const z=ZONES.find(x=>x.id===zid);
+        // задръстванията са пътна обстановка, не източник на клиенти
+        return z && z.type!=='karyk' && z.type!=='traffic'; })
       .map(([zid,score])=>{
         const z=ZONES.find(x=>x.id===zid); if(!z) return '';
         const c=demandColor(score,z.type);
@@ -5449,13 +5453,14 @@ function toggleMapView(){
     // иконата вляво следва реалното време, а не статична емоджи
     var ic = document.getElementById('wb-icon');
     if(ic){
+      // ясно небе → нищо (пейзажът вече рисува слънце/луна)
       ic.textContent = state.storm ? '⛈'
                      : state.fog   ? '🌫'
                      : state.snow > 0 ? '🌨'
                      : state.rain > 0 ? '🌧'
                      : state.cloud > .75 ? '☁️'
-                     : state.cloud > .35 ? (state.night ? '🌥' : '⛅')
-                     : (state.night ? moonEmoji(moonPhase()) : '☀️');
+                     : state.cloud > .35 ? '⛅'
+                     : '';
       ic.title = state.night ? ('Лунна фаза ' + Math.round(moonPhase()*100) + '%') : '';
     }
   }
@@ -5470,7 +5475,7 @@ function toggleMapView(){
     for(var m=0;m<5;m++) clouds.push({x:Math.random()*W, y:3+Math.random()*(H*.4), s:.5+Math.random()*.8, v:.08+Math.random()*.12});
   }
 
-  var taxi = { x: -80, active:false, next: 120 };   // първото минаване скоро
+  var taxi = { x: -80, active:false, next: 120, dir: -1 };   // редува посоката
 
   function loop(){
     if(!ctx){ return; }
@@ -5614,27 +5619,31 @@ function toggleMapView(){
     }
 
     // 🚕 от време на време минава такси
-    if(!taxi.active && t > taxi.next){ taxi.active = true; taxi.x = W + 30; }
+    if(!taxi.active && t > taxi.next){ taxi.active = true; taxi.dir = (taxi.dir === 1 ? -1 : 1); taxi.x = taxi.dir === -1 ? W + 30 : -30; }
     if(taxi.active){
-      taxi.x -= 0.75;                       // отдясно наляво, за да води надписа
+      taxi.x += 0.75 * taxi.dir;            // сменя посоката при всяко минаване
       var ty = H - 6;
       ctx.save();
       ctx.globalAlpha = .96;
       var fs = Math.round(Math.min(15, H*.46));
       ctx.font = fs + 'px system-ui';
       ctx.textBaseline = 'alphabetic';
-      // огледално, за да гледа накъдето се движи
+      // огледално само когато върви наляво
       ctx.save();
-      ctx.translate(taxi.x + fs, ty);
-      ctx.scale(-1, 1);
-      ctx.fillText('🚕', 0, 0);
+      if(taxi.dir === -1){
+        ctx.translate(taxi.x + fs, ty); ctx.scale(-1, 1); ctx.fillText('🚕', 0, 0);
+      } else {
+        ctx.fillText('🚕', taxi.x, ty);
+      }
       ctx.restore();
       // описанието се тегли ЗАД колата (вдясно, тъй като върви наляво)
       var label = state.desc || '';
       if(label){
         ctx.font = '600 ' + Math.round(fs*0.72) + 'px system-ui,-apple-system,sans-serif';
         var tw = ctx.measureText(label).width;
-        var bx = taxi.x + fs + 12, by = ty - fs*0.62;
+        // надписът винаги ЗАД колата спрямо посоката
+        var bx = taxi.dir === -1 ? (taxi.x + fs + 12) : (taxi.x - tw - 12);
+        var by = ty - fs*0.62;
         ctx.fillStyle = state.night ? 'rgba(8,16,32,.55)' : 'rgba(255,255,255,.55)';
         ctx.beginPath();
         if(ctx.roundRect) ctx.roundRect(bx-6, by-9, tw+12, fs*0.92, 6);
@@ -5644,7 +5653,7 @@ function toggleMapView(){
         ctx.fillText(label, bx, by);
       }
       ctx.restore();
-      if(taxi.x < -(200)){ taxi.active = false; taxi.next = t + 600; }   // ~10 сек пауза
+      if((taxi.dir === -1 && taxi.x < -220) || (taxi.dir === 1 && taxi.x > W + 220)){ taxi.active = false; taxi.next = t + 600; }
     }
 
     raf = requestAnimationFrame(loop);
@@ -5721,4 +5730,20 @@ function toggleMapView(){
 
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount);
   else mount();
+})();
+
+// ═══════════════════════════════════════════════
+// Брояч на отварянията (анонимен, без бисквитки)
+// ═══════════════════════════════════════════════
+(function(){
+  var W = 'https://mvr-proxy.mihov-emil.workers.dev';
+  var app = location.pathname.indexOf('TAXISOFIA') >= 0 ? 'taxisofia' : 'bak';
+  try{
+    if(!sessionStorage.getItem('open_sent')){
+      sessionStorage.setItem('open_sent','1');
+      var body = JSON.stringify({ event: 'open_' + app });
+      if(navigator.sendBeacon) navigator.sendBeacon(W + '/track', new Blob([body], {type:'application/json'}));
+      else fetch(W + '/track', {method:'POST', headers:{'Content-Type':'application/json'}, body: body, keepalive:true});
+    }
+  }catch(e){}
 })();
