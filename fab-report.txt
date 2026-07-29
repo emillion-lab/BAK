@@ -70,7 +70,7 @@ RESULT: {
   "canvas": true,
   "w": 390,
   "h": 50,
-  "yellowPx": 240,
+  "yellowPx": 228,
   "litPx": 0,
   "roadPx": 395
  },
@@ -83,5 +83,5 @@ RESULT: {
  "viewport": 844,
  "fanGone": true
 }
-TILEFAILS: 8
+TILEFAILS: 7
 PAGEERRORS: none
