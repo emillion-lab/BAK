@@ -5829,6 +5829,7 @@ function toggleMapView(){
       ctx.fill();
       ctx.restore();
 
+      window.__taxiDebug = { x: Math.round(taxi.x), dir: d, night: state.night, W: Math.round(W) };
       ctx.restore();
       if((d === -1 && taxi.x < -260) || (d === 1 && taxi.x > W + 260)){
         taxi.active = false; taxi.next = t + 600;
