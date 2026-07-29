@@ -5813,13 +5813,21 @@ function toggleMapView(){
         ctx.beginPath(); ctx.arc(taxi.x + wx, by2 - wr*0.15, wr*0.42, 0, 6.28); ctx.fill();
       });
 
-      // ── самите лампи отгоре ──
-      ctx.fillStyle = '#fffdf0';
+      // ── самите лампи: плътни, с ореол чрез сянка (работи и върху прозрачно) ──
+      ctx.save();
+      ctx.shadowColor = 'rgba(255,238,150,' + (state.night ? .95 : .6) + ')';
+      ctx.shadowBlur  = state.night ? 12 : 6;
+      ctx.fillStyle   = '#fffdf0';
       ctx.beginPath();
-      ctx.ellipse(frontX - d*1.5, lampY, 2.2, ch*0.15, 0, 0, 6.28); ctx.fill();
-      ctx.fillStyle = '#ff3b2d';
+      ctx.ellipse(frontX - d*1.5, lampY, 2.6, ch*0.17, 0, 0, 6.28); ctx.fill();
+      ctx.fill();                                   // втори проход = по-плътен ореол
+      ctx.shadowColor = 'rgba(255,70,55,' + (state.night ? .95 : .6) + ')';
+      ctx.shadowBlur  = state.night ? 10 : 5;
+      ctx.fillStyle   = '#ff3b2d';
       ctx.beginPath();
-      ctx.ellipse(backX + d*1.5, lampY, 1.8, ch*0.13, 0, 0, 6.28); ctx.fill();
+      ctx.ellipse(backX + d*1.5, lampY, 2.1, ch*0.15, 0, 0, 6.28); ctx.fill();
+      ctx.fill();
+      ctx.restore();
 
       ctx.restore();
       if((d === -1 && taxi.x < -260) || (d === 1 && taxi.x > W + 260)){
