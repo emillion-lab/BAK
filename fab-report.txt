@@ -13,7 +13,9 @@ RESULT: {
  "missing": [],
  "overlaps": [],
  "offscreen": [],
- "dark": [],
+ "dark": [
+  ".ticker-bar"
+ ],
  "opens": {
   "dest-__zones": {
    "opened": true,
@@ -70,17 +72,17 @@ RESULT: {
   "canvas": true,
   "w": 390,
   "h": 50,
-  "yellowPx": 280,
-  "litPx": 0,
-  "roadPx": 395,
+  "yellowPx": 555,
+  "litPx": 119,
+  "roadPx": 294,
   "brightest": [
-   215,
-   235,
-   255
+   255,
+   253,
+   240
   ],
   "taxiState": {
-   "x": 651,
-   "dir": 1,
+   "x": 358,
+   "dir": -1,
    "night": false,
    "W": 390
   }
