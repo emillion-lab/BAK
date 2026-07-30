@@ -522,6 +522,19 @@ const TODAY    = new Date();
 const todayStr = TODAY.toISOString().slice(0,10);
 const todayDay = TODAY.getDay();
 
+// Еднократните събития с фиксирана дата не бива да оцеляват след нея.
+// SCORPIONS от 27 юни продължаваше да пуска известие през юли.
+(function purgePastEvents(){
+  try{
+    var today = new Date().toISOString().slice(0,10);
+    for(var i = EVENTS.length - 1; i >= 0; i--){
+      var e = EVENTS[i];
+      if(e.date && e.date < today) EVENTS.splice(i, 1);
+      else if(e.endDate && e.endDate < today) EVENTS.splice(i, 1);
+    }
+  }catch(err){}
+})();
+
 function dayMatches(ev) {
   if (ev.date    && ev.date    !== todayStr)  return false;
   if (ev.endDate && todayStr   >  ev.endDate) return false;
@@ -1941,6 +1954,11 @@ function checkEventAlerts(){
   var _off = false;
   try{ _off = sessionStorage.getItem('ea_off') === '1'; }catch(e){}
   if(_off || panel.dataset.dismissed === '1'){ panel.style.display='none'; return; }
+  // еднократно събитие с минала дата няма какво да съобщава
+  upcoming = upcoming.filter(function(e){
+    if(e.date){ try{ if(e.date < new Date().toISOString().slice(0,10)) return false; }catch(x){} }
+    return e.name && String(e.name).trim().length >= 3;
+  });
   if(!upcoming.length){panel.style.display='none';return;}
   const ev=upcoming[0], z=ZONES.find(x=>x.id===ev.zone);
   if(!z) return;
@@ -6020,8 +6038,14 @@ function toggleMapView(){
         var s = d.score || 0;
         el.style.display = 'inline-flex';
         el.style.color = colorFor(s);
-        el.innerHTML = '<span class="kat-ic">⚠️</span><b>' + s + '</b>'
-                     + '<span class="kat-slash">/10</span>';
+        var col = colorFor(s);
+        el.innerHTML =
+            '<span style="font-size:.95em;line-height:1">⚠️</span>'
+          + '<b style="font-size:1.1em;font-weight:800;color:' + col + '">' + s + '</b>'
+          + '<span style="opacity:.5;font-weight:600;font-size:.82em;color:' + col + '">/10</span>';
+        el.style.display = 'inline-flex';
+        el.style.alignItems = 'center';
+        el.style.gap = '3px';
         el.title = 'Пътно напрежение ' + s + '/10 — ' + advice(s)
                  + ' · Kp ' + (d.factors && d.factors.kp)
                  + ' · Δналягане ' + (d.factors && d.factors.pressure_delta)
