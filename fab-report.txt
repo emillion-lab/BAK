@@ -47,7 +47,7 @@ RESULT: {
  "fadeCheck": {
   "активен": 0.55,
   "останали": 0.1,
-  "класНаBody": "theme-day full-list",
+  "класНаBody": "theme-night tiles-dark full-list",
   "следЗатваряне": 1
  },
  "airportTap": {
@@ -63,18 +63,18 @@ RESULT: {
   "стариятНадпис": false,
   "нямаДанни": false,
   "проба": [
-   "КПВ 20238",
-   "КПВ 10222",
-   "КПВ 20240"
+   "КПВ 50200",
+   "КПВ 20200",
+   "БВ 2626"
   ]
  },
  "taxi": {
   "canvas": true,
   "w": 390,
   "h": 50,
-  "yellowPx": 594,
-  "litPx": 104,
-  "roadPx": 527,
+  "yellowPx": 524,
+  "litPx": 105,
+  "roadPx": 566,
   "brightest": [
    255,
    253,
