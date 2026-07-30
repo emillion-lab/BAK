@@ -1,10 +1,38 @@
 {
-  "updated": "2026-07-30T20:04:52.485071+03:00",
+  "updated": "2026-07-30T21:39:24.769922+03:00",
   "source": "centralnaavtogara.bg",
   "window_hours": 8,
-  "count": 20,
-  "intl_count": 1,
+  "count": 19,
+  "intl_count": 2,
   "arrivals": [
+    {
+      "time": "00:00",
+      "from": "ВАРНА",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "00:00",
+      "from": "СВ.ВЛАС",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "00:00",
+      "from": "АХТОПОЛ",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "00:00",
+      "from": "СЛ.БРЯГ",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
     {
       "time": "00:01",
       "from": "СВ.ВЛАС",
@@ -41,58 +69,9 @@
       "intl": false
     },
     {
-      "time": "20:10",
-      "from": "ТРЯВНА",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "20:18",
-      "from": "СМОЛЯН",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "20:30",
-      "from": "Г.ДЕЛЧЕВ",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "20:30",
-      "from": "АХТОПОЛ",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "21:00",
-      "from": "ДОБРИЧ",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "21:00",
-      "from": "КЪРДЖАЛИ",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "21:20",
-      "from": "ПЛОВДИВ",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "21:30",
-      "from": "КАВАРНА",
-      "sector": "7",
+      "time": "07:00",
+      "from": "РУСЕ",
+      "sector": "9",
       "operator": "",
       "intl": false
     },
@@ -132,6 +111,13 @@
       "intl": false
     },
     {
+      "time": "23:10",
+      "from": "СКОПИЕ",
+      "sector": "",
+      "operator": "",
+      "intl": true
+    },
+    {
       "time": "23:30",
       "from": "СВ.ВЛАС",
       "sector": "23",
@@ -142,6 +128,13 @@
       "time": "23:45",
       "from": "СИНЕМОРЕЦ",
       "sector": "25",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "23:51",
+      "from": "ВАРНА",
+      "sector": "",
       "operator": "",
       "intl": false
     }
