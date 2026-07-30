@@ -142,6 +142,15 @@ jobs:
             return {
               found: boxes.map(x=>x.id), missing: ids.filter(i=>!boxes.find(x=>x.id===i)),
               overlaps, offscreen, dark, opens, scrollable,
+              alertProbe: (()=>{
+                const el=document.getElementById('event-alert');
+                if(!el) return 'липсва';
+                const cs=getComputedStyle(el);
+                return { display:cs.display, visible:cs.display!=='none',
+                         title:(document.getElementById('ea-title')||{}).textContent||'',
+                         sub:(document.getElementById('ea-sub')||{}).textContent||'',
+                         icon:(document.getElementById('ea-icon')||{}).textContent||'',
+                         dismissed:el.dataset.dismissed||'няма' };})(),
               fadeCheck: fadeIn, airportTap: airportTapIn, bdzCheck: bdzIn, taxi: taxiIn,
               tilesDark: (()=>{ document.body.classList.remove('theme-day');
                 document.body.classList.add('theme-night','tiles-dark');
