@@ -1945,7 +1945,7 @@ function checkEventAlerts(){
   const realH=new Date().getHours()+new Date().getMinutes()/60;
   // Но ако slider е близо до реалния час (±30мин), показваме и preview
   const h=Math.abs(currentHour-realH)<0.5 ? realH : currentHour;
-  const upcoming=EVENTS.filter(ev=>dayMatches(ev)&&!ev._fromFlight).filter(ev=>{
+  let upcoming=EVENTS.filter(ev=>dayMatches(ev)&&!ev._fromFlight).filter(ev=>{
     const diff=ev.endHour-h;
     return diff>=0.25&&diff<=0.5&&ev.boost>=2.0&&!alertedEvents.has(ev.name+ev.endHour);
   }).sort((a,b)=>a.endHour-b.endHour);
