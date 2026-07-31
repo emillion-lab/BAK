@@ -1,0 +1,100 @@
+name: Fix alert panel and KAT badge
+
+# Две неща, с една причина: правила с !important, които бият това,
+# което JS задава inline.
+#
+# 1. #event-alert има display:grid !important, затова panel.style.display='none'
+#    няма ефект. Панелът стои отворен с примерния шаблон от index.html
+#    (китарата и двете тирета) и ✕ не го затваря.
+# 2. Лентата за времето е грид auto/auto/1fr/auto с автоматично подреждане.
+#    Ако иконата за времето е видима, всичко се измества с една колона и
+#    значката на КАТ попада в разтегливата 1fr колона.
+
+on:
+  push:
+    paths: ['.github/workflows/fix-alert-and-kat.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Patch index.html
+        run: |
+          python3 - <<'PYEOF'
+          html = open('index.html', encoding='utf-8').read()
+
+          # --- 1. празен шаблон вместо примерните стойности ---
+          before = html
+          html = html.replace('<div class="ea-icon" id="ea-icon">🎸</div>',
+                              '<div class="ea-icon" id="ea-icon"></div>')
+          html = html.replace('<div class="ea-title" id="ea-title">—</div>',
+                              '<div class="ea-title" id="ea-title"></div>')
+          html = html.replace('<div class="ea-sub"   id="ea-sub">—</div>',
+                              '<div class="ea-sub"   id="ea-sub"></div>')
+          print('placeholders cleared:', before != html)
+
+          # --- 2. коригиращ блок най-накрая, за да бие по ред ---
+          fix = """
+          /* ═══ Поправки: видимост на известието и подредба на лентата ═══ */
+
+          /* Известието е скрито по подразбиране и се показва само когато
+             кодът изрично зададе display:block. Така ✕ и всички проверки
+             за празно съдържание отново работят. */
+          #event-alert{ display:none !important; }
+          #event-alert[style*="display:block"],
+          #event-alert[style*="display: block"]{
+            display:grid !important;
+            grid-template-columns:auto auto 1fr auto;
+            align-items:center; gap:8px;
+          }
+          #event-alert[data-dismissed="1"]{ display:none !important; }
+
+          /* Капсулите получават явни колони, за да не зависят от това
+             колко елемента преди тях са видими. */
+          #weather-bar .wb-icon{ display:none !important; }
+          #weather-bar .wb-temp{ grid-column:1 !important; justify-self:start !important; }
+          #kat-badge{ grid-column:2 !important; justify-self:start !important; }
+          #wx-rain-when{ grid-column:4 !important; justify-self:end !important; }
+          </style>"""
+
+          idx = html.rfind('</style>')
+          assert idx != -1, 'no closing style tag found'
+          html = html[:idx] + fix.replace('\n          ', '\n')[1:]  + html[idx+len('</style>'):]
+
+          open('index.html', 'w', encoding='utf-8').write(html)
+          print('css appended, style blocks now:', html.count('</style>'))
+
+          # --- 3. вдигане на версията за кеша ---
+          import re
+          m = re.search(r'app\.js\?v=([A-Za-z0-9]+)', html)
+          print('current asset version:', m.group(1) if m else 'none')
+          html = html.replace('app.js?v=20260731v143', 'app.js?v=20260731v144')
+          open('index.html', 'w', encoding='utf-8').write(html)
+          print('version bumped')
+          PYEOF
+
+      - name: Sanity checks
+        run: |
+          echo "style blocks:      $(grep -c '</style>' index.html)"
+          echo "guitar left:       $(grep -c 'ea-icon">🎸' index.html || true)"
+          echo "kat grid-column:   $(grep -c 'kat-badge{ grid-column' index.html || true)"
+          python3 -c "
+          import html,sys
+          s=open('index.html',encoding='utf-8').read()
+          assert s.count('<style')==s.count('</style>'), 'style tags unbalanced'
+          print('style tags balanced')
+          "
+
+      - name: Commit
+        run: |
+          git config user.name "ci"
+          git config user.email "ci@emillion-lab"
+          git add index.html
+          git commit -m "event alert stayed open on a placeholder; KAT badge landed in the flexible column; v144" || true
+          git push || true
