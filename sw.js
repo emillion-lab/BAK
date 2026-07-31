@@ -1,7 +1,7 @@
 // BakshishApp Service Worker
 // Кешира файловете за офлайн работа
 
-const CACHE_NAME = 'bakshishapp-bak-v98';
+const CACHE_NAME = 'bakshishapp-bak-v99';
 const STATIC_FILES = [
   '/BAK/',
   '/BAK/index.html',
@@ -43,8 +43,16 @@ self.addEventListener('fetch', event => {
     'openweathermap.org',
     'aviationstack.com',
     'nominatim.openstreetmap.org',
+    'open-meteo.com',
+    'services.swpc.noaa.gov',
+    'workers.dev',            // Worker-ът: живи полети, риск, GPS
     'flight-cache.json',
+    'train-arrivals.json',    // всички данни, които остаряват
+    'bus-arrivals.json',
+    'bus-schedule.json',
+    'events.json',
     'config.json',
+    'access.json',
   ];
   
   const isDynamic = dynamicPatterns.some(p => url.href.includes(p));
