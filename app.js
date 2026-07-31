@@ -1172,7 +1172,16 @@ function showAirportSchedule() {
       if(airportStatus==='fallback'){
         html+='<div style="color:#f59e0b;padding:10px 0;text-align:center;font-size:12px">⚠️ Няма живи полетни данни — прогнозен режим</div>';
       } else {
-        html+='<div style="color:var(--muted);padding:16px 0;text-align:center">Няма повече полети в кеша за днес</div>';
+        if(flightDetails.length){
+          var newest = Math.max.apply(null, flightDetails.map(function(x){ return x.exitToTs || 0; }));
+          var agoMin = Math.round((Date.now() - newest) / 60000);
+          html+='<div style="color:#f59e0b;padding:14px 10px;text-align:center;font-size:12.5px;line-height:1.6">'
+              + '⚠️ Данните са остарели — последният полет е бил преди '
+              + (agoMin > 90 ? Math.round(agoMin/60) + ' часа' : agoMin + ' мин') + '.<br>'
+              + '<span style="opacity:.8">Затвори и отвори панела за опресняване.</span></div>';
+        } else {
+          html+='<div style="color:var(--muted);padding:16px 0;text-align:center">Няма полетни данни</div>';
+        }
       }
     }
   }
