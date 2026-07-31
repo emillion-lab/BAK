@@ -1,0 +1,28 @@
+== trains diagnosis Fri Jul 31 04:49:32 UTC 2026 ==
+--- mvr-proxy /health ---
+{"service":"fish.taxi Worker","status":"ok","version":"2.8.1"}
+--- proxy -> live.bdz.bg (first 300 chars) ---
+bytes: 211305
+<!DOCTYPE html>
+    <html lang="bg">
+
+    <head>
+                
+        <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<title> Пристигащи София | БДЖ Пътнич
+
+--- scraper stdout/stderr ---
+  https://live.bdz.bg/ via proxy -> 202097b
+    таблица: 0 реда
+    текстов fallback: общо 26 реда
+  https://live.bdz.bg/ -> 26 влака
+OK: 26 влака (10 далечни).
+exit code: 0
+
+--- train-arrivals.json after run ---
+updated: 2026-07-31T07:49:37.392938+03:00
+count: 26
+first times: ['07:46', '07:46', '07:51', '08:07', '08:12', '08:16']
