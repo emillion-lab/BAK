@@ -1,0 +1,68 @@
+name: Diagnose trains
+
+# Скрейпърът върви с continue-on-error, затова провалите му са невидими.
+# Тук хващаме изхода и го записваме, за да се види причината.
+
+on:
+  push:
+    paths: ['.github/workflows/diag-trains.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Probe the proxy path the scraper depends on
+        run: |
+          R="debug/trains-diag.txt"
+          mkdir -p debug
+          echo "== trains diagnosis $(date -u) ==" > $R
+
+          echo "--- mvr-proxy /health ---" >> $R
+          curl -s -m 25 "https://mvr-proxy.mihov-emil.workers.dev/health" | head -c 300 >> $R
+          echo "" >> $R
+
+          echo "--- proxy -> live.bdz.bg (first 300 chars) ---" >> $R
+          curl -s -m 40 "https://mvr-proxy.mihov-emil.workers.dev/scrape?url=https%3A%2F%2Flive.bdz.bg%2F" \
+            -o /tmp/live.html || echo "curl failed" >> $R
+          echo "bytes: $(wc -c < /tmp/live.html 2>/dev/null || echo 0)" >> $R
+          head -c 300 /tmp/live.html >> $R 2>/dev/null || true
+          echo "" >> $R
+
+      - name: Run the scraper with output captured
+        run: |
+          R="debug/trains-diag.txt"
+          echo "" >> $R
+          echo "--- scraper stdout/stderr ---" >> $R
+          set +e
+          python scripts/scrape_trains.py >> $R 2>&1
+          echo "exit code: $?" >> $R
+          set -e
+          echo "" >> $R
+          echo "--- train-arrivals.json after run ---" >> $R
+          python3 -c "
+          import json
+          d=json.load(open('train-arrivals.json'))
+          print('updated:', d.get('updated'))
+          print('count:', d.get('count'))
+          print('first times:', [a['time'] for a in d.get('arrivals',[])][:6])
+          " >> $R 2>&1 || echo "could not read json" >> $R
+
+      - name: Commit diagnosis
+        if: always()
+        run: |
+          git config user.name "ci"
+          git config user.email "ci@emillion-lab"
+          git add debug/trains-diag.txt train-arrivals.json 2>/dev/null || true
+          git commit -m "trains diagnosis [skip ci]" || true
+          git pull --rebase --autostash || true
+          git push || true
