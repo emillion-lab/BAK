@@ -1,0 +1,68 @@
+name: Weather bar single row
+
+# Явните колони от предишната кръпка нямаха явен ред, затова елементите
+# се преместиха на втори ред и лентата порасна на височина, разкривайки
+# фоновата сцена. Хоризонталната подредба е по-предсказуема тук.
+
+on:
+  push:
+    paths: ['.github/workflows/fix-weather-bar-row.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Replace the grid rules with a single flex row
+        run: |
+          python3 - <<'PYEOF'
+          html = open('index.html', encoding='utf-8').read()
+
+          old = """#weather-bar .wb-icon{ display:none !important; }
+          #weather-bar .wb-temp{ grid-column:1 !important; justify-self:start !important; }
+          #kat-badge{ grid-column:2 !important; justify-self:start !important; }
+          #wx-rain-when{ grid-column:4 !important; justify-self:end !important; }""".replace('\n          ', '\n')
+
+          new = """#weather-bar{
+            display:flex !important;
+            flex-wrap:nowrap !important;
+            align-items:center !important;
+            gap:10px !important;
+            min-height:52px !important;
+            max-height:64px !important;
+          }
+          #weather-bar .wb-icon{ display:none !important; }
+          #weather-bar .wb-desc{ display:none !important; }
+          #weather-bar .wb-temp,
+          #kat-badge{ flex:0 0 auto !important; }
+          #wx-rain-when{ flex:0 0 auto !important; margin-left:auto !important; }""".replace('\n          ', '\n')
+
+          assert html.count(old) == 1, 'previous block not found exactly once: %d' % html.count(old)
+          html = html.replace(old, new)
+          html = html.replace('app.js?v=20260731v144', 'app.js?v=20260731v145')
+          open('index.html', 'w', encoding='utf-8').write(html)
+          print('flex row applied, version bumped')
+          PYEOF
+
+      - name: Sanity checks
+        run: |
+          echo "grid-column rules left: $(grep -c 'kat-badge{ grid-column' index.html || true)"
+          echo "flex rule present:      $(grep -c 'flex-wrap:nowrap' index.html || true)"
+          python3 -c "
+          s=open('index.html',encoding='utf-8').read()
+          assert s.count('<style')==s.count('</style>'), 'style tags unbalanced'
+          print('style tags balanced')
+          "
+
+      - name: Commit
+        run: |
+          git config user.name "ci"
+          git config user.email "ci@emillion-lab"
+          git add index.html
+          git commit -m "weather bar back to one row; v145" || true
+          git push || true
