@@ -2296,6 +2296,26 @@ body.map-fullscreen #next90-btn { display:none; }
   body.karyk-active #karyk-sidebar { display:block !important; max-height:30vh; overflow-y:auto; }
   .sidebar-title { font-size:13px; padding:6px 12px; }
 }
+/* ═══ Поправки: видимост на известието и подредба на лентата ═══ */
+
+/* Известието е скрито по подразбиране и се показва само когато
+   кодът изрично зададе display:block. Така ✕ и всички проверки
+   за празно съдържание отново работят. */
+#event-alert{ display:none !important; }
+#event-alert[style*="display:block"],
+#event-alert[style*="display: block"]{
+  display:grid !important;
+  grid-template-columns:auto auto 1fr auto;
+  align-items:center; gap:8px;
+}
+#event-alert[data-dismissed="1"]{ display:none !important; }
+
+/* Капсулите получават явни колони, за да не зависят от това
+   колко елемента преди тях са видими. */
+#weather-bar .wb-icon{ display:none !important; }
+#weather-bar .wb-temp{ grid-column:1 !important; justify-self:start !important; }
+#kat-badge{ grid-column:2 !important; justify-self:start !important; }
+#wx-rain-when{ grid-column:4 !important; justify-self:end !important; }
 </style>
 </head>
 <body>
@@ -2369,10 +2389,10 @@ body.map-fullscreen #next90-btn { display:none; }
 <!-- Event Alert -->
 <div id="event-alert">
   <div class="ea-row">
-    <div class="ea-icon" id="ea-icon">🎸</div>
+    <div class="ea-icon" id="ea-icon"></div>
     <div class="ea-info">
-      <div class="ea-title" id="ea-title">—</div>
-      <div class="ea-sub"   id="ea-sub">—</div>
+      <div class="ea-title" id="ea-title"></div>
+      <div class="ea-sub"   id="ea-sub"></div>
       <div class="ea-dist"  id="ea-dist"></div>
     </div>
     <button class="ea-waze" id="ea-waze">🚗 Waze</button>
@@ -2445,7 +2465,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260731v143"></script>
+<script src="app.js?v=20260731v144"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">
