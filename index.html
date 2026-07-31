@@ -2312,10 +2312,19 @@ body.map-fullscreen #next90-btn { display:none; }
 
 /* Капсулите получават явни колони, за да не зависят от това
    колко елемента преди тях са видими. */
+#weather-bar{
+  display:flex !important;
+  flex-wrap:nowrap !important;
+  align-items:center !important;
+  gap:10px !important;
+  min-height:52px !important;
+  max-height:64px !important;
+}
 #weather-bar .wb-icon{ display:none !important; }
-#weather-bar .wb-temp{ grid-column:1 !important; justify-self:start !important; }
-#kat-badge{ grid-column:2 !important; justify-self:start !important; }
-#wx-rain-when{ grid-column:4 !important; justify-self:end !important; }
+#weather-bar .wb-desc{ display:none !important; }
+#weather-bar .wb-temp,
+#kat-badge{ flex:0 0 auto !important; }
+#wx-rain-when{ flex:0 0 auto !important; margin-left:auto !important; }
 </style>
 </head>
 <body>
@@ -2465,7 +2474,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260731v144"></script>
+<script src="app.js?v=20260731v145"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">
