@@ -1,0 +1,56 @@
+name: Fix const upcoming
+
+# checkEventAlerts обявява upcoming като const и после я преприсвоява.
+# Резултат: "Assignment to constant variable" при DOMContentLoaded и
+# спрян останалият init код.
+
+on:
+  push:
+    paths: ['.github/workflows/fix-const-upcoming.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Patch app.js and bump cache version
+        run: |
+          python3 - <<'EOF'
+          src = open('app.js', encoding='utf-8').read()
+
+          old = 'const upcoming=EVENTS.filter'
+          new = 'let upcoming=EVENTS.filter'
+          assert src.count(old) == 1, 'expected exactly one occurrence, found %d' % src.count(old)
+          src = src.replace(old, new)
+          open('app.js', 'w', encoding='utf-8').write(src)
+          print('app.js patched')
+
+          html = open('index.html', encoding='utf-8').read()
+          old_v = 'app.js?v=20260730v142'
+          new_v = 'app.js?v=20260731v143'
+          print('version occurrences:', html.count(old_v))
+          html = html.replace(old_v, new_v)
+          open('index.html', 'w', encoding='utf-8').write(html)
+          print('cache version bumped')
+          EOF
+
+      - name: Syntax check
+        run: node --check app.js
+
+      - name: Verify the reassignment is gone
+        run: |
+          echo "--- const upcoming remaining: $(grep -c 'const upcoming=EVENTS' app.js || true)"
+          echo "--- let upcoming present:     $(grep -c 'let upcoming=EVENTS' app.js || true)"
+
+      - name: Commit
+        run: |
+          git config user.name "ci"
+          git config user.email "ci@emillion-lab"
+          git add app.js index.html
+          git commit -m "checkEventAlerts: upcoming was const but reassigned; v143" || true
+          git push || true
