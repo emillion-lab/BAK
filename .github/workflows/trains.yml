@@ -20,13 +20,49 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+
+      # Провалите вече не изчезват мълчаливо: изходът се пази и се
+      # записва един ред в дневника, така че застоялите данни могат да
+      # се проследят до конкретно пускане.
       - name: Scrape BDZ live arrivals
+        id: scrape
         continue-on-error: true
-        run: python scripts/scrape_trains.py
+        run: |
+          set +e
+          python scripts/scrape_trains.py 2>&1 | tee /tmp/scrape.log
+          echo "code=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
+
+      - name: Append run to the log
+        if: always()
+        run: |
+          mkdir -p debug
+          LOG="debug/trains-log.txt"
+          CODE="${{ steps.scrape.outputs.code }}"
+          STAMP=$(date -u +"%Y-%m-%dT%H:%MZ")
+          if [ "$CODE" = "0" ]; then
+            SUMMARY=$(python3 -c "
+          import json
+          d=json.load(open('train-arrivals.json'))
+          print('ok count=%s updated=%s' % (d.get('count'), d.get('updated')))
+          " 2>/dev/null || echo "ok, but json unreadable")
+          else
+            SUMMARY="FAIL exit=$CODE · $(tail -n 2 /tmp/scrape.log | tr '\n' ' ')"
+          fi
+          echo "$STAMP $SUMMARY" >> "$LOG"
+          # дневникът не расте безкрайно
+          tail -n 300 "$LOG" > "$LOG.tmp" && mv "$LOG.tmp" "$LOG"
+          echo "$STAMP $SUMMARY"
+
       - name: Commit if changed
         if: always()
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add train-arrivals.json debug/ 2>/dev/null || true
-          git diff --cached --quiet || (git commit -m "auto: БДЖ пристигащи $(date -u +%H:%M)" && git push)
+          if git diff --cached --quiet; then
+            echo "nothing to commit"
+          else
+            git commit -m "auto: БДЖ пристигащи $(date -u +%H:%M)"
+            git pull --rebase --autostash || true
+            git push
+          fi
