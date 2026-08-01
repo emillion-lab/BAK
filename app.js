@@ -832,20 +832,14 @@ function buildNext90(){
   if(!list) return;
   const now = Date.now();
   const POST_W = 45*60000;
-  var live = (window.__sevEvents || []).filter(function(e){
-    return (e.e + POST_W) > now && e.s < now + 24*3600000;   // още има вземане ИЛИ предстои
-  });
-  // Лятото е тихо — ако няма нищо в следващото денонощие,
-  // показваме следващите 10 занапред, за да има какво да се планира.
-  var ahead = [];
-  if(!live.length){
-    ahead = (window.__sevEvents || [])
-      .filter(function(e){ return e.s > now; })
-      .sort(function(a,b){ return a.s - b.s; })
-      .slice(0, 10);
-  }
-  var sev = live.length ? live : ahead;
-  var isAhead = !live.length && ahead.length > 0;
+  // Показваме всичко предстоящо, подредено по време. Едно събитие утре
+  // не бива да скрива останалите — списъкът е за планиране, не само за днес.
+  var sev = (window.__sevEvents || [])
+    .filter(function(e){ return (e.e + POST_W) > now; })
+    .sort(function(a,b){ return a.s - b.s; })
+    .slice(0, 25);
+  var liveCount = sev.filter(function(e){ return e.s < now + 24*3600000; }).length;
+  var isAhead = liveCount === 0;
   if(!sev.length){
     if(!window.__sevLoaded){
       list.innerHTML='<div style="padding:14px;color:var(--muted);font-size:14px">⏳ Зарежда програмата…</div>';
@@ -859,12 +853,11 @@ function buildNext90(){
   const hm = d => new Date(d).toLocaleTimeString('bg',{hour:'2-digit',minute:'2-digit'});
   const PRE = 2*3600000, POST = 45*60000;
   let html = '';
-  if(isAhead){
-    html += '<div style="padding:9px 11px;margin-bottom:8px;border-radius:9px;'
-          + 'background:rgba(2,132,199,.10);border:1px solid rgba(2,132,199,.35);'
-          + 'font-size:12px;color:var(--cyan);line-height:1.45">'
-          + '📅 Предстоящи събития</div>';
-  }
+  html += '<div style="padding:9px 11px;margin-bottom:8px;border-radius:9px;'
+        + 'background:rgba(2,132,199,.10);border:1px solid rgba(2,132,199,.35);'
+        + 'font-size:12px;color:var(--cyan);line-height:1.45">'
+        + '📅 ' + sev.length + ' предстоящи'
+        + (liveCount ? ' · ' + liveCount + ' в следващите 24ч' : '') + '</div>';
   let lastDay = '';
   sev.forEach(function(e, i){
     const d = new Date(e.s);
