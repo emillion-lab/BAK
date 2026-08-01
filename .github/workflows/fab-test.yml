@@ -144,6 +144,16 @@ jobs:
             return {
               found: boxes.map(x=>x.id), missing: ids.filter(i=>!boxes.find(x=>x.id===i)),
               overlaps, offscreen, dark, opens, scrollable,
+              sevProbe: {
+                loaded: !!window.__sevLoaded,
+                count: (window.__sevEvents||[]).length,
+                src: window.__sevSrc || null,
+                first: (window.__sevEvents||[])[0] ? {
+                  n: window.__sevEvents[0].n,
+                  s: new Date(window.__sevEvents[0].s).toISOString().slice(0,16)
+                } : null,
+                panelHtml: ((document.getElementById('next90-list')||{}).textContent||'').slice(0,120)
+              },
               alertProbe: (()=>{
                 const el=document.getElementById('event-alert');
                 if(!el) return 'липсва';
