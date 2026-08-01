@@ -57,7 +57,7 @@ RESULT: {
    "n": "Синьо лято",
    "s": "2026-08-02T14:00"
   },
-  "panelHtml": "📅 Предстоящи събития— УТРЕ —🎫 Синьо лятоNetworking Premium Gurko 16 · ~500 души · след 26ч 47м🚕 докарване 12:00–14:00"
+  "panelHtml": "📅 Предстоящи събития— УТРЕ —🎫 Синьо лятоNetworking Premium Gurko 16 · ~500 души · след 26ч 41м🚕 докарване 12:00–14:00"
  },
  "alertProbe": {
   "display": "none",
@@ -95,16 +95,16 @@ RESULT: {
   "canvas": true,
   "w": 390,
   "h": 50,
-  "yellowPx": 559,
-  "litPx": 1473,
-  "roadPx": 638,
+  "yellowPx": 543,
+  "litPx": 1409,
+  "roadPx": 671,
   "brightest": [
    253,
    254,
    254
   ],
   "taxiState": {
-   "x": 198,
+   "x": 197,
    "dir": 1,
    "night": false,
    "W": 390
