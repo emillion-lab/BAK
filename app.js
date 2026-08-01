@@ -1198,6 +1198,20 @@ function showAirportSchedule() {
   });
 
   let html='<div style="font-size:14px">';
+  (function(){
+    var az = (window.ZONES||[]).find(function(z){ return z.id==='airport'; });
+    if(!az) return;
+    var wn = String(az.wazeName||az.name).replace(/'/g, "\\'");
+    var nn = String(az.name).replace(/'/g, "\\'");
+    html += '<div style="display:flex;gap:6px;margin-bottom:10px">'
+      + '<button onclick="openWaze(\''+wn+'\','+az.lat+','+az.lng+')" '
+      + 'style="flex:1;padding:9px;border-radius:10px;border:1px solid var(--glass-edge);'
+      + 'background:var(--glass);color:var(--text);font:700 12.5px system-ui;cursor:pointer">🚗 Waze</button>'
+      + '<button onclick="openGoogleMaps(\''+nn+'\','+az.lat+','+az.lng+')" '
+      + 'style="flex:1;padding:9px;border-radius:10px;border:1px solid var(--glass-edge);'
+      + 'background:var(--glass);color:var(--text);font:700 12.5px system-ui;cursor:pointer">📍 Google</button>'
+      + '</div>';
+  })();
 
   const nowCount = visible.filter(f=>f._state==='now').length;
   if(nowCount){
