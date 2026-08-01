@@ -866,7 +866,8 @@ function buildNext90(){
       +   '🚕 докарване ' + hm(e.s - PRE) + '–' + hm(e.s) + ' &nbsp;·&nbsp; вземане ' + hm(e.e) + '–' + hm(e.e + POST)
       + '</div></div>';
   });
-  html += '<div style="font-size:10.5px;color:var(--muted);margin-top:8px;padding-top:6px;border-top:1px solid var(--border)">Само театри, кина и концерти (SEV). Транспортните пикове са в горната лента.</div>';
+  html += '<div style="font-size:10.5px;color:var(--muted);margin-top:8px;padding-top:6px;border-top:1px solid var(--border)">Театри, концерти, партита и фестивали'
+        + (window.__sevSrc ? ' · ' + window.__sevSrc : '') + '. Транспортните пикове са в горната лента.</div>';
   list.innerHTML = html;
 }
 
@@ -2475,6 +2476,7 @@ function toggleMapView(){
         return e.e+POST>now && e.s<=todayEnd.getTime()+36*3600000; // до утре вечер
       }).sort(function(a,b){return a.s-b.s});
       window.__sevEvents = evs;          // ползват се и от панела „Събития 24ч"
+      try{ window.__sevSrc = (d.sources_ok || []).join(', '); }catch(e){}
       window.__sevLoaded = true;
       try{ if(typeof next90Open !== 'undefined' && next90Open) buildNext90(); }catch(e){}
       try{ buildTicker(); }catch(e){}
