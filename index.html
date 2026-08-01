@@ -1825,6 +1825,42 @@ body.theme-night .wb-temp, body.theme-night #wx-rain-when{
 /* позициите и размерите се задават от JS според екрана; тук само вид */
 #next90-btn{ display:none !important; }
 #dest-__event{ position:fixed !important; }
+
+/* ═══ Панелът със събития — пълноекранен, като летището ═══ */
+#next90-panel{
+  display:none;
+  position:fixed !important;
+  left:0 !important; right:0 !important;
+  top:var(--stack-h, 238px) !important; bottom:0 !important;
+  z-index:3000 !important;
+  background:var(--modal-bg) !important;
+  color:var(--text) !important;
+  border:1px solid var(--modal-edge) !important;
+  border-radius:20px 20px 0 0 !important;
+  box-shadow:var(--modal-shadow) !important;
+  backdrop-filter:var(--modal-blur);
+  overflow:hidden;
+  flex-direction:column;
+  animation:rise .28s var(--ease) both;
+}
+#next90-panel .n90-header{
+  flex-shrink:0; display:flex; align-items:center; justify-content:space-between;
+  padding:13px 14px; border-bottom:1px solid var(--modal-edge);
+  font:800 15px system-ui,sans-serif; color:var(--cyan);
+  background:var(--modal-head); text-shadow:var(--glow);
+}
+#next90-panel .n90-close{
+  width:38px; height:38px; flex-shrink:0; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--surface); color:var(--text);
+  border:1.5px solid var(--cyan); font-size:19px; cursor:pointer;
+}
+#next90-list{
+  flex:1; overflow-y:auto; overscroll-behavior:contain;
+  padding:10px 12px 24px;
+}
+/* колоната остава над панела и кликаема */
+.tool-btn, #clean-btn, #gps-btn, #fs-btn{ z-index:3600 !important; }
 </style>
 <style>
 
@@ -2540,7 +2576,7 @@ body.map-fullscreen
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260801v152"></script>
+<script src="app.js?v=20260801v153"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">

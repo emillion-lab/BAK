@@ -4973,7 +4973,7 @@ function toggleMapView(){
       b.addEventListener('click', function(e){
         e.stopPropagation();
         setOpen(false);
-        if(d.zone === '__event'){ goToNextEvent(); return; }
+        if(d.zone === '__event'){ openFull('__event', b); return; }
         if(d.zone === '__zones'){
           document.body.classList.add('sheet-zones');
           var s = document.getElementById('zone-sidebar');
@@ -5009,6 +5009,15 @@ function toggleMapView(){
       if(s) s.scrollTop = 0;
       return;
     }
+    if(zone === '__event'){
+      try{
+        if(typeof buildNext90 === 'function') buildNext90();
+        var p = document.getElementById('next90-panel');
+        if(p) p.style.display = 'flex';
+        window.next90Open = true;
+      }catch(e){}
+      return;
+    }
     if(zone === 'airport'){ goToZone('airport'); return; }
     goToZone(zone);
   }
@@ -5039,6 +5048,7 @@ function toggleMapView(){
     document.body.classList.remove('full-list');
     document.querySelectorAll('.dest-btn').forEach(function(x){ x.classList.remove('on'); });
     try{ if(typeof closeAirportModal === 'function') closeAirportModal(); }catch(e){}
+    try{ var np = document.getElementById('next90-panel'); if(np) np.style.display = 'none'; window.next90Open = false; }catch(e){}
     try{ if(window.map) map.closePopup(); }catch(e){}
   }
   window.closeFull = closeFull;

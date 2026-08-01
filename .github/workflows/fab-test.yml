@@ -22,7 +22,7 @@ jobs:
           await new Promise(r=>setTimeout(r,8000));
           // проверката на бутоните иска изчакване, попъпът се създава след 180ms
           const opens = {};
-          for (const id of ['dest-__zones','dest-airport','dest-cjp','dest-cab_north','dest-cas_intl']) {
+          for (const id of ['dest-__zones','dest-__event','dest-airport','dest-cjp','dest-cab_north','dest-cas_intl']) {
             await p.evaluate(i=>{const e=document.getElementById(i); if(e) e.click();}, id);
             await new Promise(r=>setTimeout(r,650));
             opens[id] = await p.evaluate((i)=>{
@@ -34,6 +34,8 @@ jobs:
                 if(s){const r=s.getBoundingClientRect(); visible=r.height>100 && r.top<innerHeight;} }
               else if(i==='dest-airport'){ const m=document.getElementById('airport-modal');
                 visible = !!m && getComputedStyle(m).display!=='none'; }
+              else if(i==='dest-__event'){ const p=document.getElementById('next90-panel');
+                visible = !!p && getComputedStyle(p).display!=='none'; }
               else visible = !!document.querySelector('.leaflet-popup');
               return {opened:full, visible};
             }, id);
