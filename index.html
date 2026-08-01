@@ -1122,8 +1122,7 @@ body.tiles-dark .leaflet-tile-pane{
 }
 #next90-btn:active, #clean-btn:active, #gps-btn:active, #fs-btn:active{ transform:scale(.9); }
 /* горе вдясно, под лентите — извън обсега на палеца и на ветрилото */
-body.map-fullscreen #next90-btn{ display:none !important; }
-
+body.map-fullscreen 
 #exit-now-panel{ color:var(--text) !important; }
 #exit-now-panel > div:first-child{ color:var(--cyan) !important; }
 #exit-now-panel b{ color:var(--text) !important; }
@@ -1273,16 +1272,6 @@ body > #zone-sidebar{ position:fixed !important; }
   font-size:20px !important; border-radius:14px !important;
   overflow:hidden !important; white-space:nowrap !important;
 }
-#dest-__zones   { bottom:12px  !important; }
-#dest-__event   { bottom:60px  !important; }
-#dest-cas_intl  { bottom:108px !important; }
-#dest-cab_north { bottom:156px !important; }
-#dest-cjp       { bottom:204px !important; }
-#dest-airport   { bottom:252px !important; }
-#fs-btn         { bottom:312px !important; }
-#gps-btn        { bottom:360px !important; }
-#clean-btn      { bottom:408px !important; }
-#next90-btn     { display:none !important; }
 
 /* чиповете долу вляво да не се качват върху колоната */
 #chip-stack{ max-width:56vw !important; }
@@ -1788,7 +1777,6 @@ body.theme-night .wb-temp, body.theme-night #wx-rain-when{
 #next90-list .n90-item[data-live="1"]{ animation:ev-pulse 2.2s ease-in-out infinite; }
 
 /* билетът-дестинация носи значката за активно събитие */
-#dest-__event{ position:relative !important; }
 #dest-__event .ev-dot{
   position:absolute; top:-3px; right:-3px;
   min-width:16px; height:16px; padding:0 3px;
@@ -1820,16 +1808,7 @@ body.theme-night .wb-temp, body.theme-night #wx-rain-when{
   }
   .dest-btn{ width:40px !important; height:40px !important;
     min-width:40px !important; max-width:40px !important; font-size:18px !important; }
-  #dest-__zones   { bottom:10px  !important; }
-  #dest-__event   { bottom:54px  !important; }
-  #dest-cas_intl  { bottom:98px  !important; }
-  #dest-cab_north { bottom:142px !important; }
-  #dest-cjp       { bottom:186px !important; }
-  #dest-airport   { bottom:230px !important; }
-  #fs-btn         { bottom:284px !important; }
-  #gps-btn        { bottom:328px !important; }
-  #clean-btn      { bottom:372px !important; }
-  /* шапката още една стъпка надолу */
+                    /* шапката още една стъпка надолу */
   .header{ padding:7px 10px !important; }
   .header h1{ font-size:clamp(10.5px, 3vw, 12.5px) !important; }
   .header p{ font-size:clamp(7.5px, 2.1vw, 9.5px) !important; }
@@ -1842,6 +1821,10 @@ body.theme-night .wb-temp, body.theme-night #wx-rain-when{
   .ticker-bar .tick-item{ font-size:clamp(9px, 2.5vw, 11px) !important; }
   #chip-stack > *{ font-size:11px !important; padding:5px 9px !important; }
 }
+
+/* позициите и размерите се задават от JS според екрана; тук само вид */
+#next90-btn{ display:none !important; }
+#dest-__event{ position:fixed !important; }
 </style>
 <style>
 
@@ -2045,9 +2028,7 @@ body.map-fullscreen .timeline-panel,
 body.map-fullscreen .ticker-bar { display:none !important; }
 body.map-fullscreen #map { height:100vh !important; height:100dvh !important; }
 body.map-fullscreen #legend { bottom:70px; }
-body.map-fullscreen #gps-btn { bottom:120px; }
-body.map-fullscreen #fs-btn  { bottom:70px; }
-
+body.map-fullscreen body.map-fullscreen 
 /* Pulsing user location dot */
 @keyframes pulse-ring {
   0%   { transform:scale(1);   opacity:.7; }
@@ -2341,8 +2322,7 @@ body.map-fullscreen #weather-bar { display:none !important; }
   box-shadow:0 2px 12px rgba(0,0,0,.5);
 }
 #next90-btn.active { background:#1a1400; border-color:var(--amber); }
-body.map-fullscreen #next90-btn { display:none; }
-
+body.map-fullscreen 
 /* Event alert */
 @keyframes alert-pulse {
   0%,100% { opacity:1; transform:scale(1); }
@@ -2560,7 +2540,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260801v151"></script>
+<script src="app.js?v=20260801v152"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">

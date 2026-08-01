@@ -6295,3 +6295,55 @@ window.showKatPopup = function(){
   setInterval(tick, 20000);
   setTimeout(tick, 2500);
 })();
+
+// ═══════════════════════════════════════════════
+// Колоната вдясно се подрежда според реалната
+// височина на екрана — фиксираните стойности
+// изхвърляха последния бутон в PWA.
+// ═══════════════════════════════════════════════
+(function(){
+  var ORDER = ['dest-__zones','dest-__event','dest-cas_intl','dest-cab_north',
+               'dest-cjp','dest-airport','fs-btn','gps-btn','clean-btn'];
+
+  function layout(){
+    var els = ORDER.map(function(id){ return document.getElementById(id); }).filter(Boolean);
+    if(!els.length) return;
+
+    var stack = document.getElementById('topstack');
+    var topH  = stack ? stack.getBoundingClientRect().height : 200;
+    var vh    = window.innerHeight;
+    var avail = vh - topH - 24;                    // свободна височина под лентите
+    var n     = els.length;
+
+    // размер и стъпка се свиват, докато всичко се побере
+    var size  = Math.max(30, Math.min(44, Math.floor((avail / n) - 6)));
+    var pitch = Math.max(size + 3, Math.floor(avail / n));
+    var bottom0 = 12;
+
+    // ако пак не стига, вдигаме началото по-нагоре
+    var total = bottom0 + (n - 1) * pitch + size;
+    if(total > avail) pitch = Math.max(size + 2, Math.floor((avail - bottom0 - size) / (n - 1)));
+
+    els.forEach(function(el, i){
+      el.style.setProperty('width',  size + 'px', 'important');
+      el.style.setProperty('height', size + 'px', 'important');
+      el.style.setProperty('min-width',  size + 'px', 'important');
+      el.style.setProperty('max-width',  size + 'px', 'important');
+      el.style.setProperty('font-size', Math.round(size * 0.46) + 'px', 'important');
+      el.style.setProperty('bottom', (bottom0 + i * pitch) + 'px', 'important');
+      el.style.setProperty('top', 'auto', 'important');
+      el.style.setProperty('right', '10px', 'important');
+    });
+  }
+
+  function boot(){
+    layout();
+    setTimeout(layout, 600);
+    setTimeout(layout, 1800);
+    setInterval(layout, 4000);
+    window.addEventListener('resize', layout);
+    window.addEventListener('orientationchange', function(){ setTimeout(layout, 300); });
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
