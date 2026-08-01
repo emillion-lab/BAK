@@ -2523,16 +2523,20 @@ function toggleMapView(){
         var s=new Date(e.start).getTime();
         return {n:e.name,v:e.venue,lat:e.lat,lon:e.lon,cap:e.cap||600,s:s,e:s+DUR,src:e.src};
       }).filter(function(e){
-        return e.e+POST>now && e.s<=todayEnd.getTime()+36*3600000; // до утре вечер
+        // пазим всичко предстоящо — панелът решава кое да покаже,
+        // а маркерите на картата се ограничават отделно
+        return e.e + POST > now;
       }).sort(function(a,b){return a.s-b.s});
-      window.__sevEvents = evs;          // ползват се и от панела „Събития 24ч"
+      window.__sevEvents = evs;          // ползват се и от панела „Събития"
+      var soonEnd = todayEnd.getTime() + 36*3600000;
+      var evsNear = evs.filter(function(e){ return e.s <= soonEnd; });
       try{ window.__sevSrc = (d.sources_ok || []).join(', '); }catch(e){}
       window.__sevLoaded = true;
       try{ if(typeof next90Open !== 'undefined' && next90Open) buildNext90(); }catch(e){}
       try{ buildTicker(); }catch(e){}
       if(!evs.length) return;
       var layer=L.layerGroup();
-      evs.forEach(function(e){
+      evsNear.forEach(function(e){   // маркери само за близките 36ч
         if(!e.lat) return;
         var big=e.cap>=8000, mid=e.cap>=2500;
         var col=big?'#f85149':(mid?'#d29922':'#3fb950');
