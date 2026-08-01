@@ -1273,15 +1273,16 @@ body > #zone-sidebar{ position:fixed !important; }
   font-size:20px !important; border-radius:14px !important;
   overflow:hidden !important; white-space:nowrap !important;
 }
-#dest-__zones   { bottom:14px  !important; }
-#dest-cas_intl  { bottom:66px  !important; }
-#dest-cab_north { bottom:118px !important; }
-#dest-cjp       { bottom:170px !important; }
-#dest-airport   { bottom:222px !important; }
-#fs-btn         { bottom:288px !important; }
-#gps-btn        { bottom:340px !important; }
-#clean-btn      { bottom:392px !important; }
-#next90-btn     { bottom:444px !important; }
+#dest-__event   { bottom:14px  !important; }
+#dest-__zones   { bottom:66px  !important; }
+#dest-cas_intl  { bottom:118px !important; }
+#dest-cab_north { bottom:170px !important; }
+#dest-cjp       { bottom:222px !important; }
+#dest-airport   { bottom:274px !important; }
+#fs-btn         { bottom:340px !important; }
+#gps-btn        { bottom:392px !important; }
+#clean-btn      { bottom:444px !important; }
+#next90-btn     { display:none !important; }
 
 /* чиповете долу вляво да не се качват върху колоната */
 #chip-stack{ max-width:56vw !important; }
@@ -1785,6 +1786,18 @@ body.theme-night .wb-temp, body.theme-night #wx-rain-when{
 }
 /* активните събития в списъка пулсират дискретно */
 #next90-list .n90-item[data-live="1"]{ animation:ev-pulse 2.2s ease-in-out infinite; }
+
+/* билетът-дестинация носи значката за активно събитие */
+#dest-__event{ position:relative !important; }
+#dest-__event .ev-dot{
+  position:absolute; top:-3px; right:-3px;
+  min-width:16px; height:16px; padding:0 3px;
+  border-radius:9px; background:#dc2626; color:#fff;
+  font:900 11px/16px system-ui,sans-serif; text-align:center;
+  box-shadow:0 0 0 2px var(--surface), 0 2px 6px rgba(0,0,0,.35);
+}
+#dest-__event.has-soon .ev-dot{ background:#d97706; }
+#dest-__event.has-live{ animation:ev-pulse 1.9s ease-in-out infinite; }
 </style>
 <style>
 
@@ -2472,7 +2485,7 @@ body.map-fullscreen #next90-btn { display:none; }
 
 <div id="next90-panel">
   <div class="n90-header">
-    ⏱ СЪБИТИЯ — СЛЕДВАЩИТЕ 24 ЧАСА
+    🎫 СЪБИТИЯ
     <span class="n90-close" onclick="closeNext90()">✕</span>
   </div>
   <div id="next90-list"></div>
@@ -2503,7 +2516,7 @@ body.map-fullscreen #next90-btn { display:none; }
   </div>
 </div>
 <script src="leaflet.min.js"></script>
-<script src="app.js?v=20260801v147"></script>
+<script src="app.js?v=20260801v148"></script>
 
 <!-- PWA Install Banner -->
 <div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#0284c7;padding:10px 14px;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -3px 15px #0003">

@@ -862,10 +862,10 @@ function buildNext90(){
     html += '<div style="padding:9px 11px;margin-bottom:8px;border-radius:9px;'
           + 'background:rgba(2,132,199,.10);border:1px solid rgba(2,132,199,.35);'
           + 'font-size:12px;color:var(--cyan);line-height:1.45">'
-          + '📅 Нищо в следващите 24 часа — ето следващите ' + sev.length + '</div>';
+          + '📅 Предстоящи събития</div>';
   }
   let lastDay = '';
-  sev.forEach(function(e){
+  sev.forEach(function(e, i){
     const d = new Date(e.s);
     const _t = new Date(), _tm = new Date(_t.getTime() + 86400000);
     const day = d.toDateString() === _t.toDateString()  ? 'ДНЕС'
@@ -880,7 +880,7 @@ function buildNext90(){
     const mins = Math.round((e.s - now)/60000);
     const when = mins < 0 ? 'тече' : (mins < 60 ? ('след ' + mins + ' мин') : ('след ' + Math.floor(mins/60) + 'ч ' + (mins%60) + 'м'));
     var isLiveNow = (e.s - 2*3600000) <= now && (e.e + POST_W) > now;
-    html += '<div class="n90-item"' + (isLiveNow ? ' data-live="1"' : '')
+    html += '<div class="n90-item" data-idx="' + i + '"' + (isLiveNow ? ' data-live="1"' : '')
           + ' style="border-left:3px solid ' + (isLiveNow ? '#ef4444' : col)
           + ';padding:6px 9px;margin:3px 0;background:' + (isLiveNow ? 'rgba(239,68,68,.10)' : 'var(--surf)')
           + ';border-radius:7px">'
@@ -893,6 +893,18 @@ function buildNext90(){
   html += '<div style="font-size:10.5px;color:var(--muted);margin-top:8px;padding-top:6px;border-top:1px solid var(--border)">Театри, концерти, партита и фестивали'
         + (window.__sevSrc ? ' · ' + window.__sevSrc : '') + '. Транспортните пикове са в горната лента.</div>';
   list.innerHTML = html;
+  // клик по ред → картата отива там
+  list.querySelectorAll('.n90-item[data-idx]').forEach(function(row){
+    row.style.cursor = 'pointer';
+    row.addEventListener('click', function(){
+      var e = sev[parseInt(row.dataset.idx, 10)];
+      if(!e) return;
+      try{ window.closeNext90 && window.closeNext90(); }catch(x){}
+      document.body.removeAttribute('data-full');
+      document.querySelectorAll('.dest-btn').forEach(function(b){ b.classList.remove('on'); });
+      setTimeout(function(){ window.goToNextEvent(e); }, 160);
+    });
+  });
 }
 
 // ═══════════════════════════════════════════════
@@ -3330,7 +3342,7 @@ function toggleMapView(){
     var far = list.filter(function(x){ return x.tier === 'far'; }).length;
     var urgent = mins(list[0].t) <= 20 && list[0].tier === 'far';
     var rows = list.map(function(x){
-      var ic = x.tier === 'far' ? '🧳' : (x.tier === 'near' ? '·' : '•');
+      var ic = '·';   // еднакъв знак за всички
       return '<div style="margin:2px 0">' + ic + ' <b>' + hm(x.t) + '</b> · ' + x.from
            + ' <span style="opacity:.6">' + x.train + '</span>'
            + (x.delay ? ' <span style="color:#f59e0b">+' + x.delay + 'м</span>' : '')
@@ -3340,8 +3352,7 @@ function toggleMapView(){
          + (urgent ? 'rgba(234,88,12,.14)' : 'rgba(56,189,248,.10)')
          + ';border-left:3px solid ' + (urgent ? '#ea580c' : '#38bdf8') + ';font-size:12px">'
          + '<b>🚂 Пристигащи влакове</b>' + rows
-         + '<div style="opacity:.55;font-size:11px;margin-top:4px">🧳 = далечен (багаж) · '
-         + far + ' от ' + list.length + ' са далечни</div></div>';
+         + '</div>';
   }
 
   function enrich(el){
@@ -3599,11 +3610,7 @@ function toggleMapView(){
            + (x.sector ? ' <span style="opacity:.6">сек.' + x.sector + '</span>' : '')
            + ' <span style="opacity:.65">(' + whenTxt(m) + ')</span></div>';
     }).join('');
-    var intlNote = intl.length
-      ? '<div style="margin-top:5px;padding-top:5px;border-top:1px solid rgba(148,163,184,.25);'
-        + 'font-size:11px;color:#93c5fd">🌍 <b>' + intl.length + ' международни</b> в следващите 3ч — '
-        + 'багаж, дълъг път, почти сигурен курс</div>'
-      : '';
+    var intlNote = '';
     return '<div style="margin-top:7px;padding:7px 9px;border-radius:7px;background:'
          + (urgent ? 'rgba(234,88,12,.14)' : 'rgba(56,189,248,.10)')
          + ';border-left:3px solid ' + (urgent ? '#ea580c' : '#38bdf8') + ';font-size:12px">'
@@ -3794,6 +3801,7 @@ function toggleMapView(){
       var txt = el.textContent || '';
       // само в собствения си панел — не в Централна автогара
       if(/Централна автогара/i.test(txt)) return;
+      if(/Автогара Юг|Автогара Подуяне/i.test(txt)) return;
       if(/Междунар|Сердика \/ FlixBus|FlixBus/i.test(txt)){
         if(el.dataset) el.dataset.intl29 = '1';
         el.insertAdjacentHTML('beforeend', intlHTML());
@@ -4881,7 +4889,8 @@ function toggleMapView(){
     { zone:'cab_north', icon:'🚌', label:'Централна' },
     { zone:'cas_intl',  icon:'🌐', label:'Международна автогара' },
     { zone:'cjp',       icon:'🚂', label:'ЖП гара' },
-    { zone:'__zones',   icon:'📋', label:'Зони' }
+    { zone:'__zones',   icon:'📋', label:'Зони' },
+    { zone:'__event',   icon:'🎫', label:'Следващо събитие' }
   ];
   // ВЪНШЕН пръстен — инструменти (без надписи, иконите са познати)
   var ITEMS = [];   // инструментите вече не са в ветрилото — стоят като чипове
@@ -4950,6 +4959,7 @@ function toggleMapView(){
       b.addEventListener('click', function(e){
         e.stopPropagation();
         setOpen(false);
+        if(d.zone === '__event'){ goToNextEvent(); return; }
         if(d.zone === '__zones'){
           document.body.classList.add('sheet-zones');
           var s = document.getElementById('zone-sidebar');
@@ -5018,6 +5028,49 @@ function toggleMapView(){
     try{ if(window.map) map.closePopup(); }catch(e){}
   }
   window.closeFull = closeFull;
+
+  // Зуумва картата към следващото събитие, което ражда клиенти
+  window.goToNextEvent = function(ev){
+    try{
+      var evs = window.__sevEvents || [];
+      var now = Date.now(), PRE = 2*3600000, POST = 45*60000;
+      var target = ev;
+      if(!target){
+        target = evs.filter(function(e){ return (e.s - PRE) <= now && (e.e + POST) > now; })[0]
+              || evs.filter(function(e){ return e.s > now; })
+                    .sort(function(a,b){ return a.s - b.s; })[0];
+      }
+      if(!target){ return; }
+      document.body.classList.remove('full-list');
+      var M = window.map || map;
+      var lat = target.lat, lon = target.lon;
+      if(!isFinite(lat) || !isFinite(lon)){
+        // без координати — центрираме на залата по име, ако я знаем
+        var z = (window.ZONES || []).find(function(x){
+          return target.v && x.name && x.name.toLowerCase().indexOf(String(target.v).toLowerCase().slice(0,8)) >= 0;
+        });
+        if(z){ lat = z.lat; lon = z.lng; }
+      }
+      if(!isFinite(lat) || !isFinite(lon)){
+        alert('🎫 ' + target.n + '\n' + (target.v || '') + '\nНяма координати за тази зала.');
+        return;
+      }
+      M.invalidateSize();
+      M.setView([lat, lon], 15);
+      var hm = function(t){ return new Date(t).toLocaleTimeString('bg',{hour:'2-digit',minute:'2-digit'}); };
+      var d0 = new Date(target.s);
+      L.popup({ maxWidth: 280 })
+       .setLatLng([lat, lon])
+       .setContent('<div style="font:800 13.5px system-ui;color:var(--text);line-height:1.4">🎫 '
+         + target.n + '</div>'
+         + '<div style="font-size:12px;color:var(--muted);margin-top:3px">' + (target.v || '') + '</div>'
+         + '<div style="font-size:12px;margin-top:6px">📅 '
+         + d0.toLocaleDateString('bg',{day:'numeric',month:'long'}) + ' · ' + hm(target.s) + '</div>'
+         + '<div style="font-size:12px;font-weight:700;color:#16a34a;margin-top:4px">🚕 вземане '
+         + hm(target.e) + '–' + hm(target.e + POST) + '</div>')
+       .openOn(M);
+    }catch(e){}
+  };
 
   function goToZone(id){
     var z = (window.ZONES||[]).find(function(x){ return x.id === id; });
@@ -6203,13 +6256,13 @@ window.showKatPopup = function(){
 // ═══════════════════════════════════════════════
 (function(){
   function tick(){
-    var b = document.getElementById('next90-btn');
+    var b = document.getElementById('dest-__event') || document.getElementById('next90-btn');
     if(!b) return;
     var evs = window.__sevEvents || [];
     var now = Date.now(), PRE = 2*3600000, POST = 45*60000;
     var active = evs.filter(function(e){ return (e.s - PRE) <= now && (e.e + POST) > now; });
     var soon   = evs.filter(function(e){ var d = e.s - now; return d > 0 && d < 3*3600000; });
-    b.textContent = '🎫';
+    if(b.id === 'next90-btn') b.textContent = '🎫';
     b.classList.toggle('has-live', active.length > 0);
     b.classList.toggle('has-soon', !active.length && soon.length > 0);
     b.title = active.length ? (active.length + ' събитие/я тече сега')
