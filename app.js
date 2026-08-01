@@ -5085,11 +5085,36 @@ function toggleMapView(){
         if(z){ lat = z.lat; lon = z.lng; }
       }
       if(!isFinite(lat) || !isFinite(lon)){
-        alert('🎫 ' + target.n + '\n' + (target.v || '') + '\nНяма координати за тази зала.');
+        // последен опит: съвпадение по ключова дума в името на залата
+        var vv = String(target.v || '').toLowerCase();
+        var HINTS = [['ндк',42.6866,23.3190],['арена',42.6711,23.3692],['левски',42.6879,23.3396],
+                     ['mixtape',42.6866,23.3190],['joy',42.6700,23.3520],['текила',42.6950,23.3280],
+                     ['театр',42.6930,23.3260],['theatro',42.6930,23.3260],['експо',42.6520,23.3760],
+                     ['expo',42.6520,23.3760],['парадайс',42.6655,23.2895],['paradise',42.6655,23.2895],
+                     ['гурко',42.6930,23.3300],['gurko',42.6930,23.3300],['yalta',42.6930,23.3230],
+                     ['ялта',42.6930,23.3230],['tech park',42.6640,23.3760],['тех парк',42.6640,23.3760]];
+        for(var hi = 0; hi < HINTS.length; hi++){
+          if(vv.indexOf(HINTS[hi][0]) >= 0){ lat = HINTS[hi][1]; lon = HINTS[hi][2]; break; }
+        }
+      }
+      if(!isFinite(lat) || !isFinite(lon)){
+        alert('🎫 ' + target.n + '\n' + (target.v || '') + '\n\nЗалата няма записани координати.');
         return;
       }
       M.invalidateSize();
-      M.setView([lat, lon], 15);
+      M.setView([lat, lon], 16);
+      // изместваме, за да не потъне попъпът под горните ленти
+      setTimeout(function(){
+        try{
+          var stack = parseInt(getComputedStyle(document.documentElement)
+                        .getPropertyValue('--stack-h')) || 238;
+          var pop = document.querySelector('.leaflet-popup');
+          if(pop){
+            var r = pop.getBoundingClientRect(), need = stack + 20;
+            if(r.top < need) M.panBy([0, r.top - need], {animate:true});
+          }
+        }catch(e){}
+      }, 240);
       var hm = function(t){ return new Date(t).toLocaleTimeString('bg',{hour:'2-digit',minute:'2-digit'}); };
       var d0 = new Date(target.s);
       L.popup({ maxWidth: 280 })
@@ -5100,7 +5125,15 @@ function toggleMapView(){
          + '<div style="font-size:12px;margin-top:6px">📅 '
          + d0.toLocaleDateString('bg',{day:'numeric',month:'long'}) + ' · ' + hm(target.s) + '</div>'
          + '<div style="font-size:12px;font-weight:700;color:#16a34a;margin-top:4px">🚕 вземане '
-         + hm(target.e) + '–' + hm(target.e + POST) + '</div>')
+         + hm(target.e) + '–' + hm(target.e + POST) + '</div>'
+         + '<div style="display:flex;gap:6px;margin-top:9px">'
+         + '<button onclick="openWaze(\'' + String(target.v||target.n).replace(/'/g,"\\'") + '\',' + lat + ',' + lon + ')" '
+         + 'style="flex:1;padding:8px;border-radius:9px;border:1px solid var(--glass-edge);'
+         + 'background:var(--glass);color:var(--text);font:700 12px system-ui;cursor:pointer">🚗 Waze</button>'
+         + '<button onclick="openGoogleMaps(\'' + String(target.v||target.n).replace(/'/g,"\\'") + '\',' + lat + ',' + lon + ')" '
+         + 'style="flex:1;padding:8px;border-radius:9px;border:1px solid var(--glass-edge);'
+         + 'background:var(--glass);color:var(--text);font:700 12px system-ui;cursor:pointer">📍 Google</button>'
+         + '</div>')
        .openOn(M);
     }catch(e){}
   };
