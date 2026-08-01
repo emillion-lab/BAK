@@ -170,6 +170,39 @@ jobs:
             return {
               found: boxes.map(x=>x.id), missing: ids.filter(i=>!boxes.find(x=>x.id===i)),
               overlaps, offscreen, dark, opens, scrollable,
+              safetyAudit: (()=>{
+                const out = {};
+                // 1. Показва ли се нещо в миналото като предстоящо
+                const now = Date.now();
+                const fd = (typeof flightDetails !== 'undefined' ? flightDetails : []);
+                out.flightsTotal = fd.length;
+                out.flightsPast  = fd.filter(f => f.exitToTs < now - 3600000).length;
+                out.flightsFuture= fd.filter(f => f.exitFromTs > now).length;
+                // 2. Влакове и автобуси
+                out.trains = (window.__liveDemand && window.__liveDemand.trains) || 0;
+                // 3. Събития с координати
+                const ev = window.__sevEvents || [];
+                out.events = ev.length;
+                out.eventsNoGeo = ev.filter(e => !e.lat).length;
+                out.eventsPast  = ev.filter(e => e.e < now - 3600000).length;
+                // 4. Зони с нереалистичен резултат
+                try{
+                  const sc = computeScores(new Date().getHours()).scores;
+                  const vals = Object.values(sc);
+                  out.scoreMax = Math.max(...vals).toFixed(1);
+                  out.scoreNaN = vals.filter(v => !isFinite(v)).length;
+                  out.zonesTotal = vals.length;
+                }catch(e){ out.scoreErr = String(e.message).slice(0,60); }
+                // 5. Навигацията достъпна ли е
+                out.hasWaze = typeof window.openWaze === 'function';
+                out.hasMaps = typeof window.openGoogleMaps === 'function';
+                // 6. Критични функции
+                ['showAirportSchedule','showZonePopup','buildNext90','goToNextEvent',
+                 'closeEventAlert','toggleMapView'].forEach(fn => {
+                  out['fn_' + fn] = typeof window[fn] === 'function';
+                });
+                return out;
+              })(),
               sevProbe: {
                 loaded: !!window.__sevLoaded,
                 count: (window.__sevEvents||[]).length,
