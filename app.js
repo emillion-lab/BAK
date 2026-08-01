@@ -901,6 +901,7 @@ function buildNext90(){
       var e = sev[parseInt(row.dataset.idx, 10)];
       if(!e) return;
       try{ window.closeNext90 && window.closeNext90(); }catch(x){}
+      document.body.classList.remove('list-view', 'full-list');
       document.body.removeAttribute('data-full');
       document.querySelectorAll('.dest-btn').forEach(function(b){ b.classList.remove('on'); });
       setTimeout(function(){ window.goToNextEvent(e); }, 160);
@@ -2607,8 +2608,8 @@ function toggleMapView(){
         chip.style.background='#111827e0'; chip.style.color='#94a3b8'; chip.style.borderColor='#334155';
       } else {
         chip.style.background='#0f2818f0'; chip.style.color='#86efac'; chip.style.borderColor='#22c55e';
-        chip.textContent='✈️ ' + (out.length||0) + '+' + (soon.length||0);
-        chip.title = out.length + ' излизат сега · ' + soon.length + ' до 1ч';
+        chip.textContent='✈️ ' + (out.length||0) + ((soon.length||0) ? '+' + soon.length : '');
+        chip.title = out.length + ' излизат сега · още ' + soon.length + ' до 1ч';
       }
       var html='<div style=\"position:sticky;top:-12px;z-index:3;background:#0b1220f8;padding:6px 0 6px;margin:-6px 0 6px;font-weight:900;font-size:13px;display:flex;justify-content:space-between;align-items:center;gap:8px\">'+
         '<span>🛬 Изходи Т1/Т2</span>'+
@@ -2750,11 +2751,19 @@ function toggleMapView(){
         list.push({cas:cas,diff:diff,from:a.from,intl:a.intl,cor:corridor(a.from)});
       });
       list.sort(function(a,b){return a.cas-b.cas});
-      var hot=list.filter(function(x){return x.diff>=-20&&x.diff<=20}).length;
+      // без дубликати — един и същ курс идва и от разписание, и от живо табло
+      var seenB = {};
+      list = list.filter(function(x){
+        var k = x.from + '|' + x.cas.getTime();
+        if(seenB[k]) return false;
+        seenB[k] = 1; return true;
+      });
+      var hot  = list.filter(function(x){return x.diff>=-20 && x.diff<=20}).length;
+      var next = list.length - hot;          // предстоящите СЛЕД активните
       if(!list.length){ chip.style.display='none'; panel.style.display='none'; return; }
       chip.style.display='block';
-      chip.textContent='🚌 ' + (hot||0) + '+' + list.length;
-      chip.title = (hot||0) + ' сега · ' + list.length + ' до 2ч';
+      chip.textContent='🚌 ' + hot + (next ? '+' + next : '');
+      chip.title = hot + ' пристигат сега · още ' + next + ' до 2ч';
       if(hot){ chip.style.background='#3a2510f0'; chip.style.color='#fb923c'; chip.style.border='1px solid #ea580c'; }
       else { chip.style.background='#10233af0'; chip.style.color='#93c5fd'; chip.style.border='1px solid #3b82f6'; }
       var html='<div style=\"font-weight:900;font-size:14px;margin-bottom:8px;display:flex;justify-content:space-between\"><span>🚌 Входящи автобуси</span><span style=\"cursor:pointer;padding:2px 10px;color:#94a3b8\" onclick=\"this.parentElement.parentElement.style.display=&quot;none&quot;\">✕</span></div>';
@@ -5015,6 +5024,7 @@ function toggleMapView(){
       return;
     }
     if(zone === '__event'){
+      document.body.classList.remove('list-view');
       var p = document.getElementById('next90-panel');
       if(p) p.style.display = 'flex';
       window.next90Open = true;
@@ -5053,6 +5063,8 @@ function toggleMapView(){
   function closeFull(silent){
     var zf = document.getElementById('zone-full');
     if(zf) zf.style.display = 'none';
+    // старият режим „списък" крие картата — чистим го при всяко затваряне
+    document.body.classList.remove('list-view');
     document.body.removeAttribute('data-full');
     document.body.classList.remove('full-list');
     document.querySelectorAll('.dest-btn').forEach(function(x){ x.classList.remove('on'); });
@@ -5074,7 +5086,7 @@ function toggleMapView(){
                     .sort(function(a,b){ return a.s - b.s; })[0];
       }
       if(!target){ return; }
-      document.body.classList.remove('full-list');
+      document.body.classList.remove('full-list', 'list-view');
       var M = window.map || map;
       var lat = target.lat, lon = target.lon;
       if(!isFinite(lat) || !isFinite(lon)){
@@ -6398,4 +6410,27 @@ window.showKatPopup = function(){
   }
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
+})();
+
+// ═══════════════════════════════════════════════
+// Предпазител: картата никога не остава скрита.
+// Режимът „списък" е от стария дизайн и понякога
+// оставаше залепнал, което сивееше целия екран.
+// ═══════════════════════════════════════════════
+(function(){
+  setInterval(function(){
+    try{
+      var anyPanelOpen = document.body.classList.contains('full-list')
+                      || document.body.hasAttribute('data-full');
+      if(!anyPanelOpen && document.body.classList.contains('list-view')){
+        document.body.classList.remove('list-view');
+        if(window.map) setTimeout(function(){ map.invalidateSize(); }, 120);
+      }
+      var m = document.getElementById('map');
+      if(m && !anyPanelOpen && getComputedStyle(m).display === 'none'){
+        m.style.removeProperty('display');
+        if(window.map) setTimeout(function(){ map.invalidateSize(); }, 120);
+      }
+    }catch(e){}
+  }, 2500);
 })();
