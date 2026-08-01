@@ -74,25 +74,25 @@ RESULT: {
   "стариятНадпис": false,
   "нямаДанни": false,
   "проба": [
-   "БВ 3620",
-   "КПВ 50208",
-   "КПВ 20238"
+   "КПВ 10207",
+   "КПВ 50280",
+   "КПВ 20224"
   ]
  },
  "taxi": {
   "canvas": true,
   "w": 390,
   "h": 50,
-  "yellowPx": 564,
-  "litPx": 1422,
-  "roadPx": 637,
+  "yellowPx": 552,
+  "litPx": 1405,
+  "roadPx": 652,
   "brightest": [
    253,
    254,
    254
   ],
   "taxiState": {
-   "x": 195,
+   "x": 199,
    "dir": 1,
    "night": false,
    "W": 390
@@ -107,5 +107,5 @@ RESULT: {
  "viewport": 844,
  "fanGone": true
 }
-TILEFAILS: 1
+TILEFAILS: 4
 PAGEERRORS: none
