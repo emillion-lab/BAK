@@ -114,8 +114,11 @@ jobs:
                     brightest, taxiState};
           });
           // клик по ред от списъка със събития
-          await p.evaluate(()=>{ const e=document.getElementById('dest-__event'); if(e) e.click(); });
-          await new Promise(r=>setTimeout(r,1200));
+          await p.evaluate(()=>{ window.__evErr=null;
+            document.body.classList.remove('list-view','full-list');
+            document.body.removeAttribute('data-full');
+            const e=document.getElementById('dest-__event'); if(e) e.click(); });
+          await new Promise(r=>setTimeout(r,1500));
           const evClick = await p.evaluate(()=>{
             const rows=document.querySelectorAll('#next90-list .n90-item[data-idx]');
             const before={ rows:rows.length,

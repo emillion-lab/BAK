@@ -5076,6 +5076,7 @@ function toggleMapView(){
 
   // Зуумва картата към следващото събитие, което ражда клиенти
   window.goToNextEvent = function(ev){
+    window.__evErr = null;
     try{
       var evs = window.__sevEvents || [];
       var now = Date.now(), PRE = 2*3600000, POST = 45*60000;
