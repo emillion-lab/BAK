@@ -831,26 +831,46 @@ function buildNext90(){
   if(!list) return;
   const now = Date.now();
   const POST_W = 45*60000;
-  const sev = (window.__sevEvents || []).filter(function(e){
+  var live = (window.__sevEvents || []).filter(function(e){
     return (e.e + POST_W) > now && e.s < now + 24*3600000;   // още има вземане ИЛИ предстои
   });
+  // Лятото е тихо — ако няма нищо в следващото денонощие,
+  // показваме следващите 10 занапред, за да има какво да се планира.
+  var ahead = [];
+  if(!live.length){
+    ahead = (window.__sevEvents || [])
+      .filter(function(e){ return e.s > now; })
+      .sort(function(a,b){ return a.s - b.s; })
+      .slice(0, 10);
+  }
+  var sev = live.length ? live : ahead;
+  var isAhead = !live.length && ahead.length > 0;
   if(!sev.length){
     if(!window.__sevLoaded){
       list.innerHTML='<div style="padding:14px;color:var(--muted);font-size:14px">⏳ Зарежда програмата…</div>';
       return;
     }
     list.innerHTML='<div style="padding:14px;color:var(--muted);font-size:14px;line-height:1.5">'
-      + 'Няма театри, кина или концерти в следващите 24 часа.<br>'
-      + '<span style="font-size:12px;opacity:.8">Източник: SEV (theatre.art.bg и др.)</span></div>';
+      + 'Няма предстоящи събития.<br>'
+      + '<span style="font-size:12px;opacity:.8">Източници: ' + (window.__sevSrc || 'SEV') + '</span></div>';
     return;
   }
   const hm = d => new Date(d).toLocaleTimeString('bg',{hour:'2-digit',minute:'2-digit'});
   const PRE = 2*3600000, POST = 45*60000;
   let html = '';
+  if(isAhead){
+    html += '<div style="padding:9px 11px;margin-bottom:8px;border-radius:9px;'
+          + 'background:rgba(2,132,199,.10);border:1px solid rgba(2,132,199,.35);'
+          + 'font-size:12px;color:var(--cyan);line-height:1.45">'
+          + '📅 Нищо в следващите 24 часа — ето следващите ' + sev.length + '</div>';
+  }
   let lastDay = '';
   sev.forEach(function(e){
     const d = new Date(e.s);
-    const day = d.toDateString() === new Date().toDateString() ? 'ДНЕС' : 'УТРЕ';
+    const _t = new Date(), _tm = new Date(_t.getTime() + 86400000);
+    const day = d.toDateString() === _t.toDateString()  ? 'ДНЕС'
+              : d.toDateString() === _tm.toDateString() ? 'УТРЕ'
+              : d.toLocaleDateString('bg', { day:'numeric', month:'long' }).toUpperCase();
     if(day !== lastDay){
       lastDay = day;
       html += '<div style="font-size:11px;font-weight:900;letter-spacing:.08em;color:var(--cyan);margin:10px 0 4px">— ' + day + ' —</div>';
@@ -859,7 +879,11 @@ function buildNext90(){
     const col = big ? '#f85149' : (mid ? '#d29922' : '#3fb950');
     const mins = Math.round((e.s - now)/60000);
     const when = mins < 0 ? 'тече' : (mins < 60 ? ('след ' + mins + ' мин') : ('след ' + Math.floor(mins/60) + 'ч ' + (mins%60) + 'м'));
-    html += '<div class="n90-item" style="border-left:3px solid ' + col + ';padding:6px 9px;margin:3px 0;background:var(--surf);border-radius:7px">'
+    var isLiveNow = (e.s - 2*3600000) <= now && (e.e + POST_W) > now;
+    html += '<div class="n90-item"' + (isLiveNow ? ' data-live="1"' : '')
+          + ' style="border-left:3px solid ' + (isLiveNow ? '#ef4444' : col)
+          + ';padding:6px 9px;margin:3px 0;background:' + (isLiveNow ? 'rgba(239,68,68,.10)' : 'var(--surf)')
+          + ';border-radius:7px">'
       + '<div style="font-weight:800;font-size:13.5px;line-height:1.3">🎫 ' + e.n + '</div>'
       + '<div class="n90-zone" style="font-size:11.5px;color:var(--muted);margin:2px 0">' + e.v + ' · ~' + (e.cap||0).toLocaleString('bg') + ' души · ' + when + '</div>'
       + '<div style="font-size:12px;font-weight:800;color:' + col + '">'
@@ -6171,3 +6195,36 @@ window.showKatPopup = function(){
   w.querySelector('#kat-pop-x').addEventListener('click', function(){ w.style.display='none'; });
   w.style.display = 'flex';
 };
+
+
+// ═══════════════════════════════════════════════
+// Значка на бутона за събития: удивителен, когато
+// в момента има събитие, което ражда клиенти.
+// ═══════════════════════════════════════════════
+(function(){
+  function tick(){
+    var b = document.getElementById('next90-btn');
+    if(!b) return;
+    var evs = window.__sevEvents || [];
+    var now = Date.now(), PRE = 2*3600000, POST = 45*60000;
+    var active = evs.filter(function(e){ return (e.s - PRE) <= now && (e.e + POST) > now; });
+    var soon   = evs.filter(function(e){ var d = e.s - now; return d > 0 && d < 3*3600000; });
+    b.textContent = '🎫';
+    b.classList.toggle('has-live', active.length > 0);
+    b.classList.toggle('has-soon', !active.length && soon.length > 0);
+    b.title = active.length ? (active.length + ' събитие/я тече сега')
+            : soon.length   ? (soon.length + ' предстоят в следващите 3ч')
+            : 'Предстоящи събития';
+    var dot = b.querySelector('.ev-dot');
+    if(active.length || soon.length){
+      if(!dot){
+        dot = document.createElement('span');
+        dot.className = 'ev-dot';
+        b.appendChild(dot);
+      }
+      dot.textContent = '!';
+    } else if(dot){ dot.remove(); }
+  }
+  setInterval(tick, 20000);
+  setTimeout(tick, 2500);
+})();
