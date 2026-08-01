@@ -826,6 +826,7 @@ window.closeNext90=function(){
   document.getElementById('next90-panel').style.display='none';
 };
 
+window.buildNext90 = buildNext90;
 function buildNext90(){
   const list=document.getElementById('next90-list');
   if(!list) return;
@@ -5014,12 +5015,16 @@ function toggleMapView(){
       return;
     }
     if(zone === '__event'){
-      try{
-        if(typeof buildNext90 === 'function') buildNext90();
-        var p = document.getElementById('next90-panel');
-        if(p) p.style.display = 'flex';
-        window.next90Open = true;
-      }catch(e){}
+      var p = document.getElementById('next90-panel');
+      if(p) p.style.display = 'flex';
+      window.next90Open = true;
+      if(typeof window.buildNext90 === 'function'){
+        window.buildNext90();
+      } else {
+        var l = document.getElementById('next90-list');
+        if(l) l.innerHTML = '<div style="padding:16px;color:#dc2626;font-size:13px">'
+          + 'Списъкът не може да се построи.</div>';
+      }
       return;
     }
     if(zone === 'airport'){ goToZone('airport'); return; }
