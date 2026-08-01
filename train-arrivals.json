@@ -1,65 +1,49 @@
 {
-  "updated": "2026-08-01T21:36:21.554450+03:00",
+  "updated": "2026-08-02T00:06:34.245150+03:00",
   "source": "live.bdz.bg",
   "station": "София Централна",
-  "count": 7,
-  "far_count": 5,
+  "count": 5,
+  "far_count": 2,
   "arrivals": [
     {
-      "time": "21:25",
-      "from": "София Север",
-      "train": "КПВ 20248",
-      "delay": 5,
-      "tier": "mid",
-      "weight": 0.5
-    },
-    {
-      "time": "21:26",
-      "from": "Свиленград",
-      "train": "БВ 1614",
-      "delay": 5,
-      "tier": "far",
-      "weight": 0.85
-    },
-    {
-      "time": "21:45",
-      "from": "Варна",
-      "train": "БВ 2616",
-      "delay": 5,
-      "tier": "far",
-      "weight": 1.0
-    },
-    {
-      "time": "22:11",
-      "from": "Петрич",
-      "train": "БВ 5616",
-      "delay": 3,
-      "tier": "far",
-      "weight": 1.0
-    },
-    {
-      "time": "22:16",
-      "from": "Бургас",
-      "train": "БВ 8612",
-      "delay": 3,
-      "tier": "far",
-      "weight": 1.0
-    },
-    {
-      "time": "22:32",
-      "from": "Бургас",
-      "train": "БВ 3624",
-      "delay": 5,
-      "tier": "far",
-      "weight": 1.0
-    },
-    {
-      "time": "22:34",
-      "from": "Драгоман",
-      "train": "КПВ 10213",
+      "time": "05:10",
+      "from": "Перник",
+      "train": "КПВ 50200",
       "delay": 0,
+      "tier": "near",
+      "weight": 0.35
+    },
+    {
+      "time": "05:25",
+      "from": "Мездра",
+      "train": "КПВ 20200",
+      "delay": 6,
       "tier": "mid",
       "weight": 0.5
+    },
+    {
+      "time": "05:45",
+      "from": "Бургас",
+      "train": "БВ 8626",
+      "delay": 0,
+      "tier": "far",
+      "weight": 1.0
+    },
+    {
+      "time": "05:51",
+      "from": "Варна",
+      "train": "БВ 2626",
+      "delay": 6,
+      "tier": "far",
+      "weight": 1.0
+    },
+    {
+      "time": "06:00",
+      "from": "Перник",
+      "train": "КПВ 50202",
+      "delay": 0,
+      "tier": "near",
+      "weight": 0.35
     }
   ]
 }
