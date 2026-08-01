@@ -5207,6 +5207,7 @@ function toggleMapView(){
       b.title = t === 'night' ? 'Дневна тема' : 'Нощна тема';
     }
     document.body.classList.toggle('tiles-dark', t === 'night');
+    try{ var kb = document.getElementById('kat-badge'); if(kb && window.__katReload) window.__katReload(); }catch(e){}
     // лентата: задаваме я директно, за да не зависи от реда на CSS правилата
     var tb = document.querySelector('.ticker-bar');
     if(tb){
@@ -5623,21 +5624,27 @@ function toggleMapView(){
     // слънце / луна
     var cx = W*.045, cy = H*.26, R = Math.min(8, H*.20);
     if(state.night){
-      var ph = moonPhase();                      // 0 новолуние … .5 пълнолуние
-      var waxing = ph < .5;                      // расте ли
-      var k = Math.cos(ph * 2 * Math.PI);         // 1 при новолуние, -1 при пълнолуние
-      // светлият диск
-      ctx.fillStyle = 'rgba(226,232,240,.92)';
+      var ph = moonPhase();
+      // Осветена част: 0 при новолуние, 1 при пълнолуние
+      var illum = (1 - Math.cos(2 * Math.PI * ph)) / 2;
+      var waxing = ph < 0.5;
+
+      // светъл диск
+      ctx.fillStyle = 'rgba(232,238,248,.94)';
       ctx.beginPath(); ctx.arc(cx, cy, R, 0, 6.28); ctx.fill();
-      // терминаторът: полукръг + елипса, чиято ширина следва фазата
-      ctx.fillStyle = 'rgba(10,20,38,.95)';
-      ctx.beginPath();
-      var s = waxing ? -1 : 1;                   // тъмната страна
-      ctx.ellipse(cx, cy, R, R, 0, s>0 ? -Math.PI/2 : Math.PI/2, s>0 ? Math.PI/2 : 3*Math.PI/2);
-      ctx.ellipse(cx, cy, Math.abs(k) * R, R, 0,
-                  (k*s > 0) ? Math.PI/2 : -Math.PI/2,
-                  (k*s > 0) ? 3*Math.PI/2 : Math.PI/2, true);
-      ctx.fill();
+
+      // Сянката е кръг със същия радиус, изместен встрани.
+      // Отместване 0 = пълна сянка (новолуние), 2R = никаква (пълнолуние).
+      if(illum < 0.995){
+        var off = 2 * R * illum;
+        var side = waxing ? -1 : 1;        // растяща свети отдясно, намаляваща отляво
+        ctx.save();
+        ctx.beginPath(); ctx.arc(cx, cy, R, 0, 6.28); ctx.clip();
+        ctx.fillStyle = state.night ? 'rgba(9,16,30,.96)' : 'rgba(120,132,150,.55)';
+        ctx.beginPath(); ctx.arc(cx + side * off, cy, R, 0, 6.28); ctx.fill();
+        ctx.restore();
+      }
+
       // мек ореол
       ctx.strokeStyle = 'rgba(226,232,240,.18)'; ctx.lineWidth = 1;
       ctx.beginPath(); ctx.arc(cx, cy, R + 2.5, 0, 6.28); ctx.stroke();
@@ -5987,7 +5994,10 @@ function toggleMapView(){
       }
     }
 
-    raf = requestAnimationFrame(loop);
+    // 30 кадъра стигат за този пейзаж и спестяват половината работа
+    raf = requestAnimationFrame(function(){
+      setTimeout(loop, 33);
+    });
   }
 
   document.addEventListener('visibilitychange', function(){
@@ -6014,10 +6024,11 @@ function toggleMapView(){
     return 'спокойно';
   }
   function colorFor(score){
-    if(score >= 8) return '#dc2626';
-    if(score >= 6) return '#ea580c';
-    if(score >= 4) return '#d97706';
-    return '#16a34a';
+    var night = document.body.classList.contains('theme-night');
+    if(score >= 8) return night ? '#ff6b5e' : '#dc2626';
+    if(score >= 6) return night ? '#ffa04d' : '#ea580c';
+    if(score >= 4) return night ? '#ffc94a' : '#d97706';
+    return night ? '#4ade80' : '#16a34a';
   }
 
   function mount(){
@@ -6036,6 +6047,7 @@ function toggleMapView(){
       if(rain) bar.insertBefore(el, rain); else bar.appendChild(el);
     }
     load(el);
+    window.__katReload = function(){ load(el); };
     setInterval(function(){ load(el); }, 30 * 60 * 1000);
   }
 
