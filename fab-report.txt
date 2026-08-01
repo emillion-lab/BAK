@@ -78,16 +78,16 @@ RESULT: {
   "canvas": true,
   "w": 390,
   "h": 50,
-  "yellowPx": 567,
-  "litPx": 1401,
-  "roadPx": 659,
+  "yellowPx": 529,
+  "litPx": 1408,
+  "roadPx": 665,
   "brightest": [
    253,
    254,
    254
   ],
   "taxiState": {
-   "x": 185,
+   "x": 209,
    "dir": 1,
    "night": false,
    "W": 390
@@ -102,5 +102,5 @@ RESULT: {
  "viewport": 844,
  "fanGone": true
 }
-TILEFAILS: 0
+TILEFAILS: 3
 PAGEERRORS: none
