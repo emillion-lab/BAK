@@ -47,6 +47,16 @@ RESULT: {
   }
  },
  "scrollable": false,
+ "sevProbe": {
+  "loaded": true,
+  "count": 45,
+  "src": "arena, bilet, ndk, theatre",
+  "first": {
+   "n": "Синьо лято",
+   "s": "2026-08-02T14:00"
+  },
+  "panelHtml": ""
+ },
  "alertProbe": {
   "display": "none",
   "visible": false,
@@ -83,16 +93,16 @@ RESULT: {
   "canvas": true,
   "w": 390,
   "h": 50,
-  "yellowPx": 552,
-  "litPx": 1405,
-  "roadPx": 652,
+  "yellowPx": 516,
+  "litPx": 1419,
+  "roadPx": 411,
   "brightest": [
-   253,
+   254,
    254,
    254
   ],
   "taxiState": {
-   "x": 199,
+   "x": 200,
    "dir": 1,
    "night": false,
    "W": 390
@@ -107,5 +117,5 @@ RESULT: {
  "viewport": 844,
  "fanGone": true
 }
-TILEFAILS: 4
+TILEFAILS: 3
 PAGEERRORS: none
