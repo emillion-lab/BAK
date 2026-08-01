@@ -5147,7 +5147,7 @@ function toggleMapView(){
          + 'background:var(--glass);color:var(--text);font:700 12px system-ui;cursor:pointer">📍 Google</button>'
          + '</div>')
        .openOn(M);
-    }catch(e){}
+    }catch(e){ window.__evErr = String(e && e.message || e); }
   };
 
   function goToZone(id){

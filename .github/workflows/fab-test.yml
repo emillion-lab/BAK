@@ -113,7 +113,29 @@ jobs:
             return {canvas:true, w:cv.width, h:cv.height, yellowPx:yellow, litPx:lit, roadPx:road,
                     brightest, taxiState};
           });
-          const out = await p.evaluate((opensIn, fadeIn, airportTapIn, bdzIn, taxiIn) => {
+          // клик по ред от списъка със събития
+          await p.evaluate(()=>{ const e=document.getElementById('dest-__event'); if(e) e.click(); });
+          await new Promise(r=>setTimeout(r,1200));
+          const evClick = await p.evaluate(()=>{
+            const rows=document.querySelectorAll('#next90-list .n90-item[data-idx]');
+            const before={ rows:rows.length,
+                           center: window.map ? window.map.getCenter() : null,
+                           zoom: window.map ? window.map.getZoom() : null };
+            if(rows.length) rows[0].click();
+            return before;
+          });
+          await new Promise(r=>setTimeout(r,1400));
+          const evAfter = await p.evaluate(()=>({
+            center: window.map ? window.map.getCenter() : null,
+            zoom: window.map ? window.map.getZoom() : null,
+            popup: !!document.querySelector('.leaflet-popup'),
+            popupText: (document.querySelector('.leaflet-popup-content')||{}).textContent?.slice(0,80)||'',
+            panelOpen: getComputedStyle(document.getElementById('next90-panel')).display,
+            mapDisplay: getComputedStyle(document.getElementById('map')).display,
+            bodyClass: document.body.className,
+            err: window.__evErr || null
+          }));
+          const out = await p.evaluate((opensIn, fadeIn, airportTapIn, bdzIn, taxiIn, evIn, evAfterIn) => {
             const ids=['next90-btn','clean-btn','gps-btn','fs-btn',
                        'dest-airport','dest-cjp','dest-cab_north','dest-cas_intl','dest-__zones'];
             const boxes = ids.map(id=>{const e=document.getElementById(id);
@@ -164,6 +186,7 @@ jobs:
                          icon:(document.getElementById('ea-icon')||{}).textContent||'',
                          dismissed:el.dataset.dismissed||'няма' };})(),
               fadeCheck: fadeIn, airportTap: airportTapIn, bdzCheck: bdzIn, taxi: taxiIn,
+              evClick: evIn, evAfter: evAfterIn,
               tilesDark: (()=>{ document.body.classList.remove('theme-day');
                 document.body.classList.add('theme-night','tiles-dark');
                 const p=document.querySelector('.leaflet-tile-pane');
@@ -186,7 +209,7 @@ jobs:
               viewport: innerHeight,
               fanGone: !document.querySelector('#fab-hub:not([style*="display: none"])')
             };
-          }, opens, fadeIn, airportTap, bdz, taxiCheck);
+          }, opens, fadeIn, airportTap, bdz, taxiCheck, evClick, evAfter);
           console.log('RESULT:', JSON.stringify(out,null,1));
           console.log('TILEFAILS:', failed.length);
           console.log('PAGEERRORS:', errs.slice(0,4).join(' | ')||'none');
