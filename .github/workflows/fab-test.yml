@@ -174,7 +174,7 @@ jobs:
                 const out = {};
                 // 1. Показва ли се нещо в миналото като предстоящо
                 const now = Date.now();
-                const fd = (typeof flightDetails !== 'undefined' ? flightDetails : []);
+                const fd = window.__flightDetailsRef || [];
                 out.flightsTotal = fd.length;
                 out.flightsPast  = fd.filter(f => f.exitToTs < now - 3600000).length;
                 out.flightsFuture= fd.filter(f => f.exitFromTs > now).length;
@@ -187,7 +187,7 @@ jobs:
                 out.eventsPast  = ev.filter(e => e.e < now - 3600000).length;
                 // 4. Зони с нереалистичен резултат
                 try{
-                  const sc = computeScores(new Date().getHours()).scores;
+                  const sc = (window.computeScores || computeScores)(new Date().getHours()).scores;
                   const vals = Object.values(sc);
                   out.scoreMax = Math.max(...vals).toFixed(1);
                   out.scoreNaN = vals.filter(v => !isFinite(v)).length;

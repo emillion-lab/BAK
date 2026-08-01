@@ -1869,6 +1869,7 @@ function loadFlightsFromCache(){
     });
 }
 
+window.computeScores = window.computeScores || (typeof computeScores !== 'undefined' ? computeScores : null);
 function processFlights(data){
   return (function(){
       const fl=data.data||[]; if(!fl.length) throw 0;
@@ -1907,7 +1908,8 @@ function processFlights(data){
         // Store for popup
         const fn = (f.flight?.iata||'??');
         const depAirport = f.departure?.airport||dep;
-        flightDetails.push({
+        window.__flightDetailsRef = flightDetails;
+      flightDetails.push({
           fn, depAirport, nonSchengen:!!nonSchengen,
           delay: f._delay || 0, statusRaw: f._statusRaw || '',
           schedH: (function(){ try{ var s=new Date(f.arrival.scheduled); return (s.getUTCHours()+3)%24; }catch(e){ return 0; } })(),
