@@ -2552,7 +2552,7 @@ function toggleMapView(){
       var chip=document.createElement('div');
       chip.style.cssText='position:fixed;left:8px;bottom:154px;z-index:1500;background:#0c1f2ef0;color:#bae6fd;border:1px solid #38bdf8;border-radius:10px;padding:7px 11px;font-family:sans-serif;font-size:13px;font-weight:900;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.5)';
   chip.classList.add('map-chip');
-      chip.textContent='🎫 '+evs.length+' събития';
+      chip.remove(); return;   // билетът в колоната вече показва това
       chip.onclick=function(){
         alert(evs.map(function(e){
           var en=new Date(e.e);
