@@ -1756,6 +1756,17 @@ body.theme-night{ --capsule:rgba(10,18,32,.62); --capsule-edge:rgba(34,211,238,.
 #kat-pop-box{ margin-right:64px; }          /* Х-ът не пада под иконите */
 #kat-pop-x{ z-index:5; }
 @media (max-width:400px){ #kat-pop-box{ margin-right:58px; } }
+
+/* КАТ капсулата да се чете и в нощната тема */
+body.theme-night #kat-badge{
+  background:rgba(255,255,255,.10) !important;
+  border-color:rgba(255,255,255,.22) !important;
+}
+body.theme-night #kat-badge b{ text-shadow:0 0 10px currentColor; }
+body.theme-night .wb-temp, body.theme-night #wx-rain-when{
+  background:rgba(255,255,255,.08) !important;
+  border-color:rgba(255,255,255,.18) !important;
+}
 </style>
 <style>
 

@@ -5625,28 +5625,34 @@ function toggleMapView(){
     var cx = W*.045, cy = H*.26, R = Math.min(8, H*.20);
     if(state.night){
       var ph = moonPhase();
-      // Осветена част: 0 при новолуние, 1 при пълнолуние
-      var illum = (1 - Math.cos(2 * Math.PI * ph)) / 2;
+      var illum  = (1 - Math.cos(2 * Math.PI * ph)) / 2;   // 0 нова … 1 пълна
       var waxing = ph < 0.5;
+      var sgn    = waxing ? 1 : -1;                        // осветената страна
+      var f      = 2 * illum - 1;                          // -1 сърп … +1 пълна
 
-      // светъл диск
-      ctx.fillStyle = 'rgba(232,238,248,.94)';
+      // тъмният диск
+      ctx.fillStyle = 'rgba(26,34,54,.6)';
       ctx.beginPath(); ctx.arc(cx, cy, R, 0, 6.28); ctx.fill();
 
-      // Сянката е кръг със същия радиус, изместен встрани.
-      // Отместване 0 = пълна сянка (новолуние), 2R = никаква (пълнолуние).
-      if(illum < 0.995){
-        var off = 2 * R * illum;
-        var side = waxing ? -1 : 1;        // растяща свети отдясно, намаляваща отляво
-        ctx.save();
-        ctx.beginPath(); ctx.arc(cx, cy, R, 0, 6.28); ctx.clip();
-        ctx.fillStyle = state.night ? 'rgba(9,16,30,.96)' : 'rgba(120,132,150,.55)';
-        ctx.beginPath(); ctx.arc(cx + side * off, cy, R, 0, 6.28); ctx.fill();
-        ctx.restore();
+      // Осветената част: външен ръб + терминатор.
+      // Терминаторът е елипса с полуос f·R — точно, за всяка фаза.
+      ctx.fillStyle = 'rgba(238,243,252,.96)';
+      ctx.beginPath();
+      var ma, mx, my, mfirst = true;
+      for(ma = -Math.PI/2; ma <= Math.PI/2 + 0.01; ma += 0.12){
+        mx = sgn * R * Math.cos(ma); my = R * Math.sin(ma);
+        if(mfirst){ ctx.moveTo(cx + mx, cy + my); mfirst = false; }
+        else ctx.lineTo(cx + mx, cy + my);
       }
+      for(ma = Math.PI/2; ma >= -Math.PI/2 - 0.01; ma -= 0.12){
+        mx = sgn * f * R * Math.cos(ma); my = R * Math.sin(ma);
+        ctx.lineTo(cx + mx, cy + my);
+      }
+      ctx.closePath();
+      ctx.fill();
 
       // мек ореол
-      ctx.strokeStyle = 'rgba(226,232,240,.18)'; ctx.lineWidth = 1;
+      ctx.strokeStyle = 'rgba(226,232,240,.20)'; ctx.lineWidth = 1;
       ctx.beginPath(); ctx.arc(cx, cy, R + 2.5, 0, 6.28); ctx.stroke();
     } else {
       var pulse = 1 + .06*Math.sin(t/28);
