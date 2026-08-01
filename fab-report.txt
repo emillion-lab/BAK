@@ -13,9 +13,7 @@ RESULT: {
  "missing": [],
  "overlaps": [],
  "offscreen": [],
- "dark": [
-  ".ticker-bar"
- ],
+ "dark": [],
  "opens": {
   "dest-__zones": {
    "opened": true,
@@ -44,10 +42,18 @@ RESULT: {
   }
  },
  "scrollable": false,
+ "alertProbe": {
+  "display": "none",
+  "visible": false,
+  "title": "",
+  "sub": "",
+  "icon": "",
+  "dismissed": "няма"
+ },
  "fadeCheck": {
   "активен": 0.55,
   "останали": 0.1,
-  "класНаBody": "theme-night tiles-dark full-list",
+  "класНаBody": "theme-day full-list",
   "следЗатваряне": 1
  },
  "airportTap": {
@@ -63,26 +69,26 @@ RESULT: {
   "стариятНадпис": false,
   "нямаДанни": false,
   "проба": [
-   "КПВ 50200",
-   "КПВ 20200",
-   "БВ 2626"
+   "БВ 3620",
+   "КПВ 50208",
+   "КПВ 20238"
   ]
  },
  "taxi": {
   "canvas": true,
   "w": 390,
   "h": 50,
-  "yellowPx": 524,
-  "litPx": 105,
-  "roadPx": 566,
+  "yellowPx": 567,
+  "litPx": 1401,
+  "roadPx": 659,
   "brightest": [
-   255,
    253,
-   240
+   254,
+   254
   ],
   "taxiState": {
-   "x": 356,
-   "dir": -1,
+   "x": 185,
+   "dir": 1,
    "night": false,
    "W": 390
   }
