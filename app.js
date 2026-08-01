@@ -5092,7 +5092,8 @@ function toggleMapView(){
       if(!isFinite(lat) || !isFinite(lon)){
         // без координати — центрираме на залата по име, ако я знаем
         var z = (window.ZONES || []).find(function(x){
-          return target.v && x.name && x.name.toLowerCase().indexOf(String(target.v).toLowerCase().slice(0,8)) >= 0;
+          return target.v && x && x.name &&
+                 x.name.toLowerCase().indexOf(String(target.v).toLowerCase().slice(0,8)) >= 0;
         });
         if(z){ lat = z.lat; lon = z.lng; }
       }
