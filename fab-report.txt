@@ -20,6 +20,11 @@ RESULT: {
    "visible": true,
    "closedOnSecond": true
   },
+  "dest-__event": {
+   "opened": true,
+   "visible": true,
+   "closedOnSecond": true
+  },
   "dest-airport": {
    "opened": true,
    "visible": true,
@@ -78,16 +83,16 @@ RESULT: {
   "canvas": true,
   "w": 390,
   "h": 50,
-  "yellowPx": 529,
-  "litPx": 1408,
-  "roadPx": 665,
+  "yellowPx": 564,
+  "litPx": 1422,
+  "roadPx": 637,
   "brightest": [
    253,
    254,
    254
   ],
   "taxiState": {
-   "x": 209,
+   "x": 195,
    "dir": 1,
    "night": false,
    "W": 390
@@ -102,5 +107,5 @@ RESULT: {
  "viewport": 844,
  "fanGone": true
 }
-TILEFAILS: 3
+TILEFAILS: 1
 PAGEERRORS: none
