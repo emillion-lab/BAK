@@ -136,7 +136,8 @@ jobs:
             panelOpen: getComputedStyle(document.getElementById('next90-panel')).display,
             mapDisplay: getComputedStyle(document.getElementById('map')).display,
             bodyClass: document.body.className,
-            err: window.__evErr || null
+            err: window.__evErr || null,
+            step: window.__evStep || null
           }));
           const out = await p.evaluate((opensIn, fadeIn, airportTapIn, bdzIn, taxiIn, evIn, evAfterIn) => {
             const ids=['next90-btn','clean-btn','gps-btn','fs-btn',
