@@ -1,74 +1,10 @@
 {
-  "updated": "2026-08-02T11:35:48.608325+03:00",
+  "updated": "2026-08-02T13:17:25.359303+03:00",
   "source": "live.bdz.bg",
   "station": "София Централна",
-  "count": 22,
-  "far_count": 9,
+  "count": 20,
+  "far_count": 8,
   "arrivals": [
-    {
-      "time": "11:29",
-      "from": "Бургас",
-      "train": "БВ 3620",
-      "delay": 4,
-      "tier": "far",
-      "weight": 1.0
-    },
-    {
-      "time": "11:32",
-      "from": "Перник",
-      "train": "КПВ 50208",
-      "delay": 0,
-      "tier": "near",
-      "weight": 0.35
-    },
-    {
-      "time": "11:45",
-      "from": "София Север",
-      "train": "КПВ 20238",
-      "delay": 0,
-      "tier": "mid",
-      "weight": 0.5
-    },
-    {
-      "time": "12:17",
-      "from": "Костенец",
-      "train": "КПВ 10222",
-      "delay": 0,
-      "tier": "near",
-      "weight": 0.35
-    },
-    {
-      "time": "12:40",
-      "from": "София Север",
-      "train": "КПВ 20240",
-      "delay": 0,
-      "tier": "mid",
-      "weight": 0.5
-    },
-    {
-      "time": "12:48",
-      "from": "Благоевград",
-      "train": "ПВ 50110",
-      "delay": 0,
-      "tier": "far",
-      "weight": 1.0
-    },
-    {
-      "time": "12:53",
-      "from": "Драгоман",
-      "train": "КПВ 10207",
-      "delay": 0,
-      "tier": "mid",
-      "weight": 0.5
-    },
-    {
-      "time": "12:58",
-      "from": "Димитровград",
-      "train": "ПВ 10112",
-      "delay": 6,
-      "tier": "far",
-      "weight": 1.0
-    },
     {
       "time": "13:11",
       "from": "Копривщица",
@@ -89,7 +25,7 @@
       "time": "14:40",
       "from": "Лакатник",
       "train": "КПВ 20224",
-      "delay": 1,
+      "delay": 2,
       "tier": "near",
       "weight": 0.35
     },
@@ -97,23 +33,23 @@
       "time": "14:53",
       "from": "Петрич",
       "train": "БВ 5612",
-      "delay": 1,
+      "delay": 2,
       "tier": "far",
       "weight": 1.0
     },
     {
-      "time": "15:04",
+      "time": "15:06",
       "from": "Бургас",
       "train": "БВ 8610",
-      "delay": 18,
+      "delay": 20,
       "tier": "far",
       "weight": 1.0
     },
     {
-      "time": "15:13",
+      "time": "15:24",
       "from": "Бургас",
       "train": "БВ 3622",
-      "delay": 13,
+      "delay": 24,
       "tier": "far",
       "weight": 1.0
     },
@@ -134,10 +70,10 @@
       "weight": 0.5
     },
     {
-      "time": "16:15",
+      "time": "16:32",
       "from": "Пловдив",
       "train": "БВ 1622",
-      "delay": 0,
+      "delay": 17,
       "tier": "far",
       "weight": 1.0
     },
@@ -158,14 +94,6 @@
       "weight": 1.0
     },
     {
-      "time": "17:27",
-      "from": "Костенец",
-      "train": "КПВ 10224",
-      "delay": 0,
-      "tier": "near",
-      "weight": 0.35
-    },
-    {
       "time": "17:28",
       "from": "Враца",
       "train": "ПВ 20104",
@@ -177,9 +105,65 @@
       "time": "17:33",
       "from": "Драгоман",
       "train": "КПВ 10209",
+      "delay": 16,
+      "tier": "mid",
+      "weight": 0.5
+    },
+    {
+      "time": "17:39",
+      "from": "Костенец",
+      "train": "КПВ 10224",
+      "delay": 12,
+      "tier": "near",
+      "weight": 0.35
+    },
+    {
+      "time": "17:59",
+      "from": "Варна",
+      "train": "БВ 8650",
+      "delay": 16,
+      "tier": "far",
+      "weight": 1.0
+    },
+    {
+      "time": "18:03",
+      "from": "Петрич",
+      "train": "БВ 5614",
+      "delay": 0,
+      "tier": "far",
+      "weight": 1.0
+    },
+    {
+      "time": "18:20",
+      "from": "София Север",
+      "train": "КПВ 20244",
       "delay": 0,
       "tier": "mid",
       "weight": 0.5
+    },
+    {
+      "time": "18:45",
+      "from": "Радомир",
+      "train": "КПВ 50210",
+      "delay": 0,
+      "tier": "mid",
+      "weight": 0.5
+    },
+    {
+      "time": "19:11",
+      "from": "Лакатник",
+      "train": "КПВ 20226",
+      "delay": 0,
+      "tier": "near",
+      "weight": 0.35
+    },
+    {
+      "time": "19:16",
+      "from": "Костенец",
+      "train": "КПВ 10226",
+      "delay": 10,
+      "tier": "near",
+      "weight": 0.35
     }
   ]
 }
