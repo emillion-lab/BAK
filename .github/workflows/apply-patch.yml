@@ -1,0 +1,30 @@
+name: Apply Patch
+
+on:
+  push:
+    paths:
+      - 'patch/incoming.diff'
+
+permissions:
+  contents: write
+
+jobs:
+  apply-patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply patch
+        run: |
+          git config user.name "patch-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git apply --3way --whitespace=nowarn patch/incoming.diff
+
+      - name: Remove patch file and commit
+        run: |
+          rm -f patch/incoming.diff
+          git add -A
+          git commit -m "Apply patch (auto via patch/incoming.diff)"
+          git push
