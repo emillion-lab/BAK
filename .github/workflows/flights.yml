@@ -67,9 +67,26 @@ jobs:
           print('flights:', len(data), '| with terminal:', sum(1 for r in data if r['arrival']['terminal']))
           EOF
 
+      # Този workflow върви на всеки 30 мин и най-често се сблъсква с
+      # другите скрейпъри. Без rebase push-ът се отхвърля мълчаливо.
       - name: Commit if changed
         run: |
           git config user.name "flights-bot"
           git config user.email "flights-bot@users.noreply.github.com"
           git add flight-cache.json
-          git diff --cached --quiet || (git commit -m "update flights (AeroDataBox via mvr-proxy, with terminal)" && git push)
+          if git diff --cached --quiet; then
+            echo "nothing to commit"
+            exit 0
+          fi
+          git commit -m "update flights (AeroDataBox via mvr-proxy, with terminal)"
+          for i in 1 2 3; do
+            git pull --rebase --autostash || true
+            if git push; then
+              echo "pushed on attempt $i"
+              exit 0
+            fi
+            echo "push отхвърлен (опит $i), пробвам пак"
+            sleep $((i * 5))
+          done
+          echo "push се провали след 3 опита"
+          exit 1
