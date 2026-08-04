@@ -3,7 +3,12 @@ name: CAS Arrivals Scraper
 on:
   schedule:
     - cron: '5,35 4-20 * * *'   # на всеки 30 мин, 07:05–23:35 софийско
+    # nudge 2026-08-04: cron спря да се задейства ~7ч, push за re-register
   workflow_dispatch:
+  push:
+    paths:
+      - 'scripts/scrape_arrivals.py'
+      - '.github/workflows/bus-arrivals.yml'
 
 jobs:
   scrape:
