@@ -1,24 +1,10 @@
 {
-  "updated": "2026-08-05T00:20:02.519092+03:00",
+  "updated": "2026-08-05T00:49:43.463997+03:00",
   "source": "centralnaavtogara.bg",
   "window_hours": 8,
   "count": 19,
-  "intl_count": 3,
+  "intl_count": 4,
   "arrivals": [
-    {
-      "time": "00:30",
-      "from": "ДОБРИЧ",
-      "sector": "7",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "00:30",
-      "from": "ДОБРИЧ",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
     {
       "time": "02:00",
       "from": "ВАРНА",
@@ -118,6 +104,13 @@
       "intl": false
     },
     {
+      "time": "07:20",
+      "from": "КИЕВ",
+      "sector": "",
+      "operator": "",
+      "intl": true
+    },
+    {
       "time": "07:30",
       "from": "АЛБЕНА",
       "sector": "8",
@@ -135,6 +128,13 @@
       "time": "08:00",
       "from": "ДУЛОВО",
       "sector": "9",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "08:00",
+      "from": "СЛ.БРЯГ",
+      "sector": "23",
       "operator": "",
       "intl": false
     }
