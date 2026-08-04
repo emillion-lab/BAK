@@ -2,6 +2,7 @@ name: BDZ Train Arrivals
 on:
   schedule:
     - cron: '10,40 3-21 * * *'   # на 30 мин, 06:10–00:40 софийско
+    # nudge 2026-08-04: cron спря да се задейства ~7ч, push за re-register
   workflow_dispatch:
   push:
     paths:
