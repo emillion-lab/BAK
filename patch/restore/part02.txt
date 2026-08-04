@@ -1,0 +1,1500 @@
+      if(wknd) return 0.15;
+      return academicFactor() * ((hour >= 8 && hour <= 19) ? 1.0 : 0.3);
+    case 'attraction':
+      // атракциите живеят от уикенда и от топлите месеци; вечер са мъртви
+      if(hour < 9 || hour > 19) return 0.15;
+      return wknd ? 1.55 : 0.85;
+    case 'mall':
+      return wknd ? 1.25 : (hour >= 17 && hour <= 21 ? 1.1 : 0.9);
+    case 'nightlife':
+      return (wknd || fri) && (hour >= 21 || hour <= 4) ? 1.35 : 1.0;
+    default:
+      return 1.0;
+  }
+}
+function computeScores(hour) {
+  const scores={}, activeEvents={};
+  ZONES.forEach(z => { scores[z.id]=BASE[z.id]||0.3; activeEvents[z.id]=[]; });
+  const dz = deadZoneFactor(hour);
+  for (const ev of EVENTS) {
+    if (!dayMatches(ev)) continue;
+    const diff = hour - ev.endHour;
+    let f = 0;
+    if (diff>=-0.75 && diff<=0)   f = (diff+0.75)/0.75;
+    else if (diff>0 && diff<=1.5) f = 1 - diff/1.5;
+    if (f>0.05) {
+      scores[ev.zone] = (scores[ev.zone]||0) + ev.boost*f*dz;
+      (activeEvents[ev.zone] = activeEvents[ev.zone] || []).push({name:ev.name, f});
+    }
+  }
+  // Weather boost
+  if (weatherBoost>0) {
+    ZONES.forEach(z => {
+      if (['residential','residential_lux','hospital','karyk'].includes(z.type))
+        scores[z.id] += weatherBoost*0.6;
+      else if (['mall','hotel'].includes(z.type))
+        scores[z.id] += weatherBoost*0.3;
+    });
+  }
+  if (dz<1) ZONES.forEach(z => { if(z.id!=='airport') scores[z.id]*=(0.7+0.3*dz); });
+  // ден от седмицата × час
+  ZONES.forEach(z => { scores[z.id] *= dayTypeFactor(z.type, hour); });
+  // университетските събития не важат във ваканция
+  const acad = academicFactor();
+  if(acad < 0.5){
+    ZONES.forEach(z => { if(z.type === 'university' || z.type === 'school') scores[z.id] *= acad; });
+  }
+  // работно време: затворен обект не ражда клиенти, каквото и да казва базовата крива
+  ZONES.forEach(z => {
+    if(!z.hours) return;
+    const open = hour >= z.hours[0] && hour <= z.hours[1];
+    if(!open) scores[z.id] *= 0.12;                 // почти нула, но остава видима в списъка
+    else {
+      const shopsClose = z.type === 'mall' ? z.hours[1] - 1 : z.hours[1];  // магазините спират час по-рано
+      if(hour >= shopsClose - 1 && hour <= shopsClose + 1) scores[z.id] *= 1.25;  // изпразване
+      else if(hour >= z.hours[1] - 1) scores[z.id] *= 1.10;
+    }
+  });
+  // Летищна вълна: излизащи полети вдигат скора на летището (силно — 10 полета≈3.6)
+  try{ var _ax = window.__airportExiting|0; if(_ax>0 && scores['airport']!==undefined){ scores['airport'] += Math.min(4.0, _ax*0.36); } }catch(e){}
+  return {scores, activeEvents};
+}
+
+function totalDemand(hour) {
+  const {scores}=computeScores(hour);
+  return Object.values(scores).reduce((a,b)=>a+b,0);
+}
+
+function computeKarykScore(zid, scores) {
+  const z = ZONES.find(x=>x.id===zid);
+  if (!z) return 0;
+  const demand = scores[zid]||0;
+  const typeBonus = {
+    karyk:1.8, residential_lux:1.2, residential:1.0,
+    hospital:0.8, leisure:0.5,
+    university:-0.3, theatre:-0.2, venue:-0.2,
+    office:-0.5, mall:-0.8, hotel:-0.8,
+    airport:-1.5, transit:-0.6,
+  };
+  let ks = demand + (typeBonus[z.type]||0);
+  if (demand<1.0) ks += 0.8;
+  return Math.max(0, Math.min(5, ks));
+}
+
+// ═══════════════════════════════════════════════
+// TRAFFIC JAM INFO
+// ═══════════════════════════════════════════════
+const TRAFFIC_INFO = {
+  jam_orl:    { jamDir:'← КЪМ ЦЕНТЪРА', freeDir:'→ НАВЪН', freeArrow:'→',
+                tip:'Задръстено КЪМ ЦЕНТЪРА. Ти върви → НАВЪН (свободно!)', time:'07:30–09:30 и 17:00–19:00' },
+  jam_tsar:   { jamDir:'→ КЪМ ЛЕТИЩЕТО', freeDir:'← КЪМ ЦЕНТЪРА', freeArrow:'←',
+                tip:'Задръстено → КЪМ ЛЕТИЩЕТО. Ти върви ← КЪМ ЦЕНТЪРА (свободно!)', time:'07:00–09:00 и 17:00–19:30' },
+  jam_ndk:    { jamDir:'↑↓ ДВЕ ПОСОКИ', freeDir:'↔ СТРАНИЧНИ УЛ.', freeArrow:'↔',
+                tip:'Задръстено по бул.България. Използвай странични улици!', time:'17:00–19:30 делнични' },
+  jam_serdika:{ jamDir:'← КЪМ ЗАПАДА', freeDir:'→ КЪМ ИЗТОКА', freeArrow:'→',
+                tip:'Задръстено ← КЪМ ЗАПАДА. Ти върви → КЪМ ИЗТОКА (свободно!)', time:'07:30–09:30 делнични' },
+};
+
+const trafficMarkers={};
+function makeTrafficIcon(info,active){
+  const op=active?'1':'0.35', sz=active?14:10;
+  const glow=active?`0 0 8px #a855f7`:'none';
+  return L.divIcon({className:'',
+    html:`<div style="width:${sz}px;height:${sz}px;border-radius:50%;background:#a855f7;box-shadow:${glow};opacity:${op};${active?'animation:jam-blink 2s ease-in-out infinite':''}"></div>`,
+    iconSize:[sz,sz],iconAnchor:[sz/2,sz/2]});
+}
+
+// ═══════════════════════════════════════════════
+// HOSPITAL CROSS ICON
+// ═══════════════════════════════════════════════
+function makeHospitalIcon(score){
+  const bright=score>=2.0?'#ff2020':score>=1.3?'#ef4444':'#cc2222';
+  const sz=score>=2.0?26:score>=1.3?22:18;
+  const glow=score>=1.3?`drop-shadow(0 0 5px ${bright})`:'none';
+  return L.divIcon({className:'',
+    html:`<div style="width:${sz}px;height:${sz}px;position:relative;filter:${glow}">
+      <div style="position:absolute;left:50%;top:20%;transform:translateX(-50%);width:30%;height:60%;background:${bright};border-radius:2px"></div>
+      <div style="position:absolute;top:50%;left:15%;transform:translateY(-50%);width:70%;height:28%;background:${bright};border-radius:2px"></div>
+    </div>`,iconSize:[sz,sz],iconAnchor:[sz/2,sz/2]});
+}
+
+// ═══════════════════════════════════════════════
+// KARYK SCORE ALGORITHM
+// ═══════════════════════════════════════════════
+const KARYK_PREFER=['hospital','residential','residential_lux','karyk','leisure'];
+const KARYK_AVOID =['airport','mall','hotel','office','university','nightlife','transit','venue','theatre','cinema','traffic'];
+
+function computeKarykScore(zid,scores){
+  const z=ZONES.find(x=>x.id===zid); if(!z) return 0;
+  const demand=scores[zid]||0;
+  const typeBonus={
+    karyk:1.8, residential_lux:1.2, residential:1.0,
+    hospital:0.8, leisure:0.5,
+    university:-0.3, theatre:-0.2, cinema:-0.1, venue:-0.2, nightlife:-0.2,
+    office:-0.5, mall:-0.8, hotel:-0.8,
+    airport:-1.5, transit:-0.6, traffic:0,
+  };
+  let ks=demand+(typeBonus[z.type]||0);
+  if(demand<1.0) ks+=0.8;
+  if(!['airport','serdika','bpark','the_mall','hotels_ctr'].includes(zid)) ks+=0.3;
+  return Math.max(0,Math.min(5,ks));
+}
+
+// ═══════════════════════════════════════════════
+// NOMINATIM GEOCODING (кешира за 7 дни)
+// ═══════════════════════════════════════════════
+const NOMINATIM_QUERIES={
+  airport:'Летище София SOF Bulgaria', bpark:'Business Park Sofia Mladost Bulgaria',
+  garitage:'Garitage Park Sofia Bulgaria', polygraphia:'Polygraphia Office Center Tsarigradsko 47 Sofia Bulgaria',
+  capital_fort:'Capital Fort Tsarigradsko 90 Sofia Bulgaria', megapark:'Megapark Sofia Bulgaria',
+  serdika:'Serdika Center Sitnyakovo Sofia Bulgaria', paradise:'Paradise Center Cherni vrah Sofia Bulgaria',
+  ring_mall:'Sofia Ring Mall Okolovrasten Bulgaria', the_mall:'The Mall Sofia Tsarigradsko 115 Bulgaria',
+  mall_sofia:'Mall of Sofia Stamboliyski Bulgaria', cjp:'Central Railway Station Sofia Bulgaria',
+  cab_north:'Central Bus Station Sofia Bulgaria', ag_yug:'Автогара Юг Sofia Bulgaria',
+  arena:'Arena Sofia 8888 Asen Yordanov Bulgaria', ndk:'National Palace Culture Sofia Bulgaria',
+  pirogov:'UMBALSM Pirogov Totleben 21 Sofia Bulgaria', alexand:'UMBAL Aleksandrovska Sofia Bulgaria',
+  vma:'Voenno-medicinska akademia Sofia Bulgaria', isul:'ISUL Konyovitsa 65 Sofia Bulgaria',
+  acibadem_tokuda:'Acibadem Tokuda bul Nikola Vaptsarov 51B Sofia Bulgaria',
+  acibadem_ortho:'Acibadem Ortopedia Okolovrasten 127 Sofia Bulgaria',
+  sv_anna:'УМБАЛ Света Анна Sofia Bulgaria', nat_theatre:'Naroden teatar Ivan Vazov Sofia Bulgaria',
+  opera:'Natsionalna opera i balet Sofia Bulgaria', unss:'UNSS Sofia Bulgaria',
+  nbu:'Нов Български Университет Sofia Bulgaria',
+  simeonovo:'Симеоново София', dragalevtsi:'Драгалевци София', gradina:'жк Градина София',
+  loven_park:'Ловен парк София Bulgaria', zoo:'Зоопарк София Bulgaria', krastova_vada:'Кръстова вада София', malinova:'Малинова долина София', kv_vitosha:'кв Витоша София',
+  manast:'Manastirski livadi Sofia Bulgaria', boyana:'Boyana Sofia Bulgaria',
+  kambanite:'ЖК Камбаните Sofia Bulgaria',
+};
+
+const CACHE_KEY='sofia_taxi_coords_v4', CACHE_TTL=7*24*3600*1000;
+
+async function geocodeZones(){
+  let cache={};
+  try{
+    const raw=localStorage.getItem(CACHE_KEY);
+    if(raw){const p=JSON.parse(raw);if(Date.now()-p.ts<CACHE_TTL)cache=p.coords;}
+  }catch(e){}
+  const zMap={}; ZONES.forEach(z=>{zMap[z.id]=z;});
+  const missing=ZONES.filter(z=>!cache[z.id]&&NOMINATIM_QUERIES[z.id]);
+  if(!missing.length){applyGeoCache(cache,zMap);return;}
+  const badge=document.getElementById('airport-badge');
+  const orig=badge.textContent;
+  let i=0;
+  for(const z of missing){
+    try{
+      const r=await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(NOMINATIM_QUERIES[z.id])}`,
+        {headers:{'User-Agent':'SofiaTaxiDemand/1.0'}});
+      const d=await r.json();
+      if(d&&d[0]) cache[z.id]={lat:parseFloat(d[0].lat),lng:parseFloat(d[0].lon)};
+    }catch(e){}
+    badge.textContent=`📡 ${++i}/${missing.length}`;
+    await new Promise(r=>setTimeout(r,1100));
+  }
+  try{localStorage.setItem(CACHE_KEY,JSON.stringify({ts:Date.now(),coords:cache}));}catch(e){}
+  badge.textContent=orig;
+  applyGeoCache(cache,zMap);
+}
+
+function applyGeoCache(cache,zMap){
+  let n=0;
+  for(const[id,coords]of Object.entries(cache)){
+    if(zMap[id]&&coords){zMap[id].lat=coords.lat;zMap[id].lng=coords.lng;n++;}
+  }
+  if(n>0){
+    ZONES.forEach(z=>{circleMap[z.id]?.setLatLng?.([z.lat,z.lng]);});
+    Object.values(hospitalMarkers).forEach(({marker,circle},id)=>{
+      const z=ZONES.find(x=>x.id===id); if(!z) return;
+      marker?.setLatLng([z.lat,z.lng]); circle?.setLatLng([z.lat,z.lng]);
+    });
+    render(currentHour);
+  }
+}
+
+// ═══════════════════════════════════════════════
+// NEXT 90 MINUTES PANEL
+// ═══════════════════════════════════════════════
+let next90Open=false;
+document.getElementById('next90-btn')?.addEventListener('click',()=>{
+  next90Open=!next90Open;
+  document.getElementById('next90-btn').classList.toggle('active',next90Open);
+  const panel=document.getElementById('next90-panel');
+  if(next90Open){buildNext90();panel.style.display='block';}
+  else panel.style.display='none';
+});
+window.closeNext90=function(){
+  next90Open=false;
+  document.getElementById('next90-btn')?.classList.remove('active');
+  document.getElementById('next90-panel').style.display='none';
+};
+
+window.buildNext90 = buildNext90;
+function buildNext90(){
+  const list=document.getElementById('next90-list');
+  if(!list) return;
+  const now = Date.now();
+  const POST_W = 45*60000;
+  // Показваме всичко предстоящо, подредено по време. Едно събитие утре
+  // не бива да скрива останалите — списъкът е за планиране, не само за днес.
+  var sev = (window.__sevEvents || [])
+    .filter(function(e){ return (e.e + POST_W) > now; })
+    .sort(function(a,b){ return a.s - b.s; })
+    .slice(0, 25);
+  var liveCount = sev.filter(function(e){ return e.s < now + 24*3600000; }).length;
+  var isAhead = liveCount === 0;
+  if(!sev.length){
+    if(!window.__sevLoaded){
+      list.innerHTML='<div style="padding:14px;color:var(--muted);font-size:14px">⏳ Зарежда програмата…</div>';
+      return;
+    }
+    list.innerHTML='<div style="padding:14px;color:var(--muted);font-size:14px;line-height:1.5">'
+      + 'Няма предстоящи събития.<br>'
+      + '<span style="font-size:12px;opacity:.8">Източници: ' + (window.__sevSrc || 'SEV') + '</span></div>';
+    return;
+  }
+  const hm = d => new Date(d).toLocaleTimeString('bg',{hour:'2-digit',minute:'2-digit'});
+  const PRE = 2*3600000, POST = 45*60000;
+  let html = '';
+  html += '<div style="padding:9px 11px;margin-bottom:8px;border-radius:9px;'
+        + 'background:rgba(2,132,199,.10);border:1px solid rgba(2,132,199,.35);'
+        + 'font-size:12px;color:var(--cyan);line-height:1.45">'
+        + '📅 ' + sev.length + ' предстоящи'
+        + (liveCount ? ' · ' + liveCount + ' в следващите 24ч' : '') + '</div>';
+  let lastDay = '';
+  sev.forEach(function(e, i){
+    const d = new Date(e.s);
+    const _t = new Date(), _tm = new Date(_t.getTime() + 86400000);
+    const day = d.toDateString() === _t.toDateString()  ? 'ДНЕС'
+              : d.toDateString() === _tm.toDateString() ? 'УТРЕ'
+              : d.toLocaleDateString('bg', { day:'numeric', month:'long' }).toUpperCase();
+    if(day !== lastDay){
+      lastDay = day;
+      html += '<div style="font-size:11px;font-weight:900;letter-spacing:.08em;color:var(--cyan);margin:10px 0 4px">— ' + day + ' —</div>';
+    }
+    const big = e.cap >= 8000, mid = e.cap >= 2500;
+    const col = big ? '#f85149' : (mid ? '#d29922' : '#3fb950');
+    const mins = Math.round((e.s - now)/60000);
+    const when = mins < 0 ? 'тече' : (mins < 60 ? ('след ' + mins + ' мин') : ('след ' + Math.floor(mins/60) + 'ч ' + (mins%60) + 'м'));
+    var isLiveNow = (e.s - 2*3600000) <= now && (e.e + POST_W) > now;
+    html += '<div class="n90-item" data-idx="' + i + '"' + (isLiveNow ? ' data-live="1"' : '')
+          + ' style="border-left:3px solid ' + (isLiveNow ? '#ef4444' : col)
+          + ';padding:6px 9px;margin:3px 0;background:' + (isLiveNow ? 'rgba(239,68,68,.10)' : 'var(--surf)')
+          + ';border-radius:7px">'
+      + '<div style="font-weight:800;font-size:13.5px;line-height:1.3">🎫 ' + e.n + '</div>'
+      + '<div class="n90-zone" style="font-size:11.5px;color:var(--muted);margin:2px 0">' + e.v + ' · ~' + (e.cap||0).toLocaleString('bg') + ' души · ' + when + '</div>'
+      + '<div style="font-size:12px;font-weight:800;color:' + col + '">'
+      +   '🚕 докарване ' + hm(e.s - PRE) + '–' + hm(e.s) + ' &nbsp;·&nbsp; вземане ' + hm(e.e) + '–' + hm(e.e + POST)
+      + '</div></div>';
+  });
+  html += '<div style="font-size:10.5px;color:var(--muted);margin-top:8px;padding-top:6px;border-top:1px solid var(--border)">Театри, концерти, партита и фестивали'
+        + (window.__sevSrc ? ' · ' + window.__sevSrc : '') + '. Транспортните пикове са в горната лента.</div>';
+  list.innerHTML = html;
+  // клик по ред → картата отива там
+  list.querySelectorAll('.n90-item[data-idx]').forEach(function(row){
+    row.style.cursor = 'pointer';
+    row.addEventListener('click', function(){
+      var e = sev[parseInt(row.dataset.idx, 10)];
+      if(!e) return;
+      try{ window.closeNext90 && window.closeNext90(); }catch(x){}
+      document.body.classList.remove('list-view', 'full-list');
+      document.body.removeAttribute('data-full');
+      document.querySelectorAll('.dest-btn').forEach(function(b){ b.classList.remove('on'); });
+      setTimeout(function(){ window.goToNextEvent(e); }, 160);
+    });
+  });
+}
+
+// ═══════════════════════════════════════════════
+const map = L.map('map', {center:[42.698,23.322], zoom:13, zoomControl:true, attributionControl:false});
+window.map = map;   // достъпна за модулите отдолу
+// OSM стандарт: най-подробният свободен слой — еднопосочни стрелки,
+// пешеходни зони, всички обекти. Нощем се обръща с филтър САМО върху
+// плочките, за да останат маркерите и кръговете с истинските си цветове.
+window.__TILE_DAY   = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+window.__TILE_NIGHT = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+window.__tileLayer = L.tileLayer(window.__TILE_DAY, { maxZoom:19 }).addTo(map);
+document.getElementById('map').style.filter='brightness(0.85) saturate(0.6)';
+// начален изглед: цяла София заедно с летището
+setTimeout(function(){
+  try{
+    map.invalidateSize();
+    var sofia = L.latLngBounds([[42.6300,23.2300],[42.7450,23.4300]]);
+    var ap = ZONES.find(function(z){ return z.id==='airport'; });
+    if(ap) sofia.extend([ap.lat, ap.lng]);
+    map.fitBounds(sofia, { padding:[24,24] });
+  }catch(e){}
+}, 320);
+setTimeout(()=>map.invalidateSize(), 300);
+setTimeout(()=>map.invalidateSize(), 800);
+
+const circleMap={}, hospitalMarkers={};
+
+function makeHospitalIcon(score) {
+  const bright = score>=2.0?'#ff2020':score>=1.3?'#ef4444':'#cc2222';
+  const sz = score>=2.0?26:score>=1.3?22:18;
+  const glow = score>=1.3?`drop-shadow(0 0 5px ${bright})`:'none';
+  return L.divIcon({
+    className:'',
+    html:`<div style="width:${sz}px;height:${sz}px;position:relative;filter:${glow}">
+      <div style="position:absolute;left:50%;top:20%;transform:translateX(-50%);width:30%;height:60%;background:${bright};border-radius:2px"></div>
+      <div style="position:absolute;top:50%;left:15%;transform:translateY(-50%);width:70%;height:28%;background:${bright};border-radius:2px"></div>
+    </div>`,
+    iconSize:[sz,sz], iconAnchor:[sz/2,sz/2],
+  });
+}
+
+function buildCircles() {
+  ZONES.forEach(z => {
+    if (z.type==='traffic') {
+      const info=TRAFFIC_INFO[z.id];
+      if(info){
+        const m=L.marker([z.lat,z.lng],{icon:makeTrafficIcon(info,false),zIndexOffset:600}).addTo(map);
+        m.on('click',()=>showZonePopup(z.id));
+        trafficMarkers[z.id]=m; circleMap[z.id]=m;
+      }
+      return;
+    }
+    if (z.type==='karyk') {
+      const c=L.circle([z.lat,z.lng],{radius:z.radius,fillOpacity:0,opacity:0,weight:0});
+      c.on('click',()=>z.type==='airport'?showAirportSchedule():z.type==='transit'?showTransitPopup(z.id):showZonePopup(z.id)); c.addTo(map); circleMap[z.id]=c;
+      return;
+    }
+    if (z.type==='hospital') {
+      const hm=L.marker([z.lat,z.lng],{icon:makeHospitalIcon(BASE[z.id]||0.5),zIndexOffset:400}).addTo(map);
+      hm.on('click',()=>showZonePopup(z.id));
+      const hc=L.circle([z.lat,z.lng],{radius:z.radius,color:'#991b1b',fillColor:'#991b1b',fillOpacity:0.12,weight:1}).addTo(map);
+      hc.on('click',()=>showZonePopup(z.id));
+      hospitalMarkers[z.id]={marker:hm,circle:hc};
+      circleMap[z.id]={setStyle:(o)=>hc.setStyle({fillColor:o.fillColor||'#991b1b',fillOpacity:o.fillOpacity||0.12,color:o.color||'#cc2222'}),_hm:hm,_hc:hc};
+      return;
+    }
+    const c=L.circle([z.lat,z.lng],{radius:z.radius,...getScoreStyle(BASE[z.id]||0.3,z.type)});
+    c.on('click',()=>z.type==='airport'?showAirportSchedule():z.type==='transit'?showTransitPopup(z.id):showZonePopup(z.id)); c.addTo(map); circleMap[z.id]=c;
+  });
+}
+
+function getScoreStyle(score, type) {
+  const c=demandColor(score,type);
+  return {color:c.stroke, fillColor:c.fill, fillOpacity:c.fillAlpha, weight:1.5, opacity:0.85};
+}
+
+function updateCircles() {
+  const {scores}=computeScores(currentHour); if(window.__applyLive)window.__applyLive(scores);
+  ZONES.forEach(z => {
+    const s=scores[z.id]||0;
+    if (z.type==='traffic') {
+      const info=TRAFFIC_INFO[z.id];
+      const marker=trafficMarkers[z.id];
+      if(marker&&info) marker.setIcon(makeTrafficIcon(info,s>=1.5));
+      return;
+    }
+    if (z.type==='hospital') {
+      const cm=circleMap[z.id];
+      if(cm?._hm) cm._hm.setIcon(makeHospitalIcon(s));
+      cm?.setStyle(getScoreStyle(s,z.type));
+      return;
+    }
+    if (z.type==='karyk') {
+      if (karykMode) {
+        const ks=computeKarykScore(z.id,scores);
+        const kc=karykColor(ks);
+        circleMap[z.id]?.setStyle({color:kc.stroke,fillColor:kc.fill,fillOpacity:ks>=1?0.6:0.1,weight:2,opacity:ks>=1?0.9:0.2});
+      } else {
+        circleMap[z.id]?.setStyle({fillOpacity:0,opacity:0,weight:0});
+      }
+      return;
+    }
+    if (karykMode) {
+      const ks=computeKarykScore(z.id,scores);
+      const kc=karykColor(ks);
+      circleMap[z.id]?.setStyle({color:kc.stroke,fillColor:kc.fill,fillOpacity:Math.max(0.08,0.1+ks*0.08),weight:ks>=3?2:1,opacity:ks>=2?0.8:0.3});
+      return;
+    }
+    circleMap[z.id]?.setStyle(getScoreStyle(s,z.type));
+  });
+}
+
+
+// (дублираната bus система е премахната — виж BUS SCHEDULE по-долу)
+function showTransitPopup(zid){
+  const z = ZONES.find(x=>x.id===zid);
+  if(!z) return;
+
+  const fmt = (h,m) => String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
+
+  let html = '<div style="font-size:14px;max-height:60vh;overflow-y:auto">';
+  html += `<div style="font-weight:800;font-size:15px;margin-bottom:10px;color:var(--cyan)">${z.icon||'🚌'} ${z.name}</div>`;
+
+  // Plovdiv buses arriving at Central Autogara (cab_north)
+  if(zid === 'cab_north'){
+    const arrivals = getSofiaArrivals(12);
+    if(arrivals.length){
+      html += '<div style="font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.6px;margin-bottom:8px">🚌 ПРИСТИГАЩИ НА ЦЕНТРАЛНА АВТОГАРА</div>';
+      arrivals.forEach(b=>{
+        const untilArr = b.arrMin - b.nowMin; // минути до пристигане
+        const isSoon = untilArr>=-5 && untilArr<=40;
+        const bg = isSoon?'rgba(239,68,68,.1)':'transparent';
+        const col = untilArr<=0?'var(--muted)':untilArr<=40?'#ef4444':untilArr<=90?'var(--amber)':'var(--muted)';
+        const label = untilArr<=0?`пристигнал ~${b.arrTime}`:
+                      untilArr<=90?`~${b.arrTime} · след ${untilArr} мин`:
+                      `~${b.arrTime}`;
+        const origin = b.route.name.replace(' → София','');
+        html += `<div style="padding:6px 8px;border-radius:7px;background:${bg};margin-bottom:3px;display:flex;justify-content:space-between;gap:8px">
+          <span style="font-weight:800;color:var(--text)">${origin} <span style="font-weight:400;color:var(--muted);font-size:11px">(${b.dep}${b.route.approx?' ≈':''})</span></span>
+          <span style="font-size:12px;color:${col};text-align:right;white-space:nowrap">${label}</span>
+        </div>`;
+      });
+    } else {
+      html += '<div style="color:var(--muted);padding:8px">Няма пристигащи в следващите часове / зареждане…</div>';
+    }
+    html += '<div style="font-size:11px;color:var(--muted);margin-top:8px;padding-top:6px;border-top:1px solid var(--border)">≈ разписание по модел на превозвача (Пловдив — точно). Сортирано по час на пристигане.</div>';
+  }
+
+  // Expo Center bus stop
+  if(zid === 'iec' || zid === 'expo2000'){
+    // Автобуси по Тракия, минаващи през Expo/Цариградско, по route stops offset
+    const data = busSchedule;
+    const now = new Date();
+    const nowMin = now.getHours()*60 + now.getMinutes();
+    const rows = [];
+    for(const route of (data?.routes||[])){
+      const expo = (route.stops||[]).find(s=>s.name.includes('Expo'));
+      if(!expo || !route.to || !route.to.includes('Централна автогара София')) continue;
+      for(const dep of route.departures){
+        const [h,m] = dep.split(':').map(Number);
+        const atExpo = h*60+m+(expo.offset_min||0);
+        let delta = atExpo - nowMin;
+        if(delta < -10) continue;
+        if(delta > 240) continue;
+        rows.push({route, dep, atExpo, delta});
+      }
+    }
+    rows.sort((a,b)=>a.atExpo-b.atExpo);
+    if(rows.length){
+      html += '<div style="font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.6px;margin-bottom:8px">🚌 Минаващи през Expo/Цариградско</div>';
+      rows.slice(0,6).forEach(b=>{
+        const t = `${String(Math.floor((b.atExpo%1440)/60)).padStart(2,'0')}:${String(b.atExpo%60).padStart(2,'0')}`;
+        const origin = (b.route.name||'').replace(' → София','');
+        const col = b.delta<40?'#ef4444':'var(--amber)';
+        html += `<div style="padding:6px 8px;border-radius:7px;margin-bottom:3px;display:flex;justify-content:space-between">
+          <span>${origin} <span style="color:var(--muted);font-size:11px">${b.dep}${b.route.approx?' ≈':''}</span></span>
+          <span style="font-weight:800;color:${col}">~${t}</span>
+        </div>`;
+      });
+    }
+  }
+
+  // Generic transit info
+  if(!['cab_north','iec','expo2000'].includes(zid)){
+    html += '<div style="color:var(--muted);padding:8px 0">Транспортен хъб.</div>';
+  }
+
+  html += '</div>';
+
+  L.popup({maxWidth:Math.min(340,window.innerWidth-30), className:'transit-popup'})
+    .setLatLng([z.lat, z.lng])
+    .setContent(html)
+    .openOn(map);
+}
+
+// ═══ AIRPORT SCHEDULE POPUP ═══
+window.showAirportSchedule = showAirportSchedule;   // вика се от inline onclick → трябва да е глобална
+// ------ Waze: отваря ПРИЛОЖЕНИЕТО, не уеб страницата ------
+window.openWaze = function(name, lat, lng){
+  var hasLL = isFinite(lat) && isFinite(lng);
+  var q   = encodeURIComponent(name || '');
+  // Схемата на самото приложение — не минава през waze.com, който
+  // пренасочва към intent:// и чупи инсталираното PWA.
+  var app = hasLL ? 'waze://?ll=' + lat + ',' + lng + '&navigate=yes'
+                  : 'waze://?q=' + q + '&navigate=yes';
+  var web = hasLL ? 'https://waze.com/ul?ll=' + lat + '%2C' + lng + '&navigate=yes'
+                  : 'https://waze.com/ul?q=' + q + '&navigate=yes';
+  openApp(app, web);
+};
+
+window.openGoogleMaps = function(name, lat, lng){
+  var hasLL = isFinite(lat) && isFinite(lng);
+  var app = hasLL ? 'geo:' + lat + ',' + lng + '?q=' + lat + ',' + lng
+                  : 'geo:0,0?q=' + encodeURIComponent(name || '');
+  var web = hasLL
+    ? 'https://www.google.com/maps/dir/?api=1&destination=' + lat + ',' + lng + '&travelmode=driving'
+    : 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(name || '');
+  openApp(app, web);
+};
+
+// Пробва схемата на приложението; ако нищо не се отвори за 1.2 сек,
+// пада към уеб адреса. Работи и в браузър, и в инсталирано PWA.
+function openApp(appUrl, webUrl){
+  var t0 = Date.now(), fired = false;
+  function fallback(){
+    if(fired) return;
+    fired = true;
+    if(Date.now() - t0 < 1600 && !document.hidden) openExternal(webUrl);
+  }
+  var timer = setTimeout(fallback, 1200);
+  document.addEventListener('visibilitychange', function once(){
+    if(document.hidden){ fired = true; clearTimeout(timer); }
+    document.removeEventListener('visibilitychange', once);
+  });
+  try{
+    var f = document.createElement('iframe');
+    f.style.display = 'none';
+    f.src = appUrl;
+    document.body.appendChild(f);
+    setTimeout(function(){ try{ f.remove(); }catch(e){} }, 1500);
+  }catch(e){
+    try{ location.href = appUrl; }catch(e2){ fallback(); }
+  }
+}
+window.openApp = openApp;
+
+// В инсталирано приложение (standalone) схемата intent:// се блокира от
+// WebView-то с ERR_UNKNOWN_URL_SCHEME. Обикновен https линк в нов таб
+// работи навсякъде — Android сам предлага съответното приложение.
+function openExternal(url){
+  try{
+    var w = window.open(url, '_blank', 'noopener');
+    if(w) return;
+  }catch(e){}
+  // резерва: временна връзка с истински клик
+  try{
+    var a = document.createElement('a');
+    a.href = url; a.target = '_blank'; a.rel = 'noopener';
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ a.remove(); }, 300);
+    return;
+  }catch(e){}
+  location.href = url;
+}
+window.openExternal = openExternal;
+
+
+function showAirportSchedule() {
+  const now = new Date();
+  const nowMin = ((now.getUTCHours()+3)%24)*60 + now.getUTCMinutes();
+
+  const fmt = (h,m) => String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
+  const flag = f => f.nonSchengen ? '🛂' : '🇪🇺';
+
+  // Всички полети по абсолютно време (кешът носи датата — никакви среднощни трикове)
+  const nowTs = Date.now();
+  const all = [...flightDetails]
+    .filter(f=>f.exitFromTs)
+    .sort((a,b)=>a.exitFromTs-b.exitFromTs);
+
+  // Крие излезли преди >2ч; класифицира останалите
+  const visible = [];
+  all.forEach(f=>{
+    // ПРИКЛЮЧИЛ: минал е повече от час след края на прозореца → само „???"
+    if(f.exitToTs < nowTs - 60*60000) return;
+    const graceTs = f.exitToTs + 25*60000;   // пасажерите се точат и след прозореца
+    f._state = (nowTs >= f.exitFromTs && nowTs <= graceTs) ? 'now'      // ТОЧНИЯТ диапазон → пулсира
+             : (f.exitToTs < nowTs)                        ? 'fading'   // вероятно още има → червено
+             :                                               'future';
+    visible.push(f);
+  });
+
+  let html='<div style="font-size:14px">';
+  (function(){
+    var az = (window.ZONES||[]).find(function(z){ return z.id==='airport'; });
+    if(!az) return;
+    var wn = String(az.wazeName||az.name).replace(/'/g, "\\'");
+    var nn = String(az.name).replace(/'/g, "\\'");
+    html += '<div style="display:flex;gap:6px;margin-bottom:10px">'
+      + '<button onclick="openWaze(\''+wn+'\','+az.lat+','+az.lng+')" '
+      + 'style="flex:1;padding:9px;border-radius:10px;border:1px solid var(--glass-edge);'
+      + 'background:var(--glass);color:var(--text);font:700 12.5px system-ui;cursor:pointer">🚗 Waze</button>'
+      + '<button onclick="openGoogleMaps(\''+nn+'\','+az.lat+','+az.lng+')" '
+      + 'style="flex:1;padding:9px;border-radius:10px;border:1px solid var(--glass-edge);'
+      + 'background:var(--glass);color:var(--text);font:700 12.5px system-ui;cursor:pointer">📍 Google</button>'
+      + '</div>';
+  })();
+
+  const nowCount = visible.filter(f=>f._state==='now').length;
+  if(nowCount){
+  } else {
+    const next = visible.find(f=>f._state==='future');
+    if(next){
+      html+=`<div style="background:rgba(2,132,199,.1);border:1px solid var(--cyan);border-radius:8px;padding:6px 10px;margin-bottom:8px;font-size:13px;color:var(--cyan)"><b>Следващ: ${fmt(next.exitFromH,next.exitFromM)}</b> · ${next.fn} от ${(next.depAirport||'').slice(0,18)} ${flag(next)}</div>`;
+    } else if(visible.length===0){
+      if(airportStatus==='fallback'){
+        html+='<div style="color:#f59e0b;padding:10px 0;text-align:center;font-size:12px">⚠️ Няма живи полетни данни — прогнозен режим</div>';
+      } else {
+        if(flightDetails.length){
+          var newest = Math.max.apply(null, flightDetails.map(function(x){ return x.exitToTs || 0; }));
+          var agoMin = Math.round((Date.now() - newest) / 60000);
+          html+='<div style="color:#f59e0b;padding:14px 10px;text-align:center;font-size:12.5px;line-height:1.6">'
+              + '⚠️ Данните са остарели — последният полет е бил преди '
+              + (agoMin > 90 ? Math.round(agoMin/60) + ' часа' : agoMin + ' мин') + '.<br>'
+              + '<span style="opacity:.8">Затвори и отвори панела за опресняване.</span></div>';
+        } else {
+          html+='<div style="color:var(--muted);padding:16px 0;text-align:center">Няма полетни данни</div>';
+        }
+      }
+    }
+  }
+
+  // Скролируем списък: терминали → часове → полети
+  // ═ Терминал табове (изборът се помни) ═
+  let flTerm = 'all';
+  try{ flTerm = localStorage.getItem('bak_fl_term') || 'all'; }catch(e){}
+  if(flTerm!=='all' && !visible.some(f=>f.term===flTerm)) flTerm='all';
+  window.__setFlTerm = t => { try{ localStorage.setItem('bak_fl_term', t); }catch(e){} showAirportSchedule(); };
+  const cnt = t => visible.filter(f=>f.term===t).length;
+  const tabs = [['all','Всички',visible.length],['2','Т2',cnt('2')],['1','Т1',cnt('1')]];
+  html+='<div style="display:flex;gap:6px;margin-bottom:8px">';
+  tabs.forEach(([id,label,n])=>{
+    const on = flTerm===id;
+    html+=`<button onclick="window.__setFlTerm('${id}')" style="flex:1;padding:7px 4px;border-radius:9px;font-weight:900;font-size:13px;cursor:pointer;border:1px solid ${on?'var(--cyan)':'var(--border)'};background:${on?'rgba(2,132,199,.18)':'transparent'};color:${on?'var(--cyan)':'var(--muted)'}">${label} <span style="font-weight:700;font-size:11px">${n}</span></button>`;
+  });
+  html+='</div>';
+
+  const shownList = flTerm==='all' ? visible : visible.filter(f=>f.term===flTerm);
+  const nowCnt = shownList.filter(f=>f._state==='now').length;
+  try{ window.__airportExiting = visible.filter(f=>f._state==='now').length; }catch(e){}
+  html+='<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;margin-bottom:8px;border-radius:10px;'
+    +'background:'+(nowCnt?'rgba(239,68,68,.18)':'rgba(255,255,255,.04)')+';'
+    +'border:1px solid '+(nowCnt?'#ef4444':'var(--border)')+'">'
+    +'<span style="font-size:20px">🔴</span>'
+    +'<span style="font-weight:900;font-size:16px;color:'+(nowCnt?'#ef4444':'var(--muted)')+'">'
+    +(nowCnt?('Сега излизат: '+nowCnt+' полет'+(nowCnt===1?'':'а')):'Няма излизащи в момента')
+    +'</span></div>';
+  html+='<div id="fl-scroll" style="max-height:48vh;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-right:2px">';
+  let anchorSet = false;
+  {
+    const grp = shownList;
+    let lastHour = -1;
+    grp.forEach(f=>{
+      if(f.exitFromH !== lastHour){
+        lastHour = f.exitFromH;
+        html+=`<div style="font-size:11px;font-weight:800;color:var(--muted);margin:7px 0 3px;padding-left:4px">— ${String(lastHour).padStart(2,'0')}:00 —</div>`;
+      }
+      const isNow    = f._state==='now';      // точният диапазон — ПУЛСИРА
+      const isFading = f._state==='fading';   // вероятно още има пътници — ЧЕРВЕНО
+      const bg  = isNow ? 'rgba(239,68,68,.16)' : isFading ? 'rgba(239,68,68,.06)' : 'transparent';
+      const brd = isNow ? '1px solid #ef4444' : isFading ? '1px solid rgba(239,68,68,.45)' : '1px solid transparent';
+      const col = isNow ? '#ef4444' : isFading ? '#dc2626' : 'var(--amber)';
+      const op  = isFading ? 'opacity:.88;' : '';
+      const isDone = false;
+      const anchor = (!anchorSet && (isNow || f._state==='future')) ? (anchorSet=true, ' id="fl-now-anchor"') : '';
+      html+=`<div${anchor}${isNow?' data-now="1"':(isFading?' data-fading="1"':'')} style="display:grid;grid-template-columns:46px 1fr auto;align-items:center;gap:7px;padding:4px 7px;border-radius:7px;background:${bg};border:${brd};margin-bottom:1px;${op}">
+        <span style="display:flex;flex-direction:column;line-height:1.05">
+          <b style="font-size:11.5px;color:var(--text);white-space:nowrap">${f.fn}</b>
+          <span style="font-size:9px;font-weight:800;color:var(--cyan);opacity:.85">Т${f.term}</span>
+        </span>
+        <span style="min-width:0;overflow:hidden">
+          <span style="display:block;font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.25">${(f.depAirport||'').slice(0,18)}<span style="font-size:9.5px;opacity:.9"> ${fmt(f.schedH,f.schedM)}${
+            f.delay >= 5  ? `<b style="color:#dc2626">+${f.delay}′</b>` :
+            f.delay <= -5 ? `<b style="color:#16a34a">${f.delay}′</b>` : ''
+          }</span></span>
+          <span style="display:block;font-size:10px;color:var(--muted);opacity:.85;white-space:nowrap;line-height:1.2">🛬 ${fmt(f.landH,f.landM)}${
+            /arriv/i.test(f.statusRaw||'')   ? ' <span style="color:#16a34a">кацна</span>' :
+            /approach|en.?route/i.test(f.statusRaw||'') ? ' <span style="color:#0369a1">каца</span>' : ''
+          }</span>
+        </span>
+        <span style="display:flex;align-items:center;gap:5px;white-space:nowrap">
+          <span style="font-size:12px">${flag(f)}</span>
+          ${isNow?'<span style="font-size:9.5px;font-weight:900;color:#ef4444">ИЗЛИЗА</span>':''}
+          ${isFading?'<span style="font-size:10px;font-weight:800;color:#dc2626" title="Прозорецът мина, но е възможно още да излизат">???</span>':''}
+
+          <span style="font-weight:800;font-size:11.5px;color:${col}">${fmt(f.exitFromH,f.exitFromM)}–${fmt(f.exitToH,f.exitToM)}</span>
+        </span>
+      </div>`;
+    });
+    if(!grp.length) html+='<div style="color:var(--muted);text-align:center;padding:14px 0;font-size:13px">Няма полети за този терминал</div>';
+  }
+  // легендата е ВЪТРЕ в скрола, за да не се наслагва върху редовете
+  html+='<div style="font-size:10.5px;color:var(--muted);margin-top:10px;padding-top:7px;border-top:1px solid var(--border);line-height:1.5">🇪🇺 Шенген +5–15 мин · 🛂 Извън +10–30 мин · 🔴 излизат сега · бледите още се точат</div>';
+  (function(){
+    var late = flightDetails.filter(function(x){ return (x.delay||0) >= 15 && x.exitToTs > Date.now(); });
+    if(late.length){
+      var worst = late.slice().sort(function(a,b){ return b.delay - a.delay; })[0];
+      html = `<div style="background:rgba(220,38,38,.10);border:1px solid rgba(220,38,38,.45);border-radius:10px;padding:7px 10px;margin-bottom:8px;font-size:12.5px;font-weight:700;color:#dc2626">
+        ⏱ ${late.length} ${late.length===1?'полет закъснява':'полета закъсняват'} · най-много ${worst.fn} с +${worst.delay} мин</div>` + html;
+    }
+  })();
+  html+=`<div style="font-size:10.5px;color:var(--muted);margin-top:5px;line-height:1.45">Източник: AeroDataBox · ${flightDetails.length} пристигания · обновено ${new Date().toLocaleTimeString('bg',{hour:'2-digit',minute:'2-digit'})}</div>`;
+  html+='</div>';
+  html+='</div>';
+
+  // Самостоятелен прозорец, НЕ Leaflet попъп: попъпът се закача за маркера
+  // и когато летището е горе на екрана, съдържанието се реже извън картата.
+  var modal = document.getElementById('airport-modal');
+  if(!modal){
+    modal = document.createElement('div');
+    modal.id = 'airport-modal';
+    modal.innerHTML = '<div id="airport-modal-box">'
+      + '<div id="airport-modal-head"><span>✈️ Излизане на пасажери — СОФ</span>'
+      + '<button id="airport-modal-x" aria-label="Затвори">✕</button></div>'
+      + '<div id="airport-modal-body"></div></div>';
+    document.body.appendChild(modal);
+    modal.addEventListener('click', function(e){ if(e.target === modal) closeAirportModal(); });
+    modal.querySelector('#airport-modal-x').addEventListener('click', closeAirportModal);
+  }
+  modal.querySelector('#airport-modal-body').innerHTML = html;
+  modal.style.display = 'flex';
+  setTimeout(function(){
+    var box = document.getElementById('fl-scroll'), el = document.getElementById('fl-now-anchor');
+    if(box && el) box.scrollTop = Math.max(0, el.offsetTop - box.offsetTop - 34);
+  }, 60);
+}
+
+function closeAirportModal(){
+  var m = document.getElementById('airport-modal');
+  if(m) m.style.display = 'none';
+}
+window.closeAirportModal = closeAirportModal;
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape') closeAirportModal();
+});
+
+window.showZonePopup = showZonePopup;
+function showZonePopup(zid) {
+  const z=ZONES.find(x=>x.id===zid); if(!z) return;
+  const {scores,activeEvents}=computeScores(currentHour); if(window.__applyLive)window.__applyLive(scores);
+  const s=scores[zid]||0;
+  const isTraffic=z.type==='traffic';
+  const ti=TRAFFIC_INFO[zid];
+  let c, label, evHtml;
+  if (karykMode&&!isTraffic) {
+    const ks=computeKarykScore(zid,scores);
+    c=karykColor(ks); label=`К:${ks.toFixed(1)} ${c.label}`;
+  } else {
+    c=demandColor(s,z.type); label=c.label;
+  }
+  if (isTraffic&&ti) {
+    const active=s>=1.5;
+    const sc=active?'#ef4444':'#22c55e';
+    evHtml=`<div style="background:${active?'#1a0808':'#081a0d'};border:1px solid ${sc};border-radius:5px;padding:5px 8px;margin-bottom:5px;color:${sc};font-size:15px;font-weight:600">${active?'🔴 ЗАДРЪСТЕНО СЕГА':'🟢 В МОМЕНТА СВОБОДНО'}</div>
+      <div style="font-size:15px;color:#a855f7;margin-bottom:3px">🚦 ${ti.jamDir}</div>
+      <div style="font-size:15px;color:#00e5ff;margin-bottom:5px">✅ Свободно: ${ti.freeDir}</div>
+      ${active?`<div style="background:#1a0a2e;border:1px solid #a855f7;border-radius:5px;padding:5px 8px;font-size:15px;color:#d08dff;margin-bottom:4px">💡 Карай ${ti.freeArrow} обратно — стигаш по-бързо!</div>`:''}
+      <div style="font-size:14px;color:#4a6080">⏰ Пик: ${ti.time}</div>`;
+  } else {
+    const evs=(activeEvents[zid]||[]).slice(0,3);
+    evHtml=evs.length?evs.map(e=>`<div>• ${e.name}</div>`).join(''):'<div style="color:#4a6080">Базово търсене</div>';
+  }
+  const pct=Math.min(100,(s/4.5)*100);
+  L.popup({maxWidth:240}).setLatLng([z.lat,z.lng]).setContent(`
+    <div style="font-family:'Share Tech Mono',monospace;font-size:16px;color:#00e5ff;margin-bottom:5px">${z.icon} ${z.name}</div>
+    <div style="font-size:18px;font-weight:bold;color:${c.fill};margin-bottom:4px">${s.toFixed(1)} <span style="font-size:15px">${label}</span></div>
+    <div style="height:4px;background:#182d47;border-radius:2px;margin:5px 0"><div style="width:${pct}%;height:100%;background:${c.fill};border-radius:2px"></div></div>
+    <div style="font-size:15px;color:#c8daf0;margin:6px 0">${evHtml}</div>
+    ${!isTraffic?`<button onclick="startNav('${zid}')" style="width:100%;background:#00e5ff;color:#000;border:none;border-radius:4px;padding:5px;font-size:15px;cursor:pointer;margin-top:4px">🧭 Навигирай</button>
+    <div style="display:flex;gap:5px;margin-top:5px">
+      <a href="#" onclick="event.preventDefault();openWaze('${(z.wazeName||z.name).replace(/'/g,"\\'")}',${z.lat},${z.lng});return false;"
+         style="flex:1;text-align:center;font-size:14px;color:#00e5ff;padding:4px;background:#0d1929;border:1px solid #182d47;border-radius:4px;text-decoration:none">🚗 Waze</a>
+      <a href="#" onclick="event.preventDefault();openGoogleMaps('${(z.name||'').replace(/'/g,"\\'")}',${z.lat},${z.lng});return false;"
+         style="flex:1;text-align:center;font-size:14px;color:#4a6080;padding:4px;background:#0d1929;border:1px solid #182d47;border-radius:4px;text-decoration:none">📍 Google</a>
+    </div>`:''}
+  `).openOn(map);
+}
+window.startNav=function(zid){
+  const z=ZONES.find(x=>x.id===zid); if(!z) return;
+  navTarget=z; map.closePopup();
+  openWaze(z.wazeName||z.name, z.lat, z.lng);
+};
+
+// ═══════════════════════════════════════════════
+// SPARKLINE
+// ═══════════════════════════════════════════════
+const canvas=document.getElementById('demand-canvas');
+const ctx=canvas.getContext('2d');
+const MIN_H=0, MAX_H=24, STEPS=96;
+
+function buildCurve() {
+  demandCurve=[];
+  for(let i=0;i<=STEPS;i++) demandCurve.push(totalDemand(MIN_H+(i/STEPS)*(MAX_H-MIN_H)));
+}
+
+function drawSparkline(h) {
+  const dpr=window.devicePixelRatio||1;
+  const W=Math.max(canvas.offsetWidth,canvas.parentElement?.offsetWidth||300);
+  const H=40;
+  canvas.width=W*dpr; canvas.height=H*dpr; ctx.scale(dpr,dpr);
+  if(!demandCurve.length) return;
+  const maxD=Math.max(...demandCurve), minD=Math.min(...demandCurve)*0.85;
+  const xOf=i=>(i/STEPS)*W;
+  const yOf=v=>H-3-((v-minD)/(maxD-minD))*(H-8);
+  // Dead zone shade
+  const x20=((20-MIN_H)/(MAX_H-MIN_H))*W;
+  const x21=((21-MIN_H)/(MAX_H-MIN_H))*W;
+  ctx.fillStyle='rgba(239,68,68,0.08)'; ctx.fillRect(x20,0,x21-x20,H);
+  // Полетни ленти за ЦЕЛИЯ ден — интензитет по брой рейсове, неон на пиковете
+  if(flightHours && flightHours.length){
+    const fmax = Math.max(...flightHours);
+    if(fmax > 0){
+      const peakCut = fmax * 0.72;
+      for(let fh = 0; fh < 24; fh++){
+        const live = flightHours[fh];
+        const est  = (window.__flightBase && window.__flightBase[fh]) || 0;
+        const c    = live || est;
+        if(!c) continue;
+        const isLive = !!live;
+        const x1 = ((fh     - MIN_H)/(MAX_H-MIN_H))*W;
+        const x2 = ((fh + 1 - MIN_H)/(MAX_H-MIN_H))*W;
+        if(x2 <= 0 || x1 >= W) continue;
+        const xa = Math.max(0,x1), xb = Math.min(W,x2);
+        const isPeak = isLive && c >= peakCut;
+        ctx.save();
+        if(!isLive){                       // прогнозен час — бледо, без неон
+          ctx.fillStyle = 'rgba(239,68,68,' + (0.05 + 0.07*(c/fmax)).toFixed(3) + ')';
+          ctx.fillRect(xa, 0, xb-xa, H);
+          ctx.restore();
+          continue;
+        }
+        if(isPeak){
+          ctx.shadowColor = 'rgba(255,64,64,0.95)';
+          ctx.shadowBlur  = 12;
+          ctx.fillStyle   = 'rgba(255,72,72,0.42)';
+        } else {
+          ctx.fillStyle   = 'rgba(239,68,68,' + (0.10 + 0.22*(c/fmax)).toFixed(3) + ')';
+        }
+        ctx.fillRect(xa, 0, xb-xa, H);
+        if(isPeak){                       // ярък неонов ръб отгоре
+          ctx.shadowBlur = 16;
+          ctx.fillStyle  = 'rgba(255,110,110,0.95)';
+          ctx.fillRect(xa, 0, xb-xa, 2.5);
+        }
+        ctx.restore();
+      }
+    }
+  }
+  // Fill
+  const grad=ctx.createLinearGradient(0,0,0,H);
+  grad.addColorStop(0,'rgba(239,68,68,0.28)');
+  grad.addColorStop(0.5,'rgba(245,158,11,0.14)');
+  grad.addColorStop(1,'rgba(34,197,94,0.02)');
+  ctx.beginPath(); ctx.moveTo(xOf(0),yOf(demandCurve[0]));
+  for(let i=1;i<=STEPS;i++) ctx.lineTo(xOf(i),yOf(demandCurve[i]));
+  ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath();
+  ctx.fillStyle=grad; ctx.fill();
+  ctx.beginPath(); ctx.moveTo(xOf(0),yOf(demandCurve[0]));
+  for(let i=1;i<=STEPS;i++) ctx.lineTo(xOf(i),yOf(demandCurve[i]));
+  ctx.strokeStyle='#f59e0b99'; ctx.lineWidth=1.5; ctx.stroke();
+  // Cursor
+  const cx=((h-MIN_H)/(MAX_H-MIN_H))*W;
+  ctx.beginPath(); ctx.moveTo(cx,0); ctx.lineTo(cx,H);
+  ctx.strokeStyle='#00e5ff'; ctx.lineWidth=1.5; ctx.setLineDash([3,3]); ctx.stroke(); ctx.setLineDash([]);
+  const ci=Math.round(((h-MIN_H)/(MAX_H-MIN_H))*STEPS);
+  ctx.beginPath(); ctx.arc(cx,yOf(demandCurve[Math.min(ci,STEPS)]),4,0,Math.PI*2);
+  ctx.fillStyle='#00e5ff'; ctx.fill();
+}
+
+// ═══════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════
+function render(hour) {
+  const {scores,activeEvents}=computeScores(hour); if(window.__applyLive)window.__applyLive(scores);
+  const dead=hour>=19.8&&hour<=21.2;
+  document.getElementById('tl-dead').style.display=dead?'inline':'none';
+  updateCircles();
+  drawSparkline(hour);
+  // Sidebar
+  const sorted=Object.entries(scores).sort((a,b)=>b[1]-a[1]);
+  const top=sorted[0];
+  const tz=ZONES.find(z=>z.id===top[0]);
+  if(dead){
+    document.getElementById('tl-hint').textContent='— мъртва зона, почини';
+    window.__topRot = null;
+  } else {
+    // Топ винаги отразява текущия момент, а не позицията на плъзгача
+    var nowH = new Date().getHours() + new Date().getMinutes()/60;
+    var liveScores = (Math.abs(nowH - hour) > 0.5)
+      ? computeScores(Math.round(nowH*2)/2).scores : scores;
+    var sortedLive = Object.entries(liveScores).sort((a,b)=>b[1]-a[1]);
+    window.__topRot = sortedLive
+      .filter(function(e){
+        var zz = ZONES.find(function(x){ return x.id === e[0]; });
+        if(!zz) return true;
+        // болниците и задръстванията не са източник на клиенти
+        return zz.type !== 'hospital' && zz.type !== 'traffic';
+      })
+      .slice(0,3).map(function(e){
+      var zz=ZONES.find(x=>x.id===e[0]);
+      var tag = zz && zz.type==='airport' ? ' ✈ пик'
+              : zz && zz.type==='transit' ? ' 🚉 пик' : '';
+      return 'Топ: '+(zz?.icon||'')+' '+(zz?.name||e[0]).split('(')[0].trim()+' ('+e[1].toFixed(1)+')'+tag;
+    });
+    var el=document.getElementById('tl-hint');
+    el.textContent = window.__topRot[(window.__topIdx||0) % window.__topRot.length];
+  }
+  const zList=document.getElementById('zone-list');
+  if (zList && !karykMode) {
+    zList.innerHTML=sorted
+      .filter(([zid])=>{ const z=ZONES.find(x=>x.id===zid);
+        // задръстванията са пътна обстановка, не източник на клиенти
+        return z && z.type!=='karyk' && z.type!=='traffic'; })
+      .map(([zid,score])=>{
+        const z=ZONES.find(x=>x.id===zid); if(!z) return '';
+        const c=demandColor(score,z.type);
+        const sub=(activeEvents[zid]||[])[0]?.name||'';
+        return `<div class="zone-item" onclick="(function(){document.body.classList.remove('full-list');document.body.removeAttribute('data-full');document.querySelectorAll('.dest-btn').forEach(function(b){b.classList.remove('on')});if(document.body.classList.contains('list-view'))toggleMapView();setTimeout(()=>{window.__focusZone(${z.lat},${z.lng},'${zid}'==='airport'?14:15);'${zid}'==='airport'?showAirportSchedule():showZonePopup('${zid}');},150);})()">
+          <div class="zone-dot" style="background:${c.fill}"></div>
+          <div style="flex:1;min-width:0">
+            <div class="zone-name">${z.icon} ${z.name}</div>
+            ${sub?`<div class="zone-sub">${sub}</div>`:''}
+          </div>
+          <div style="text-align:right">
+            <div class="zone-score" style="color:${c.fill};font-size:16px;font-weight:800">${score.toFixed(1)}</div>
+            <div style="font-size:11px;color:${c.fill}">${c.label}</div>
+          </div>
+        </div>`;
+      }).join('');
+  }
+  const kList=document.getElementById('karyk-list');
+  if (kList && karykMode) {
+    const ranked=ZONES
+      .filter(z=>z.type!=='hospital')
+      .map(z=>({z,ks:computeKarykScore(z.id,scores),ev:(activeEvents[z.id]||[])[0]?.name||''}))
+      .filter(({ks})=>ks>=1.0)
+      .sort((a,b)=>b.ks-a.ks).slice(0,20);
+    kList.innerHTML=ranked.map(({z,ks,ev},i)=>{
+      const c=karykColor(ks);
+      const reason=ev||(z.type==='karyk'?'Тих квартал':z.type==='residential_lux'?'Луксозен жк':'');
+      return `<div class="karyk-item" onclick="(function(){if(document.body.classList.contains('list-view'))toggleMapView();setTimeout(function(){map.invalidateSize();map.setView([${z.lat},${z.lng}],15);showZonePopup('${z.id}');},200);})()">
+        <div class="karyk-rank" style="color:${c.fill}">#${i+1}</div>
+        <div class="karyk-dot" style="background:${c.fill}"></div>
+        <div style="flex:1;min-width:0">
+          <div class="karyk-name">${z.icon} ${z.name.split('(')[0].trim()}</div>
+          <div class="karyk-sub">${c.label}${reason?' · '+reason:''}</div>
+        </div>
+        <div style="text-align:right">
+          <div class="karyk-score" style="color:${c.fill}">К:${ks.toFixed(1)}</div>
+          <div style="font-size:14px;color:#5a3a10">↑${scores[z.id]?.toFixed(1)||'0.0'}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+}
+
+// ═══════════════════════════════════════════════
+// GPS
+// ═══════════════════════════════════════════════
+function deg2rad(d){return d*Math.PI/180;}
+function haversine(lat1,lng1,lat2,lng2){
+  const R=6371000,dLat=deg2rad(lat2-lat1),dLng=deg2rad(lng2-lng1);
+  const a=Math.sin(dLat/2)**2+Math.cos(deg2rad(lat1))*Math.cos(deg2rad(lat2))*Math.sin(dLng/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+function bearing(lat1,lng1,lat2,lng2){
+  const dLng=deg2rad(lng2-lng1);
+  const y=Math.sin(dLng)*Math.cos(deg2rad(lat2));
+  const x=Math.cos(deg2rad(lat1))*Math.sin(deg2rad(lat2))-Math.sin(deg2rad(lat1))*Math.cos(deg2rad(lat2))*Math.cos(dLng);
+  return (Math.atan2(y,x)*180/Math.PI+360)%360;
+}
+const ARROWS=['⬆️','↗️','➡️','↘️','⬇️','↙️','⬅️','↖️'];
+const DIRS  =['С','СИ','И','ЮИ','Ю','ЮЗ','З','СЗ'];
+
+if(window.DeviceOrientationEvent){
+  window.addEventListener('deviceorientationabsolute',e=>{deviceHeading=e.alpha;},true);
+  window.addEventListener('deviceorientation',e=>{if(e.webkitCompassHeading)deviceHeading=e.webkitCompassHeading;},true);
+}
+
+function updateDirectionHint(scores) {
+  if(userLat===null||dirHintSuppressed) return;
+  let best=null,bestW=Infinity;
+  ZONES.forEach(z=>{
+    const s=scores[z.id]||0; if(s<1.3) return;
+    const d=haversine(userLat,userLng,z.lat,z.lng);
+    const w=d/(s*s);
+    if(w<bestW){bestW=w;best=z;}
+  });
+  const panel=document.getElementById('direction-hint');
+  if(!best){panel.style.display='none';return;}
+  if(best.id===dirHintZid&&panel.style.display!=='none') return;
+  dirHintZid=best.id;
+  const {scores:sc}=computeScores(currentHour);
+  const bs=sc[best.id]||0;
+  const dist=haversine(userLat,userLng,best.lat,best.lng);
+  const bear=bearing(userLat,userLng,best.lat,best.lng);
+  let relBear=bear;
+  if(deviceHeading!==null) relBear=(bear-deviceHeading+360)%360;
+  const c=demandColor(bs,best.type);
+  const distTxt=dist<1000?`${Math.round(dist)} м`:`${(dist/1000).toFixed(1)} км`;
+  document.getElementById('dh-arrow').textContent=ARROWS[Math.round(relBear/45)%8];
+  document.getElementById('dh-name').textContent=`${best.icon} ${best.name}`;
+  document.getElementById('dh-addr').textContent=`\u{1F697} Карай ${DIRS[Math.round(bear/45)%8]} · ${distTxt} · скор ${bs.toFixed(1)}`;
+  document.getElementById('dh-score').textContent=bs.toFixed(1);
+  document.getElementById('dh-score').style.color=c.fill;
+  panel.style.display='block';
+  panel.style.borderTopColor=c.fill;
+  if(window._dirLine) map.removeLayer(window._dirLine);
+  window._dirLine=L.polyline([[userLat,userLng],[best.lat,best.lng]],{color:c.fill,weight:2,dashArray:'6,4',opacity:0.9}).addTo(map);
+}
+
+function startGPS(){
+  const btn=document.getElementById('gps-btn');
+  btn.classList.add('active');
+  if(!navigator.geolocation){return;}
+  if(watchId) return;
+  document.getElementById('direction-hint').style.display='block';
+  document.getElementById('dh-name').textContent='🛰 Изчакай GPS…';
+  document.getElementById('dh-arrow').textContent='📡';
+  watchId=navigator.geolocation.watchPosition(pos=>{
+    userLat=pos.coords.latitude; userLng=pos.coords.longitude;
+    if(!userMarker){
+      const icon=L.divIcon({className:'',
+        html:`<div style="position:relative;width:24px;height:24px">
+          <div style="position:absolute;inset:0;border-radius:50%;background:rgba(0,229,255,.2);animation:pulse-ring 3s ease-out infinite"></div>
+          <div style="position:absolute;inset:5px;border-radius:50%;background:#00e5ff;border:2px solid #fff;box-shadow:0 0 8px #00e5ff"></div>
+        </div>`,iconSize:[24,24],iconAnchor:[12,12]});
+      userMarker=L.marker([userLat,userLng],{icon,zIndexOffset:1000}).addTo(map);
+      map.setView([userLat,userLng],14);
+    } else {
+      userMarker.setLatLng([userLat,userLng]);
+    }
+    // Update airport badge to show GPS is active
+    document.getElementById('gps-btn').title=`📍 ${userLat.toFixed(4)}, ${userLng.toFixed(4)}`;
+    const {scores}=computeScores(currentHour); if(window.__applyLive)window.__applyLive(scores);
+    updateDirectionHint(scores);
+  },()=>{btn.classList.remove('active');},{enableHighAccuracy:true,maximumAge:5000,timeout:15000});
+}
+
+document.getElementById('gps-btn').addEventListener('click',()=>{
+  if(watchId){
+    navigator.geolocation.clearWatch(watchId); watchId=null;
+    document.getElementById('gps-btn').classList.remove('active');
+    if(userMarker){map.removeLayer(userMarker);userMarker=null;}
+    if(window._dirLine){map.removeLayer(window._dirLine);window._dirLine=null;}
+    document.getElementById('direction-hint').style.display='none';
+    userLat=null; userLng=null;
+  } else { startGPS(); }
+});
+document.getElementById('direction-hint').querySelector('.dh-close').addEventListener('click',()=>{
+  dirHintSuppressed=true;
+  document.getElementById('direction-hint').style.display='none';
+});
+
+// ═══════════════════════════════════════════════
+// FULLSCREEN
+// ═══════════════════════════════════════════════
+let isFullscreen=false;
+document.getElementById('fs-btn').addEventListener('click',()=>{
+  isFullscreen=!isFullscreen;
+  document.body.classList.toggle('map-fullscreen',isFullscreen);
+  document.getElementById('fs-btn').textContent=isFullscreen?'✕':'⛶';
+  setTimeout(()=>{map.invalidateSize();drawSparkline(currentHour);},200);
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&isFullscreen)document.getElementById('fs-btn').click();});
+
+// ═══════════════════════════════════════════════
+// КАРЪК MODE
+// ═══════════════════════════════════════════════
+const karykBtn=document.getElementById('karyk-btn');
+karykBtn.addEventListener('click',()=>{
+  karykMode=!karykMode;
+  karykMode = false;                       // Карък режимът е премахнат
+  karykBtn.classList.toggle('active',false);
+  document.body.classList.toggle('karyk-active',karykMode);
+  document.getElementById('karyk-banner').style.display=karykMode?'block':'none';
+  (function(){
+    if(!document.getElementById('karyk-corner-tr')){
+      ['karyk-corner-tr','karyk-corner-bl'].forEach(function(id){
+        var c=document.createElement('div'); c.id=id; document.body.appendChild(c);
+      });
+    }
+    var b=document.getElementById('karyk-badge');
+    if(!b){
+      b=document.createElement('div'); b.id='karyk-badge';
+      b.innerHTML='🥉 КАРЪК РЕЖИМ <span style="opacity:.7;font-weight:600">· тихите зони</span>';
+      b.title='Изключи Карък режим';
+      b.addEventListener('click',function(){ document.getElementById('karyk-btn').click(); });
+      document.body.appendChild(b);
+    }
+    b.style.display = karykMode ? 'block' : 'none';
+  })();
+  if(karykMode){
+    const {scores}=computeScores(currentHour); if(window.__applyLive)window.__applyLive(scores);
+    const gems=ZONES.filter(z=>z.type==='karyk'||z.type==='residential_lux'||z.type==='residential'||(window.__liveDemand&&window.__liveDemand.hub&&window.__liveDemand.hub[z.id]!==undefined))
+      .map(z=>({z,ks:(window.__karykLive?window.__karykLive(z,computeKarykScore(z.id,scores),typeof userLat==='number'?userLat:null,typeof userLng==='number'?userLng:null):computeKarykScore(z.id,scores))})).sort((a,b)=>b.ks-a.ks);
+    if(gems[0]){
+      const c=karykColor(gems[0].ks);
+      document.getElementById('karyk-hint').innerHTML=
+        `🥉 Иди при <span style="color:${c.fill}">${gems[0].z.icon} ${gems[0].z.name.split('(')[0].trim()}</span> (К:${gems[0].ks.toFixed(1)})`;
+    }
+  }
+  render(currentHour);
+});
+
+// ═══════════════════════════════════════════════
+// TICKER
+// ═══════════════════════════════════════════════
+function buildTicker(){
+  // Лентата показва МЕСТА, които раждат клиенти: летище, гари, автогари,
+  // плюс края на големи събития. Гради се от данни и не остава празна.
+  const now = Date.now(), HORIZON = 180*60000;
+  const hm = ts => new Date(ts).toLocaleTimeString('bg',{hour:'2-digit',minute:'2-digit'});
+  let items = [];
+
+  try{
+    (typeof flightDetails !== 'undefined' ? flightDetails : []).forEach(f => {
+      const d = f.exitFromTs - now;
+      if(d >= -20*60000 && d <= HORIZON)
+        items.push({ d, t:`✈️ ${hm(f.exitFromTs)} ${f.fn} от ${(f.depAirport||'').slice(0,16)}${d<=0?' — ИЗЛИЗАТ':''}` });
+    });
+  }catch(e){}
+
+  try{
+    (window.__transitUpcoming||[]).forEach(t => {
+      if(t.min >= -20 && t.min <= 180)
+        items.push({ d:t.min*60000, t:`${t.icon} ${t.time} ${t.what}` });
+    });
+  }catch(e){}
+
+  try{
+    (window.__sevEvents||[]).forEach(e => {
+      const d = e.e - now;                       // краят ражда клиенти
+      if(d >= -15*60000 && d <= HORIZON && (e.cap||0) >= 500)
+        items.push({ d, t:`🎫 ${hm(e.e)} край · ${String(e.n).slice(0,26)}` });
+    });
+  }catch(e){}
+
+  items.sort((a,b)=>a.d-b.d);
+  let out = items.slice(0,12).map(i=>i.t);
+
+  if(!out.length){                                // никога празна
+    try{
+      const sc = computeScores(new Date().getHours());
+      out = Object.entries(sc).sort((a,b)=>b[1]-a[1]).slice(0,5).map(p=>{
+        const z = ZONES.find(x=>x.id===p[0]);
+        return `${z&&z.icon?z.icon+' ':''}${z?z.name.split('(')[0].trim():p[0]} (${p[1].toFixed(1)})`;
+      });
+    }catch(e){}
+  }
+  if(!out.length) out = ['📍 Зоните се обновяват…'];
+
+  const el = document.getElementById('ticker');
+  if(!el) return;
+  const html = out.map(s=>`<span class="tick-item">${s}<span style="opacity:.45"> · </span></span>`).join('');
+  el.innerHTML = html + html;
+  // постоянна скорост в пиксели/сек — иначе при много редове изглежда, че пълзи
+  const SPEED = 115;                                  // px/сек
+  const half  = Math.max(400, el.scrollWidth / 2);
+  el.style.animation = 'none'; el.offsetHeight;
+  el.style.animation = `ticker ${Math.round(half / SPEED)}s linear infinite`;
+  var night = document.body.classList.contains('theme-night');
+  el.querySelectorAll('.tick-item').forEach(function(x){ x.style.color = night ? '#e8eef7' : '#0f1b2d'; });
+}
+
+// ═══════════════════════════════════════════════
+// FLIGHT-CACHE.JSON
+// ═══════════════════════════════════════════════
+function injectAirportEvents(){
+  const keep=EVENTS.filter(e=>!e._fromFlight);
+  for(let h=0;h<24;h++){
+    const c=flightHours[h]; if(!c) continue;
+    keep.push({zone:'airport',name:`✈ ${c} рейса ~${String(h).padStart(2,'0')}:00`,
+      endHour:h+0.25,boost:Math.min(3.8,c*0.42),repeat:'daily',_fromFlight:true});
+  }
+  EVENTS.length=0; keep.forEach(e=>EVENTS.push(e));
+}
+
+// Типичен дневен профил на СОФ — ползва се за часовете, които кешът не покрива
+window.__flightBase = {};
+[[6,2],[7,4],[8,5],[9,5],[10,4],[11,4],[12,3],[13,4],[14,3],[15,4],[16,6],
+ [17,5],[18,7],[19,8],[20,6],[21,5],[22,5],[23,4]].forEach(function(p){ window.__flightBase[p[0]] = p[1]; });
+
+function applyFallbackAirport(){
+  airportStatus='fallback';
+  [[6,2],[7,4],[8,5],[9,5],[10,4],[11,4],[12,3],[13,4],[14,3],[15,4],[16,6],
+   [17,5],[18,7],[19,8],[20,6],[21,5],[22,5],[23,4]].forEach(([h,c])=>{flightHours[h]=c;});
+  injectAirportEvents();
+}
+
+function updateAirportBadge(){
+  try{
+    var _b = document.getElementById('airport-badge');
+    if(_b && typeof flightDetails !== 'undefined' && flightDetails.length){
+      _b.textContent = '🛰 ' + flightDetails.length + ' полета · ' + (window.__flightSource || 'ЗАРЕДЕН');
+      _b.classList.add('ready');
+      return;
+    }
+  }catch(e){}
+  const b=document.getElementById('airport-badge');
+  if(airportStatus==='live')        {b.textContent='✈ LIVE';     b.style.color='#22c55e';}
+  else if(airportStatus==='fallback'){b.textContent='✈ ПРОГНОЗА';b.style.color='#f59e0b';}
+  else                              {b.textContent='✈ ОФЛАЙН';  b.style.color='#ef4444';}
+}
+
+function loadFlights(){
+  // ЖИВО от Worker-а (кеш 15 мин), а качденият файл е само резерва.
+  // Разписаните задачи в GitHub се бавят до 2 часа и данните остаряваха.
+  var LIVE = 'https://mvr-proxy.mihov-emil.workers.dev/flights/SOF';
+  fetch(LIVE, { cache:'no-store' })
+    .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+    .then(function(live){
+      if(!live || !live.arrivals || !live.arrivals.length) throw 0;
+      // привеждаме към формата, който приложението вече разбира
+      var data = { data: live.arrivals.map(function(a){
+        var sch = (a.scheduled || '').replace(' ', 'T');
+        var rev = (a.revised  || '').replace(' ', 'T');
+        var t   = rev || sch;
+        var dmin = 0;
+        if(sch && rev){
+          try{ dmin = Math.round((new Date(rev) - new Date(sch)) / 60000); }catch(e){}
+        }
+        return {
+          flight:   { iata: String(a.number || '').replace(/\s+/g,'') },
+          airline:  { name: a.airline || '' },
+          arrival:  { scheduled: sch || t, estimated: t, terminal: a.terminal || null },
+          departure:{ airport: a.from || '' },
+          flight_status: (a.status || '').toLowerCase(),
+          _delay: dmin,
+          _statusRaw: a.status || ''
+        };
+      })};
+      window.__flightSource = 'живо · ' + data.data.length;
+      processFlights(data);
+    })
+    .catch(function(){
+      window.__flightSource = 'кеш';
+      loadFlightsFromCache();
+    });
+}
+
+function loadFlightsFromCache(){
+  fetch('flight-cache.json?v='+Date.now())
+    .then(r=>{if(!r.ok)throw 0;return r.json();})
+    .then(processFlights)
+    .catch(e=>{
+      window.__flErr = String(e && (e.stack||e.message) || e).slice(0,160);
+      applyFallbackAirport(); updateAirportBadge();
+      buildCurve(); buildTicker(); render(currentHour);
+    });
+}
+
+window.computeScores = window.computeScores || (typeof computeScores !== 'undefined' ? computeScores : null);
+function processFlights(data){
+  return (function(){
+      const fl=data.data||[]; if(!fl.length) throw 0;
+      flightHours=Array(24).fill(0); flightDetails=[];
+      fl.forEach(f=>{
+        if(!f.arrival?.scheduled) return;
+        // Липсващ терминал НЕ значи частен полет — Sky Express и някои чартъри
+        // също идват без него. Отсяваме по превозвач, не по липсваща стойност.
+        if(!f.arrival?.terminal){
+          const al = ((f.airline && f.airline.name) || '').toLowerCase();
+          const num = ((f.flight && f.flight.iata) || '').toUpperCase();
+          const PRIVATE = /vistajet|netjets|luxaviation|globeair|jet aviation|hahn air|private|executive|cargo|dhl|fedex|ups|swiftair|asl airlines/;
+          if(PRIVATE.test(al)) return;                       // частни и карго — вън
+          if(/^(VJT|NJE|LXA|GAC|HLR|RHH)/.test(num)) return;  // техните кодове — вън
+          // останалите остават: пътнически полет без обявен терминал
+        }
+        const t=new Date(f.arrival.estimated||f.arrival.scheduled);
+        const dep=(f.departure?.airport||f.departure?.country_name||'').toLowerCase();
+        const nonSchengen=dep.match(/tur|istanbul|sabiha|ankar|israel|ben.gurion|dubai|abu.dhabi|egypt|cairo|morocco|casablanca|london|heathrow|gatwick|stansted|luton|manchester|birmingham|usa|jfk|lax|china|beijing|shanghai|russia|moscow|georgia|tbilisi|armenia|yerevan|jordan|amman|serbia|belgrade|ukraine|kyiv|north.mac/);
+        // Exit window (наблюдения): ЕС/Шенген ~10 мин, извън ~15–20 мин след кацане
+        // Наблюдение от терена: хората излизат по-бавно от очакваното,
+        // затова краят е разтегнат с 5 мин. Ще се калибрира с още данни.
+        const exitFirst = nonSchengen ? 10 : 5;
+        const exitLast  = nonSchengen ? 35 : 20;
+        const tFirst = new Date(t.getTime() + exitFirst*60000);
+        const tLast  = new Date(t.getTime() + exitLast*60000);
+        const hFirst = (tFirst.getUTCHours()+3)%24;
+        const hLast  = (tLast.getUTCHours()+3)%24;
+        const mFirst = tFirst.getUTCMinutes();
+        const mLast  = tLast.getUTCMinutes();
+        // Spread passengers across exit window (3 slots: start, mid, end)
+        const hMid = (new Date(t.getTime()+(exitFirst+exitLast)/2*60000).getUTCHours()+3)%24;
+        flightHours[hFirst] = (flightHours[hFirst]||0) + 0.3;
+        flightHours[hMid]   = (flightHours[hMid]||0)   + 0.5;
+        flightHours[hLast]  = (flightHours[hLast]||0)  + 0.2;
+        // Store for popup
+        const fn = (f.flight?.iata||'??');
+        const depAirport = f.departure?.airport||dep;
+        window.__flightDetailsRef = flightDetails;
+      flightDetails.push({
+          fn, depAirport, nonSchengen:!!nonSchengen,
+          delay: f._delay || 0, statusRaw: f._statusRaw || '',
+          schedH: (function(){ try{ var s=new Date(f.arrival.scheduled); return (s.getUTCHours()+3)%24; }catch(e){ return 0; } })(),
+          schedM: (function(){ try{ return new Date(f.arrival.scheduled).getUTCMinutes(); }catch(e){ return 0; } })(),
+          term: (f.arrival && f.arrival.terminal) ? String(f.arrival.terminal) : '?',
+          exitFromTs: tFirst.getTime(), exitToTs: tLast.getTime(),
+          landH:(t.getUTCHours()+3)%24, landM:t.getUTCMinutes(),
+          exitFromH:hFirst, exitFromM:mFirst,
+          exitToH:hLast,   exitToM:mLast
+        });
+      });
+      console.log('[SOF] flightDetails populated:', flightDetails.length, 'flights');
+      airportStatus='live';
+      injectAirportEvents(); updateAirportBadge();
+      buildCurve(); buildTicker(); render(currentHour);
+  })();
+}
+
+
+// ═══════════════════════════════════════════════
+// WEATHER
+// ═══════════════════════════════════════════════
+let OWM_KEY = '';
+
+async function loadConfig(){
+  try {
+    const r = await fetch('config.json');
+    const d = await r.json();
+    OWM_KEY = d.owm_key || '';
+  } catch(e) {}
+}
+
+async function loadWeather(){
+  const bar=document.getElementById('weather-bar');
+  if(!OWM_KEY){
+    bar.style.display='flex';
+    document.getElementById('wb-desc').textContent='Добави OWM ключ в config.json';
+    return;
+  }
+  try{
+    const r=await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=42.6977&lon=23.3219&units=metric&lang=bg&appid=${OWM_KEY}`);
+    const d=await r.json();
+    if(d.cod!==200) throw 0;
+    const w=d.weather[0], temp=Math.round(d.main.temp), wind=d.wind?.speed||0;
+    const icons={'Rain':'🌧','Drizzle':'🌦','Thunderstorm':'⛈','Snow':'❄️','Fog':'🌫','Mist':'🌫'};
+    const wIcon=icons[w.main]||'☀️';
+    const boost=w.main==='Rain'?2.0:w.main==='Thunderstorm'?2.8:w.main==='Snow'?1.8:w.main==='Drizzle'?1.2:wind>10?0.5:0;
+    weatherBoost=boost;
+    bar.style.display='flex';
+    // иконата се управлява от пейзажа (нощем луна с фаза) — не я пипаме тук
+    document.getElementById('wb-temp').textContent=`${temp}°C`;
+    document.getElementById('wb-desc').textContent=w.description;
+    document.getElementById('wb-boost').textContent=boost>0?`+${boost.toFixed(1)} demand 🌧`:'';
+    if(boost>0){bar.style.borderBottomColor='#00e5ff'; buildCurve(); render(currentHour);}
+  }catch(e){console.warn('Weather error',e);}
+}
+
+// ═══════════════════════════════════════════════
+// SLIDER + AUTO TIME
+// ═══════════════════════════════════════════════
+const slider=document.getElementById('time-slider');
+slider.addEventListener('input',()=>{
+  autoTime=false; clearTimeout(slider._t);
+  slider._t=setTimeout(()=>{autoTime=true;},10*60000);
+  currentHour=parseFloat(slider.value);
+  const td=document.getElementById('time-display');
+  td.textContent=fmtHour(currentHour);
+  // Показва дали е реален час или симулация
+  const realH=new Date().getHours()+new Date().getMinutes()/60;
+  const isSim=Math.abs(currentHour-realH)>0.4;
+  td.style.color = isSim ? '#f59e0b' : 'var(--cyan)';
+  td.title = isSim ? '⏱ Симулация — не е реалното време' : '';
+  render(currentHour);
+  // Обновява панелите ако са отворени
+  if(bakshishOpen) buildBakshishPanel();
+  if(next90Open) buildNext90();
+  checkEventAlerts();
+});
+
+function syncTime(){
+  if(!autoTime) return;
+  const h=new Date().getHours()+new Date().getMinutes()/60;
+  const sn=Math.round(h*2)/2;
+  if(Math.abs(sn-currentHour)>=0.25){
+    currentHour=sn; slider.value=sn;
+    document.getElementById('time-display').textContent=fmtHour(sn);
+    render(sn);
+  }
+}
+setInterval(syncTime,60000);
+
+// ═══════════════════════════════════════════════
+// EVENT ALERT — 15-30 мин преди голям event
+// ═══════════════════════════════════════════════
+function checkEventAlerts(){
+  // Event alerts използват реалния час (не slider) - за реални предупреждения
+  const realH=new Date().getHours()+new Date().getMinutes()/60;
+  // Но ако slider е близо до реалния час (±30мин), показваме и preview
+  const h=Math.abs(currentHour-realH)<0.5 ? realH : currentHour;
+  let upcoming=EVENTS.filter(ev=>dayMatches(ev)&&!ev._fromFlight).filter(ev=>{
+    const diff=ev.endHour-h;
+    return diff>=0.25&&diff<=0.5&&ev.boost>=2.0&&!alertedEvents.has(ev.name+ev.endHour);
+  }).sort((a,b)=>a.endHour-b.endHour);
+  const panel=document.getElementById('event-alert');
+  // затворено веднъж — не се връща
+  var _off = false;
+  try{ _off = sessionStorage.getItem('ea_off') === '1'; }catch(e){}
+  if(_off || panel.dataset.dismissed === '1'){ panel.style.display='none'; return; }
+  // еднократно събитие с минала дата няма какво да съобщава
+  upcoming = upcoming.filter(function(e){
+    if(e.date){ try{ if(e.date < new Date().toISOString().slice(0,10)) return false; }catch(x){} }
+    return e.name && String(e.name).trim().length >= 3;
+  });
+  if(!upcoming.length){panel.style.display='none';return;}
+  const ev=upcoming[0], z=ZONES.find(x=>x.id===ev.zone);
+  if(!z) return;
+  // затвореното известие не се отваря наново до края на сесията
+  var off = false;
+  try{ off = sessionStorage.getItem('ea_off') === '1'; }catch(e){}
+  if(panel.dataset.dismissed === '1' || off){ panel.style.display='none'; return; }
+  // събитие без име не носи информация
+  if(!ev.name || String(ev.name).trim().length < 3){ panel.style.display='none'; return; }
+  const min=Math.round((ev.endHour-h)*60);
+  document.getElementById('ea-icon').textContent=z.icon;
+  document.getElementById('ea-title').textContent=`${ev.name} — след ${min} мин!`;
+  document.getElementById('ea-sub').textContent=`${z.name.split('(')[0].trim()} · ${fmtHour(ev.endHour)}`;
+  document.getElementById('ea-dist').textContent=userLat?`📏 ${(haversine(userLat,userLng,z.lat,z.lng)/1000).toFixed(1)} км`:'';
+  document.getElementById('ea-waze').onclick=()=>openWaze(z.wazeName||z.name, z.lat, z.lng);
+  panel.style.display='block';
+}
+setInterval(checkEventAlerts,60000);
+document.getElementById('event-alert').querySelector('.ea-close').addEventListener('click',()=>{
+  const p=document.getElementById('event-alert');
+  p.style.display='none';
+  p.dataset.dismissed='1';           // повече не се отваря в тази сесия
+  try{ sessionStorage.setItem('ea_off','1'); }catch(e){}
+});
+
+// ═══════════════════════════════════════════════
+// 🎩 БАКШИШ РАДАР
+// Смени и бакшиш score по тип клиент/зона/час
+
+// ═══════════════════════════════════════════════
+// BUS SCHEDULE
+// ═══════════════════════════════════════════════
+let busSchedule = null;
+
+async function loadBuses(){
+  try{
+    const r = await fetch('bus-schedule.json');
+    if(!r.ok) return;
+    busSchedule = await r.json();
+    renderBusPanel();
+    addBusZones();
+  }catch(e){ console.warn('Bus schedule:', e.message); }
+}
+
+function getNextBuses(routeId, count=5){
+  if(!busSchedule) return [];
+  const route = busSchedule.routes.find(r => r.id === routeId);
+  if(!route) return [];
+  const now = new Date();
+  const nowMin = now.getHours()*60 + now.getMinutes();
+  const results = [];
+  for(const dep of route.departures){
+    const [h,m] = dep.split(':').map(Number);
+    const depMin = h*60+m;
+    const diff = depMin - nowMin;
+    if(diff >= -10){ // include buses that left up to 10min ago (may still be picking up)
+      const arrMin = depMin + route.duration_min;
+      results.push({
+        dep, depMin,
+        arr: `${Math.floor(arrMin/60).toString().padStart(2,'0')}:${(arrMin%60).toString().padStart(2,'0')}`,
+        diffMin: diff,
+        route
+      });
+    }
+    if(results.length >= count) break;
+  }
+  return results;
+}
+
+// Всички пристигащи на ЦАС от всички маршрути, сортирани по час на пристигане
+let liveArrivals = null;
+
+async function loadLiveArrivals(){
+  try{
+    const r = await fetch('bus-arrivals.json?v='+Date.now());
+    if(!r.ok) return;
+    const d = await r.json();
+    // валидни само ако са свежи (<100 мин)
+    if(d.updated && (Date.now()-new Date(d.updated).getTime()) < 100*60000){
+      liveArrivals = d;
+    }
+  }catch(e){ /* няма live файл — оставаме на разписание */ }
