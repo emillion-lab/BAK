@@ -1,0 +1,31 @@
+name: Assemble Restored File
+
+on:
+  push:
+    paths:
+      - 'patch/restore/DONE'
+
+permissions:
+  contents: write
+
+jobs:
+  assemble:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Assemble parts into app.js
+        run: |
+          cat patch/restore/part*.txt > app.js
+          node --check app.js
+
+      - name: Clean up and commit
+        run: |
+          git config user.name "patch-bot"
+          git config user.email "actions@users.noreply.github.com"
+          rm -rf patch/restore
+          git add -A
+          git commit -m "Restore app.js from uploaded parts (auto)"
+          git push
