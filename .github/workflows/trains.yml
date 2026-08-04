@@ -62,8 +62,17 @@ jobs:
           git add train-arrivals.json debug/ 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "nothing to commit"
-          else
-            git commit -m "auto: БДЖ пристигащи $(date -u +%H:%M)"
-            git pull --rebase --autostash || true
-            git push
+            exit 0
           fi
+          git commit -m "auto: БДЖ пристигащи $(date -u +%H:%M)"
+          for i in 1 2 3; do
+            git pull --rebase --autostash || true
+            if git push; then
+              echo "pushed on attempt $i"
+              exit 0
+            fi
+            echo "push отхвърлен (опит $i), пробвам пак"
+            sleep $((i * 5))
+          done
+          echo "push се провали след 3 опита"
+          exit 1
