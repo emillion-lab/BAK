@@ -1,10 +1,38 @@
 {
-  "updated": "2026-08-07T20:23:57.115903+03:00",
+  "updated": "2026-08-07T21:22:09.538176+03:00",
   "source": "centralnaavtogara.bg",
   "window_hours": 8,
-  "count": 20,
+  "count": 19,
   "intl_count": 2,
   "arrivals": [
+    {
+      "time": "00:00",
+      "from": "ВАРНА",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "00:00",
+      "from": "СВ.ВЛАС",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "00:00",
+      "from": "АХТОПОЛ",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "00:00",
+      "from": "СЛ.БРЯГ",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
     {
       "time": "00:01",
       "from": "СВ.ВЛАС",
@@ -37,41 +65,6 @@
       "time": "06:40",
       "from": "ПЕТРИЧ",
       "sector": "29",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "20:30",
-      "from": "Г.ДЕЛЧЕВ",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "20:30",
-      "from": "АХТОПОЛ",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "21:00",
-      "from": "ДОБРИЧ",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "21:00",
-      "from": "КЪРДЖАЛИ",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "21:20",
-      "from": "ПЛОВДИВ",
-      "sector": "",
       "operator": "",
       "intl": false
     },
