@@ -1,9 +1,9 @@
 {
-  "updated": "2026-08-07T21:22:09.538176+03:00",
+  "updated": "2026-08-07T22:30:41.848101+03:00",
   "source": "centralnaavtogara.bg",
   "window_hours": 8,
-  "count": 19,
-  "intl_count": 2,
+  "count": 18,
+  "intl_count": 3,
   "arrivals": [
     {
       "time": "00:00",
@@ -32,6 +32,13 @@
       "sector": "",
       "operator": "",
       "intl": false
+    },
+    {
+      "time": "00:00",
+      "from": "КИЕВ",
+      "sector": "",
+      "operator": "",
+      "intl": true
     },
     {
       "time": "00:01",
@@ -69,37 +76,23 @@
       "intl": false
     },
     {
-      "time": "21:30",
-      "from": "КАВАРНА",
-      "sector": "7",
+      "time": "07:00",
+      "from": "РУСЕ",
+      "sector": "9",
       "operator": "",
       "intl": false
     },
     {
-      "time": "22:00",
-      "from": "БУКУРЕЩ",
-      "sector": "9",
+      "time": "07:00",
+      "from": "СКОПИЕ",
+      "sector": "41",
       "operator": "",
       "intl": true
     },
     {
-      "time": "22:30",
-      "from": "АЛБЕНА",
-      "sector": "6",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "22:30",
-      "from": "СЛ.БРЯГ",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "22:30",
-      "from": "ПЛОВДИВ",
-      "sector": "",
+      "time": "07:00",
+      "from": "ЛОМ",
+      "sector": "36",
       "operator": "",
       "intl": false
     },
