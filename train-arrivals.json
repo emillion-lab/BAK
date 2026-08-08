@@ -1,49 +1,65 @@
 {
-  "updated": "2026-08-08T21:53:54.545547+03:00",
+  "updated": "2026-08-09T00:41:34.676767+03:00",
   "source": "live.bdz.bg",
   "station": "София Централна",
-  "count": 5,
-  "far_count": 4,
+  "count": 7,
+  "far_count": 3,
   "arrivals": [
     {
-      "time": "22:10",
-      "from": "Петрич",
-      "train": "БВ 5616",
-      "delay": 2,
-      "tier": "far",
-      "weight": 1.0
+      "time": "05:10",
+      "from": "Перник",
+      "train": "КПВ 50200",
+      "delay": 0,
+      "tier": "near",
+      "weight": 0.35
     },
     {
-      "time": "22:16",
-      "from": "Бургас",
-      "train": "БВ 8612",
-      "delay": 3,
-      "tier": "far",
-      "weight": 1.0
-    },
-    {
-      "time": "22:23",
-      "from": "Варна",
-      "train": "БВ 2616",
-      "delay": 43,
-      "tier": "far",
-      "weight": 1.0
-    },
-    {
-      "time": "22:29",
-      "from": "Бургас",
-      "train": "БВ 3624",
-      "delay": 2,
-      "tier": "far",
-      "weight": 1.0
-    },
-    {
-      "time": "22:36",
-      "from": "Драгоман",
-      "train": "КПВ 10213",
+      "time": "05:25",
+      "from": "Мездра",
+      "train": "КПВ 20200",
       "delay": 2,
       "tier": "mid",
       "weight": 0.5
+    },
+    {
+      "time": "05:46",
+      "from": "Бургас",
+      "train": "БВ 8626",
+      "delay": 1,
+      "tier": "far",
+      "weight": 1.0
+    },
+    {
+      "time": "05:47",
+      "from": "Варна",
+      "train": "БВ 2626",
+      "delay": 2,
+      "tier": "far",
+      "weight": 1.0
+    },
+    {
+      "time": "06:00",
+      "from": "Перник",
+      "train": "КПВ 50202",
+      "delay": 0,
+      "tier": "near",
+      "weight": 0.35
+    },
+    {
+      "time": "06:07",
+      "from": "Варна",
+      "train": "БВ 3636",
+      "delay": 0,
+      "tier": "far",
+      "weight": 1.0
+    },
+    {
+      "time": "06:28",
+      "from": "Септември",
+      "train": "ПВ 10120",
+      "delay": 0,
+      "tier": "mid",
+      "weight": 0.55
     }
   ]
 }
