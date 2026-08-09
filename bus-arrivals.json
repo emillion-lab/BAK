@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-09T22:35:29.721259+03:00",
+  "updated": "2026-08-09T23:36:20.640801+03:00",
   "source": "centralnaavtogara.bg",
   "window_hours": 8,
   "count": 18,
@@ -36,6 +36,20 @@
     {
       "time": "00:00",
       "from": "СЛ.БРЯГ",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "00:00",
+      "from": "КИЕВ",
+      "sector": "",
+      "operator": "",
+      "intl": true
+    },
+    {
+      "time": "00:00",
+      "from": "ПЛОВДИВ",
       "sector": "",
       "operator": "",
       "intl": false
@@ -97,23 +111,9 @@
       "intl": false
     },
     {
-      "time": "23:00",
-      "from": "СВ.ВЛАС",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "23:10",
-      "from": "СКОПИЕ",
-      "sector": "",
-      "operator": "",
-      "intl": true
-    },
-    {
-      "time": "23:30",
-      "from": "СВ.ВЛАС",
-      "sector": "23",
+      "time": "07:01",
+      "from": "ЦАРЕВО",
+      "sector": "25",
       "operator": "",
       "intl": false
     },
