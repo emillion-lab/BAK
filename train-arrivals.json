@@ -1,81 +1,41 @@
 {
-  "updated": "2026-08-12T21:05:11.603318+03:00",
+  "updated": "2026-08-12T22:15:50.701168+03:00",
   "source": "live.bdz.bg",
   "station": "София Централна",
-  "count": 9,
-  "far_count": 6,
+  "count": 4,
+  "far_count": 3,
   "arrivals": [
     {
-      "time": "20:56",
-      "from": "Драгоман",
-      "train": "КПВ 10211",
-      "delay": 6,
-      "tier": "mid",
-      "weight": 0.5
-    },
-    {
-      "time": "21:16",
-      "from": "Кюстендил",
-      "train": "БВ 6622",
-      "delay": 5,
-      "tier": "far",
-      "weight": 0.85
-    },
-    {
-      "time": "21:20",
-      "from": "София Север",
-      "train": "КПВ 20248",
-      "delay": 0,
-      "tier": "mid",
-      "weight": 0.5
-    },
-    {
-      "time": "21:33",
-      "from": "Свиленград",
-      "train": "БВ 1614",
-      "delay": 12,
-      "tier": "far",
-      "weight": 0.85
-    },
-    {
-      "time": "21:48",
-      "from": "Варна",
-      "train": "БВ 2616",
-      "delay": 8,
-      "tier": "far",
-      "weight": 1.0
-    },
-    {
-      "time": "22:18",
+      "time": "22:10",
       "from": "Петрич",
       "train": "БВ 5616",
-      "delay": 10,
+      "delay": 2,
       "tier": "far",
       "weight": 1.0
     },
     {
-      "time": "22:21",
+      "time": "22:17",
       "from": "Бургас",
       "train": "БВ 8612",
-      "delay": 8,
+      "delay": 4,
       "tier": "far",
       "weight": 1.0
     },
     {
-      "time": "22:34",
-      "from": "Драгоман",
-      "train": "КПВ 10213",
-      "delay": 0,
-      "tier": "mid",
-      "weight": 0.5
-    },
-    {
-      "time": "22:44",
+      "time": "22:32",
       "from": "Бургас",
       "train": "БВ 3624",
-      "delay": 17,
+      "delay": 5,
       "tier": "far",
       "weight": 1.0
+    },
+    {
+      "time": "22:39",
+      "from": "Драгоман",
+      "train": "КПВ 10213",
+      "delay": 5,
+      "tier": "mid",
+      "weight": 0.5
     }
   ]
 }
