@@ -1,9 +1,9 @@
 {
-  "updated": "2026-08-12T23:03:08.958174+03:00",
+  "updated": "2026-08-12T23:55:56.384395+03:00",
   "source": "centralnaavtogara.bg",
   "window_hours": 8,
-  "count": 18,
-  "intl_count": 3,
+  "count": 17,
+  "intl_count": 2,
   "arrivals": [
     {
       "time": "00:00",
@@ -43,6 +43,13 @@
     {
       "time": "00:00",
       "from": "ПЛОВДИВ",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "00:00",
+      "from": "ВРАБЕВО",
       "sector": "",
       "operator": "",
       "intl": false
@@ -104,30 +111,16 @@
       "intl": false
     },
     {
-      "time": "23:10",
-      "from": "СКОПИЕ",
-      "sector": "",
-      "operator": "",
-      "intl": true
-    },
-    {
-      "time": "23:30",
-      "from": "СВ.ВЛАС",
-      "sector": "23",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "23:45",
-      "from": "СИНЕМОРЕЦ",
+      "time": "07:01",
+      "from": "ЦАРЕВО",
       "sector": "25",
       "operator": "",
       "intl": false
     },
     {
-      "time": "23:51",
+      "time": "07:30",
       "from": "ВАРНА",
-      "sector": "",
+      "sector": "8",
       "operator": "",
       "intl": false
     }
