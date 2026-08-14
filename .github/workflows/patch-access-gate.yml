@@ -1,0 +1,45 @@
+name: patch-access-gate
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/patch-access-gate.yml'
+      - 'scripts/patch_access_gate.py'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Закачи gate скрипта
+        run: python3 scripts/patch_access_gate.py
+
+      - name: Провери синтаксиса на access-gate.js
+        run: node --check access-gate.js && echo "JS OK"
+
+      - name: Commit
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "няма промяна"
+            exit 0
+          fi
+          git commit -m "index.html: закачен access-gate.js"
+          for i in 1 2 3; do
+            git pull --rebase --autostash || true
+            if git push; then
+              echo "качено от опит $i"
+              exit 0
+            fi
+            sleep $((i * 5))
+          done
+          exit 1
