@@ -1,26 +1,10 @@
 {
-  "updated": "2026-08-15T16:57:10.186064+03:00",
+  "updated": "2026-08-15T17:33:58.828908+03:00",
   "source": "live.bdz.bg",
   "station": "София Централна",
-  "count": 25,
-  "far_count": 11,
+  "count": 23,
+  "far_count": 9,
   "arrivals": [
-    {
-      "time": "17:01",
-      "from": "Карлово",
-      "train": "ПВ 30114",
-      "delay": 19,
-      "tier": "far",
-      "weight": 1.0
-    },
-    {
-      "time": "17:13",
-      "from": "Благоевград",
-      "train": "ПВ 50112",
-      "delay": 5,
-      "tier": "far",
-      "weight": 1.0
-    },
     {
       "time": "17:27",
       "from": "Враца",
@@ -38,34 +22,34 @@
       "weight": 0.35
     },
     {
-      "time": "17:47",
+      "time": "17:45",
       "from": "Драгоман",
       "train": "КПВ 10209",
-      "delay": 14,
+      "delay": 12,
       "tier": "mid",
       "weight": 0.5
     },
     {
-      "time": "17:58",
+      "time": "17:59",
       "from": "Варна",
       "train": "БВ 8650",
-      "delay": 15,
+      "delay": 16,
       "tier": "far",
       "weight": 1.0
     },
     {
-      "time": "18:00",
+      "time": "18:03",
       "from": "Мездра",
       "train": "КПВ 20204",
-      "delay": 8,
+      "delay": 11,
       "tier": "mid",
       "weight": 0.5
     },
     {
-      "time": "18:04",
+      "time": "18:05",
       "from": "Петрич",
       "train": "БВ 5614",
-      "delay": 1,
+      "delay": 2,
       "tier": "far",
       "weight": 1.0
     },
@@ -86,18 +70,18 @@
       "weight": 0.5
     },
     {
-      "time": "19:11",
-      "from": "Лакатник",
-      "train": "КПВ 20226",
-      "delay": 0,
+      "time": "19:10",
+      "from": "Костенец",
+      "train": "КПВ 10226",
+      "delay": 4,
       "tier": "near",
       "weight": 0.35
     },
     {
-      "time": "19:13",
-      "from": "Костенец",
-      "train": "КПВ 10226",
-      "delay": 7,
+      "time": "19:11",
+      "from": "Лакатник",
+      "train": "КПВ 20226",
+      "delay": 0,
       "tier": "near",
       "weight": 0.35
     },
