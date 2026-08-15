@@ -1,55 +1,23 @@
 {
-  "updated": "2026-08-15T17:54:47.815361+03:00",
+  "updated": "2026-08-15T18:31:48.317032+03:00",
   "source": "live.bdz.bg",
   "station": "София Централна",
-  "count": 21,
-  "far_count": 9,
+  "count": 17,
+  "far_count": 7,
   "arrivals": [
     {
-      "time": "17:41",
-      "from": "Драгоман",
-      "train": "КПВ 10209",
-      "delay": 8,
-      "tier": "mid",
-      "weight": 0.5
-    },
-    {
-      "time": "17:59",
-      "from": "Варна",
-      "train": "БВ 8650",
-      "delay": 16,
-      "tier": "far",
-      "weight": 1.0
-    },
-    {
-      "time": "18:03",
-      "from": "Мездра",
-      "train": "КПВ 20204",
-      "delay": 11,
-      "tier": "mid",
-      "weight": 0.5
-    },
-    {
-      "time": "18:07",
-      "from": "Петрич",
-      "train": "БВ 5614",
-      "delay": 4,
-      "tier": "far",
-      "weight": 1.0
-    },
-    {
-      "time": "18:29",
+      "time": "18:30",
       "from": "София Север",
       "train": "КПВ 20244",
-      "delay": 9,
+      "delay": 10,
       "tier": "mid",
       "weight": 0.5
     },
     {
-      "time": "18:47",
+      "time": "18:45",
       "from": "Радомир",
       "train": "КПВ 50210",
-      "delay": 2,
+      "delay": 0,
       "tier": "mid",
       "weight": 0.5
     },
@@ -78,10 +46,10 @@
       "weight": 0.35
     },
     {
-      "time": "20:05",
+      "time": "20:01",
       "from": "Дупница",
       "train": "КПВ 50232",
-      "delay": 4,
+      "delay": 0,
       "tier": "mid",
       "weight": 0.5
     },
@@ -153,7 +121,15 @@
       "time": "22:13",
       "from": "Бургас",
       "train": "БВ 8612",
-      "delay": 1,
+      "delay": 7,
+      "tier": "far",
+      "weight": 1.0
+    },
+    {
+      "time": "22:34",
+      "from": "Бургас",
+      "train": "БВ 3624",
+      "delay": 7,
       "tier": "far",
       "weight": 1.0
     },
@@ -164,14 +140,6 @@
       "delay": 0,
       "tier": "mid",
       "weight": 0.5
-    },
-    {
-      "time": "22:37",
-      "from": "Бургас",
-      "train": "БВ 3624",
-      "delay": 10,
-      "tier": "far",
-      "weight": 1.0
     }
   ]
 }
