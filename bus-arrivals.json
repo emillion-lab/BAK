@@ -1,87 +1,10 @@
 {
-  "updated": "2026-08-15T12:51:05.456382+03:00",
+  "updated": "2026-08-15T13:25:41.195289+03:00",
   "source": "centralnaavtogara.bg",
   "window_hours": 8,
   "count": 20,
   "intl_count": 0,
   "arrivals": [
-    {
-      "time": "13:00",
-      "from": "КРУМОВГРАД",
-      "sector": "34",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "13:00",
-      "from": "ВАРНА",
-      "sector": "7",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "13:00",
-      "from": "ТРОЯН",
-      "sector": "32",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "13:00",
-      "from": "БЯЛА/ВАРНА",
-      "sector": "25",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "13:00",
-      "from": "АХТОПОЛ",
-      "sector": "23",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "13:00",
-      "from": "ВЪРШЕЦ",
-      "sector": "36",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "13:00",
-      "from": "ЛОВЕЧ",
-      "sector": "31",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "13:15",
-      "from": "Г.ДЕЛЧЕВ",
-      "sector": "27",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "13:15",
-      "from": "ЧИПРОВЦИ",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "13:15",
-      "from": "ПЕТРИЧ",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "13:20",
-      "from": "БЛАГОЕВГРАД",
-      "sector": "26",
-      "operator": "",
-      "intl": false
-    },
     {
       "time": "13:30",
       "from": "КОЗЛОДУЙ",
@@ -104,6 +27,20 @@
       "intl": false
     },
     {
+      "time": "13:40",
+      "from": "ЗЛАТОГРАД",
+      "sector": "33",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "13:45",
+      "from": "БЪРДАРСКИ ГЕРАН",
+      "sector": "38",
+      "operator": "",
+      "intl": false
+    },
+    {
       "time": "13:45",
       "from": "ВАРНА",
       "sector": "",
@@ -114,6 +51,55 @@
       "time": "13:50",
       "from": "ПЛОВДИВ",
       "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "14:00",
+      "from": "ВИДИН",
+      "sector": "37",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "14:00",
+      "from": "СЛИВЕН",
+      "sector": "28",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "14:00",
+      "from": "ВАРНА",
+      "sector": "7",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "14:00",
+      "from": "Г.ДЕЛЧЕВ",
+      "sector": "31",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "14:00",
+      "from": "ПЕТРИЧ",
+      "sector": "29",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "14:00",
+      "from": "ПАДИНА",
+      "sector": "34",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "14:00",
+      "from": "БЕЛЕНЕ",
+      "sector": "11",
       "operator": "",
       "intl": false
     },
@@ -141,6 +127,20 @@
     {
       "time": "14:50",
       "from": "ПЛОВДИВ",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "15:00",
+      "from": "БЛАГОЕВГРАД",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "15:02",
+      "from": "КЪРДЖАЛИ",
       "sector": "",
       "operator": "",
       "intl": false
