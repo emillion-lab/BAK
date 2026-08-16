@@ -1,17 +1,10 @@
 {
-  "updated": "2026-08-16T11:33:22.315186+03:00",
+  "updated": "2026-08-16T11:58:42.540900+03:00",
   "source": "centralnaavtogara.bg",
   "window_hours": 8,
   "count": 20,
   "intl_count": 2,
   "arrivals": [
-    {
-      "time": "11:50",
-      "from": "ВАРНА",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
     {
       "time": "12:00",
       "from": "ПЕТРИЧ",
@@ -144,6 +137,13 @@
       "sector": "",
       "operator": "",
       "intl": true
+    },
+    {
+      "time": "12:50",
+      "from": "БУРГАС",
+      "sector": "",
+      "operator": "",
+      "intl": false
     }
   ]
 }
