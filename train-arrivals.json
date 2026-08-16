@@ -1,22 +1,22 @@
 {
-  "updated": "2026-08-16T08:37:45.395577+03:00",
+  "updated": "2026-08-16T08:58:48.607804+03:00",
   "source": "live.bdz.bg",
   "station": "София Централна",
-  "count": 21,
-  "far_count": 10,
+  "count": 24,
+  "far_count": 12,
   "arrivals": [
     {
       "time": "08:56",
-      "from": "Лакатник",
-      "train": "КПВ 20222",
-      "delay": 6,
+      "from": "Перник",
+      "train": "КПВ 50206",
+      "delay": 3,
       "tier": "near",
       "weight": 0.35
     },
     {
-      "time": "08:59",
-      "from": "Перник",
-      "train": "КПВ 50206",
+      "time": "08:56",
+      "from": "Лакатник",
+      "train": "КПВ 20222",
       "delay": 6,
       "tier": "near",
       "weight": 0.35
@@ -46,20 +46,20 @@
       "weight": 1.0
     },
     {
+      "time": "09:57",
+      "from": "Кюстендил",
+      "train": "БВ 6620",
+      "delay": 7,
+      "tier": "far",
+      "weight": 0.85
+    },
+    {
       "time": "09:58",
       "from": "Пловдив",
       "train": "БВ 1620",
       "delay": 4,
       "tier": "far",
       "weight": 1.0
-    },
-    {
-      "time": "10:00",
-      "from": "Кюстендил",
-      "train": "БВ 6620",
-      "delay": 10,
-      "tier": "far",
-      "weight": 0.85
     },
     {
       "time": "10:23",
@@ -108,6 +108,14 @@
       "delay": 0,
       "tier": "near",
       "weight": 0.35
+    },
+    {
+      "time": "12:39",
+      "from": "Димово",
+      "train": "БВ 7621",
+      "delay": 158,
+      "tier": "far",
+      "weight": 0.85
     },
     {
       "time": "12:40",
@@ -166,12 +174,28 @@
       "weight": 0.35
     },
     {
-      "time": "14:25",
-      "from": "Димово",
-      "train": "БВ 7621",
-      "delay": 264,
+      "time": "14:40",
+      "from": "Лакатник",
+      "train": "КПВ 20224",
+      "delay": 0,
+      "tier": "near",
+      "weight": 0.35
+    },
+    {
+      "time": "14:46",
+      "from": "Бургас",
+      "train": "БВ 8610",
+      "delay": 0,
       "tier": "far",
-      "weight": 0.85
+      "weight": 1.0
+    },
+    {
+      "time": "14:53",
+      "from": "Петрич",
+      "train": "БВ 5612",
+      "delay": 0,
+      "tier": "far",
+      "weight": 1.0
     }
   ]
 }
