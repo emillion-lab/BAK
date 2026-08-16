@@ -1,39 +1,15 @@
 {
-  "updated": "2026-08-16T18:53:10.273110+03:00",
+  "updated": "2026-08-16T19:37:18.794665+03:00",
   "source": "live.bdz.bg",
   "station": "София Централна",
-  "count": 16,
+  "count": 13,
   "far_count": 7,
   "arrivals": [
     {
-      "time": "18:51",
-      "from": "Радомир",
-      "train": "КПВ 50210",
-      "delay": 6,
-      "tier": "mid",
-      "weight": 0.5
-    },
-    {
-      "time": "19:07",
-      "from": "Костенец",
-      "train": "КПВ 10226",
-      "delay": 1,
-      "tier": "near",
-      "weight": 0.35
-    },
-    {
-      "time": "19:12",
-      "from": "Лакатник",
-      "train": "КПВ 20226",
-      "delay": 1,
-      "tier": "near",
-      "weight": 0.35
-    },
-    {
-      "time": "19:59",
+      "time": "19:52",
       "from": "Перник",
       "train": "ПВ 10123",
-      "delay": 7,
+      "delay": 0,
       "tier": "near",
       "weight": 0.35
     },
@@ -86,10 +62,10 @@
       "weight": 0.5
     },
     {
-      "time": "21:21",
+      "time": "21:23",
       "from": "Свиленград",
       "train": "БВ 1614",
-      "delay": 0,
+      "delay": 2,
       "tier": "far",
       "weight": 0.85
     },
@@ -97,15 +73,15 @@
       "time": "21:40",
       "from": "Варна",
       "train": "БВ 2616",
-      "delay": 0,
+      "delay": 3,
       "tier": "far",
       "weight": 1.0
     },
     {
-      "time": "22:08",
+      "time": "22:11",
       "from": "Петрич",
       "train": "БВ 5616",
-      "delay": 0,
+      "delay": 3,
       "tier": "far",
       "weight": 1.0
     },
@@ -113,15 +89,7 @@
       "time": "22:13",
       "from": "Бургас",
       "train": "БВ 8612",
-      "delay": 6,
-      "tier": "far",
-      "weight": 1.0
-    },
-    {
-      "time": "22:33",
-      "from": "Бургас",
-      "train": "БВ 3624",
-      "delay": 6,
+      "delay": 8,
       "tier": "far",
       "weight": 1.0
     },
@@ -132,6 +100,14 @@
       "delay": 0,
       "tier": "mid",
       "weight": 0.5
+    },
+    {
+      "time": "22:35",
+      "from": "Бургас",
+      "train": "БВ 3624",
+      "delay": 8,
+      "tier": "far",
+      "weight": 1.0
     }
   ]
 }
