@@ -1,0 +1,51 @@
+name: Patch Waze Fix
+# Поправя PAGE NOT FOUND при навигация от инсталираното BAK PWA.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Приложи патча
+        run: python3 patch_waze_fix.py app.js
+
+      - name: Синтаксис
+        run: node --check app.js && echo "SYNTAX OK"
+
+      - name: Провери резултата
+        run: |
+          if grep -q "https://waze.com/ul" app.js; then
+            echo "ГРЕШКА: остана адрес без www"; exit 1
+          fi
+          grep -q "https://www.waze.com/ul" app.js || { echo "ГРЕШКА: липсва новият адрес"; exit 1; }
+          grep -q "isStandalonePWA" app.js || { echo "ГРЕШКА: липсва проверката за PWA"; exit 1; }
+          if grep -q "ll=' + lat + '%2C'" app.js; then
+            echo "ГРЕШКА: запетаята още е кодирана"; exit 1
+          fi
+          echo "CLEAN"
+
+      - name: Commit
+        run: |
+          git config user.name  "patch-bot"
+          git config user.email "actions@users.noreply.github.com"
+          if git diff --quiet app.js; then
+            echo "no change"
+          else
+            git add app.js
+            git commit -m "waze: www.waze.com, сурова запетая, пряк път в standalone"
+            git fetch origin main && git rebase origin/main || true
+            git push
+          fi
+
+      - name: Готово
+        run: echo "GitHub Pages ще публикува за 2-5 минути. В PWA-то дръпни надолу за презареждане."
