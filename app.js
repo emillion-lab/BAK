@@ -1098,20 +1098,40 @@ function showTransitPopup(zid){
 // ═══ AIRPORT SCHEDULE POPUP ═══
 window.showAirportSchedule = showAirportSchedule;   // вика се от inline onclick → трябва да е глобална
 // ------ Waze: отваря ПРИЛОЖЕНИЕТО, не уеб страницата ------
+/* FT-WAZE-FIX — виж коментара в patch_waze_fix.py */
+window.isStandalonePWA = function(){
+  try{
+    return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)
+        || window.navigator.standalone === true
+        || document.referrer.indexOf('android-app://') === 0;
+  }catch(e){ return false; }
+};
+
+window.wazeUrl = function(name, lat, lng){
+  var hasLL = isFinite(lat) && isFinite(lng);
+  return hasLL
+    ? 'https://www.waze.com/ul?ll=' + lat + ',' + lng + '&navigate=yes&zoom=17'
+    : 'https://www.waze.com/ul?q=' + encodeURIComponent(name || '') + '&navigate=yes';
+};
+
 window.openWaze = function(name, lat, lng){
   var hasLL = isFinite(lat) && isFinite(lng);
   var q   = encodeURIComponent(name || '');
-  // Схемата на самото приложение — не минава през waze.com, който
-  // пренасочва към intent:// и чупи инсталираното PWA.
+  var web = window.wazeUrl(name, lat, lng);
+  if (window.isStandalonePWA()) { openExternal(web); return; }
   var app = hasLL ? 'waze://?ll=' + lat + ',' + lng + '&navigate=yes'
                   : 'waze://?q=' + q + '&navigate=yes';
-  var web = hasLL ? 'https://waze.com/ul?ll=' + lat + '%2C' + lng + '&navigate=yes'
-                  : 'https://waze.com/ul?q=' + q + '&navigate=yes';
   openApp(app, web);
 };
 
 window.openGoogleMaps = function(name, lat, lng){
   var hasLL = isFinite(lat) && isFinite(lng);
+  if (window.isStandalonePWA()) {
+    openExternal(hasLL
+      ? 'https://www.google.com/maps/dir/?api=1&destination=' + lat + ',' + lng + '&travelmode=driving'
+      : 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(name || ''));
+    return;
+  }
   var app = hasLL ? 'geo:' + lat + ',' + lng + '?q=' + lat + ',' + lng
                   : 'geo:0,0?q=' + encodeURIComponent(name || '');
   var web = hasLL
