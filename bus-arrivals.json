@@ -1,45 +1,10 @@
 {
-  "updated": "2026-08-16T16:33:45.301045+03:00",
+  "updated": "2026-08-16T16:55:07.835439+03:00",
   "source": "centralnaavtogara.bg",
   "window_hours": 8,
   "count": 20,
   "intl_count": 1,
   "arrivals": [
-    {
-      "time": "16:40",
-      "from": "БЛАГОЕВГРАД",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "16:45",
-      "from": "Г.ДЕЛЧЕВ",
-      "sector": "30",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "16:45",
-      "from": "ВИДИН",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "16:45",
-      "from": "СВ.ВЛАС",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "16:51",
-      "from": "БУРГАС",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
     {
       "time": "17:00",
       "from": "ГАБРОВО",
@@ -119,6 +84,13 @@
     },
     {
       "time": "17:30",
+      "from": "БЕРКОВИЦА",
+      "sector": "35",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "17:30",
       "from": "ПЛОВДИВ",
       "sector": "",
       "operator": "",
@@ -141,6 +113,34 @@
     {
       "time": "18:20",
       "from": "КНЕЖА",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "18:30",
+      "from": "ПЛОВДИВ",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "18:30",
+      "from": "ХАДЖИДИМОВО",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "18:33",
+      "from": "КОЗЛОДУЙ",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "18:35",
+      "from": "РУСЕ",
       "sector": "",
       "operator": "",
       "intl": false
