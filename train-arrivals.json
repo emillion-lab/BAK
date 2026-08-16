@@ -1,18 +1,10 @@
 {
-  "updated": "2026-08-16T12:37:21.754551+03:00",
+  "updated": "2026-08-16T12:56:13.360931+03:00",
   "source": "live.bdz.bg",
   "station": "София Централна",
   "count": 23,
-  "far_count": 11,
+  "far_count": 10,
   "arrivals": [
-    {
-      "time": "12:39",
-      "from": "Димово",
-      "train": "БВ 7621",
-      "delay": 158,
-      "tier": "far",
-      "weight": 0.85
-    },
     {
       "time": "12:48",
       "from": "Благоевград",
@@ -38,18 +30,18 @@
       "weight": 0.55
     },
     {
-      "time": "13:37",
+      "time": "13:43",
       "from": "София Север",
       "train": "КПВ 20240",
-      "delay": 57,
+      "delay": 63,
       "tier": "mid",
       "weight": 0.5
     },
     {
-      "time": "13:41",
+      "time": "13:54",
       "from": "Димитровград",
       "train": "ПВ 10112",
-      "delay": 49,
+      "delay": 62,
       "tier": "far",
       "weight": 1.0
     },
@@ -102,10 +94,10 @@
       "weight": 0.5
     },
     {
-      "time": "16:06",
+      "time": "15:58",
       "from": "Петрич",
       "train": "БВ 5612",
-      "delay": 73,
+      "delay": 65,
       "tier": "far",
       "weight": 1.0
     },
@@ -185,6 +177,14 @@
       "time": "18:20",
       "from": "София Север",
       "train": "КПВ 20244",
+      "delay": 0,
+      "tier": "mid",
+      "weight": 0.5
+    },
+    {
+      "time": "18:45",
+      "from": "Радомир",
+      "train": "КПВ 50210",
       "delay": 0,
       "tier": "mid",
       "weight": 0.5
