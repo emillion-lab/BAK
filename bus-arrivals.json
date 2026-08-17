@@ -1,119 +1,70 @@
 {
-  "updated": "2026-08-17T16:40:56.377473+03:00",
+  "updated": "2026-08-17T17:30:47.389296+03:00",
   "source": "centralnaavtogara.bg",
   "window_hours": 8,
   "count": 20,
   "intl_count": 1,
   "arrivals": [
     {
-      "time": "16:45",
-      "from": "Г.ДЕЛЧЕВ",
-      "sector": "30",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "16:45",
+      "time": "17:45",
       "from": "ВИДИН",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "16:45",
-      "from": "ХАСКОВО",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "16:45",
-      "from": "СВ.ВЛАС",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "17:00",
-      "from": "ГАБРОВО",
-      "sector": "33",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "17:00",
-      "from": "ШУМЕН",
-      "sector": "7",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "17:00",
-      "from": "РУДОЗЕМ",
-      "sector": "35",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "17:00",
-      "from": "САНДАНСКИ",
-      "sector": "29",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "17:00",
-      "from": "СЛ.БРЯГ",
-      "sector": "23",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "17:00",
-      "from": "ПЛЕВЕН",
-      "sector": "10",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "17:00",
-      "from": "ЛОВЕЧ",
-      "sector": "31",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "17:00",
-      "from": "ОДЕСА",
-      "sector": "42",
-      "operator": "",
-      "intl": true
-    },
-    {
-      "time": "17:00",
-      "from": "ВАРНА",
-      "sector": "8",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "17:00",
-      "from": "БЛАГОЕВГРАД",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "17:30",
-      "from": "ПЛОВДИВ",
-      "sector": "",
+      "sector": "38",
       "operator": "",
       "intl": false
     },
     {
       "time": "18:00",
+      "from": "ПАЗАРДЖИК",
+      "sector": "5",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "18:00",
+      "from": "БЛАГОЕВГРАД",
+      "sector": "26",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "18:00",
+      "from": "ЧИПРОВЦИ",
+      "sector": "36",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "18:00",
+      "from": "КЪРДЖАЛИ",
+      "sector": "35",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "18:00",
+      "from": "ПЛОВДИВ",
+      "sector": "6",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "18:00",
+      "from": "ОДЕСА",
+      "sector": "44",
+      "operator": "",
+      "intl": true
+    },
+    {
+      "time": "18:00",
       "from": "ОРЯХОВО",
       "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "18:10",
+      "from": "ПЛЕВЕН",
+      "sector": "10",
       "operator": "",
       "intl": false
     },
@@ -133,6 +84,20 @@
     },
     {
       "time": "18:30",
+      "from": "СЛИВЕН",
+      "sector": "28",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "18:30",
+      "from": "РУСЕ",
+      "sector": "11",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "18:30",
       "from": "ПЛОВДИВ",
       "sector": "",
       "operator": "",
@@ -141,6 +106,41 @@
     {
       "time": "18:30",
       "from": "ХАДЖИДИМОВО",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "18:33",
+      "from": "КОЗЛОДУЙ",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "18:35",
+      "from": "РУСЕ",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "18:40",
+      "from": "ЗЛАТОГРАД",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "18:50",
+      "from": "АПРИЛЦИ",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "19:00",
+      "from": "ЛОВЕЧ",
       "sector": "",
       "operator": "",
       "intl": false
