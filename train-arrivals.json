@@ -1,18 +1,10 @@
 {
-  "updated": "2026-08-17T20:38:34.368918+03:00",
+  "updated": "2026-08-17T21:01:24.768969+03:00",
   "source": "live.bdz.bg",
   "station": "София Централна",
-  "count": 11,
+  "count": 10,
   "far_count": 7,
   "arrivals": [
-    {
-      "time": "20:46",
-      "from": "София Север",
-      "train": "КПВ 20246",
-      "delay": 24,
-      "tier": "mid",
-      "weight": 0.5
-    },
     {
       "time": "20:50",
       "from": "Карлово",
@@ -46,26 +38,26 @@
       "weight": 0.85
     },
     {
-      "time": "21:39",
+      "time": "21:47",
       "from": "София Север",
       "train": "КПВ 20248",
-      "delay": 19,
+      "delay": 27,
       "tier": "mid",
       "weight": 0.5
     },
     {
-      "time": "21:52",
+      "time": "22:03",
       "from": "Варна",
       "train": "БВ 2616",
-      "delay": 12,
+      "delay": 23,
       "tier": "far",
       "weight": 1.0
     },
     {
-      "time": "22:14",
+      "time": "22:09",
       "from": "Петрич",
       "train": "БВ 5616",
-      "delay": 6,
+      "delay": 1,
       "tier": "far",
       "weight": 1.0
     },
@@ -78,10 +70,10 @@
       "weight": 1.0
     },
     {
-      "time": "22:32",
+      "time": "22:30",
       "from": "Бургас",
       "train": "БВ 3624",
-      "delay": 5,
+      "delay": 3,
       "tier": "far",
       "weight": 1.0
     },
