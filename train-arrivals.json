@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-18T20:37:46.415823+03:00",
+  "updated": "2026-08-18T20:59:00.001106+03:00",
   "source": "live.bdz.bg",
   "station": "София Централна",
   "count": 9,
@@ -49,15 +49,15 @@
       "time": "21:40",
       "from": "Варна",
       "train": "БВ 2616",
-      "delay": 5,
+      "delay": 2,
       "tier": "far",
       "weight": 1.0
     },
     {
-      "time": "22:13",
+      "time": "22:10",
       "from": "Петрич",
       "train": "БВ 5616",
-      "delay": 5,
+      "delay": 2,
       "tier": "far",
       "weight": 1.0
     },
