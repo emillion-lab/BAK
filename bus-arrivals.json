@@ -1,38 +1,10 @@
 {
-  "updated": "2026-08-18T14:27:54.064358+03:00",
+  "updated": "2026-08-18T14:52:22.592794+03:00",
   "source": "centralnaavtogara.bg",
   "window_hours": 8,
   "count": 20,
   "intl_count": 0,
   "arrivals": [
-    {
-      "time": "14:30",
-      "from": "НЕДЕЛИНО",
-      "sector": "34",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "14:30",
-      "from": "СЛИВЕН",
-      "sector": "25",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "14:30",
-      "from": "ДУЛОВО",
-      "sector": "10",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "14:50",
-      "from": "ПЛОВДИВ",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
     {
       "time": "15:00",
       "from": "ВИДИН",
@@ -111,6 +83,27 @@
       "intl": false
     },
     {
+      "time": "15:15",
+      "from": "СВИЛЕНГРАД",
+      "sector": "36",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "15:15",
+      "from": "ПЛОВДИВ",
+      "sector": "6",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "15:15",
+      "from": "ИСКЪР",
+      "sector": "40",
+      "operator": "",
+      "intl": false
+    },
+    {
       "time": "15:20",
       "from": "ЛОВЕЧ",
       "sector": "",
@@ -141,6 +134,13 @@
     {
       "time": "16:00",
       "from": "Г.ДЕЛЧЕВ",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "16:11",
+      "from": "ВАРНА",
       "sector": "",
       "operator": "",
       "intl": false
