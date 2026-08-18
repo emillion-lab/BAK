@@ -1,126 +1,147 @@
 {
-  "updated": "2026-08-17T23:54:49.678036+03:00",
+  "updated": "2026-08-18T07:37:58.818095+03:00",
   "source": "centralnaavtogara.bg",
   "window_hours": 8,
-  "count": 17,
-  "intl_count": 2,
+  "count": 20,
+  "intl_count": 0,
   "arrivals": [
     {
-      "time": "00:00",
-      "from": "ВАРНА",
+      "time": "07:40",
+      "from": "БЕРКОВИЦА",
       "sector": "",
       "operator": "",
       "intl": false
     },
     {
-      "time": "00:00",
-      "from": "СВ.ВЛАС",
+      "time": "07:50",
+      "from": "МОНТАНА",
       "sector": "",
       "operator": "",
       "intl": false
     },
     {
-      "time": "00:00",
-      "from": "АХТОПОЛ",
-      "sector": "",
+      "time": "08:00",
+      "from": "ДУЛОВО",
+      "sector": "9",
       "operator": "",
       "intl": false
     },
     {
-      "time": "00:00",
+      "time": "08:00",
       "from": "СЛ.БРЯГ",
+      "sector": "23",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "08:00",
+      "from": "СМОЛЯН",
+      "sector": "35",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "08:03",
+      "from": "Г.ДЕЛЧЕВ",
       "sector": "",
       "operator": "",
       "intl": false
     },
     {
-      "time": "00:00",
-      "from": "КИЕВ",
-      "sector": "",
-      "operator": "",
-      "intl": true
-    },
-    {
-      "time": "00:00",
-      "from": "ПЛОВДИВ",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "00:00",
-      "from": "ВРАБЕВО",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "00:01",
-      "from": "СВ.ВЛАС",
-      "sector": "24",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "00:02",
-      "from": "АХТОПОЛ",
-      "sector": "26",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "00:30",
-      "from": "ДОБРИЧ",
-      "sector": "7",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "06:30",
-      "from": "ВАРНА",
-      "sector": "7",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "06:40",
+      "time": "08:10",
       "from": "ПЕТРИЧ",
       "sector": "29",
       "operator": "",
       "intl": false
     },
     {
-      "time": "07:00",
-      "from": "РУСЕ",
-      "sector": "9",
+      "time": "08:10",
+      "from": "ПЛОВДИВ",
+      "sector": "6",
       "operator": "",
       "intl": false
     },
     {
-      "time": "07:00",
-      "from": "СКОПИЕ",
-      "sector": "41",
+      "time": "08:10",
+      "from": "ВАРНА",
+      "sector": "",
       "operator": "",
-      "intl": true
+      "intl": false
     },
     {
-      "time": "07:00",
+      "time": "08:15",
+      "from": "КОЗЛОДУЙ",
+      "sector": "39",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "08:15",
+      "from": "СЛИВЕН",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "08:20",
+      "from": "ДРАГАНА",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "08:21",
+      "from": "СЛИВЕН",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "08:30",
+      "from": "ХАДЖИДИМОВО",
+      "sector": "30",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "08:30",
+      "from": "АПРИЛЦИ",
+      "sector": "31",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "08:30",
+      "from": "ВАРНА",
+      "sector": "7",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "08:30",
       "from": "ЛОМ",
       "sector": "36",
       "operator": "",
       "intl": false
     },
     {
-      "time": "07:01",
-      "from": "ЦАРЕВО",
-      "sector": "25",
+      "time": "08:30",
+      "from": "БЛАГОЕВГРАД",
+      "sector": "",
       "operator": "",
       "intl": false
     },
     {
-      "time": "07:30",
-      "from": "ВАРНА",
-      "sector": "8",
+      "time": "08:30",
+      "from": "СИЛИСТРА",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "08:47",
+      "from": "ХАСКОВО",
+      "sector": "",
       "operator": "",
       "intl": false
     }
