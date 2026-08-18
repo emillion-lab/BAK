@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-18T21:41:41.820345+03:00",
+  "updated": "2026-08-18T22:29:39.249247+03:00",
   "source": "centralnaavtogara.bg",
   "window_hours": 8,
   "count": 20,
@@ -83,9 +83,9 @@
       "intl": false
     },
     {
-      "time": "22:00",
-      "from": "БУКУРЕЩ",
-      "sector": "9",
+      "time": "07:00",
+      "from": "СКОПИЕ",
+      "sector": "41",
       "operator": "",
       "intl": true
     },
