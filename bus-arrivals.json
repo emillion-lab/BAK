@@ -1,10 +1,24 @@
 {
-  "updated": "2026-08-19T20:29:07.028401+03:00",
+  "updated": "2026-08-19T20:51:15.637350+03:00",
   "source": "centralnaavtogara.bg",
   "window_hours": 8,
   "count": 20,
   "intl_count": 2,
   "arrivals": [
+    {
+      "time": "00:00",
+      "from": "ВАРНА",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "00:00",
+      "from": "СВ.ВЛАС",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
     {
       "time": "00:01",
       "from": "СВ.ВЛАС",
@@ -37,20 +51,6 @@
       "time": "06:40",
       "from": "ПЕТРИЧ",
       "sector": "29",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "20:30",
-      "from": "Г.ДЕЛЧЕВ",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "20:30",
-      "from": "АХТОПОЛ",
-      "sector": "",
       "operator": "",
       "intl": false
     },
