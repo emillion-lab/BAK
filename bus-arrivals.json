@@ -1,31 +1,10 @@
 {
-  "updated": "2026-08-19T08:33:09.093197+03:00",
+  "updated": "2026-08-19T08:58:25.878507+03:00",
   "source": "centralnaavtogara.bg",
   "window_hours": 8,
   "count": 20,
   "intl_count": 0,
   "arrivals": [
-    {
-      "time": "08:47",
-      "from": "ХАСКОВО",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "08:50",
-      "from": "ВИДИН",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "08:50",
-      "from": "ПЛОВДИВ",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
     {
       "time": "09:00",
       "from": "АХТОПОЛ",
@@ -97,6 +76,20 @@
       "intl": false
     },
     {
+      "time": "09:22",
+      "from": "ПЕТРИЧ",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "09:28",
+      "from": "СЛИВЕН",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
       "time": "09:30",
       "from": "ВИДИН",
       "sector": "38",
@@ -107,6 +100,13 @@
       "time": "09:30",
       "from": "ВАРНА",
       "sector": "7",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "09:30",
+      "from": "БЪРДАРСКИ ГЕРАН",
+      "sector": "",
       "operator": "",
       "intl": false
     },
