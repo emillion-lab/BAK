@@ -1,39 +1,23 @@
 {
-  "updated": "2026-08-19T19:42:34.986023+03:00",
+  "updated": "2026-08-19T20:36:07.375632+03:00",
   "source": "live.bdz.bg",
   "station": "София Централна",
-  "count": 14,
+  "count": 12,
   "far_count": 7,
   "arrivals": [
     {
-      "time": "19:35",
-      "from": "Лакатник",
-      "train": "КПВ 20226",
-      "delay": 24,
-      "tier": "near",
-      "weight": 0.35
-    },
-    {
-      "time": "20:02",
-      "from": "Перник",
-      "train": "ПВ 10123",
-      "delay": 10,
-      "tier": "near",
-      "weight": 0.35
-    },
-    {
-      "time": "20:22",
-      "from": "София Север",
-      "train": "КПВ 20246",
-      "delay": 0,
+      "time": "20:42",
+      "from": "Дупница",
+      "train": "КПВ 50232",
+      "delay": 41,
       "tier": "mid",
       "weight": 0.5
     },
     {
-      "time": "20:48",
-      "from": "Дупница",
-      "train": "КПВ 50232",
-      "delay": 47,
+      "time": "20:44",
+      "from": "София Север",
+      "train": "КПВ 20246",
+      "delay": 22,
       "tier": "mid",
       "weight": 0.5
     },
@@ -46,10 +30,10 @@
       "weight": 1.0
     },
     {
-      "time": "20:56",
+      "time": "21:00",
       "from": "Драгоман",
       "train": "КПВ 10211",
-      "delay": 6,
+      "delay": 10,
       "tier": "mid",
       "weight": 0.5
     },
@@ -62,28 +46,28 @@
       "weight": 0.5
     },
     {
-      "time": "21:24",
+      "time": "21:34",
       "from": "Свиленград",
       "train": "БВ 1614",
-      "delay": 3,
+      "delay": 13,
       "tier": "far",
       "weight": 0.85
     },
     {
-      "time": "21:40",
-      "from": "Варна",
-      "train": "БВ 2616",
-      "delay": 0,
-      "tier": "far",
-      "weight": 1.0
-    },
-    {
-      "time": "21:42",
+      "time": "21:44",
       "from": "Кюстендил",
       "train": "БВ 6622",
-      "delay": 31,
+      "delay": 33,
       "tier": "far",
       "weight": 0.85
+    },
+    {
+      "time": "21:47",
+      "from": "Варна",
+      "train": "БВ 2616",
+      "delay": 7,
+      "tier": "far",
+      "weight": 1.0
     },
     {
       "time": "22:08",
