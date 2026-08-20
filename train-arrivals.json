@@ -1,18 +1,10 @@
 {
-  "updated": "2026-08-20T22:39:23.062480+03:00",
+  "updated": "2026-08-20T23:00:27.812672+03:00",
   "source": "live.bdz.bg",
   "station": "София Централна",
-  "count": 5,
+  "count": 4,
   "far_count": 3,
   "arrivals": [
-    {
-      "time": "22:44",
-      "from": "Драгоман",
-      "train": "КПВ 10213",
-      "delay": 10,
-      "tier": "mid",
-      "weight": 0.5
-    },
     {
       "time": "22:53",
       "from": "Бургас",
@@ -38,10 +30,10 @@
       "weight": 1.0
     },
     {
-      "time": "23:49",
+      "time": "23:48",
       "from": "Христо Даново",
       "train": "ПВ 30116",
-      "delay": 179,
+      "delay": 178,
       "tier": "mid",
       "weight": 0.55
     }
