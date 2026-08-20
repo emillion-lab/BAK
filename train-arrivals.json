@@ -1,87 +1,55 @@
 {
-  "updated": "2026-08-20T21:01:23.184149+03:00",
+  "updated": "2026-08-20T21:55:07.106797+03:00",
   "source": "live.bdz.bg",
   "station": "София Централна",
-  "count": 10,
-  "far_count": 6,
+  "count": 6,
+  "far_count": 4,
   "arrivals": [
     {
-      "time": "20:55",
-      "from": "Драгоман",
-      "train": "КПВ 10211",
-      "delay": 5,
-      "tier": "mid",
-      "weight": 0.5
-    },
-    {
-      "time": "21:20",
-      "from": "София Север",
-      "train": "КПВ 20248",
-      "delay": 0,
-      "tier": "mid",
-      "weight": 0.5
-    },
-    {
-      "time": "21:30",
-      "from": "Кюстендил",
-      "train": "БВ 6622",
-      "delay": 19,
-      "tier": "far",
-      "weight": 0.85
-    },
-    {
-      "time": "21:30",
-      "from": "Свиленград",
-      "train": "БВ 1614",
-      "delay": 9,
-      "tier": "far",
-      "weight": 0.85
-    },
-    {
-      "time": "22:10",
+      "time": "22:08",
       "from": "Петрич",
       "train": "БВ 5616",
-      "delay": 2,
+      "delay": 3,
       "tier": "far",
       "weight": 1.0
     },
     {
-      "time": "22:42",
+      "time": "22:44",
       "from": "Драгоман",
       "train": "КПВ 10213",
-      "delay": 8,
+      "delay": 10,
       "tier": "mid",
       "weight": 0.5
     },
     {
-      "time": "22:50",
+      "time": "22:52",
       "from": "Бургас",
       "train": "БВ 8612",
-      "delay": 37,
+      "delay": 39,
       "tier": "far",
       "weight": 1.0
     },
     {
-      "time": "22:58",
-      "from": "Варна",
-      "train": "БВ 2616",
-      "delay": 78,
-      "tier": "far",
-      "weight": 1.0
-    },
-    {
-      "time": "23:08",
+      "time": "23:09",
       "from": "Бургас",
       "train": "БВ 3624",
-      "delay": 41,
+      "delay": 42,
       "tier": "far",
       "weight": 1.0
     },
     {
-      "time": "23:39",
+      "time": "23:26",
+      "from": "Варна",
+      "train": "БВ 2616",
+      "delay": 106,
+      "tier": "far",
+      "weight": 1.0
+    },
+    {
+      "time": "23:41",
       "from": "Христо Даново",
       "train": "ПВ 30116",
-      "delay": 169,
+      "delay": 171,
       "tier": "mid",
       "weight": 0.55
     }
