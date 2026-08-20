@@ -1,24 +1,10 @@
 {
-  "updated": "2026-08-20T14:00:03.561975+03:00",
+  "updated": "2026-08-20T14:29:15.684061+03:00",
   "source": "centralnaavtogara.bg",
   "window_hours": 8,
   "count": 20,
   "intl_count": 0,
   "arrivals": [
-    {
-      "time": "14:14",
-      "from": "СМОЛЯН",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "14:20",
-      "from": "ПАЗАРДЖИК",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
     {
       "time": "14:30",
       "from": "НЕДЕЛИНО",
@@ -141,6 +127,20 @@
     {
       "time": "15:30",
       "from": "ПЛЕВЕН",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "15:47",
+      "from": "КЪРДЖАЛИ",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "16:00",
+      "from": "Г.ДЕЛЧЕВ",
       "sector": "",
       "operator": "",
       "intl": false
