@@ -1,38 +1,10 @@
 {
-  "updated": "2026-08-21T14:29:23.573354+03:00",
+  "updated": "2026-08-21T14:53:23.893571+03:00",
   "source": "centralnaavtogara.bg",
   "window_hours": 8,
   "count": 20,
   "intl_count": 0,
   "arrivals": [
-    {
-      "time": "14:30",
-      "from": "НЕДЕЛИНО",
-      "sector": "34",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "14:30",
-      "from": "СЛИВЕН",
-      "sector": "25",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "14:30",
-      "from": "ДУЛОВО",
-      "sector": "10",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "14:50",
-      "from": "ПЛОВДИВ",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
     {
       "time": "15:00",
       "from": "ВИДИН",
@@ -84,6 +56,13 @@
     },
     {
       "time": "15:00",
+      "from": "ДРАГАНА",
+      "sector": "5",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "15:00",
       "from": "БЛАГОЕВГРАД",
       "sector": "",
       "operator": "",
@@ -107,6 +86,20 @@
       "time": "15:10",
       "from": "ПЕТРИЧ",
       "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "15:15",
+      "from": "СВИЛЕНГРАД",
+      "sector": "36",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "15:15",
+      "from": "ПЛОВДИВ",
+      "sector": "6",
       "operator": "",
       "intl": false
     },
@@ -141,6 +134,13 @@
     {
       "time": "15:47",
       "from": "КЪРДЖАЛИ",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "16:00",
+      "from": "Г.ДЕЛЧЕВ",
       "sector": "",
       "operator": "",
       "intl": false
