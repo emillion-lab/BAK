@@ -1,9 +1,9 @@
 {
-  "updated": "2026-08-22T08:37:34.874054+03:00",
+  "updated": "2026-08-22T08:58:47.073521+03:00",
   "source": "live.bdz.bg",
   "station": "София Централна",
-  "count": 21,
-  "far_count": 10,
+  "count": 24,
+  "far_count": 12,
   "arrivals": [
     {
       "time": "08:53",
@@ -14,18 +14,18 @@
       "weight": 0.35
     },
     {
-      "time": "09:06",
+      "time": "09:01",
       "from": "Лакатник",
       "train": "КПВ 20222",
-      "delay": 10,
+      "delay": 5,
       "tier": "near",
       "weight": 0.35
     },
     {
-      "time": "09:08",
+      "time": "09:09",
       "from": "Варна",
       "train": "БВ 8656",
-      "delay": 8,
+      "delay": 9,
       "tier": "far",
       "weight": 1.0
     },
@@ -86,10 +86,10 @@
       "weight": 0.5
     },
     {
-      "time": "10:55",
+      "time": "10:57",
       "from": "Свиленград",
       "train": "БВ 1612",
-      "delay": 8,
+      "delay": 2,
       "tier": "far",
       "weight": 0.85
     },
@@ -172,6 +172,30 @@
       "delay": 0,
       "tier": "near",
       "weight": 0.35
+    },
+    {
+      "time": "14:40",
+      "from": "Лакатник",
+      "train": "КПВ 20224",
+      "delay": 4,
+      "tier": "near",
+      "weight": 0.35
+    },
+    {
+      "time": "14:50",
+      "from": "Бургас",
+      "train": "БВ 8610",
+      "delay": 4,
+      "tier": "far",
+      "weight": 1.0
+    },
+    {
+      "time": "14:53",
+      "from": "Петрич",
+      "train": "БВ 5612",
+      "delay": 0,
+      "tier": "far",
+      "weight": 1.0
     }
   ]
 }
