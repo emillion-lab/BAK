@@ -1,9 +1,9 @@
 {
-  "updated": "2026-08-22T21:34:28.241968+03:00",
+  "updated": "2026-08-22T22:00:23.095708+03:00",
   "source": "centralnaavtogara.bg",
   "window_hours": 8,
   "count": 19,
-  "intl_count": 3,
+  "intl_count": 2,
   "arrivals": [
     {
       "time": "00:00",
@@ -76,11 +76,11 @@
       "intl": true
     },
     {
-      "time": "22:00",
-      "from": "БУКУРЕЩ",
-      "sector": "9",
+      "time": "07:00",
+      "from": "ЛОМ",
+      "sector": "36",
       "operator": "",
-      "intl": true
+      "intl": false
     },
     {
       "time": "22:30",
