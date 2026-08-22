@@ -1,42 +1,10 @@
 {
-  "updated": "2026-08-22T09:55:33.136733+03:00",
+  "updated": "2026-08-22T10:39:47.149555+03:00",
   "source": "live.bdz.bg",
   "station": "София Централна",
-  "count": 21,
-  "far_count": 11,
+  "count": 18,
+  "far_count": 8,
   "arrivals": [
-    {
-      "time": "09:59",
-      "from": "Пловдив",
-      "train": "БВ 1620",
-      "delay": 5,
-      "tier": "far",
-      "weight": 1.0
-    },
-    {
-      "time": "10:01",
-      "from": "Видин",
-      "train": "БВ 7621",
-      "delay": 0,
-      "tier": "far",
-      "weight": 1.0
-    },
-    {
-      "time": "10:08",
-      "from": "Кюстендил",
-      "train": "БВ 6620",
-      "delay": 18,
-      "tier": "far",
-      "weight": 0.85
-    },
-    {
-      "time": "10:18",
-      "from": "Петрич",
-      "train": "БВ 5610",
-      "delay": 0,
-      "tier": "far",
-      "weight": 1.0
-    },
     {
       "time": "10:46",
       "from": "Волуяк",
@@ -46,26 +14,26 @@
       "weight": 0.5
     },
     {
-      "time": "10:57",
+      "time": "11:00",
       "from": "Свиленград",
       "train": "БВ 1612",
-      "delay": 2,
+      "delay": 5,
       "tier": "far",
       "weight": 0.85
     },
     {
-      "time": "11:29",
+      "time": "11:25",
       "from": "Бургас",
       "train": "БВ 3620",
-      "delay": 4,
+      "delay": 0,
       "tier": "far",
       "weight": 1.0
     },
     {
-      "time": "11:33",
+      "time": "11:32",
       "from": "Перник",
       "train": "КПВ 50208",
-      "delay": 1,
+      "delay": 0,
       "tier": "near",
       "weight": 0.35
     },
@@ -153,15 +121,15 @@
       "time": "14:53",
       "from": "Петрич",
       "train": "БВ 5612",
-      "delay": 7,
+      "delay": 1,
       "tier": "far",
       "weight": 1.0
     },
     {
-      "time": "15:07",
+      "time": "15:15",
       "from": "Бургас",
       "train": "БВ 3622",
-      "delay": 7,
+      "delay": 15,
       "tier": "far",
       "weight": 1.0
     },
@@ -172,6 +140,14 @@
       "delay": 0,
       "tier": "mid",
       "weight": 0.5
+    },
+    {
+      "time": "16:18",
+      "from": "Пловдив",
+      "train": "БВ 1622",
+      "delay": 3,
+      "tier": "far",
+      "weight": 1.0
     }
   ]
 }
