@@ -1,9 +1,9 @@
 {
-  "updated": "2026-08-22T14:31:07.302593+03:00",
+  "updated": "2026-08-22T14:53:15.156291+03:00",
   "source": "live.bdz.bg",
   "station": "София Централна",
-  "count": 22,
-  "far_count": 8,
+  "count": 24,
+  "far_count": 9,
   "arrivals": [
     {
       "time": "14:54",
@@ -14,18 +14,18 @@
       "weight": 1.0
     },
     {
-      "time": "15:03",
-      "from": "Петрич",
-      "train": "БВ 5612",
-      "delay": 10,
+      "time": "15:12",
+      "from": "Бургас",
+      "train": "БВ 3622",
+      "delay": 12,
       "tier": "far",
       "weight": 1.0
     },
     {
-      "time": "15:14",
-      "from": "Бургас",
-      "train": "БВ 3622",
-      "delay": 14,
+      "time": "15:16",
+      "from": "Петрич",
+      "train": "БВ 5612",
+      "delay": 23,
       "tier": "far",
       "weight": 1.0
     },
@@ -38,10 +38,10 @@
       "weight": 0.5
     },
     {
-      "time": "15:26",
+      "time": "15:44",
       "from": "Лакатник",
       "train": "КПВ 20224",
-      "delay": 46,
+      "delay": 64,
       "tier": "near",
       "weight": 0.35
     },
@@ -70,10 +70,10 @@
       "weight": 0.5
     },
     {
-      "time": "17:16",
+      "time": "17:17",
       "from": "Благоевград",
       "train": "ПВ 50112",
-      "delay": 8,
+      "delay": 9,
       "tier": "far",
       "weight": 1.0
     },
@@ -113,15 +113,15 @@
       "time": "17:52",
       "from": "Мездра",
       "train": "КПВ 20204",
-      "delay": 0,
+      "delay": 1,
       "tier": "mid",
       "weight": 0.5
     },
     {
-      "time": "18:03",
+      "time": "18:04",
       "from": "Петрич",
       "train": "БВ 5614",
-      "delay": 0,
+      "delay": 1,
       "tier": "far",
       "weight": 1.0
     },
@@ -177,6 +177,22 @@
       "time": "20:22",
       "from": "София Север",
       "train": "КПВ 20246",
+      "delay": 0,
+      "tier": "mid",
+      "weight": 0.5
+    },
+    {
+      "time": "20:50",
+      "from": "Карлово",
+      "train": "ПВ 30116",
+      "delay": 0,
+      "tier": "far",
+      "weight": 1.0
+    },
+    {
+      "time": "20:50",
+      "from": "Драгоман",
+      "train": "КПВ 10211",
       "delay": 0,
       "tier": "mid",
       "weight": 0.5
