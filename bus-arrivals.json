@@ -1,31 +1,10 @@
 {
-  "updated": "2026-08-23T14:22:50.840252+03:00",
+  "updated": "2026-08-23T14:47:18.986713+03:00",
   "source": "centralnaavtogara.bg",
   "window_hours": 8,
   "count": 20,
   "intl_count": 0,
   "arrivals": [
-    {
-      "time": "14:30",
-      "from": "НЕДЕЛИНО",
-      "sector": "34",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "14:30",
-      "from": "СЛИВЕН",
-      "sector": "25",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "14:30",
-      "from": "ДУЛОВО",
-      "sector": "10",
-      "operator": "",
-      "intl": false
-    },
     {
       "time": "14:50",
       "from": "ПЛОВДИВ",
@@ -114,6 +93,27 @@
       "time": "15:08",
       "from": "ДУЛОВО",
       "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "15:15",
+      "from": "СВИЛЕНГРАД",
+      "sector": "36",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "15:15",
+      "from": "ПЛОВДИВ",
+      "sector": "6",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "15:15",
+      "from": "ИСКЪР",
+      "sector": "40",
       "operator": "",
       "intl": false
     },
