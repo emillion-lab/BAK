@@ -1,66 +1,10 @@
 {
-  "updated": "2026-08-23T07:48:22.465782+03:00",
+  "updated": "2026-08-23T08:39:04.893117+03:00",
   "source": "live.bdz.bg",
   "station": "София Централна",
-  "count": 27,
-  "far_count": 12,
+  "count": 21,
+  "far_count": 10,
   "arrivals": [
-    {
-      "time": "07:37",
-      "from": "Пловдив",
-      "train": "ПВ 10110",
-      "delay": 0,
-      "tier": "far",
-      "weight": 1.0
-    },
-    {
-      "time": "07:46",
-      "from": "Благоевград",
-      "train": "БВ 5620",
-      "delay": 0,
-      "tier": "far",
-      "weight": 1.0
-    },
-    {
-      "time": "07:46",
-      "from": "Копривщица",
-      "train": "ПВ 30120",
-      "delay": 0,
-      "tier": "mid",
-      "weight": 0.55
-    },
-    {
-      "time": "07:50",
-      "from": "Драгоман",
-      "train": "КПВ 10203",
-      "delay": 0,
-      "tier": "mid",
-      "weight": 0.5
-    },
-    {
-      "time": "08:07",
-      "from": "Банкя",
-      "train": "КПВ 13203",
-      "delay": 0,
-      "tier": "mid",
-      "weight": 0.5
-    },
-    {
-      "time": "08:12",
-      "from": "Перник",
-      "train": "БВ 1611",
-      "delay": 0,
-      "tier": "near",
-      "weight": 0.35
-    },
-    {
-      "time": "08:16",
-      "from": "Мездра",
-      "train": "КПВ 20202",
-      "delay": 0,
-      "tier": "mid",
-      "weight": 0.5
-    },
     {
       "time": "08:53",
       "from": "Перник",
@@ -110,10 +54,10 @@
       "weight": 0.85
     },
     {
-      "time": "09:54",
+      "time": "09:57",
       "from": "Пловдив",
       "train": "БВ 1620",
-      "delay": 0,
+      "delay": 3,
       "tier": "far",
       "weight": 1.0
     },
@@ -142,18 +86,18 @@
       "weight": 0.5
     },
     {
-      "time": "10:58",
+      "time": "10:57",
       "from": "Свиленград",
       "train": "БВ 1612",
-      "delay": 3,
+      "delay": 2,
       "tier": "far",
       "weight": 0.85
     },
     {
-      "time": "11:25",
+      "time": "11:31",
       "from": "Бургас",
       "train": "БВ 3620",
-      "delay": 0,
+      "delay": 6,
       "tier": "far",
       "weight": 1.0
     },
@@ -220,6 +164,14 @@
       "delay": 0,
       "tier": "mid",
       "weight": 0.55
+    },
+    {
+      "time": "14:06",
+      "from": "Перник",
+      "train": "КПВ 50280",
+      "delay": 0,
+      "tier": "near",
+      "weight": 0.35
     }
   ]
 }
