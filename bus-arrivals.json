@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-23T18:48:22.720461+03:00",
+  "updated": "2026-08-23T19:29:05.760320+03:00",
   "source": "centralnaavtogara.bg",
   "window_hours": 8,
   "count": 20,
@@ -13,58 +13,16 @@
       "intl": false
     },
     {
-      "time": "18:50",
-      "from": "ТЕТЕВЕН",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "18:50",
-      "from": "АПРИЛЦИ",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "19:00",
-      "from": "БЛАГОЕВГРАД",
+      "time": "00:02",
+      "from": "АХТОПОЛ",
       "sector": "26",
       "operator": "",
       "intl": false
     },
     {
-      "time": "19:00",
-      "from": "ТЕТЕВЕН",
-      "sector": "30",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "19:00",
-      "from": "БЕЛОГРАДЧИК",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "19:00",
-      "from": "ДИМИТРОВГРАД",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "19:00",
-      "from": "ЛОВЕЧ",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "19:20",
-      "from": "ПЛОВДИВ",
-      "sector": "",
+      "time": "00:30",
+      "from": "ДОБРИЧ",
+      "sector": "7",
       "operator": "",
       "intl": false
     },
@@ -104,9 +62,51 @@
       "intl": false
     },
     {
+      "time": "19:45",
+      "from": "ЛОМ",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "19:45",
+      "from": "ЕЛХОВО",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
       "time": "20:00",
       "from": "ПЛОВДИВ",
       "sector": "6",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "20:00",
+      "from": "ВИДИН",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "20:00",
+      "from": "БУРГАС",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "20:10",
+      "from": "ТРЯВНА",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "20:18",
+      "from": "СМОЛЯН",
+      "sector": "",
       "operator": "",
       "intl": false
     },
