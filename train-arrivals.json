@@ -1,31 +1,15 @@
 {
-  "updated": "2026-08-24T12:27:41.009063+03:00",
+  "updated": "2026-08-24T13:20:14.608892+03:00",
   "source": "live.bdz.bg",
   "station": "София Централна",
-  "count": 24,
+  "count": 25,
   "far_count": 10,
   "arrivals": [
     {
-      "time": "12:19",
-      "from": "Костенец",
-      "train": "КПВ 10222",
-      "delay": 2,
-      "tier": "near",
-      "weight": 0.35
-    },
-    {
-      "time": "12:42",
-      "from": "София Север",
-      "train": "КПВ 20240",
-      "delay": 2,
-      "tier": "mid",
-      "weight": 0.5
-    },
-    {
-      "time": "12:48",
+      "time": "13:11",
       "from": "Благоевград",
       "train": "ПВ 50110",
-      "delay": 0,
+      "delay": 23,
       "tier": "far",
       "weight": 1.0
     },
@@ -46,10 +30,10 @@
       "weight": 1.0
     },
     {
-      "time": "13:43",
+      "time": "13:47",
       "from": "Перник",
       "train": "КПВ 50270",
-      "delay": 12,
+      "delay": 16,
       "tier": "near",
       "weight": 0.35
     },
@@ -65,23 +49,23 @@
       "time": "14:40",
       "from": "Лакатник",
       "train": "КПВ 20224",
-      "delay": 4,
+      "delay": 3,
       "tier": "near",
       "weight": 0.35
     },
     {
-      "time": "14:50",
+      "time": "14:49",
       "from": "Бургас",
       "train": "БВ 8610",
-      "delay": 4,
+      "delay": 3,
       "tier": "far",
       "weight": 1.0
     },
     {
-      "time": "14:53",
+      "time": "14:56",
       "from": "Петрич",
       "train": "БВ 5612",
-      "delay": 5,
+      "delay": 3,
       "tier": "far",
       "weight": 1.0
     },
@@ -118,10 +102,10 @@
       "weight": 1.0
     },
     {
-      "time": "16:42",
+      "time": "16:46",
       "from": "Карлово",
       "train": "ПВ 30114",
-      "delay": 0,
+      "delay": 4,
       "tier": "far",
       "weight": 1.0
     },
@@ -196,6 +180,30 @@
       "delay": 0,
       "tier": "mid",
       "weight": 0.5
+    },
+    {
+      "time": "18:45",
+      "from": "Радомир",
+      "train": "КПВ 50210",
+      "delay": 0,
+      "tier": "mid",
+      "weight": 0.5
+    },
+    {
+      "time": "19:06",
+      "from": "Костенец",
+      "train": "КПВ 10226",
+      "delay": 0,
+      "tier": "near",
+      "weight": 0.35
+    },
+    {
+      "time": "19:11",
+      "from": "Лакатник",
+      "train": "КПВ 20226",
+      "delay": 0,
+      "tier": "near",
+      "weight": 0.35
     }
   ]
 }
