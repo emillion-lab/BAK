@@ -1,8 +1,8 @@
 {
-  "updated": "2026-08-25T23:32:15.671850+03:00",
+  "updated": "2026-08-25T23:57:20.269532+03:00",
   "source": "centralnaavtogara.bg",
   "window_hours": 8,
-  "count": 18,
+  "count": 17,
   "intl_count": 3,
   "arrivals": [
     {
@@ -118,16 +118,9 @@
       "intl": false
     },
     {
-      "time": "23:45",
-      "from": "СИНЕМОРЕЦ",
-      "sector": "25",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "23:51",
+      "time": "07:30",
       "from": "ВАРНА",
-      "sector": "",
+      "sector": "8",
       "operator": "",
       "intl": false
     }
