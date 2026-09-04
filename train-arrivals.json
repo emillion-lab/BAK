@@ -1,151 +1,23 @@
 {
-  "updated": "2026-09-04T15:41:15.184207+03:00",
+  "updated": "2026-09-04T19:49:41.475270+03:00",
   "source": "live.bdz.bg",
   "station": "София Централна",
-  "count": 25,
-  "far_count": 11,
+  "count": 13,
+  "far_count": 8,
   "arrivals": [
     {
-      "time": "15:46",
-      "from": "Бургас",
-      "train": "БВ 3622",
-      "delay": 46,
-      "tier": "far",
-      "weight": 1.0
-    },
-    {
-      "time": "15:49",
-      "from": "Перник",
-      "train": "КПВ 50272",
-      "delay": 9,
-      "tier": "near",
-      "weight": 0.35
-    },
-    {
-      "time": "16:25",
-      "from": "Пловдив",
-      "train": "БВ 1622",
-      "delay": 10,
-      "tier": "far",
-      "weight": 1.0
-    },
-    {
-      "time": "16:45",
-      "from": "Карлово",
-      "train": "ПВ 30114",
-      "delay": 3,
-      "tier": "far",
-      "weight": 1.0
-    },
-    {
-      "time": "16:49",
-      "from": "Волуяк",
-      "train": "КПВ 10215",
-      "delay": 0,
-      "tier": "mid",
-      "weight": 0.5
-    },
-    {
-      "time": "17:18",
-      "from": "Благоевград",
-      "train": "ПВ 50112",
-      "delay": 10,
-      "tier": "far",
-      "weight": 1.0
-    },
-    {
-      "time": "17:34",
-      "from": "Враца",
-      "train": "ПВ 20104",
-      "delay": 7,
-      "tier": "mid",
-      "weight": 0.55
-    },
-    {
-      "time": "17:36",
-      "from": "Костенец",
-      "train": "КПВ 10224",
-      "delay": 9,
-      "tier": "near",
-      "weight": 0.35
-    },
-    {
-      "time": "17:38",
-      "from": "Волуяк",
-      "train": "КПВ 10209",
-      "delay": 14,
-      "tier": "mid",
-      "weight": 0.5
-    },
-    {
-      "time": "17:57",
-      "from": "Варна",
-      "train": "БВ 8650",
-      "delay": 14,
-      "tier": "far",
-      "weight": 1.0
-    },
-    {
-      "time": "18:03",
-      "from": "Мездра",
-      "train": "КПВ 20204",
-      "delay": 11,
-      "tier": "mid",
-      "weight": 0.5
-    },
-    {
-      "time": "18:11",
-      "from": "Петрич",
-      "train": "БВ 5614",
-      "delay": 8,
-      "tier": "far",
-      "weight": 1.0
-    },
-    {
-      "time": "18:31",
-      "from": "София Север",
-      "train": "КПВ 20244",
-      "delay": 11,
-      "tier": "mid",
-      "weight": 0.5
-    },
-    {
-      "time": "18:45",
-      "from": "Радомир",
-      "train": "КПВ 50210",
-      "delay": 0,
-      "tier": "mid",
-      "weight": 0.5
-    },
-    {
-      "time": "19:06",
-      "from": "Костенец",
-      "train": "КПВ 10226",
-      "delay": 0,
-      "tier": "near",
-      "weight": 0.35
-    },
-    {
-      "time": "19:11",
-      "from": "Лакатник",
-      "train": "КПВ 20226",
-      "delay": 0,
-      "tier": "near",
-      "weight": 0.35
-    },
-    {
-      "time": "19:52",
+      "time": "19:58",
       "from": "Перник",
       "train": "ПВ 10123",
-      "delay": 0,
+      "delay": 6,
       "tier": "near",
       "weight": 0.35
     },
     {
-      "time": "20:01",
+      "time": "20:05",
       "from": "Дупница",
       "train": "КПВ 50232",
-      "delay": 0,
+      "delay": 4,
       "tier": "mid",
       "weight": 0.5
     },
@@ -166,10 +38,10 @@
       "weight": 1.0
     },
     {
-      "time": "20:50",
+      "time": "20:53",
       "from": "Драгоман",
       "train": "КПВ 10211",
-      "delay": 0,
+      "delay": 3,
       "tier": "mid",
       "weight": 0.5
     },
@@ -193,17 +65,49 @@
       "time": "21:20",
       "from": "Свиленград",
       "train": "БВ 1614",
-      "delay": 1,
+      "delay": 0,
       "tier": "far",
       "weight": 0.85
     },
     {
-      "time": "21:41",
+      "time": "21:40",
       "from": "Варна",
       "train": "БВ 2616",
-      "delay": 1,
+      "delay": 0,
       "tier": "far",
       "weight": 1.0
+    },
+    {
+      "time": "22:08",
+      "from": "Петрич",
+      "train": "БВ 5616",
+      "delay": 0,
+      "tier": "far",
+      "weight": 1.0
+    },
+    {
+      "time": "22:13",
+      "from": "Бургас",
+      "train": "БВ 8612",
+      "delay": 5,
+      "tier": "far",
+      "weight": 1.0
+    },
+    {
+      "time": "22:32",
+      "from": "Бургас",
+      "train": "БВ 3624",
+      "delay": 5,
+      "tier": "far",
+      "weight": 1.0
+    },
+    {
+      "time": "22:34",
+      "from": "Драгоман",
+      "train": "КПВ 10213",
+      "delay": 0,
+      "tier": "mid",
+      "weight": 0.5
     }
   ]
 }
