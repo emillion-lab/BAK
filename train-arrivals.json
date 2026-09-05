@@ -1,14 +1,14 @@
 {
-  "updated": "2026-09-06T00:09:29.281820+03:00",
+  "updated": "2026-09-06T01:52:45.312047+03:00",
   "source": "live.bdz.bg",
   "station": "София Централна",
-  "count": 6,
-  "far_count": 3,
+  "count": 15,
+  "far_count": 4,
   "arrivals": [
     {
       "time": "05:10",
       "from": "Перник",
-      "train": "SU 50200",
+      "train": "КПВ 50200",
       "delay": 0,
       "tier": "near",
       "weight": 0.35
@@ -16,23 +16,23 @@
     {
       "time": "05:25",
       "from": "Мездра",
-      "train": "SU 20200",
+      "train": "КПВ 20200",
       "delay": 3,
       "tier": "mid",
       "weight": 0.5
     },
     {
-      "time": "05:45",
-      "from": "Бургас",
-      "train": "ICF 8626",
-      "delay": 0,
+      "time": "05:48",
+      "from": "Варна",
+      "train": "БВ 2626",
+      "delay": 3,
       "tier": "far",
       "weight": 1.0
     },
     {
       "time": "05:48",
-      "from": "Варна",
-      "train": "ICF 2626",
+      "from": "Бургас",
+      "train": "БВ 8626",
       "delay": 3,
       "tier": "far",
       "weight": 1.0
@@ -40,18 +40,90 @@
     {
       "time": "06:00",
       "from": "Перник",
-      "train": "SU 50202",
+      "train": "КПВ 50202",
+      "delay": 3,
+      "tier": "near",
+      "weight": 0.35
+    },
+    {
+      "time": "06:10",
+      "from": "Варна",
+      "train": "БВ 3636",
+      "delay": 3,
+      "tier": "far",
+      "weight": 1.0
+    },
+    {
+      "time": "06:28",
+      "from": "Септември",
+      "train": "ПВ 10120",
+      "delay": 0,
+      "tier": "mid",
+      "weight": 0.55
+    },
+    {
+      "time": "06:45",
+      "from": "Дупница",
+      "train": "КПВ 50230",
+      "delay": 0,
+      "tier": "mid",
+      "weight": 0.5
+    },
+    {
+      "time": "06:50",
+      "from": "Драгоман",
+      "train": "КПВ 10201",
+      "delay": 0,
+      "tier": "mid",
+      "weight": 0.5
+    },
+    {
+      "time": "06:50",
+      "from": "Лакатник",
+      "train": "КПВ 20220",
       "delay": 0,
       "tier": "near",
       "weight": 0.35
     },
     {
-      "time": "06:07",
-      "from": "Варна",
-      "train": "ICF 3636",
+      "time": "07:20",
+      "from": "Червен бряг",
+      "train": "ПВ 20100",
+      "delay": 0,
+      "tier": "mid",
+      "weight": 0.55
+    },
+    {
+      "time": "07:23",
+      "from": "Перник",
+      "train": "КПВ 50204",
+      "delay": 0,
+      "tier": "near",
+      "weight": 0.35
+    },
+    {
+      "time": "07:37",
+      "from": "Септември",
+      "train": "ПВ 10110",
+      "delay": 0,
+      "tier": "mid",
+      "weight": 0.55
+    },
+    {
+      "time": "07:46",
+      "from": "Благоевград",
+      "train": "БВ 5620",
       "delay": 0,
       "tier": "far",
       "weight": 1.0
+    },
+    {
+      "time": "07:46",
+      "from": "Копривщица",
+      "train": "ПВ 30120",
+      "delay": 0,
+      "tier": "mid",
+      "weight": 0.55
     }
   ]
 }
