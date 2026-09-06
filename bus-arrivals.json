@@ -1,8 +1,8 @@
 {
-  "updated": "2026-09-06T21:07:32.402765+03:00",
+  "updated": "2026-09-06T23:41:42.631944+03:00",
   "source": "centralnaavtogara.bg",
   "window_hours": 8,
-  "count": 20,
+  "count": 18,
   "intl_count": 3,
   "arrivals": [
     {
@@ -29,6 +29,27 @@
     {
       "time": "00:00",
       "from": "АХТОПОЛ",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "00:00",
+      "from": "СЛ.БРЯГ",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "00:00",
+      "from": "КИЕВ",
+      "sector": "",
+      "operator": "",
+      "intl": true
+    },
+    {
+      "time": "00:00",
+      "from": "ПЛОВДИВ",
       "sector": "",
       "operator": "",
       "intl": false
@@ -76,58 +97,23 @@
       "intl": false
     },
     {
-      "time": "21:20",
-      "from": "ПЛОВДИВ",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "22:00",
-      "from": "БУКУРЕЩ",
-      "sector": "9",
-      "operator": "",
-      "intl": true
-    },
-    {
-      "time": "22:30",
-      "from": "АЛБЕНА",
-      "sector": "6",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "22:30",
-      "from": "СЛ.БРЯГ",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "22:30",
-      "from": "ПЛОВДИВ",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "23:00",
-      "from": "СВ.ВЛАС",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "23:10",
+      "time": "07:00",
       "from": "СКОПИЕ",
-      "sector": "",
+      "sector": "41",
       "operator": "",
       "intl": true
     },
     {
-      "time": "23:30",
-      "from": "СВ.ВЛАС",
-      "sector": "23",
+      "time": "07:00",
+      "from": "ЛОМ",
+      "sector": "36",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "07:01",
+      "from": "ЦАРЕВО",
+      "sector": "25",
       "operator": "",
       "intl": false
     },
