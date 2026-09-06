@@ -1,10 +1,38 @@
 {
-  "updated": "2026-09-06T18:40:14.575594+03:00",
+  "updated": "2026-09-06T21:07:32.402765+03:00",
   "source": "centralnaavtogara.bg",
   "window_hours": 8,
   "count": 20,
-  "intl_count": 1,
+  "intl_count": 3,
   "arrivals": [
+    {
+      "time": "00:00",
+      "from": "ВАРНА",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "00:00",
+      "from": "КИШИНЕВ",
+      "sector": "",
+      "operator": "",
+      "intl": true
+    },
+    {
+      "time": "00:00",
+      "from": "СВ.ВЛАС",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "00:00",
+      "from": "АХТОПОЛ",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
     {
       "time": "00:01",
       "from": "СВ.ВЛАС",
@@ -13,107 +41,44 @@
       "intl": false
     },
     {
-      "time": "18:50",
-      "from": "ТЕТЕВЕН",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "18:50",
-      "from": "АПРИЛЦИ",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "19:00",
-      "from": "БЛАГОЕВГРАД",
+      "time": "00:02",
+      "from": "АХТОПОЛ",
       "sector": "26",
       "operator": "",
       "intl": false
     },
     {
-      "time": "19:00",
-      "from": "ТЕТЕВЕН",
-      "sector": "30",
+      "time": "00:30",
+      "from": "ДОБРИЧ",
+      "sector": "7",
       "operator": "",
       "intl": false
     },
     {
-      "time": "19:00",
-      "from": "БЕЛОГРАДЧИК",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "19:00",
-      "from": "ДИМИТРОВГРАД",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "19:00",
-      "from": "ЛОВЕЧ",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "19:20",
-      "from": "ПЛОВДИВ",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "19:30",
+      "time": "06:30",
       "from": "ВАРНА",
       "sector": "7",
       "operator": "",
       "intl": false
     },
     {
-      "time": "19:30",
-      "from": "ЯМБОЛ",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "19:30",
-      "from": "КОТЕЛ",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "19:30",
-      "from": "ОГНЯНОВО",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "19:45",
+      "time": "06:40",
       "from": "ПЕТРИЧ",
-      "sector": "",
+      "sector": "29",
       "operator": "",
       "intl": false
     },
     {
-      "time": "20:00",
+      "time": "07:00",
+      "from": "РУСЕ",
+      "sector": "9",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "21:20",
       "from": "ПЛОВДИВ",
-      "sector": "6",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "21:30",
-      "from": "КАВАРНА",
-      "sector": "7",
+      "sector": "",
       "operator": "",
       "intl": false
     },
@@ -132,6 +97,34 @@
       "intl": false
     },
     {
+      "time": "22:30",
+      "from": "СЛ.БРЯГ",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "22:30",
+      "from": "ПЛОВДИВ",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "23:00",
+      "from": "СВ.ВЛАС",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "23:10",
+      "from": "СКОПИЕ",
+      "sector": "",
+      "operator": "",
+      "intl": true
+    },
+    {
       "time": "23:30",
       "from": "СВ.ВЛАС",
       "sector": "23",
@@ -142,6 +135,13 @@
       "time": "23:45",
       "from": "СИНЕМОРЕЦ",
       "sector": "25",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "23:51",
+      "from": "ВАРНА",
+      "sector": "",
       "operator": "",
       "intl": false
     }
