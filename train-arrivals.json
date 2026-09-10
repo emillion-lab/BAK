@@ -1,41 +1,81 @@
 {
-  "updated": "2026-09-10T22:35:42.503095+03:00",
+  "updated": "2026-09-11T00:50:34.209684+03:00",
   "source": "live.bdz.bg",
   "station": "София Централна",
-  "count": 4,
-  "far_count": 2,
+  "count": 9,
+  "far_count": 3,
   "arrivals": [
     {
-      "time": "22:22",
-      "from": "Видин",
-      "train": "БВ 7625",
-      "delay": 66,
-      "tier": "far",
-      "weight": 1.0
+      "time": "02:49",
+      "from": "Бели извор",
+      "train": "ПВ 20112",
+      "delay": 387,
+      "tier": "mid",
+      "weight": 0.55
     },
     {
-      "time": "22:34",
-      "from": "Драгоман",
-      "train": "КПВ 10213",
+      "time": "05:10",
+      "from": "Перник",
+      "train": "КПВ 50200",
       "delay": 0,
+      "tier": "near",
+      "weight": 0.35
+    },
+    {
+      "time": "05:25",
+      "from": "Мездра",
+      "train": "КПВ 20200",
+      "delay": 2,
       "tier": "mid",
       "weight": 0.5
     },
     {
-      "time": "22:41",
-      "from": "Бургас",
-      "train": "БВ 3624",
-      "delay": 14,
+      "time": "05:47",
+      "from": "Варна",
+      "train": "БВ 2626",
+      "delay": 2,
       "tier": "far",
       "weight": 1.0
     },
     {
-      "time": "23:13",
-      "from": "Бели извор",
-      "train": "ПВ 20112",
-      "delay": 171,
+      "time": "06:00",
+      "from": "Перник",
+      "train": "КПВ 50202",
+      "delay": 0,
+      "tier": "near",
+      "weight": 0.35
+    },
+    {
+      "time": "06:03",
+      "from": "Бургас",
+      "train": "БВ 8626",
+      "delay": 18,
+      "tier": "far",
+      "weight": 1.0
+    },
+    {
+      "time": "06:07",
+      "from": "Варна",
+      "train": "БВ 3636",
+      "delay": 0,
+      "tier": "far",
+      "weight": 1.0
+    },
+    {
+      "time": "06:28",
+      "from": "Септември",
+      "train": "ПВ 10120",
+      "delay": 0,
       "tier": "mid",
       "weight": 0.55
+    },
+    {
+      "time": "06:45",
+      "from": "Дупница",
+      "train": "КПВ 50230",
+      "delay": 0,
+      "tier": "mid",
+      "weight": 0.5
     }
   ]
 }
