@@ -1,38 +1,10 @@
 {
-  "updated": "2026-09-19T21:44:32.195732+03:00",
+  "updated": "2026-09-20T00:20:39.721232+03:00",
   "source": "centralnaavtogara.bg",
   "window_hours": 8,
   "count": 19,
-  "intl_count": 3,
+  "intl_count": 2,
   "arrivals": [
-    {
-      "time": "00:00",
-      "from": "ВАРНА",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "00:00",
-      "from": "СВ.ВЛАС",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "00:00",
-      "from": "АХТОПОЛ",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "00:00",
-      "from": "СЛ.БРЯГ",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
     {
       "time": "00:30",
       "from": "ДОБРИЧ",
@@ -41,9 +13,44 @@
       "intl": false
     },
     {
+      "time": "00:30",
+      "from": "ДОБРИЧ",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "02:00",
+      "from": "ВАРНА",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "05:21",
+      "from": "ВАРНА",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
       "time": "06:30",
       "from": "ВАРНА",
       "sector": "7",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "06:30",
+      "from": "ВАРНА",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "06:56",
+      "from": "ВАРНА",
+      "sector": "",
       "operator": "",
       "intl": false
     },
@@ -76,6 +83,27 @@
       "intl": false
     },
     {
+      "time": "07:04",
+      "from": "КАВАРНА",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "07:20",
+      "from": "КУБРАТ",
+      "sector": "",
+      "operator": "",
+      "intl": false
+    },
+    {
+      "time": "07:20",
+      "from": "КИЕВ",
+      "sector": "",
+      "operator": "",
+      "intl": true
+    },
+    {
       "time": "07:30",
       "from": "ВАРНА",
       "sector": "8",
@@ -83,58 +111,30 @@
       "intl": false
     },
     {
-      "time": "22:00",
-      "from": "БУКУРЕЩ",
-      "sector": "9",
-      "operator": "",
-      "intl": true
-    },
-    {
-      "time": "22:30",
-      "from": "ВАРНА",
-      "sector": "6",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "22:30",
+      "time": "07:30",
       "from": "СЛ.БРЯГ",
       "sector": "",
       "operator": "",
       "intl": false
     },
     {
-      "time": "22:30",
-      "from": "ПЛОВДИВ",
-      "sector": "",
+      "time": "08:00",
+      "from": "ДУЛОВО",
+      "sector": "9",
       "operator": "",
       "intl": false
     },
     {
-      "time": "23:00",
-      "from": "СВ.ВЛАС",
-      "sector": "",
-      "operator": "",
-      "intl": false
-    },
-    {
-      "time": "23:10",
-      "from": "СКОПИЕ",
-      "sector": "",
-      "operator": "",
-      "intl": true
-    },
-    {
-      "time": "23:30",
-      "from": "СВ.ВЛАС",
+      "time": "08:00",
+      "from": "СЛ.БРЯГ",
       "sector": "23",
       "operator": "",
       "intl": false
     },
     {
-      "time": "23:51",
-      "from": "ВАРНА",
-      "sector": "",
+      "time": "08:00",
+      "from": "СМОЛЯН",
+      "sector": "35",
       "operator": "",
       "intl": false
     }
