@@ -1,7 +1,7 @@
-опит 1: HTTP Error 520: <none>
-опит 2: HTTP Error 520: <none>
-опит 3: HTTP Error 520: <none>
-опит 4: HTTP Error 520: <none>
+опит 1: HTTP Error 403: Forbidden
+опит 2: HTTP Error 403: Forbidden
+опит 3: HTTP Error 403: Forbidden
+опит 4: HTTP Error 403: Forbidden
 EXCEPTION: RuntimeError('proxy не върна пълна страница след 4 опита')
 Traceback (most recent call last):
   File "<stdin>", line 18, in <module>
