@@ -1233,7 +1233,7 @@ function showAirportSchedule() {
   } else {
     const next = visible.find(f=>f._state==='future');
     if(next){
-      html+=`<div style="background:rgba(2,132,199,.1);border:1px solid var(--cyan);border-radius:8px;padding:6px 10px;margin-bottom:8px;font-size:13px;color:var(--cyan)"><b>Следващ: ${fmt(next.exitFromH,next.exitFromM)}</b> · ${next.fn} от ${(next.depAirport||'').slice(0,18)} ${flag(next)}</div>`;
+      html+=`<div style="background:rgba(2,132,199,.1);border:1px solid var(--cyan);border-radius:8px;padding:6px 10px;margin-bottom:8px;font-size:13px;color:var(--cyan)"><b style="color:inherit">Следващ: ${fmt(next.exitFromH,next.exitFromM)}</b> · ${next.fn} от ${(next.depAirport||'').slice(0,18)} ${flag(next)}</div>`;
     } else if(visible.length===0){
       if(airportStatus==='fallback'){
         html+='<div style="color:#f59e0b;padding:10px 0;text-align:center;font-size:12px">⚠️ Няма живи полетни данни — прогнозен режим</div>';
@@ -1295,13 +1295,13 @@ function showAirportSchedule() {
       const op  = isFading ? 'opacity:.88;' : '';
       const isDone = false;
       const anchor = (!anchorSet && (isNow || f._state==='future')) ? (anchorSet=true, ' id="fl-now-anchor"') : '';
-      html+=`<div${anchor}${isNow?' data-now="1"':(isFading?' data-fading="1"':'')} style="display:grid;grid-template-columns:46px 1fr auto;align-items:center;gap:7px;padding:4px 7px;border-radius:7px;background:${bg};border:${brd};margin-bottom:1px;${op}">
+      html+=`<div${anchor}${isNow?' data-now="1"':(isFading?' data-fading="1"':'')} style="display:grid;grid-template-columns:minmax(46px,max-content) minmax(0,1fr) auto;align-items:center;gap:9px;padding:4px 7px;border-radius:7px;background:${bg};border:${brd};margin-bottom:1px;${op}">
         <span style="display:flex;flex-direction:column;line-height:1.05">
           <b style="font-size:11.5px;color:var(--text);white-space:nowrap">${f.fn}</b>
           <span style="font-size:9px;font-weight:800;color:var(--cyan);opacity:.85">Т${f.term}</span>
         </span>
         <span style="min-width:0;overflow:hidden">
-          <span style="display:block;font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.25">${(f.depAirport||'').slice(0,18)}<span style="font-size:9.5px;opacity:.9"> ${fmt(f.schedH,f.schedM)}${
+          <span style="display:block;font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.25">${(f.depAirport||'').slice(0,18)}<span style="font-size:9.5px;opacity:.9">${(f.schedH===f.landH&&f.schedM===f.landM)?'':' '+fmt(f.schedH,f.schedM)}${
             f.delay >= 5  ? `<b style="color:#dc2626">+${f.delay}′</b>` :
             f.delay <= -5 ? `<b style="color:#16a34a">${f.delay}′</b>` : ''
           }</span></span>
@@ -1835,6 +1835,10 @@ function updateAirportBadge(){
   else                              {b.textContent='✈ ОФЛАЙН';  b.style.color='#ef4444';}
 }
 
+window.__fixCity = (function(){
+  var M = {'larnarca':'Larnaca','rodes island':'Rhodes'};
+  return function(n){ var k = String(n||'').trim().toLowerCase(); return M[k] || n; };
+})();
 function loadFlights(){
   // ЖИВО от Worker-а (кеш 15 мин), а качденият файл е само резерва.
   // Разписаните задачи в GitHub се бавят до 2 часа и данните остаряваха.
@@ -1843,6 +1847,8 @@ function loadFlights(){
     .then(function(r){ if(!r.ok) throw 0; return r.json(); })
     .then(function(live){
       if(!live || !live.arrivals || !live.arrivals.length) throw 0;
+      // жив отговор без нито едно скорошно/бъдещо кацане е безполезен → кешът
+      if(!live.arrivals.some(function(a){ var ts=new Date(String(a.revised||a.scheduled||'').replace(' ','T')).getTime(); return isFinite(ts) && ts > Date.now()-60*60000; })) throw 0;
       // привеждаме към формата, който приложението вече разбира
       var data = { data: live.arrivals.map(function(a){
         var sch = (a.scheduled || '').replace(' ', 'T');
@@ -1901,7 +1907,7 @@ function processFlights(data){
         }
         const t=new Date(f.arrival.estimated||f.arrival.scheduled);
         const dep=(f.departure?.airport||f.departure?.country_name||'').toLowerCase();
-        const nonSchengen=dep.match(/tur|istanbul|sabiha|ankar|israel|ben.gurion|dubai|abu.dhabi|egypt|cairo|morocco|casablanca|london|heathrow|gatwick|stansted|luton|manchester|birmingham|usa|jfk|lax|china|beijing|shanghai|russia|moscow|georgia|tbilisi|armenia|yerevan|jordan|amman|serbia|belgrade|ukraine|kyiv|north.mac/);
+        const nonSchengen=dep.match(/turkey|türk|istanbul|sabiha|ankar|antalya|izmir|bodrum|dalaman|israel|tel.aviv|ben.gurion|dubai|abu.dhabi|doha|egypt|cairo|hurghada|sharm|morocco|marrakech|marrakesh|agadir|casablanca|tunis|larnaca|larnarca|paphos|cyprus|dublin|ireland|london|heathrow|gatwick|stansted|luton|manchester|birmingham|edinburgh|glasgow|bristol|liverpool|leeds|newcastle|bournemouth|east.midlands|usa|jfk|lax|china|beijing|shanghai|russia|moscow|georgia|tbilisi|kutaisi|baku|armenia|yerevan|jordan|amman|beirut|serbia|belgrade|ukraine|kyiv|tirana|podgorica|sarajevo|skopje|pristina|chisinau|north.mac/);
         // Exit window (наблюдения): ЕС/Шенген ~10 мин, извън ~15–20 мин след кацане
         // Наблюдение от терена: хората излизат по-бавно от очакваното,
         // затова краят е разтегнат с 5 мин. Ще се калибрира с още данни.
@@ -1920,7 +1926,7 @@ function processFlights(data){
         flightHours[hLast]  = (flightHours[hLast]||0)  + 0.2;
         // Store for popup
         const fn = (f.flight?.iata||'??');
-        const depAirport = f.departure?.airport||dep;
+        const depAirport = (window.__fixCity||function(x){return x})(f.departure?.airport||dep);
         window.__flightDetailsRef = flightDetails;
       flightDetails.push({
           fn, depAirport, nonSchengen:!!nonSchengen,
