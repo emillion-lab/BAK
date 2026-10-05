@@ -1,0 +1,25 @@
+name: patch-flights-merge
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'patch_flights_merge.py'
+      - '.github/workflows/patch-flights-merge.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply patch
+        run: python3 patch_flights_merge.py
+      - name: Syntax check
+        run: node --check app.js
+      - name: Commit
+        run: |
+          git config user.name ui-bot; git config user.email ui-bot@bak
+          git add app.js index.html flights-merge-report.txt 2>/dev/null || true
+          git diff --cached --quiet || (git commit -m "полети: жив+кеш сливане, разделител УТРЕ" && git push)
