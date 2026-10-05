@@ -1281,8 +1281,17 @@ function showAirportSchedule() {
   let anchorSet = false;
   {
     const grp = shownList;
-    let lastHour = -1;
+    let lastHour = -1, lastDay = null;
+    const _today = Math.floor((Date.now()+3*3600000)/86400000);
     grp.forEach(f=>{
+      const _day = Math.floor((f.exitFromTs+3*3600000)/86400000);
+      if(_day !== lastDay){
+        if(lastDay !== null || _day !== _today){
+          const _lbl = _day===_today ? 'ДНЕС' : _day===_today+1 ? 'УТРЕ' : new Date(f.exitFromTs).toLocaleDateString('bg',{day:'numeric',month:'short'});
+          html+=`<div style="font-size:12px;font-weight:900;color:var(--cyan);margin:12px 0 4px;padding:4px 8px;border-top:2px solid var(--cyan);letter-spacing:.5px">${_lbl}</div>`;
+        }
+        lastDay = _day; lastHour = -1;
+      }
       if(f.exitFromH !== lastHour){
         lastHour = f.exitFromH;
         html+=`<div style="font-size:11px;font-weight:800;color:var(--muted);margin:7px 0 3px;padding-left:4px">— ${String(lastHour).padStart(2,'0')}:00 —</div>`;
@@ -1868,8 +1877,23 @@ function loadFlights(){
           _statusRaw: a.status || ''
         };
       })};
-      window.__flightSource = 'живо · ' + data.data.length;
-      processFlights(data);
+      // Живият отговор понякога носи само единия 12-часов прозорец (утрешния).
+      // Допълваме дупките от кеша; ключ = номер + местна дата, защото
+      // ежедневните полети имат един и същ номер днес и утре.
+      return fetch('flight-cache.json?v='+Date.now())
+        .then(function(r){ return r.ok ? r.json() : null; })
+        .catch(function(){ return null; })
+        .then(function(cache){
+          var key = function(f){ return ((f.flight&&f.flight.iata)||'') + '|' + String((f.arrival&&f.arrival.scheduled)||'').slice(0,10); };
+          var seen = {}, liveN = data.data.length, added = 0;
+          data.data.forEach(function(f){ seen[key(f)] = 1; });
+          ((cache && cache.data) || []).forEach(function(f){
+            var k = key(f); if(seen[k] || !(f.flight&&f.flight.iata)) return;
+            seen[k] = 1; data.data.push(f); added++;
+          });
+          window.__flightSource = 'живо · ' + liveN + (added ? ' + кеш ' + added : '');
+          processFlights(data);
+        });
     })
     .catch(function(){
       window.__flightSource = 'кеш';
