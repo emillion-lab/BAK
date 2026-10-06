@@ -1,0 +1,25 @@
+name: patch-struma-marker
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'patch_struma_marker.py'
+      - '.github/workflows/patch-struma-marker.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply patch
+        run: python3 patch_struma_marker.py
+      - name: Syntax check
+        run: node --check app.js
+      - name: Commit
+        run: |
+          git config user.name ui-bot; git config user.email ui-bot@bak
+          git add app.js index.html struma-fix-report.txt 2>/dev/null || true
+          git diff --cached --quiet || (git commit -m "маркер Струма → Автогара Овча купел" && git push)
