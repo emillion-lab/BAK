@@ -1,0 +1,35 @@
+name: diag-struma
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/diag-struma.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Overpass — автогари и пътни възли в Западна София
+        run: |
+          Q='[out:json][timeout:60];(nwr["amenity"="bus_station"](42.64,23.18,42.73,23.34);nwr["highway"="motorway_junction"](42.64,23.18,42.73,23.34);way["highway"="motorway"]["ref"~"A6|А6"](42.64,23.15,42.73,23.30););out center tags;'
+          curl -s -m 90 https://overpass-api.de/api/interpreter --data-urlencode "data=$Q" -o osm.json
+          python3 - <<'EOF' > struma-diag.txt
+          import json
+          d = json.load(open('osm.json'))
+          rows = []
+          for e in d.get('elements', []):
+              c = e.get('center', e); t = e.get('tags', {})
+              rows.append((t.get('amenity') or t.get('highway'), round(c.get('lat',0),5), round(c.get('lon',0),5),
+                           t.get('name') or '', t.get('name:bg') or '', t.get('ref') or ''))
+          for r in sorted(rows): print(' | '.join(str(x) for x in r))
+          EOF
+          cat struma-diag.txt
+      - name: Commit
+        run: |
+          git config user.name ui-bot; git config user.email ui-bot@bak
+          git add struma-diag.txt
+          git diff --cached --quiet || (git commit -m "diag: Струма — OSM координати" && git push)
