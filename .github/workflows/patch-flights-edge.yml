@@ -1,0 +1,23 @@
+name: patch-flights-edge
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'patch_flights_edge.py'
+      - '.github/workflows/patch-flights-edge.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply patch
+        run: python3 patch_flights_edge.py
+      - name: Commit
+        run: |
+          git config user.name ui-bot; git config user.email ui-bot@bak
+          git add index.html flights-edge-report.txt 2>/dev/null || true
+          git diff --cached --quiet || (git commit -m "полети: редовете до десния ръб" && git push)
