@@ -1,0 +1,25 @@
+name: patch-flights-row
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'patch_flights_row.py'
+      - '.github/workflows/patch-flights-row.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply patch
+        run: python3 patch_flights_row.py
+      - name: Syntax check
+        run: node --check app.js
+      - name: Commit
+        run: |
+          git config user.name ui-bot; git config user.email ui-bot@bak
+          git add app.js index.html flights-row-report.txt 2>/dev/null || true
+          git diff --cached --quiet || (git commit -m "полети: градът не се мачка, статус под часовете" && git push)
