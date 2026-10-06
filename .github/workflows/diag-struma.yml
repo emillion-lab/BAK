@@ -14,22 +14,29 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Overpass — автогари и пътни възли в Западна София
+        continue-on-error: true
         run: |
-          Q='[out:json][timeout:60];(nwr["amenity"="bus_station"](42.64,23.18,42.73,23.34);nwr["highway"="motorway_junction"](42.64,23.18,42.73,23.34);way["highway"="motorway"]["ref"~"A6|А6"](42.64,23.15,42.73,23.30););out center tags;'
-          curl -s -m 90 https://overpass-api.de/api/interpreter --data-urlencode "data=$Q" -o osm.json
-          python3 - <<'EOF' > struma-diag.txt
+          Q='[out:json][timeout:60];(nwr["amenity"="bus_station"](42.64,23.18,42.73,23.34);nwr["highway"="motorway_junction"](42.64,23.15,42.73,23.34););out center tags;'
+          for EP in https://overpass-api.de/api/interpreter https://overpass.kumi.systems/api/interpreter https://overpass.private.coffee/api/interpreter; do
+            echo "== $EP" >> struma-diag.txt
+            curl -s -m 90 -A "BAK-diag/1.0 (github.com/emillion-lab/BAK)" "$EP" --data-urlencode "data=$Q" -o osm.json -w "http=%{http_code}\n" >> struma-diag.txt || true
+            if python3 -c "import json;json.load(open('osm.json'))" 2>/dev/null; then
+              python3 -c "
           import json
-          d = json.load(open('osm.json'))
-          rows = []
-          for e in d.get('elements', []):
-              c = e.get('center', e); t = e.get('tags', {})
-              rows.append((t.get('amenity') or t.get('highway'), round(c.get('lat',0),5), round(c.get('lon',0),5),
-                           t.get('name') or '', t.get('name:bg') or '', t.get('ref') or ''))
-          for r in sorted(rows): print(' | '.join(str(x) for x in r))
-          EOF
+          d=json.load(open('osm.json'))
+          for e in sorted(d.get('elements',[]), key=lambda e:(e.get('tags',{}).get('amenity') or e.get('tags',{}).get('highway') or '')):
+              c=e.get('center',e); t=e.get('tags',{})
+              print(t.get('amenity') or t.get('highway'), '|', round(c.get('lat',0),5), '|', round(c.get('lon',0),5), '|', t.get('name',''), '|', t.get('name:bg',''), '|', t.get('ref',''))
+          " >> struma-diag.txt
+              break
+            else
+              head -c 300 osm.json >> struma-diag.txt 2>/dev/null; echo >> struma-diag.txt
+            fi
+          done
           cat struma-diag.txt
       - name: Commit
         run: |
           git config user.name ui-bot; git config user.email ui-bot@bak
+          touch struma-diag.txt
           git add struma-diag.txt
           git diff --cached --quiet || (git commit -m "diag: Струма — OSM координати" && git push)
