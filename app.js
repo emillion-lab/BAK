@@ -1310,7 +1310,7 @@ function showAirportSchedule() {
           <span style="font-size:9px;font-weight:800;color:var(--cyan);opacity:.85">Т${f.term}</span>
         </span>
         <span style="min-width:0;overflow:hidden">
-          <span style="display:block;font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.25">${(f.depAirport||'').slice(0,18)}<span style="font-size:9.5px;opacity:.9">${(f.schedH===f.landH&&f.schedM===f.landM)?'':' '+fmt(f.schedH,f.schedM)}${
+          <span class="fl-city" style="display:block;font-size:12.5px;font-weight:700;color:var(--text);white-space:normal;overflow-wrap:anywhere;line-height:1.15">${(f.depAirport||'').slice(0,24)}<span style="font-size:9.5px;opacity:.9">${(f.schedH===f.landH&&f.schedM===f.landM)?'':' '+fmt(f.schedH,f.schedM)}${
             f.delay >= 5  ? `<b style="color:#dc2626">+${f.delay}′</b>` :
             f.delay <= -5 ? `<b style="color:#16a34a">${f.delay}′</b>` : ''
           }</span></span>
@@ -1319,12 +1319,13 @@ function showAirportSchedule() {
             /approach|en.?route/i.test(f.statusRaw||'') ? ' <span style="color:#0369a1">каца</span>' : ''
           }</span>
         </span>
-        <span style="display:flex;align-items:center;gap:5px;white-space:nowrap">
-          <span style="font-size:12px">${flag(f)}</span>
+        <span class="fl-right" style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;white-space:nowrap">
+          <span style="font-weight:800;font-size:11.5px;color:${col}">${fmt(f.exitFromH,f.exitFromM)}–${fmt(f.exitToH,f.exitToM)}</span>
+          <span style="display:flex;align-items:center;gap:4px">
+          <span style="font-size:11px">${flag(f)}</span>
           ${isNow?'<span style="font-size:9.5px;font-weight:900;color:#ef4444">ИЗЛИЗА</span>':''}
           ${isFading?'<span style="font-size:10px;font-weight:800;color:#dc2626" title="Прозорецът мина, но е възможно още да излизат">???</span>':''}
-
-          <span style="font-weight:800;font-size:11.5px;color:${col}">${fmt(f.exitFromH,f.exitFromM)}–${fmt(f.exitToH,f.exitToM)}</span>
+          </span>
         </span>
       </div>`;
     });
