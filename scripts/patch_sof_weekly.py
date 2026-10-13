@@ -135,15 +135,6 @@ EDITS = [
   "    return `<span style=\"font-size:8.5px;font-weight:800;color:${s[2]};border:1px solid ${s[2]};border-radius:4px;padding:0 3px;margin-right:3px\">${s[0]} ${s[1]}</span>`; };",
   "const srcBadge = f =>"),
 
- ('лента: само радар',
-  "  // Скролируем списък: терминали → часове → полети",
-  "  if(flightDetails.some(f=>f.src==='radar'||f.src==='radar+') && !flightDetails.some(f=>f.src==='live')){\n"
-  "    html+='<div style=\"background:rgba(180,83,9,.10);border:1px solid #b45309;border-radius:8px;padding:6px 10px;margin-bottom:8px;font-size:12px;color:#b45309;line-height:1.4\">'\n"
-  "        +'⚠️ AeroDataBox дава само <b>📡 радар</b> за SOF. Бъдещите са <b>📅 по разписание</b> от предни седмици — може да са отменени или преместени.</div>';\n"
-  "  }\n"
-  "  // Скролируем списък: терминали → часове → полети",
-  "дава само <b>📡 радар</b>"),
-
  ('ред: лява черта по източник',
   "margin-bottom:1px;${op}\">",
   "margin-bottom:1px;${op}${f.src==='weekly'?'border-left:3px dashed #b45309;':(f.src==='radar'||f.src==='radar+')?'border-left:3px solid #0369a1;':''}\">",
@@ -165,8 +156,8 @@ EDITS = [
 
  ('легенда: източници',
   "🔴 излизат сега · бледите още се точат</div>';",
-  "🔴 излизат сега · бледите още се точат<br>✈️ живо · 📡 радар (без разписание) · 📅 по разписание от предни седмици (прогноза) · 🗄 кеш · Т? = терминалът е предположен</div>';",
-  "📅 по разписание от предни седмици (прогноза)"),
+  "🔴 излизат сега · бледите още се точат<br>✈️ живо · 📡 радар · 📅 разписание · 🗄 кеш</div>';",
+  "<br>✈️ живо · 📡 радар · 📅 разписание · 🗄 кеш</div>';"),
 
  ('долен ред: източник',
   "Източник: AeroDataBox · ${flightDetails.length} пристигания",
@@ -197,10 +188,34 @@ EDITS = [
   "    if (_m < 6 || _m > 9 || (_m === 9 && _d > 15)) return false;\n"
   "  }\n",
   "ev.season === 'summer'"),
+ ('басейни: извън сезона вън от картата и топа',
+  "window.ZONES = ZONES;   // ползва се от бутоните за дестинации",
+  "// Открити басейни извън сезона (16.09 – 31.05) са затворени → вън от картата и от топа.\n"
+  "(function(){\n"
+  "  var _m = new Date().getMonth()+1, _d = new Date().getDate();\n"
+  "  if(!(_m < 6 || _m > 9 || (_m === 9 && _d > 15))) return;\n"
+  "  var INDOOR = { pool_sportpalace:1, pool_infinity:1 };\n"
+  "  for(var i = ZONES.length - 1; i >= 0; i--){\n"
+  "    if(/^pool_/.test(ZONES[i].id) && !INDOOR[ZONES[i].id]) ZONES.splice(i, 1);\n"
+  "  }\n"
+  "})();\n"
+  "window.ZONES = ZONES;   // ползва се от бутоните за дестинации",
+  "Открити басейни извън сезона (16.09 – 31.05) са затворени"),
 ]
+
+
+# ── 14.10: махната лента „само радар“ и съкратена легенда (стари версии от 13.10) ──
+OLD_BANNER = ("  if(flightDetails.some(f=>f.src==='radar'||f.src==='radar+') && !flightDetails.some(f=>f.src==='live')){\n"
+  "    html+='<div style=\"background:rgba(180,83,9,.10);border:1px solid #b45309;border-radius:8px;padding:6px 10px;margin-bottom:8px;font-size:12px;color:#b45309;line-height:1.4\">'\n"
+  "        +'⚠️ AeroDataBox дава само <b>📡 радар</b> за SOF. Бъдещите са <b>📅 по разписание</b> от предни седмици — може да са отменени или преместени.</div>';\n"
+  "  }\n")
+OLD_LEGEND = "<br>✈️ живо · 📡 радар (без разписание) · 📅 по разписание от предни седмици (прогноза) · 🗄 кеш · Т? = терминалът е предположен</div>';"
+NEW_LEGEND = "<br>✈️ живо · 📡 радар · 📅 разписание · 🗄 кеш</div>';"
 
 s = open('app.js', encoding='utf-8').read()
 log = []
+if OLD_BANNER in s: s = s.replace(OLD_BANNER, ''); log.append('лента „само радар“: махната')
+if OLD_LEGEND in s: s = s.replace(OLD_LEGEND, NEW_LEGEND); log.append('легенда: съкратена')
 for name, old, new, marker in EDITS:
     if marker in s:
         log.append(f'{name}: вече е приложено'); continue
@@ -219,11 +234,14 @@ else:
 open('app.js', 'w', encoding='utf-8').write(s)
 
 h = open('index.html', encoding='utf-8').read()
-OLD_V, NEW_V = 'app.js?v=20261007v167', 'app.js?v=20261013v168'
-if NEW_V in h: log.append('версия: вече е приложено')
-elif h.count(OLD_V) == 1:
-    h = h.replace(OLD_V, NEW_V); log.append('версия: OK')
-else: log.append('версия: пропусната — index.html вече е на друга версия')
+# нова версия само ако app.js се е променил, за да не остане старият в кеша на телефона
+changed = any(l.endswith(': OK') or 'махната' in l or 'съкратена' in l or 'маркирани' in l for l in log)
+if changed:
+    stamp = 'app.js?v=' + __import__('datetime').date.today().strftime('%Y%m%d') + 's'
+    h2, n = re.subn(r'app\.js\?v=[0-9A-Za-z]+', lambda m: stamp + str(int(__import__('time').time()) % 100000), h, count=1)
+    log.append('версия: OK' if n == 1 else 'версия: ГРЕШКА — няма app.js?v= в index.html'); h = h2
+else:
+    log.append('версия: без промяна')
 open('index.html', 'w', encoding='utf-8').write(h)
 
 open('sof-weekly-report.txt', 'w', encoding='utf-8').write('\n'.join(log) + '\n')
