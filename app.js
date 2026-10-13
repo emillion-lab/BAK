@@ -461,9 +461,9 @@ const EVENTS = [
 
   // Допълнителни болници
   
-  { zone:"pool_spartak",    name:"Басейн Спартак – лятно изтичане",    endHour:18.5, boost:1.5, repeat:"daily" },
-  { zone:"pool_diana",      name:"Басейни Диана – лятно изтичане",     endHour:19.0, boost:1.5, repeat:"daily" },
-  { zone:"pool_akademika",  name:"Басейн Академика – лятно изтичане",  endHour:18.0, boost:1.4, repeat:"daily" },
+  { zone:"pool_spartak",    name:"Басейн Спартак – лятно изтичане",    endHour:18.5, boost:1.5, repeat:"daily", season:"summer" },
+  { zone:"pool_diana",      name:"Басейни Диана – лятно изтичане",     endHour:19.0, boost:1.5, repeat:"daily", season:"summer" },
+  { zone:"pool_akademika",  name:"Басейн Академика – лятно изтичане",  endHour:18.0, boost:1.4, repeat:"daily", season:"summer" },
   { zone:"acibadem_tokuda",  name:"Acibadem Токуда – прегледи",        endHour:9.0,  boost:1.1, repeat:"mon-fri" },
   { zone:"acibadem_cardio",  name:"Acibadem Сърдечно-съдов – прегледи",endHour:9.0,  boost:1.0, repeat:"mon-fri" },
   { zone:"acibadem_mladost", name:"Acibadem Младост – прегледи",       endHour:9.0,  boost:1.1, repeat:"mon-fri" },
@@ -536,6 +536,10 @@ const todayDay = TODAY.getDay();
 })();
 
 function dayMatches(ev) {
+  if (ev.season === 'summer') {
+    const _m = new Date().getMonth()+1, _d = new Date().getDate();
+    if (_m < 6 || _m > 9 || (_m === 9 && _d > 15)) return false;
+  }
   if (ev.date    && ev.date    !== todayStr)  return false;
   if (ev.endDate && todayStr   >  ev.endDate) return false;
   const r = ev.repeat;
@@ -1193,6 +1197,10 @@ function showAirportSchedule() {
 
   const fmt = (h,m) => String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
   const flag = f => f.nonSchengen ? '🛂' : '🇪🇺';
+  const SRC = { live:['✈️','живо','#16a34a'], radar:['📡','радар','#0369a1'], 'radar+':['📡','радар','#0369a1'],
+                weekly:['📅','разписание','#b45309'], cache:['🗄','кеш','#6b7280'] };
+  const srcBadge = f => { const s = SRC[f.src] || SRC.live;
+    return `<span style="font-size:8.5px;font-weight:800;color:${s[2]};border:1px solid ${s[2]};border-radius:4px;padding:0 3px;margin-right:3px">${s[0]} ${s[1]}</span>`; };
 
   // Всички полети по абсолютно време (кешът носи датата — никакви среднощни трикове)
   const nowTs = Date.now();
@@ -1252,6 +1260,10 @@ function showAirportSchedule() {
     }
   }
 
+  if(flightDetails.some(f=>f.src==='radar'||f.src==='radar+') && !flightDetails.some(f=>f.src==='live')){
+    html+='<div style="background:rgba(180,83,9,.10);border:1px solid #b45309;border-radius:8px;padding:6px 10px;margin-bottom:8px;font-size:12px;color:#b45309;line-height:1.4">'
+        +'⚠️ AeroDataBox дава само <b>📡 радар</b> за SOF. Бъдещите са <b>📅 по разписание</b> от предни седмици — може да са отменени или преместени.</div>';
+  }
   // Скролируем списък: терминали → часове → полети
   // ═ Терминал табове (изборът се помни) ═
   let flTerm = 'all';
@@ -1304,19 +1316,19 @@ function showAirportSchedule() {
       const op  = isFading ? 'opacity:.88;' : '';
       const isDone = false;
       const anchor = (!anchorSet && (isNow || f._state==='future')) ? (anchorSet=true, ' id="fl-now-anchor"') : '';
-      html+=`<div${anchor}${isNow?' data-now="1"':(isFading?' data-fading="1"':'')} style="display:grid;grid-template-columns:minmax(46px,max-content) minmax(0,1fr) auto;align-items:center;gap:9px;padding:4px 7px;border-radius:7px;background:${bg};border:${brd};margin-bottom:1px;${op}">
+      html+=`<div${anchor}${isNow?' data-now="1"':(isFading?' data-fading="1"':'')} style="display:grid;grid-template-columns:minmax(46px,max-content) minmax(0,1fr) auto;align-items:center;gap:9px;padding:4px 7px;border-radius:7px;background:${bg};border:${brd};margin-bottom:1px;${op}${f.src==='weekly'?'border-left:3px dashed #b45309;':(f.src==='radar'||f.src==='radar+')?'border-left:3px solid #0369a1;':''}">
         <span style="display:flex;flex-direction:column;line-height:1.05">
           <b style="font-size:11.5px;color:var(--text);white-space:nowrap">${f.fn}</b>
-          <span style="font-size:9px;font-weight:800;color:var(--cyan);opacity:.85">Т${f.term}</span>
+          <span style="font-size:9px;font-weight:800;color:var(--cyan);opacity:.85">Т${f.term}${f.termGuess?'?':''}</span>
         </span>
         <span style="min-width:0;overflow:hidden">
           <span class="fl-city" style="display:block;font-size:12.5px;font-weight:700;color:var(--text);white-space:normal;overflow-wrap:anywhere;line-height:1.15">${(f.depAirport||'').slice(0,24)}<span style="font-size:9.5px;opacity:.9">${(f.schedH===f.landH&&f.schedM===f.landM)?'':' '+fmt(f.schedH,f.schedM)}${
             f.delay >= 5  ? `<b style="color:#dc2626">+${f.delay}′</b>` :
             f.delay <= -5 ? `<b style="color:#16a34a">${f.delay}′</b>` : ''
           }</span></span>
-          <span style="display:block;font-size:10px;color:var(--muted);opacity:.85;white-space:nowrap;line-height:1.2">🛬 ${fmt(f.landH,f.landM)}${
+          <span style="display:block;font-size:10px;color:var(--muted);opacity:.85;white-space:nowrap;line-height:1.2">${srcBadge(f)}🛬 ${fmt(f.landH,f.landM)}${
             /arriv/i.test(f.statusRaw||'')   ? ' <span style="color:#16a34a">кацна</span>' :
-            /approach|en.?route/i.test(f.statusRaw||'') ? ' <span style="color:#0369a1">каца</span>' : ''
+            /approach|en.?route/i.test(f.statusRaw||'') ? ((f.landTs && f.landTs < Date.now()-15*60000) ? ' <span style="color:#16a34a;opacity:.75">~кацна</span>' : ' <span style="color:#0369a1">каца</span>') : ''
           }</span>
         </span>
         <span class="fl-right" style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;white-space:nowrap">
@@ -1332,7 +1344,7 @@ function showAirportSchedule() {
     if(!grp.length) html+='<div style="color:var(--muted);text-align:center;padding:14px 0;font-size:13px">Няма полети за този терминал</div>';
   }
   // легендата е ВЪТРЕ в скрола, за да не се наслагва върху редовете
-  html+='<div style="font-size:10.5px;color:var(--muted);margin-top:10px;padding-top:7px;border-top:1px solid var(--border);line-height:1.5">🇪🇺 Шенген +5–15 мин · 🛂 Извън +10–30 мин · 🔴 излизат сега · бледите още се точат</div>';
+  html+='<div style="font-size:10.5px;color:var(--muted);margin-top:10px;padding-top:7px;border-top:1px solid var(--border);line-height:1.5">🇪🇺 Шенген +5–15 мин · 🛂 Извън +10–30 мин · 🔴 излизат сега · бледите още се точат<br>✈️ живо · 📡 радар (без разписание) · 📅 по разписание от предни седмици (прогноза) · 🗄 кеш · Т? = терминалът е предположен</div>';
   (function(){
     var late = flightDetails.filter(function(x){ return (x.delay||0) >= 15 && x.exitToTs > Date.now(); });
     if(late.length){
@@ -1341,7 +1353,7 @@ function showAirportSchedule() {
         ⏱ ${late.length} ${late.length===1?'полет закъснява':'полета закъсняват'} · най-много ${worst.fn} с +${worst.delay} мин</div>` + html;
     }
   })();
-  html+=`<div style="font-size:10.5px;color:var(--muted);margin-top:5px;line-height:1.45">Източник: AeroDataBox · ${flightDetails.length} пристигания · обновено ${new Date().toLocaleTimeString('bg',{hour:'2-digit',minute:'2-digit'})}</div>`;
+  html+=`<div style="font-size:10.5px;color:var(--muted);margin-top:5px;line-height:1.45">Източник: ${window.__flightSource||'AeroDataBox'} · ${flightDetails.length} пристигания · обновено ${new Date().toLocaleTimeString('bg',{hour:'2-digit',minute:'2-digit'})}</div>`;
   html+='</div>';
   html+='</div>';
 
@@ -1849,6 +1861,91 @@ window.__fixCity = (function(){
   var M = {'larnarca':'Larnaca','rodes island':'Rhodes'};
   return function(n){ var k = String(n||'').trim().toLowerCase(); return M[k] || n; };
 })();
+// ═ SOF седмично разписание (резерва при радарни данни) ═
+// Източници на всеки полет (f._src):
+//   live    — AeroDataBox с разписание и терминал (нормалният случай)
+//   radar   — AeroDataBox само по радар: без разписание, номерът е позивна
+//   radar+  — радарен полет, разпознат в разписанието → истински номер и терминал
+//   weekly  — само от sof-weekly.json (същият ден от предни седмици) = прогноза
+//   cache   — от flight-cache.json
+function __sofOffset(d){
+  try{
+    var s = new Intl.DateTimeFormat('en',{timeZone:'Europe/Sofia',timeZoneName:'shortOffset'})
+      .formatToParts(d).find(function(p){ return p.type==='timeZoneName'; }).value;
+    var m = s.match(/GMT([+-]\d+)/), h = m ? parseInt(m[1],10) : 3;
+    return (h<0?'-':'+') + String(Math.abs(h)).padStart(2,'0') + ':00';
+  }catch(e){ return '+03:00'; }
+}
+function __sofYmd(d){
+  try{ return new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Sofia'}).format(d); }
+  catch(e){ return new Date(d.getTime()+3*3600000).toISOString().slice(0,10); }
+}
+function __cityKey(s){ return String(s||'').toLowerCase().replace(/[^a-zа-я]/g,'').slice(0,5); }
+function mergeWeekly(data){
+  data = data || {data:[]}; data.data = data.data || [];
+  return fetch('sof-weekly.json?v='+Date.now())
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .catch(function(){ return null; })
+    .then(function(wk){
+      var now = Date.now();
+      var tsOf = function(f){ return Date.parse(String((f.arrival&&(f.arrival.estimated||f.arrival.scheduled))||'').replace(' ','T')); };
+      var ex = data.data.map(function(f){
+        if(!f._src) f._src = (f.arrival&&f.arrival.terminal) ? 'live' : 'radar';
+        return { f:f, ts:tsOf(f), fn:((f.flight&&f.flight.iata)||'').toUpperCase(), city:__cityKey(f.departure&&f.departure.airport), used:false };
+      });
+      var nW = 0, nMatch = 0;
+      if(wk && wk.days){
+        [0,1].forEach(function(off){
+          var d = new Date(now + off*86400000), ymd = __sofYmd(d);
+          var wd = new Date(ymd+'T12:00:00Z').getUTCDay();
+          var tz = __sofOffset(new Date(ymd+'T12:00:00Z'));
+          (wk.days[String(wd)] || []).forEach(function(r){
+            var iso = ymd + 'T' + r.t + ':00' + tz, ts = Date.parse(iso);
+            if(!(ts > now - 3*3600000 && ts < now + 21*3600000)) return;
+            var fn = String(r.fn||'').toUpperCase(), ck = __cityKey(r.from);
+            // 1) същият номер (днешното разписание вече го има)
+            var hit = ex.find(function(e){ return e.fn===fn && Math.abs(e.ts-ts) < 3*3600000; });
+            if(hit){
+              if(!hit.f.arrival.terminal){ hit.f.arrival.terminal = r.term; }
+              if(hit.f._src==='radar'){ hit.f._src = 'radar+'; hit.used = true; nMatch++; }
+              return;
+            }
+            // 2) радарен полет от същия град ±40 мин → това е той
+            hit = ex.find(function(e){ return !e.used && e.f._src==='radar' && e.city && e.city===ck && Math.abs(e.ts-ts) <= 40*60000; });
+            if(hit){
+              hit.used = true; nMatch++;
+              hit.f._radarFn = hit.fn; hit.f.flight.iata = fn;
+              hit.f.arrival.terminal = r.term; hit.f._src = 'radar+';
+              return;
+            }
+            nW++;
+            data.data.push({
+              flight:{ iata: fn }, airline:{ name: r.airline||'' },
+              arrival:{ scheduled: iso, estimated: iso, terminal: r.term },
+              departure:{ airport: r.from||'' },
+              flight_status:'scheduled', _delay:0, _statusRaw:'', _src:'weekly'
+            });
+          });
+        });
+      }
+      // радарни без съвпадение: терминал по превозвач (Wizz → Т1, другите → Т2), с „?“
+      ex.forEach(function(e){
+        if(e.f._src!=='radar' || e.f.arrival.terminal) return;
+        var al = ((e.f.airline&&e.f.airline.name)||'') + ' ' + e.fn;
+        e.f.arrival.terminal = /wizz|^W6|\bW6/i.test(al) ? '1' : '2';
+        e.f._termGuess = true;
+      });
+      var c = {live:0, radar:0, cache:0};
+      data.data.forEach(function(f){ var s=f._src||'live'; if(s==='radar+') s='radar'; if(c[s]!==undefined) c[s]++; });
+      var parts = [];
+      if(c.live)  parts.push('✈️ живо ' + c.live);
+      if(c.radar) parts.push('📡 радар ' + c.radar + (nMatch ? ' (' + nMatch + ' разпознати)' : ''));
+      if(nW)      parts.push('📅 разписание ' + nW);
+      if(c.cache) parts.push('🗄 кеш ' + c.cache);
+      window.__flightSource = parts.join(' · ') || 'няма данни';
+      return data;
+    });
+}
 function loadFlights(){
   // ЖИВО от Worker-а (кеш 15 мин), а качденият файл е само резерва.
   // Разписаните задачи в GitHub се бавят до 2 часа и данните остаряваха.
@@ -1875,7 +1972,8 @@ function loadFlights(){
           departure:{ airport: a.from || '' },
           flight_status: (a.status || '').toLowerCase(),
           _delay: dmin,
-          _statusRaw: a.status || ''
+          _statusRaw: a.status || '',
+          _src: a.terminal ? 'live' : 'radar'
         };
       })};
       // Живият отговор понякога носи само единия 12-часов прозорец (утрешния).
@@ -1890,10 +1988,9 @@ function loadFlights(){
           data.data.forEach(function(f){ seen[key(f)] = 1; });
           ((cache && cache.data) || []).forEach(function(f){
             var k = key(f); if(seen[k] || !(f.flight&&f.flight.iata)) return;
-            seen[k] = 1; data.data.push(f); added++;
+            seen[k] = 1; f._src = (f.arrival&&f.arrival.terminal) ? 'cache' : 'radar'; data.data.push(f); added++;
           });
-          window.__flightSource = 'живо · ' + liveN + (added ? ' + кеш ' + added : '');
-          processFlights(data);
+          return mergeWeekly(data).then(processFlights);
         });
     })
     .catch(function(){
@@ -1905,7 +2002,7 @@ function loadFlights(){
 function loadFlightsFromCache(){
   fetch('flight-cache.json?v='+Date.now())
     .then(r=>{if(!r.ok)throw 0;return r.json();})
-    .then(processFlights)
+    .then(function(d){ return mergeWeekly(d).then(processFlights); })
     .catch(e=>{
       window.__flErr = String(e && (e.stack||e.message) || e).slice(0,160);
       applyFallbackAirport(); updateAirportBadge();
@@ -1956,6 +2053,7 @@ function processFlights(data){
       flightDetails.push({
           fn, depAirport, nonSchengen:!!nonSchengen,
           delay: f._delay || 0, statusRaw: f._statusRaw || '',
+          src: f._src || 'live', termGuess: !!f._termGuess, radarFn: f._radarFn || '', landTs: t.getTime(),
           schedH: (function(){ try{ var s=new Date(f.arrival.scheduled); return (s.getUTCHours()+3)%24; }catch(e){ return 0; } })(),
           schedM: (function(){ try{ return new Date(f.arrival.scheduled).getUTCMinutes(); }catch(e){ return 0; } })(),
           term: (f.arrival && f.arrival.terminal) ? String(f.arrival.terminal) : '?',
@@ -3192,6 +3290,9 @@ function toggleMapView(){
     var wknd = (now.getDay()===0 || now.getDay()===6);
     var open = wknd ? h[2] : h[0], close = wknd ? h[3] : h[1];
     var indoor = !!h[4];
+    // открит басейн извън сезона (16.09 – 31.05) е затворен → няма работа
+    var _mo = now.getMonth()+1, _dd = now.getDate();
+    if(!indoor && (_mo < 6 || _mo > 9 || (_mo === 9 && _dd > 15))) return 0;
     var hh = now.getHours() + now.getMinutes()/60;
 
     // Sport Palace не работи в неделя
@@ -3265,6 +3366,8 @@ function toggleMapView(){
 
   function alertTick(){
     if(W.t === null) return;
+    var _m = new Date().getMonth()+1, _d = new Date().getDate();
+    if(_m < 6 || _m > 9 || (_m === 9 && _d > 15)){ chip.style.display='none'; return; }
     var now=new Date(), hh=now.getHours()+now.getMinutes()/60;
     var wknd=(now.getDay()===0||now.getDay()===6);
     // има ли изобщо отворени открити басейни сега?
