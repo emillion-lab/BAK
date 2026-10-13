@@ -1,0 +1,34 @@
+name: patch-toilets
+# 🚻 слой „бързи тоалетни“. Първо таг pre-toilets (резервно копие), после патч.
+# Нови места: само toilets.json, без нов патч.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Резервен таг (само първия път)
+        run: |
+          git rev-parse -q --verify refs/tags/pre-toilets >/dev/null \
+            || { git tag pre-toilets HEAD && git push origin pre-toilets; }
+      - name: Patch
+        run: python3 scripts/patch_toilets.py
+      - name: Syntax check
+        run: |
+          node --check app.js
+          python3 -c "import json; d=json.load(open('toilets.json')); print(len(d['places']), 'места')"
+      - name: Commit
+        run: |
+          git config user.name ui-bot; git config user.email ui-bot@bak
+          git add app.js index.html toilets-report.txt
+          git diff --cached --quiet && exit 0
+          git commit -m "🚻 слой бързи тоалетни (Kaufland, Praktiker, Decathlon Витоша, БПС сграда 10)"
+          for i in 1 2 3; do git pull --rebase --autostash && git push && exit 0; sleep $((i*5)); done
+          exit 1
