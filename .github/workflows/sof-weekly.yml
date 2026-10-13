@@ -1,0 +1,63 @@
+name: sof-weekly
+# SOF: седмично разписание от историята на flight-cache.json + патч на панела.
+# Първото пускане слага таг pre-sof-weekly (резервно копие) ПРЕДИ да пипне app.js.
+# Връщане назад: workflow „restore-pre-sof“.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 2 * * 1'   # понеделник 05:17 BG — опреснява разписанието
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0          # трябва цялата история на flight-cache.json
+
+      - name: Изключен ли е?
+        id: off
+        run: |
+          if [ -f .sof-weekly-off ]; then
+            echo "изключено ($(cat .sof-weekly-off)) — изтрий .sof-weekly-off, за да го пуснеш пак"
+            echo "skip=1" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Резервен таг (само първия път)
+        if: steps.off.outputs.skip != '1'
+        run: |
+          if git rev-parse -q --verify refs/tags/pre-sof-weekly >/dev/null; then
+            echo "тагът вече съществува: $(git rev-parse --short pre-sof-weekly)"
+          else
+            git tag pre-sof-weekly HEAD
+            git push origin pre-sof-weekly
+            echo "резервен таг: $(git rev-parse --short HEAD)"
+          fi
+
+      - name: Сглоби седмичното разписание
+        if: steps.off.outputs.skip != '1'
+        run: python3 scripts/build_sof_weekly.py
+
+      - name: Патч на панела (идемпотентен)
+        if: steps.off.outputs.skip != '1'
+        run: python3 scripts/patch_sof_weekly.py
+
+      - name: Проверка на синтаксиса
+        if: steps.off.outputs.skip != '1'
+        run: node --check app.js
+
+      - name: Commit
+        if: steps.off.outputs.skip != '1'
+        run: |
+          git config user.name ui-bot; git config user.email ui-bot@bak
+          git add app.js index.html sof-weekly.json sof-weekly-report.txt
+          if git diff --cached --quiet; then echo "няма промени"; exit 0; fi
+          git commit -m "SOF: седмично разписание + източник на всеки полет; басейни извън сезона"
+          for i in 1 2 3; do
+            git pull --rebase --autostash && git push && exit 0
+            sleep $((i*5))
+          done
+          exit 1
