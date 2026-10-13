@@ -1,0 +1,36 @@
+name: restore-pre-sof
+# Връща app.js и index.html както бяха преди SOF седмичното разписание
+# (таг pre-sof-weekly). sof-weekly.json остава — без патча никой не го чете.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Върни файловете от тага
+        run: |
+          git rev-parse -q --verify refs/tags/pre-sof-weekly >/dev/null || { echo "няма таг pre-sof-weekly"; exit 1; }
+          git checkout pre-sof-weekly -- app.js index.html
+          # нова версия, за да не остане старият app.js в кеша на телефона
+          sed -i 's/app\.js?v=[0-9a-z]*/app.js?v=20261013r1/' index.html
+          node --check app.js
+          # спира и седмичния cron да не го приложи пак в понеделник
+          echo "изключено с restore-pre-sof на $(date -u +%F)" > .sof-weekly-off
+      - name: Commit
+        run: |
+          git config user.name ui-bot; git config user.email ui-bot@bak
+          git add app.js index.html .sof-weekly-off
+          git diff --cached --quiet && { echo "няма разлика"; exit 0; }
+          git commit -m "restore: app.js и index.html от pre-sof-weekly"
+          for i in 1 2 3; do
+            git pull --rebase --autostash && git push && exit 0
+            sleep $((i*5))
+          done
+          exit 1
