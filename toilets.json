@@ -1,0 +1,31 @@
+{
+  "_info": "Бързи тоалетни за шофьора. Моловете не влизат нарочно (паркиране + влизане отнема много). kind: kaufland | praktiker | decathlon | office | other. hours: формат OSM (Mo-Su 07:00-22:00); празно = неизвестни. Координатите са от OpenStreetMap, 13.10.2026.",
+  "places": [
+    {"kind": "kaufland", "name": "Kaufland Люлин", "addr": "бул. Царица Йоанна 97", "lat": 42.725375, "lng": 23.241565, "hours": "Mo-Su 07:00-22:00"},
+    {"kind": "kaufland", "name": "Kaufland Петър Дертлиев", "addr": "бул. Д-р Петър Дертлиев 56", "lat": 42.710181, "lng": 23.258091, "hours": "Mo-Su 07:00-22:00"},
+    {"kind": "kaufland", "name": "Kaufland Овча купел", "addr": "ул. Кукуряк 3", "lat": 42.683118, "lng": 23.267211, "hours": "Mo-Su 07:00-22:00"},
+    {"kind": "kaufland", "name": "Kaufland Витоша", "addr": "ул. Тодор Каблешков 3", "lat": 42.670388, "lng": 23.273477, "hours": "Mo-Su 07:00-22:00"},
+    {"kind": "kaufland", "name": "Kaufland Надежда", "addr": "ул. Хан Кубрат 61", "lat": 42.727945, "lng": 23.285874, "hours": "Mo-Su 07:00-22:00"},
+    {"kind": "kaufland", "name": "Kaufland Манастирски ливади", "addr": "ул. Васил Стефанов 61", "lat": 42.655307, "lng": 23.287364, "hours": "Mo-Su 07:00-22:00"},
+    {"kind": "kaufland", "name": "Kaufland Крива река", "addr": "бул. Ген. Тотлебен 36", "lat": 42.690125, "lng": 23.301858, "hours": "Mo-Su 07:00-22:00"},
+    {"kind": "kaufland", "name": "Kaufland Банишора", "addr": "", "lat": 42.710957, "lng": 23.302792, "hours": "Mo-Su 07:00-22:00"},
+    {"kind": "kaufland", "name": "Kaufland Военна рампа", "addr": "", "lat": 42.731724, "lng": 23.315999, "hours": "Mo-Su 07:00-22:00"},
+    {"kind": "kaufland", "name": "Kaufland София-Център", "addr": "", "lat": 42.699976, "lng": 23.321924, "hours": "Mo-Su 07:00-22:00"},
+    {"kind": "kaufland", "name": "Kaufland Малинова долина", "addr": "", "lat": 42.64178, "lng": 23.336214, "hours": "Mo-Su 07:00-22:00"},
+    {"kind": "kaufland", "name": "Kaufland Подуяне", "addr": "ул. Проф. Милко Бичев 2", "lat": 42.698833, "lng": 23.347831, "hours": "Mo-Su 07:00-22:00"},
+    {"kind": "kaufland", "name": "Kaufland Хаджи Димитър", "addr": "ул. Резбарска 7Б", "lat": 42.71379, "lng": 23.353623, "hours": "Mo-Su 07:00-22:00"},
+    {"kind": "kaufland", "name": "Kaufland Изгрев", "addr": "", "lat": 42.667756, "lng": 23.364931, "hours": "Mo-Su 07:00-22:00"},
+    {"kind": "kaufland", "name": "Kaufland Младост", "addr": "ул. Филип Аврамов 3", "lat": 42.645965, "lng": 23.379256, "hours": "Mo-Su 07:00-22:00"},
+    {"kind": "kaufland", "name": "Kaufland Слатина", "addr": "", "lat": 42.674502, "lng": 23.383149, "hours": "Mo-Su 07:00-22:00"},
+    {"kind": "kaufland", "name": "Kaufland Младост 4", "addr": "Околовръстен път 271", "lat": 42.624224, "lng": 23.38372, "hours": "Mo-Su 07:00-22:00"},
+    {"kind": "kaufland", "name": "Kaufland Дружба", "addr": "ул. Хайделберг 1", "lat": 42.656301, "lng": 23.399402, "hours": "Mo-Su 07:00-22:00"},
+    {"kind": "kaufland", "name": "Kaufland Горубляне", "addr": "", "lat": 42.634456, "lng": 23.407135, "hours": "Mo-Th 07:00-22:00; Fr 07:00-21:00; Sa-Su 07:00-22:00"},
+    {"kind": "kaufland", "name": "Kaufland Ботевградско шосе", "addr": "бул. Ботевградско шосе 515", "lat": 42.709559, "lng": 23.455268, "hours": "Mo-Su 08:00-21:00"},
+    {"kind": "praktiker", "name": "Praktiker Люлин", "addr": "бул. Панчо Владигеров", "lat": 42.729441, "lng": 23.267218, "hours": "Mo-Sa 08:00-21:00; Su 08:30-20:00"},
+    {"kind": "praktiker", "name": "Praktiker Овча купел", "addr": "бул. Никола Мушанов 149Б", "lat": 42.68808, "lng": 23.277922, "hours": "Mo-Sa 08:00-21:00; Su 08:30-20:00"},
+    {"kind": "praktiker", "name": "Praktiker Витоша", "addr": "Околовръстен път", "lat": 42.626413, "lng": 23.348099, "hours": ""},
+    {"kind": "praktiker", "name": "Praktiker Цариградско шосе", "addr": "бул. Цариградско шосе 323", "lat": 42.640855, "lng": 23.409872, "hours": "Mo-Sa 08:00-21:00; Su 08:30-20:00"},
+    {"kind": "decathlon", "name": "Decathlon Витоша", "addr": "ул. Олимпийска 4", "lat": 42.622574, "lng": 23.366632, "hours": "Mo-Su 10:00-21:00"},
+    {"kind": "office", "name": "Бизнес Парк София — сграда 10", "addr": "Младост 4", "lat": 42.625924, "lng": 23.376606, "hours": "", "note": "офис сграда — часовете не са известни"}
+  ]
+}
