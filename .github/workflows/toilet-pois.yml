@@ -1,0 +1,24 @@
+name: toilet-pois
+# Еднократно: тегли от OpenStreetMap всички Kaufland и Praktiker в София
+# → toilets-osm.json (суровото: toilets-osm-raw.json). Само dispatch.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Overpass → toilets-osm.json
+        run: python3 scripts/fetch_toilet_pois.py | tee toilets-osm-report.txt
+      - name: Commit
+        run: |
+          git config user.name ui-bot; git config user.email ui-bot@bak
+          git add toilets-osm.json toilets-osm-raw.json toilets-osm-report.txt
+          git diff --cached --quiet && exit 0
+          git commit -m "тоалетни: Kaufland и Praktiker от OSM"
+          for i in 1 2 3; do git pull --rebase --autostash && git push && exit 0; sleep $((i*5)); done
+          exit 1
