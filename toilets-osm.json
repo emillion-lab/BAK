@@ -1,0 +1,221 @@
+{
+ "built": "2026-10-13",
+ "osm": [
+  {
+   "kind": "kaufland",
+   "name": "Kaufland",
+   "addr": "бул. Царица Йоанна 97",
+   "lat": 42.725375,
+   "lng": 23.241565,
+   "hours": "Mo-Su 07:00-22:00",
+   "osm": "way/1201109017"
+  },
+  {
+   "kind": "kaufland",
+   "name": "Kaufland",
+   "addr": "бул. Д-р Петър Дертлиев 56",
+   "lat": 42.710181,
+   "lng": 23.258091,
+   "hours": "Mo-Su 07:00-22:00",
+   "osm": "way/178660975"
+  },
+  {
+   "kind": "kaufland",
+   "name": "Kaufland",
+   "addr": "Кукуряк 3",
+   "lat": 42.683118,
+   "lng": 23.267211,
+   "hours": "Mo-Su 07:00-22:00",
+   "osm": "way/293882184"
+  },
+  {
+   "kind": "kaufland",
+   "name": "Kaufland",
+   "addr": "Тодор Каблешков 3",
+   "lat": 42.670388,
+   "lng": 23.273477,
+   "hours": "Mo-Su 07:00-22:00",
+   "osm": "way/166213061"
+  },
+  {
+   "kind": "kaufland",
+   "name": "Kaufland",
+   "addr": "Хан Кубрат 61",
+   "lat": 42.727945,
+   "lng": 23.285874,
+   "hours": "Mo-Su 07:00-22:00",
+   "osm": "way/146542080"
+  },
+  {
+   "kind": "kaufland",
+   "name": "Kaufland",
+   "addr": "Васил Стефанов 61",
+   "lat": 42.655307,
+   "lng": 23.287364,
+   "hours": "Mo-Su 07:00-22:00",
+   "osm": "way/1199513638"
+  },
+  {
+   "kind": "kaufland",
+   "name": "Kaufland",
+   "addr": "бул. Ген. Тотлебен 36",
+   "lat": 42.690125,
+   "lng": 23.301858,
+   "hours": "Mo-Su 07:00-22:00",
+   "osm": "way/443185153"
+  },
+  {
+   "kind": "kaufland",
+   "name": "Kaufland",
+   "addr": "",
+   "lat": 42.710957,
+   "lng": 23.302792,
+   "hours": "Mo-Su 07:00-22:00",
+   "osm": "way/147119718"
+  },
+  {
+   "kind": "kaufland",
+   "name": "Kaufland",
+   "addr": "",
+   "lat": 42.731724,
+   "lng": 23.315999,
+   "hours": "Mo-Su 07:00-22:00",
+   "osm": "way/1421682040"
+  },
+  {
+   "kind": "kaufland",
+   "name": "Kaufland",
+   "addr": "",
+   "lat": 42.699976,
+   "lng": 23.321924,
+   "hours": "Mo-Su 07:00-22:00",
+   "osm": "node/14166786832"
+  },
+  {
+   "kind": "kaufland",
+   "name": "Kaufland",
+   "addr": "",
+   "lat": 42.64178,
+   "lng": 23.336214,
+   "hours": "Mo-Su 07:00-22:00",
+   "osm": "node/3766181129"
+  },
+  {
+   "kind": "kaufland",
+   "name": "Kaufland",
+   "addr": "Проф. Милко Бичев 2",
+   "lat": 42.698833,
+   "lng": 23.347831,
+   "hours": "Mo-Su 07:00-22:00",
+   "osm": "node/13370554738"
+  },
+  {
+   "kind": "kaufland",
+   "name": "Kaufland",
+   "addr": "Резбарска 7Б",
+   "lat": 42.71379,
+   "lng": 23.353623,
+   "hours": "Mo-Su 07:00-22:00",
+   "osm": "way/245791985"
+  },
+  {
+   "kind": "kaufland",
+   "name": "Kaufland",
+   "addr": "",
+   "lat": 42.667756,
+   "lng": 23.364931,
+   "hours": "Mo-Su 07:00-22:00",
+   "osm": "node/13155765602"
+  },
+  {
+   "kind": "kaufland",
+   "name": "Kaufland",
+   "addr": "Филип Аврамов 3",
+   "lat": 42.645965,
+   "lng": 23.379256,
+   "hours": "Mo-Su 07:00-22:00",
+   "osm": "node/2186724183"
+  },
+  {
+   "kind": "kaufland",
+   "name": "Kaufland",
+   "addr": "",
+   "lat": 42.674502,
+   "lng": 23.383149,
+   "hours": "Mo-Su 07:00-22:00",
+   "osm": "way/225064115"
+  },
+  {
+   "kind": "kaufland",
+   "name": "Kaufland",
+   "addr": "Околовръстен път 271",
+   "lat": 42.624224,
+   "lng": 23.38372,
+   "hours": "Mo-Su 07:00-22:00",
+   "osm": "way/1052494001"
+  },
+  {
+   "kind": "kaufland",
+   "name": "Kaufland",
+   "addr": "Хайделберг 1",
+   "lat": 42.656301,
+   "lng": 23.399402,
+   "hours": "Mo-Su 07:00-22:00",
+   "osm": "node/852991369"
+  },
+  {
+   "kind": "kaufland",
+   "name": "Kaufland",
+   "addr": "",
+   "lat": 42.634456,
+   "lng": 23.407135,
+   "hours": "Mo-Th 07:00-22:00; Fr 07:00-21:00; Sa-Su 07:00-22:00",
+   "osm": "node/10035527922"
+  },
+  {
+   "kind": "kaufland",
+   "name": "Kaufland",
+   "addr": "бул. Ботевградско шосе 515",
+   "lat": 42.709559,
+   "lng": 23.455268,
+   "hours": "Mo-Su 08:00-21:00",
+   "osm": "way/1348382457"
+  },
+  {
+   "kind": "praktiker",
+   "name": "Praktiker",
+   "addr": "бул. Панчо Владигеров",
+   "lat": 42.729441,
+   "lng": 23.267218,
+   "hours": "Mo-Sa 08:00-21:00; Su 08:30-20:00",
+   "osm": "way/88690590"
+  },
+  {
+   "kind": "praktiker",
+   "name": "Praktiker",
+   "addr": "бул. Никола Мушанов 149Б",
+   "lat": 42.68808,
+   "lng": 23.277922,
+   "hours": "Mo-Sa 08:00-21:00; Su 08:30-20:00",
+   "osm": "way/1283566524"
+  },
+  {
+   "kind": "praktiker",
+   "name": "Praktiker",
+   "addr": "",
+   "lat": 42.626413,
+   "lng": 23.348099,
+   "hours": "",
+   "osm": "node/14156888683"
+  },
+  {
+   "kind": "praktiker",
+   "name": "Praktiker",
+   "addr": "бул. Цариградско шосе 323",
+   "lat": 42.640855,
+   "lng": 23.409872,
+   "hours": "Mo-Sa 08:00-21:00; Su 08:30-20:00",
+   "osm": "way/1341612145"
+  }
+ ]
+}
