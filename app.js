@@ -322,6 +322,15 @@ const ZONES = window.__ZONES = [
   { id:"jam_ndk",        name:"⚠ Задръстване бул.България (при Мол България)",             icon:"🚦", lat:42.6655, lng:23.2895, radius:160, type:"traffic",          wazeName:"булевард България Sofia" },
   { id:"jam_serdika",    name:"⚠ Задръстване бул.Сливница (при Лъвов мост)",   icon:"🚦", lat:42.7049, lng:23.3239, radius:160, type:"traffic",          wazeName:"Сердика бул Сливница Sofia" },
 ];
+// Открити басейни извън сезона (16.09 – 31.05) са затворени → вън от картата и от топа.
+(function(){
+  var _m = new Date().getMonth()+1, _d = new Date().getDate();
+  if(!(_m < 6 || _m > 9 || (_m === 9 && _d > 15))) return;
+  var INDOOR = { pool_sportpalace:1, pool_infinity:1 };
+  for(var i = ZONES.length - 1; i >= 0; i--){
+    if(/^pool_/.test(ZONES[i].id) && !INDOOR[ZONES[i].id]) ZONES.splice(i, 1);
+  }
+})();
 window.ZONES = ZONES;   // ползва се от бутоните за дестинации
 
 // ═══════════════════════════════════════════════
@@ -1260,10 +1269,6 @@ function showAirportSchedule() {
     }
   }
 
-  if(flightDetails.some(f=>f.src==='radar'||f.src==='radar+') && !flightDetails.some(f=>f.src==='live')){
-    html+='<div style="background:rgba(180,83,9,.10);border:1px solid #b45309;border-radius:8px;padding:6px 10px;margin-bottom:8px;font-size:12px;color:#b45309;line-height:1.4">'
-        +'⚠️ AeroDataBox дава само <b>📡 радар</b> за SOF. Бъдещите са <b>📅 по разписание</b> от предни седмици — може да са отменени или преместени.</div>';
-  }
   // Скролируем списък: терминали → часове → полети
   // ═ Терминал табове (изборът се помни) ═
   let flTerm = 'all';
@@ -1344,7 +1349,7 @@ function showAirportSchedule() {
     if(!grp.length) html+='<div style="color:var(--muted);text-align:center;padding:14px 0;font-size:13px">Няма полети за този терминал</div>';
   }
   // легендата е ВЪТРЕ в скрола, за да не се наслагва върху редовете
-  html+='<div style="font-size:10.5px;color:var(--muted);margin-top:10px;padding-top:7px;border-top:1px solid var(--border);line-height:1.5">🇪🇺 Шенген +5–15 мин · 🛂 Извън +10–30 мин · 🔴 излизат сега · бледите още се точат<br>✈️ живо · 📡 радар (без разписание) · 📅 по разписание от предни седмици (прогноза) · 🗄 кеш · Т? = терминалът е предположен</div>';
+  html+='<div style="font-size:10.5px;color:var(--muted);margin-top:10px;padding-top:7px;border-top:1px solid var(--border);line-height:1.5">🇪🇺 Шенген +5–15 мин · 🛂 Извън +10–30 мин · 🔴 излизат сега · бледите още се точат<br>✈️ живо · 📡 радар · 📅 разписание · 🗄 кеш</div>';
   (function(){
     var late = flightDetails.filter(function(x){ return (x.delay||0) >= 15 && x.exitToTs > Date.now(); });
     if(late.length){
