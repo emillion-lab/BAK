@@ -25,16 +25,16 @@ for url in (f"https://www.centralnaavtogara.bg/avtobusi?date={d}&hours=8",
     out.append(f"== {url}\nHTTP {status}, {len(html)} знака")
     out.append(f"брой 'Пристига': {html.count('Пристига')}, '<tr': {html.lower().count('<tr')}, "
                f"'Сектор': {html.count('Сектор')}, '/schedule/': {html.count('/schedule/')}")
-    i = html.find("Пристига")
+    i = html.find("/schedule/")
     if i < 0:
         out.append("няма 'Пристига' в HTML — вероятно се зарежда с JS")
         for m in re.finditer(r'(fetch\(|axios|/api/[^"\' ]+|data-url="[^"]+")', html):
             out.append("JS/API следа: " + html[max(0, m.start()-80):m.end()+120].replace("\n", " "))
         continue
     # назад до началото на блока, напред ~3 записа
-    start = html.rfind("<div", 0, max(0, i - 1500))
-    out.append("--- суров откъс ---")
-    out.append(html[max(0, start):i + 4500])
+    start = max(0, i - 2500)
+    out.append("--- суров откъс около първия /schedule/ ---")
+    out.append(html[start:i + 6000])
     break
 
 open("debug/cas-probe.txt", "w", encoding="utf-8").write("\n".join(out))
