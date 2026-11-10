@@ -1,57 +1,121 @@
 == https://www.centralnaavtogara.bg/avtobusi?date=10.11.2026&hours=8
 HTTP 200, 306830 знака
 брой 'Пристига': 59, '<tr': 0, 'Сектор': 50, '/schedule/': 50
---- суров откъс ---
-<!doctype html>
-<html class="no-js" lang="bg">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta http-equiv="Content-Language" content="bg">
-    <meta name="csrf-token" content="CyKu8IIqHHXi1kNvbsF8ENyELaSY4xZ2daAawaE0">
-    <title>Пристигащи автобуси в София | Централна автогара - София</title>
-    <meta name="description" content="Разписание на пристигащи автобуси в Централна автогара София. Часове на пристигане и превозвачи.">
-    <link rel="canonical" href="https://www.centralnaavtogara.bg/avtobusi">
-        <meta property="og:type" content="website">
-    <meta property="og:locale" content="bg_BG">
-    <meta property="og:site_name" content="Централна автогара - София">
-    <meta property="og:title" content="Пристигащи автобуси в София | Централна автогара - София">
-    <meta property="og:description" content="Разписание на пристигащи автобуси в Централна автогара София. Часове на пристигане и превозвачи.">
-    <meta property="og:url" content="https://www.centralnaavtogara.bg/avtobusi">
-    <meta property="og:image" content="https://www.centralnaavtogara.bg/img/cbs_icon.jpg">
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Пристигащи автобуси в София | Централна автогара - София">
-    <meta name="twitter:description" content="Разписание на пристигащи автобуси в Централна автогара София. Часове на пристигане и превозвачи.">
-    <meta name="twitter:image" content="https://www.centralnaavtogara.bg/img/cbs_icon.jpg">
-            <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Начало","item":"https://www.centralnaavtogara.bg/"},{"@type":"ListItem","position":2,"name":"Пристигащи автобуси","item":"https://www.centralnaavtogara.bg/avtobusi"}]}</script>
-        <link rel="icon" href="https://www.centralnaavtogara.bg/img/cbs_icon.jpg">
-    <link href="https://fonts.googleapis.com/css?family=Poppins:200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://www.centralnaavtogara.bg/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://www.centralnaavtogara.bg/css/nice-select.css">
-    <link rel="stylesheet" href="https://www.centralnaavtogara.bg/css/font-awesome.min.css">
-    <link rel="stylesheet" href="https://www.centralnaavtogara.bg/css/icofont.css">
-    <link rel="stylesheet" href="https://www.centralnaavtogara.bg/css/slicknav.min.css">
-    <link rel="stylesheet" href="https://www.centralnaavtogara.bg/css/owl-carousel.css">
-    <link rel="stylesheet" href="https://www.centralnaavtogara.bg/css/datepicker.css">
-    <link rel="stylesheet" href="https://www.centralnaavtogara.bg/css/animate.min.css">
-    <link rel="stylesheet" href="https://www.centralnaavtogara.bg/css/magnific-popup.css">
-    <link rel="stylesheet" href="https://www.centralnaavtogara.bg/css/normalize.css">
-    <link rel="stylesheet" href="https://www.centralnaavtogara.bg/style.css">
-    <link rel="stylesheet" href="https://www.centralnaavtogara.bg/css/responsive.css">
-    <style>
-        @media (min-width: 1200px) {
-            .container { max-width: 1280px; }
-        }
-        .ticket-form-grid{background:linear-gradient(135deg,rgba(255,255,255,0.98) 0%,rgba(248,250,252,0.97) 100%);padding:12px 20px 14px;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.1);border:1px solid rgba(255,255,255,0.6);display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap;max-width:760px}
-        .ticket-form-grid form{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start;width:100%;min-width:0}
-        .ticket-form-grid .form-input{box-sizing:border-box;padding:8px 10px;border:1px solid #ddd;border-radius:6px;font-size:14px;min-height:38px}
-        .ticket-form-grid .form-input-from-fixed,
-        .ticket-form-grid .form-input-to-fixed{flex:0 0 100px;min-width:80px;background:#f0f0f0;color:#555;cursor:default}
-        .ticket-form-grid .ticket-form-stop-wrap{position:relative;flex:2 1 320px;min-width:220px;max-width:min(100%,520px)}
-        .ticket-form-grid .ticket-form-stop-wrap .stop-autocomplete-wrap{width:100%}
-        .ticket-form-grid .ticket-form-stop-wrap .form-input{width:100%;max-width:100%}
-        .ticket-form-grid .form-input-date{flex:0 0 10ch;width:10ch;min-width:10ch;max-width:10ch;padding:8px 6px;font-size:14px}
-        .ticket-form-grid .stop-autocomplete-pills{flex:0 0 100%;width:100%;margin-top:2px}
-        .ticket-form-grid .stop-autocomplete-wrap{position:relative}
-        .stop-autocomplete-dropdown{position:absolute;left:0;right:0;top:calc(100% + 3px);z-index:10050;background:#fff;border:1px solid #cfd8dc;border-radius:8px;box-shad
+--- суров откъс около първия /schedule/ ---
+        <div class="departure-time">
+                    <span class="time-label">Тръгва</span>
+                    09:00
+                </div>
+                <div class="bus-direction-block">
+                    <div class="bus-direction">Варна - София</div>
+                    <ul class="bus-stops">
+                                                                                                <li class="">Варна (09:00)</li>
+                                                                                                                        <li class="">Велико Търново (12:15)</li>
+                                                                                                                        <li class="bus-stop-priced">София (14:00)</li>
+                                                                    </ul>
+                </div>
+                <div class="arrival-time">
+                    <span class="time-label">Пристига</span>
+                    15:15
+                                        <div class="bus-week-days" aria-label="Дни на пътуване">
+                                                <span class="travels" title="понеделник">п</span>
+                                                <span class="travels" title="вторник">в</span>
+                                                <span class="travels" title="сряда">с</span>
+                                                <span class="travels" title="четвъртък">ч</span>
+                                                <span class="travels" title="петък">п</span>
+                                                <span class="travels" title="събота">с</span>
+                                                <span class="travels" title="неделя">н</span>
+                                            </div>
+                </div>
+                <div class="bus-carrier-block">
+                    <div class="bus-carrier">Глобал Биомет ЕООД</div>
+                    <div class="bus-period-text">
+                                                    <span class="bus-period-line">изпълнява се</span>
+                            <span class="bus-period-line">от 01.01.2026 до 31.12.2026</span>
+                                            </div>
+                </div>
+                <div class="bus-sector"><span class="bus-sector-label">Сектор</span><span class="bus-sector-num">12-17</span></div>
+                <div class="bus-card-actions">
+                    <a href="https://www.centralnaavtogara.bg/schedule/216" class="btn">Детайли</a>
+                                                        </div>
+            </article>
+                                    <article class="arriving-bus-card">
+                <div class="departure-time">
+                    <span class="time-label">Тръгва</span>
+                    13:40
+                </div>
+                <div class="bus-direction-block">
+                    <div class="bus-direction">Благоевград - София (Централна Аг)</div>
+                    <ul class="bus-stops">
+                                                                                                <li class="">Благоевград (13:40)</li>
+                                                                                                                        <li class="bus-stop-priced">София (Централна Аг)</li>
+                                                                    </ul>
+                </div>
+                <div class="arrival-time">
+                    <span class="time-label">Пристига</span>
+                    15:25
+                                        <div class="bus-week-days" aria-label="Дни на пътуване">
+                                                <span class="travels" title="понеделник">п</span>
+                                                <span class="travels" title="вторник">в</span>
+                                                <span class="travels" title="сряда">с</span>
+                                                <span class="travels" title="четвъртък">ч</span>
+                                                <span class="travels" title="петък">п</span>
+                                                <span class="travels" title="събота">с</span>
+                                                <span class="travels" title="неделя">н</span>
+                                            </div>
+                </div>
+                <div class="bus-carrier-block">
+                    <div class="bus-carrier">СТРУМА 11 ООД</div>
+                    <div class="bus-period-text">
+                                                    <span class="bus-period-line">изпълнява се</span>
+                            <span class="bus-period-line">от 01.01.2026 до 31.12.2026</span>
+                                            </div>
+                </div>
+                <div class="bus-sector"><span class="bus-sector-label">Сектор</span><span class="bus-sector-num">12-17</span></div>
+                <div class="bus-card-actions">
+                    <a href="https://www.centralnaavtogara.bg/schedule/148" class="btn">Детайли</a>
+                                                            <a href="https://www.centralnaavtogara.bg/company/45/general-terms" class="link-details" target="_blank" rel="noopener noreferrer">Условия за анулиране</a>
+                                    </div>
+            </article>
+                                    <article class="arriving-bus-card">
+                <div class="departure-time">
+                    <span class="time-label">Тръгва</span>
+                    12:00
+                </div>
+                <div class="bus-direction-block">
+                    <div class="bus-direction">Габрово - София (Централна Аг)</div>
+                    <ul class="bus-stops">
+                                                                                                <li class="">Габрово (12:00)</li>
+                                                                                                                        <li class="">Севлиево (12:35)</li>
+                                                                                                                        <li class="bus-stop-priced">София (Централна Аг)</li>
+                                                                    </ul>
+                </div>
+                <div class="arrival-time">
+                    <span class="time-label">Пристига</span>
+                    15:30
+                                        <div class="bus-week-days" aria-label="Дни на пътуване">
+                                                <span class="travels" title="понеделник">п</span>
+                                                <span class="travels" title="вторник">в</span>
+                                                <span class="travels" title="сряда">с</span>
+                                                <span class="travels" title="четвъртък">ч</span>
+                                                <span class="travels" title="петък">п</span>
+                                                <span class="travels" title="събота">с</span>
+                                                <span class="travels" title="неделя">н</span>
+                                            </div>
+                </div>
+                <div class="bus-carrier-block">
+                    <div class="bus-carrier">ОБЩИНСКИ ПЪТНИЧЕСКИ ТРАНСПОРТ</div>
+                    <div class="bus-period-text">
+                                                    <span class="bus-period-line">изпълнява се</span>
+                            <span class="bus-period-line">от 01.01.2026 до 31.12.2026</span>
+                                            </div>
+                </div>
+                <div class="bus-sector"><span class="bus-sector-label">Сектор</span><span class="bus-sector-num">12-17</span></div>
+                <div class="bus-card-actions">
+                    <a href="https://www.centralnaavtogara.bg/schedule/181" class="btn">Детайли</a>
+                                                            <a href="https://www.centralnaavtogara.bg/company/3/general-terms" class="link-details" target="_blank" rel="noopener noreferrer">Условия за анулиране</a>
+                                    </div>
+            </article>
+                                    <article class="arriving-bus-card">
+                <div class="departure-time">
+                    <span class="time-label">Тръгва</span>
