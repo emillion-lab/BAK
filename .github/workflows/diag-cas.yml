@@ -1,0 +1,25 @@
+name: diag-cas
+# Еднократна проба на новия centralnaavtogara.bg (10.11.2026). Да се махне
+# след като scrape_arrivals.py мине на новата разметка.
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - 'scripts/diag_cas.py'
+      - '.github/workflows/diag-cas.yml'
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 scripts/diag_cas.py
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add debug/cas-probe.txt
+          git commit -m "diag: cas probe [skip ci]" || exit 0
+          for i in 1 2 3; do git pull --rebase --autostash && git push && exit 0; sleep $((i*5)); done
