@@ -1,15 +1,22 @@
 #!/usr/bin/env python3
-"""ЦАС scraper v2 — пристигащи автобуси от centralnaavtogara.bg.
+"""ЦАС scraper v3 — пристигащи автобуси от centralnaavtogara.bg.
+v3 (10.11.2026): сайтът е сменен около 30.09 — пристигащите вече са карти
+<article class="arriving-bus-card"> на /avtobusi?date=ДД.ММ.ГГГГ&hours=8, не
+<table>. Старият парсър намираше 0 реда и излизаше с exit 0 (зелен рън, данни
+от 30.09 цели 41 дни). Сега: първо картите, после старата таблица като резерва;
+ако данните са по-стари от 24 ч и пак няма редове — exit 1, за да се види.
 v2: валидация на часове (мин<60 — 15.80 е цена, не час), филтър на dropdown боклук,
 опит за отделна страница 'Международни' с принудително intl=True.
 Защитен: <3 реда -> НЕ презаписва последния добър файл."""
 import urllib.request, json, re, sys
 from datetime import datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
 from html import unescape
 
 BASE = "https://www.centralnaavtogara.bg/"
 OUT = "bus-arrivals.json"
-SOFIA = timezone(timedelta(hours=3))
+SOFIA = ZoneInfo("Europe/Sofia")   # беше твърдо +3 — през зимата е +2
+STALE_HOURS = 24
 UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/125 Safari/537.36",
       "Accept-Language": "bg-BG,bg;q=0.9"}
 
@@ -108,18 +115,75 @@ def parse_rows(html, force_intl=False):
         out.append(a)
     return out
 
+DAYS = ["понеделник", "вторник", "сряда", "четвъртък", "петък", "събота", "неделя"]
+
+def parse_cards(html, today):
+    """Новият сайт: една <article class="arriving-bus-card"> на автобус."""
+    out = []
+    for card in re.findall(r'<article[^>]*class="[^"]*arriving-bus-card[^"]*"[^>]*>(.*?)</article>', html, re.S | re.I):
+        def field(cls):
+            # точно този клас, не bus-direction-block и подобни
+            m = re.search(r'class="(?:[^"]*\s)?' + cls + r'(?:\s[^"]*)?"[^>]*>(.*?)</(?:div|span)>', card, re.S | re.I)
+            return clean(m.group(1)) if m else ""
+        # часът на пристигане е текстът след етикета „Пристига“
+        arr = re.search(r'class="[^"]*arrival-time[^"]*"[^>]*>(.*?)(?:<div|</div>)', card, re.S | re.I)
+        t = None
+        if arr:
+            m = re.search(r"(\d{1,2}[:.]\d{2})", clean(arr.group(1)))
+            t = valid_time(m.group(1)) if m else None
+        if not t:
+            continue
+        # дни на движение: ако са дадени и днешният не е сред тях — пропускаме
+        runs = {d.lower() for c, d in re.findall(r'<span[^>]*class="([^"]*)"[^>]*title="([^"]+)"', card)
+                if "travels" in c.split()}
+        if runs and today not in runs:
+            continue
+        direction = field("bus-direction")
+        origin = re.split(r"\s+-\s+", direction)[0].strip() if direction else ""
+        if not origin:
+            continue
+        operator = field("bus-carrier")
+        sector = field("bus-sector-num")
+        intl = any(k in origin.upper() for k in INTL)
+        out.append({"time": t, "from": origin[:60], "sector": sector[:12],
+                    "operator": operator[:60], "intl": intl})
+    seen, uniq = set(), []
+    for a in out:
+        key = (a["time"], a["from"], a["sector"])
+        if key not in seen:
+            seen.add(key); uniq.append(a)
+    return uniq
+
+
+def file_age_hours():
+    try:
+        u = json.load(open(OUT, encoding="utf-8")).get("updated")
+        return (datetime.now(SOFIA) - datetime.fromisoformat(u)).total_seconds() / 3600
+    except Exception:
+        return 1e9
+
+
 def main():
     now = datetime.now(SOFIA)
     home = fetch(BASE)
 
     best = []
-    url = find_tab_url(home, r"[Пп]ристигащ")
+    cards_url = BASE + f"avtobusi?date={now:%d.%m.%Y}&hours=8"
+    try:
+        best = parse_cards(fetch(cards_url), DAYS[now.weekday()])
+        print(f"  {cards_url} → {len(best)} карти")
+    except Exception as e:
+        print("  cards fail:", e)
+    url = find_tab_url(home, r"[Пп]ристигащ") if len(best) < 3 else None
     print("arrivals url:", url)
     candidates = []
-    if url:
+    if len(best) >= 3:
+        pass
+    elif url:
         url = absolute(url)
         candidates += [url + ("&" if "?" in url else "?") + "t=8", url]
-    candidates += [BASE + "index.php?d=a&t=8", BASE + "index.php?d=p&t=8"]
+    if len(best) < 3:
+        candidates += [BASE + "index.php?d=a&t=8", BASE + "index.php?d=p&t=8"]
     for c in candidates:
         try:
             rows = parse_rows(fetch(c))
@@ -132,7 +196,7 @@ def main():
             break
 
     # отделна страница 'Международни' (ако има) -> intl=True принудително
-    iurl = find_tab_url(home, r"[Мм]еждународ")
+    iurl = find_tab_url(home, r"[Мм]еждународ") if len(best) < 3 else None
     print("intl url:", iurl)
     if iurl:
         try:
@@ -146,8 +210,11 @@ def main():
             print("  intl fail:", e)
 
     if len(best) < 3:
-        print("⚠️ Парсирането върна твърде малко редове — запазвам последния добър файл.")
-        sys.exit(0)
+        age = file_age_hours()
+        print(f"⚠️ Парсирането върна твърде малко редове — запазвам последния добър файл ({age:.0f} ч).")
+        # Кратка дупка е нормална; застой над денонощие е счупен скрейпър —
+        # тогава рънът пада, за да дойде имейл, вместо да стои зелен седмици.
+        sys.exit(1 if age > STALE_HOURS else 0)
 
     json.dump({
         "updated": now.isoformat(),
