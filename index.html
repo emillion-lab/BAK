@@ -2,10 +2,11 @@
 <html lang="bg">
 <head>
 <meta charset="UTF-8">
-<meta name="theme-color" content="#0284c7">
+<!-- BAK-V3-DESIGN --><script src="bak-guard.js?v=1"></script>
+<meta name="theme-color" content="#0e1012">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="BakshishApp">
 <link rel="manifest" href="manifest.json">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
@@ -717,7 +718,7 @@ body.list-view #toggle-map-btn {
   border:2px solid var(--cyan);
   color:var(--cyan); font-size:27px; line-height:1;
   display:flex; align-items:center; justify-content:center;
-  box-shadow:0 4px 18px rgba(0,0,0,.65), 0 0 14px rgba(34,211,238,.25);
+  box-shadow:0 4px 18px rgba(0,0,0,.65), 0 0 14px rgba(230,195,106,.25);
   transition:transform .25s cubic-bezier(.34,1.56,.64,1), border-color .2s, box-shadow .2s;
   -webkit-tap-highlight-color:transparent; user-select:none;
 }
@@ -896,7 +897,7 @@ body.karyk-active .sidebar-title{ color:#e8a050; }
 }
 .header, #weather-bar{ position:relative; }
 body.theme-night .header::after, body.theme-night #weather-bar::after{
-  background:linear-gradient(90deg,transparent,rgba(34,211,238,.45),transparent);
+  background:linear-gradient(90deg,transparent,rgba(230,195,106,.45),transparent);
 }
 
 /* ═══════ OVERLAY СЦЕНА: картата минава под стъклените ленти ═══════ */
@@ -934,7 +935,7 @@ body.theme-night .header::after, body.theme-night #weather-bar::after{
 }
 /* меко повдигане на стъклото */
 .header{ box-shadow:0 6px 20px rgba(15,27,45,.10); }
-body.theme-night .header{ box-shadow:0 6px 22px rgba(0,0,0,.5), 0 0 24px rgba(34,211,238,.10); }
+body.theme-night .header{ box-shadow:0 6px 22px rgba(0,0,0,.5), 0 0 24px rgba(230,195,106,.10); }
 
 /* ═══ бутонът за темата — на нивото на времето ═══ */
 #theme-btn{ top:56px !important; right:10px !important; }
@@ -962,7 +963,7 @@ body.theme-night .header{ box-shadow:0 6px 22px rgba(0,0,0,.5), 0 0 24px rgba(34
   box-shadow:var(--card) !important;
 }
 body.theme-night #fab-wrap .fab-sat{
-  background:#12203a !important; border-color:rgba(34,211,238,.3) !important;
+  background:#12203a !important; border-color:rgba(230,195,106,.3) !important;
 }
 #fab-backdrop{ background:var(--scrim) !important; }
 
@@ -976,7 +977,7 @@ body.theme-night #fab-wrap .fab-sat{
   box-shadow:var(--card) !important;
   border-radius:12px !important;
 }
-body.theme-night .map-chip{ box-shadow:var(--card), 0 0 14px rgba(34,211,238,.12) !important; }
+body.theme-night .map-chip{ box-shadow:var(--card), 0 0 14px rgba(230,195,106,.12) !important; }
 
 /* бакшиш панелът: четими цветове и в двете теми */
 #bakshish-panel .bp-name, #bakshish-panel .bp-rank{ color:var(--text) !important; }
@@ -1247,7 +1248,7 @@ body.theme-day .leaflet-popup-content [style*="background:rgba(0"]{
   animation:wx-sheen 7s var(--ease) infinite;
 }
 body.theme-night #weather-bar::before{
-  background:linear-gradient(100deg,transparent 20%,rgba(34,211,238,.22) 45%,transparent 70%);
+  background:linear-gradient(100deg,transparent 20%,rgba(230,195,106,.22) 45%,transparent 70%);
 }
 @keyframes wx-sheen{ 0%{transform:translateX(-120%)} 55%{transform:translateX(120%)} 100%{transform:translateX(120%)} }
 #weather-bar .wb-icon{ display:inline-block; animation:wx-float 4.5s ease-in-out infinite; }
@@ -1346,10 +1347,10 @@ body.theme-night .dest-btn{
   animation:neon-breathe 3.2s ease-in-out infinite;
 }
 @keyframes neon-breathe{
-  0%,100%{ box-shadow:0 6px 18px rgba(0,0,0,.55), 0 0 0 2px var(--dest-ring), 0 0 10px rgba(34,211,238,.20); }
-  50%    { box-shadow:0 6px 18px rgba(0,0,0,.55), 0 0 0 2px var(--dest-ring), 0 0 24px rgba(34,211,238,.55); }
+  0%,100%{ box-shadow:0 6px 18px rgba(0,0,0,.55), 0 0 0 2px var(--dest-ring), 0 0 10px rgba(230,195,106,.20); }
+  50%    { box-shadow:0 6px 18px rgba(0,0,0,.55), 0 0 0 2px var(--dest-ring), 0 0 24px rgba(230,195,106,.55); }
 }
-body.theme-night .dest-btn.on{ animation:none; box-shadow:0 0 0 3px var(--cyan), 0 0 28px rgba(34,211,238,.75) !important; }
+body.theme-night .dest-btn.on{ animation:none; box-shadow:0 0 0 3px var(--cyan), 0 0 28px rgba(230,195,106,.75) !important; }
 body.theme-night #airport-badge.ready{ color:#34d399; text-shadow:0 0 12px rgba(52,211,153,.6); }
 body.theme-night .zone-row [class*="peak"], body.theme-night .tl-dead{
   animation:neon-pulse 1.8s ease-in-out infinite;
@@ -1357,7 +1358,7 @@ body.theme-night .zone-row [class*="peak"], body.theme-night .tl-dead{
 @keyframes neon-pulse{ 0%,100%{ filter:none } 50%{ filter:drop-shadow(0 0 8px currentColor) } }
 body.theme-night .header h1{ animation:title-glow 5s ease-in-out infinite; }
 @keyframes title-glow{
-  0%,100%{ filter:drop-shadow(0 0 8px rgba(34,211,238,.30)) }
+  0%,100%{ filter:drop-shadow(0 0 8px rgba(230,195,106,.30)) }
   50%    { filter:drop-shadow(0 0 16px rgba(167,139,250,.55)) }
 }
 #airport-badge.ready{ color:var(--green); font-weight:800; }
@@ -1640,7 +1641,7 @@ body.full-list #chip-stack, body[data-full] #chip-stack{ opacity:0 !important; p
 
 /* тъмната тема: по-плътни капсули */
 body.theme-day{ --capsule:rgba(255,255,255,.72); --capsule-edge:rgba(15,27,45,.12); }
-body.theme-night{ --capsule:rgba(10,18,32,.62); --capsule-edge:rgba(34,211,238,.28); }
+body.theme-night{ --capsule:rgba(10,18,32,.62); --capsule-edge:rgba(230,195,106,.28); }
 
 @media (max-width:400px){
   #weather-bar{ gap:6px; padding-right:50px !important; }
@@ -1899,29 +1900,29 @@ body.theme-night .wb-temp, body.theme-night #wx-rain-when{
 }
 body.theme-night {
   --bg:#060b14; --surface:#0e1726; --border:#22334c;
-  --amber:#fbbf24; --cyan:#22d3ee; --green:#34d399;
+  --amber:#fbbf24; --cyan:#e6c36a; --green:#34d399;
   --red:#f87171; --orange:#fb923c; --muted:#8ea6c2; --text:#e9eff8;
   --surf:#0e1726;
   --glow:0 0 10px currentColor;
-  --glow-soft:0 0 22px rgba(34,211,238,.18);
-  --card:0 2px 8px rgba(0,0,0,.55), 0 0 24px rgba(34,211,238,.09);
-  --ring:rgba(34,211,238,.38);
-  --sheen:linear-gradient(180deg,rgba(34,211,238,.10),rgba(14,23,38,.65));
+  --glow-soft:0 0 22px rgba(230,195,106,.18);
+  --card:0 2px 8px rgba(0,0,0,.55), 0 0 24px rgba(230,195,106,.09);
+  --ring:rgba(230,195,106,.38);
+  --sheen:linear-gradient(180deg,rgba(230,195,106,.10),rgba(14,23,38,.65));
   --modal-bg:#0d1524;
   --modal-head:linear-gradient(180deg,#122036,#0d1524);
-  --modal-edge:rgba(34,211,238,.35);
-  --modal-shadow:0 10px 44px rgba(0,0,0,.75), 0 0 26px rgba(34,211,238,.22);
+  --modal-edge:rgba(230,195,106,.35);
+  --modal-shadow:0 10px 44px rgba(0,0,0,.75), 0 0 26px rgba(230,195,106,.22);
   --modal-blur:none;
   --bar-bg:rgba(6,16,28,.72);
   --bar-fg:#e8eef7;
   --glass:rgba(12,22,38,.58);
-  --glass-edge:rgba(34,211,238,.20);
-  --title:linear-gradient(100deg,#22d3ee,#67e8f9 40%,#a78bfa);
+  --glass-edge:rgba(230,195,106,.20);
+  --title:linear-gradient(100deg,#e6c36a,#efd79a 40%,#a78bfa);
   --scrim:rgba(3,7,18,.55);
   --bronze:#e8a050; --bronze-soft:rgba(205,127,50,.35); --bronze-hot:rgba(255,175,90,.75);
   --gold:#d4af37; --gold-edge:rgba(212,175,55,.35);
   --dest-bg:linear-gradient(160deg,#1b3050,#132540 70%,#0e1b30);
-  --dest-ring:rgba(34,211,238,.60);
+  --dest-ring:rgba(230,195,106,.60);
 }
 
 /* плавна смяна на темата */
@@ -1942,7 +1943,7 @@ body.theme-night #karyk-badge{ text-shadow:var(--glow); }
 body.theme-night .hist-table-wrap,
 body.theme-night #bakshish-panel,
 body.theme-night #next90-panel{
-  box-shadow:var(--card), inset 0 0 0 1px rgba(34,211,238,.07);
+  box-shadow:var(--card), inset 0 0 0 1px rgba(230,195,106,.07);
 }
 
 /* ── FAB: 3D разгъване ── */
@@ -1981,7 +1982,7 @@ body{font-size:16px;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;ba
   background:var(--title); -webkit-background-clip:text; background-clip:text;
   color:transparent; -webkit-text-fill-color:transparent;
 }
-body.theme-night .header h1{ filter:drop-shadow(0 0 10px rgba(34,211,238,.35)); }
+body.theme-night .header h1{ filter:drop-shadow(0 0 10px rgba(230,195,106,.35)); }
 .header p{ font-size:12.5px !important; letter-spacing:.6px !important; opacity:.85; }
 .header p{font-size:16px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:1px;}
 .hdr-right{margin-left:auto;display:flex;align-items:center;gap:6px;}
@@ -1998,7 +1999,7 @@ body.theme-night .header h1{ filter:drop-shadow(0 0 10px rgba(34,211,238,.35)); 
 #demand-canvas{width:100%;height:40px;display:block;cursor:pointer;min-height:40px;}
 .tl-slider-wrap{margin-top:-4px;}
 input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:4px;background:transparent;outline:none;cursor:pointer;}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--cyan);border:2px solid var(--bg);box-shadow:0 0 6px rgba(0,229,255,.7);cursor:pointer;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--cyan);border:2px solid var(--bg);box-shadow:0 0 6px rgba(230,195,106,.7);cursor:pointer;}
 .tl-ticks{display:flex;justify-content:space-between;font-size:16px;color:var(--muted);font-family:'Courier New',Courier,monospace;margin-top:1px;}
 
 /* TICKER */
@@ -2006,7 +2007,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .ticker-wrap{display:flex;gap:50px;animation:ticker 28s linear infinite;width:max-content;white-space:nowrap;}
 @keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 .tick-item{font-family:'Courier New',Courier,monospace;font-size:16px;color:var(--bar-fg);font-weight:700;}
-body.theme-night .tick-item{text-shadow:0 0 8px rgba(34,211,238,.35);}
+body.theme-night .tick-item{text-shadow:0 0 8px rgba(230,195,106,.35);}
 .tick-item .ev-time{color:var(--amber);}
 .tick-item .ev-loc{color:#9fb3c8;}
 
@@ -2428,6 +2429,7 @@ body.map-fullscreen
 #kat-badge{ flex:0 0 auto !important; }
 #wx-rain-when{ flex:0 0 auto !important; margin-left:auto !important; }
 </style>
+<link rel="stylesheet" href="bak-v3.css?v=1">
 </head>
 <body>
 <div id="stage">
@@ -2616,6 +2618,6 @@ body.map-fullscreen
   }
 })();
 </script>
-<script src="access-gate.js?v=2" defer></script>
+<script src="access-gate.js?v=3" defer></script>
 </body>
 </html>
