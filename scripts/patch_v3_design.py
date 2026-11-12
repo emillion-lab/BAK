@@ -9,6 +9,8 @@ index.html:
   - неоновото синьо в CSS → жълто такси (само цветът, правилата остават)
 sw.js: нова версия на кеша, за да се изтеглят новите файлове.
 Маркер: BAK-V3-DESIGN
+
+Част 2 (маркер BAK-V3-UI): <script src="bak-ui.js"> — лого с рибата и бутон „Моят профил“.
 """
 import re, sys, pathlib
 
@@ -64,5 +66,29 @@ else:
     s = s.replace(m.group(0), "const CACHE_NAME = 'bakshishapp-bak-v%d';" % v, 1)
     s = s.replace("  '/BAK/manifest.json',\n", "  '/BAK/manifest.json',\n  '/BAK/bak-v3.css',\n  '/BAK/bak-guard.js',\n", 1)
     assert "'/BAK/bak-v3.css'" in s, 'sw.js: STATIC_FILES не е намерен'
+    SW.write_text(s, encoding='utf-8')
+    print('sw.js: кеш v%d' % v)
+
+# ── част 2: лого + „Моят профил“ ──
+h = IDX.read_text(encoding='utf-8')
+UI = 'BAK-V3-UI'
+if UI in h:
+    print('index.html: bak-ui.js вече е закачен')
+else:
+    a = '<script src="access-gate.js?v=3" defer></script>'
+    assert h.count(a) == 1, 'няма access-gate.js?v=3'
+    h = h.replace(a, '<!-- ' + UI + ' --><script src="bak-ui.js?v=1" defer></script>\n' + a, 1)
+    IDX.write_text(h, encoding='utf-8')
+    print('index.html: закачен bak-ui.js')
+
+s = SW.read_text(encoding='utf-8')
+if "'/BAK/bak-ui.js'" in s:
+    print('sw.js: bak-ui.js вече е в кеша')
+else:
+    m = re.search(r"const CACHE_NAME = 'bakshishapp-bak-v(\d+)';", s)
+    v = int(m.group(1)) + 1
+    s = s.replace(m.group(0), "const CACHE_NAME = 'bakshishapp-bak-v%d';" % v, 1)
+    assert "  '/BAK/bak-guard.js',\n" in s
+    s = s.replace("  '/BAK/bak-guard.js',\n", "  '/BAK/bak-guard.js',\n  '/BAK/bak-ui.js',\n", 1)
     SW.write_text(s, encoding='utf-8')
     print('sw.js: кеш v%d' % v)
