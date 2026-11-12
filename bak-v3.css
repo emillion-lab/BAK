@@ -1,0 +1,125 @@
+/* BAK · дизайн като fish.taxi v3 (12.11.2026)
+ * Само слой отгоре: нищо не е махнато от index.html или app.js.
+ * Тъмно стъкло, системен шрифт, един дискретен акцент (жълто такси) вместо неоновото синьо.
+ * Връщане към стария вид: махни реда с bak-v3.css от index.html.
+ */
+html body{
+  --f:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --taxi:#e6c36a;
+}
+html body.theme-night{
+  color-scheme:dark;
+  --bg:#0e1012; --surface:rgba(22,26,30,.72); --border:rgba(255,255,255,.12);
+  --amber:#e8b25e; --cyan:#e6c36a; --green:#86d3a4;
+  --red:#ef8f86; --orange:#e9a27a; --muted:#a3abb1; --text:#eef0ee;
+  --surf:rgba(22,26,30,.72);
+  --glow:none; --glow-soft:none;
+  --card:0 8px 24px rgba(0,0,0,.32);
+  --ring:rgba(230,195,106,.30);
+  --sheen:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.015));
+  --modal-bg:rgba(16,19,22,.84);
+  --modal-head:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,0));
+  --modal-edge:rgba(255,255,255,.12);
+  --modal-shadow:0 20px 50px rgba(0,0,0,.5);
+  --modal-blur:blur(30px) saturate(160%);
+  --bar-bg:rgba(20,23,26,.42); --bar-fg:#eef0ee;
+  --glass:rgba(24,28,32,.38); --glass-edge:rgba(255,255,255,.12);
+  --title:linear-gradient(100deg,#eef0ee,#eef0ee);
+  --scrim:rgba(0,0,0,.42);
+  --dest-bg:rgba(24,28,32,.55); --dest-ring:rgba(230,195,106,.55);
+  --capsule:rgba(24,28,32,.38); --capsule-edge:rgba(255,255,255,.12);
+}
+html body.theme-day{
+  --cyan:#9a7424; --amber:#a86f12; --green:#2f8f5b; --red:#c4554b;
+  --ring:rgba(154,116,36,.25);
+  --title:linear-gradient(100deg,#15191c,#15191c);
+  --glass:rgba(255,255,255,.55); --glass-edge:rgba(15,20,25,.10);
+  --dest-ring:rgba(154,116,36,.55);
+}
+
+/* ── шрифт ── */
+html body, html body *{ font-family:var(--f) !important; letter-spacing:-.01em; }
+html body{ -webkit-font-smoothing:antialiased; font-variant-numeric:tabular-nums; }
+html body .tl-clock, html body .tick-item, html body #airport-badge, html body .tl-ticks, html body .tl-dead{
+  font-variant-numeric:tabular-nums; letter-spacing:0;
+}
+html body .tl-clock{ font-weight:600 !important; }
+
+/* ── горната част: стъкло, без неон ── */
+html body.theme-night .header, html body.theme-night #weather-bar,
+html body.theme-night .timeline-panel, html body.theme-night .ticker-bar{
+  background:rgba(20,23,26,.42) !important;
+  backdrop-filter:blur(18px) saturate(160%) !important; -webkit-backdrop-filter:blur(18px) saturate(160%) !important;
+  border-color:rgba(255,255,255,.08) !important;
+  box-shadow:none !important;
+}
+html body .header h1{
+  font-weight:700 !important; letter-spacing:.02em !important;
+  filter:none !important; animation:none !important;
+}
+html body .header p{ letter-spacing:.04em !important; }
+html body.theme-night .tick-item{ text-shadow:none !important; }
+
+/* плъзгачът на часа */
+html body input[type=range]::-webkit-slider-thumb{
+  background:var(--cyan) !important; border:2px solid rgba(14,16,18,.9) !important;
+  box-shadow:0 2px 8px rgba(0,0,0,.4) !important;
+}
+
+/* ── кръглите бутони: прозрачно стъкло ── */
+html body #fab-hub{
+  background:rgba(24,28,32,.38) !important;
+  border:1px solid rgba(255,255,255,.16) !important;
+  color:var(--cyan) !important;
+  backdrop-filter:blur(16px) saturate(160%) !important; -webkit-backdrop-filter:blur(16px) saturate(160%) !important;
+  box-shadow:0 8px 24px rgba(0,0,0,.35) !important;
+}
+html body.theme-night #fab-wrap .fab-sat, html body.theme-night #theme-btn, html body.theme-night #bakshish-btn,
+html body.theme-night #next90-btn, html body.theme-night #clean-btn,
+html body.theme-night #gps-btn, html body.theme-night #fs-btn, html body.theme-night .tool-btn{
+  background:rgba(24,28,32,.38) !important;
+  border:0 !important;
+  backdrop-filter:blur(14px) saturate(160%) !important; -webkit-backdrop-filter:blur(14px) saturate(160%) !important;
+  box-shadow:0 8px 22px rgba(0,0,0,.32), 0 0 0 1px rgba(255,255,255,.14) !important;
+}
+/* кръгли, както в fish.taxi */
+html body #next90-btn, html body #clean-btn, html body #gps-btn, html body #fs-btn, html body .tool-btn{ border-radius:50% !important; }
+/* дестинациите се различават с тънък жълт пръстен, активната — с плътен */
+html body.theme-night .dest-btn{ box-shadow:0 8px 22px rgba(0,0,0,.32), 0 0 0 1px rgba(230,195,106,.42) !important; }
+html body.theme-night .dest-btn.on{ animation:none !important; background:rgba(230,195,106,.2) !important;
+  box-shadow:0 8px 22px rgba(0,0,0,.32), 0 0 0 2px rgba(230,195,106,.85) !important; }
+html body #fab-wrap .fab-sat:active, html body #fab-hub:active,
+html body #gps-btn:active, html body #fs-btn:active, html body #theme-btn:active, html body .tool-btn:active{ transform:scale(.9) !important; }
+html body .fab-label{ border-radius:12px !important; font-weight:600 !important; }
+html body.theme-night .map-chip, html body.theme-night #clean-btn, html body.theme-night #karyk-list-btn{
+  background:rgba(24,28,32,.38) !important; box-shadow:0 8px 22px rgba(0,0,0,.3) !important;
+}
+
+/* ── панели и прозорци: по-плътно стъкло, за да се чете ── */
+html body.theme-night .leaflet-popup-content-wrapper,
+html body.theme-night .leaflet-popup-tip{
+  background:rgba(16,19,22,.86) !important; color:var(--text) !important;
+  backdrop-filter:blur(24px) saturate(160%); -webkit-backdrop-filter:blur(24px) saturate(160%);
+  border:1px solid rgba(255,255,255,.1); box-shadow:0 12px 32px rgba(0,0,0,.45) !important;
+}
+html body.theme-night #bakshish-panel, html body.theme-night #next90-panel,
+html body.theme-night #nav-panel, html body.theme-night #event-alert, html body.theme-night #direction-hint,
+html body.theme-night #zone-sidebar, html body.theme-night #karyk-sidebar{
+  background:rgba(16,19,22,.84) !important;
+  backdrop-filter:blur(30px) saturate(160%) !important; -webkit-backdrop-filter:blur(30px) saturate(160%) !important;
+  border-color:rgba(255,255,255,.12) !important;
+  box-shadow:0 20px 50px rgba(0,0,0,.45) !important;
+}
+
+/* ── банерът за инсталиране ── */
+html body #pwa-banner{
+  background:rgba(16,19,22,.88) !important;
+  backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+  border-top:1px solid rgba(255,255,255,.12);
+}
+html body #pwa-bak-btn{ background:rgba(230,195,106,.18) !important; color:#e6c36a !important; border:1px solid rgba(230,195,106,.5) !important; }
+
+/* ── по-меки анимации ── */
+@media (prefers-reduced-motion:reduce){
+  html body *{ animation-duration:.01ms !important; transition-duration:.01ms !important; }
+}
