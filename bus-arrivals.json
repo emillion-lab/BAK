@@ -1,399 +1,42 @@
 {
-  "updated": "2026-11-12T14:20:49.760489+02:00",
+  "updated": "2026-11-12T22:17:17.350538+02:00",
   "source": "centralnaavtogara.bg",
   "window_hours": 8,
-  "count": 57,
-  "intl_count": 0,
+  "count": 9,
+  "intl_count": 1,
   "arrivals": [
     {
-      "time": "14:30",
-      "from": "Смолян",
-      "sector": "12-17",
-      "operator": "РОЖЕН ЕКСПРЕС АД",
-      "intl": false
-    },
-    {
-      "time": "14:35",
-      "from": "Кърджали (Аг \"Xxi Век\")",
-      "sector": "12-17",
-      "operator": "МАРИЕТА ООД",
-      "intl": false
-    },
-    {
-      "time": "14:40",
-      "from": "Разград",
-      "sector": "12-17",
-      "operator": "ЮНИОН ИВКОНИ ООД",
-      "intl": false
-    },
-    {
-      "time": "14:43",
-      "from": "Дулово",
-      "sector": "12-17",
-      "operator": "ЮНИОН ИВКОНИ ООД",
-      "intl": false
-    },
-    {
-      "time": "14:45",
-      "from": "Пазарджик",
-      "sector": "12-17",
-      "operator": "ЮНИОН ИВКОНИ ООД",
-      "intl": false
-    },
-    {
-      "time": "14:45",
-      "from": "Благоевград",
-      "sector": "12-17",
-      "operator": "СТРУМА 11 ООД",
-      "intl": false
-    },
-    {
-      "time": "14:50",
+      "time": "01:05",
       "from": "Добрич",
       "sector": "12-17",
       "operator": "ГРУП ПЛЮС ООД",
       "intl": false
     },
     {
-      "time": "14:50",
-      "from": "Пловдив (Аг \"Юг\")",
-      "sector": "12-17",
-      "operator": "МЕРИТРАНС - 2002 ЕООД",
-      "intl": false
-    },
-    {
-      "time": "15:15",
+      "time": "02:45",
       "from": "Варна",
       "sector": "12-17",
       "operator": "Глобал Биомет ЕООД",
       "intl": false
     },
     {
-      "time": "15:25",
-      "from": "Благоевград",
-      "sector": "12-17",
-      "operator": "СТРУМА 11 ООД",
-      "intl": false
-    },
-    {
-      "time": "15:30",
-      "from": "Ловеч",
-      "sector": "12-17",
-      "operator": "ГРАЦИЯ - Ц И А ООД",
-      "intl": false
-    },
-    {
-      "time": "15:30",
-      "from": "Габрово",
-      "sector": "12-17",
-      "operator": "ОБЩИНСКИ ПЪТНИЧЕСКИ ТРАНСПОРТ",
-      "intl": false
-    },
-    {
-      "time": "15:52",
-      "from": "Гоце Делчев",
-      "sector": "12-17",
-      "operator": "СОНЯ ТУРС ЕООД",
-      "intl": false
-    },
-    {
-      "time": "16:00",
-      "from": "Плевен",
-      "sector": "12-17",
-      "operator": "ПЛАНЕТА ТРАНС ООД",
-      "intl": false
-    },
-    {
-      "time": "16:05",
-      "from": "Благоевград",
-      "sector": "12-17",
-      "operator": "СТРУМА 11 ООД",
-      "intl": false
-    },
-    {
-      "time": "16:16",
-      "from": "Сливен",
-      "sector": "12-17",
-      "operator": "ГЛОБУС - ЕС ООД",
-      "intl": false
-    },
-    {
-      "time": "16:20",
-      "from": "Пловдив (Централна Аг)",
-      "sector": "12-17",
-      "operator": "КАРАТ-С АД",
-      "intl": false
-    },
-    {
-      "time": "16:20",
-      "from": "Варна",
-      "sector": "12-17",
-      "operator": "ГРУП ПЛЮС ООД",
-      "intl": false
-    },
-    {
-      "time": "16:25",
-      "from": "Свети Влас",
-      "sector": "11-17",
-      "operator": "ЮНИОН ИВКОНИ ООД",
-      "intl": false
-    },
-    {
-      "time": "16:25",
-      "from": "Свети Влас",
-      "sector": "12-17",
-      "operator": "ЮНИОН ИВКОНИ ООД",
-      "intl": false
-    },
-    {
-      "time": "16:32",
-      "from": "Кърджали",
-      "sector": "12-17",
-      "operator": "ОЛМЕНА ООД",
-      "intl": false
-    },
-    {
-      "time": "16:45",
-      "from": "Благоевград",
-      "sector": "12-17",
-      "operator": "СТРУМА 11 ООД",
-      "intl": false
-    },
-    {
-      "time": "16:45",
-      "from": "Хасково",
-      "sector": "12-17",
-      "operator": "СЪРНЕЛА - ПЕТКО АНГЕЛОВ ЕТ",
-      "intl": false
-    },
-    {
-      "time": "17:00",
-      "from": "Видин",
-      "sector": "12-17",
-      "operator": "АЛЕКСИЕВ-91-ВД ЕТ",
-      "intl": false
-    },
-    {
-      "time": "17:30",
-      "from": "Пловдив (Централна Аг)",
-      "sector": "12-17",
-      "operator": "КАРАТ-С АД",
-      "intl": false
-    },
-    {
-      "time": "17:50",
-      "from": "Петрич",
-      "sector": "12-17",
-      "operator": "ЮНИОН ИВКОНИ ООД",
-      "intl": false
-    },
-    {
-      "time": "18:05",
-      "from": "Силистра",
-      "sector": "12-17",
-      "operator": "ЮНИОН ИВКОНИ ООД",
-      "intl": false
-    },
-    {
-      "time": "18:08",
-      "from": "Оряхово",
-      "sector": "12-17",
-      "operator": "ЛИОНТУРС 1991 ЕООД",
-      "intl": false
-    },
-    {
-      "time": "18:20",
-      "from": "Кнежа",
-      "sector": "12-17",
-      "operator": "БОЖИ ДАР ТРАНС БМ ООД",
-      "intl": false
-    },
-    {
-      "time": "18:20",
-      "from": "Хаджидимово",
-      "sector": "12-17",
-      "operator": "ЮНИОН ИВКОНИ ООД",
-      "intl": false
-    },
-    {
-      "time": "18:30",
-      "from": "Пловдив (Централна Аг)",
-      "sector": "12-17",
-      "operator": "КАРАТ-С АД",
-      "intl": false
-    },
-    {
-      "time": "18:30",
-      "from": "Каварна",
-      "sector": "12-17",
-      "operator": "ГРУП ПЛЮС ООД",
-      "intl": false
-    },
-    {
-      "time": "18:33",
-      "from": "Козлодуй",
-      "sector": "12-17",
-      "operator": "ЛИБЪРТИ АП ООД",
-      "intl": false
-    },
-    {
-      "time": "18:40",
-      "from": "Варна",
-      "sector": "12-17",
-      "operator": "ГРУП ПЛЮС ООД",
-      "intl": false
-    },
-    {
-      "time": "18:40",
-      "from": "Златоград",
-      "sector": "12-17",
-      "operator": "КРИСТАЛ - ЛЮТВИ ХАДЖИЮСЕИН ЕТ",
-      "intl": false
-    },
-    {
-      "time": "18:45",
-      "from": "Свети Влас",
-      "sector": "12-17",
-      "operator": "ЮНИОН ИВКОНИ ООД",
-      "intl": false
-    },
-    {
-      "time": "19:00",
-      "from": "Ловеч",
-      "sector": "12-17",
-      "operator": "ГРАЦИЯ - Ц И А ООД",
-      "intl": false
-    },
-    {
-      "time": "19:15",
+      "time": "04:15",
       "from": "Варна",
       "sector": "12-17",
       "operator": "Глобал Биомет ЕООД",
       "intl": false
     },
     {
-      "time": "19:20",
-      "from": "Пловдив",
+      "time": "06:15",
+      "from": "Варна",
       "sector": "12-17",
-      "operator": "КАРАТ-С АД",
+      "operator": "Глобал Биомет ЕООД",
       "intl": false
     },
     {
-      "time": "19:20",
-      "from": "Русе",
-      "sector": "12-17",
-      "operator": "ЮНИОН ИВКОНИ ООД",
-      "intl": false
-    },
-    {
-      "time": "19:30",
-      "from": "Априлци",
+      "time": "07:15",
+      "from": "Бургас",
       "sector": "11-17",
-      "operator": "ЮНИОН ИВКОНИ ООД",
-      "intl": false
-    },
-    {
-      "time": "19:33",
-      "from": "Гоце Делчев",
-      "sector": "12-17",
-      "operator": "ЮНИОН ИВКОНИ ООД",
-      "intl": false
-    },
-    {
-      "time": "19:45",
-      "from": "Петрич",
-      "sector": "12-17",
-      "operator": "ЮНИОН ИВКОНИ ООД",
-      "intl": false
-    },
-    {
-      "time": "19:45",
-      "from": "Елхово",
-      "sector": "12-17",
-      "operator": "ЧАПЪРА-ММ ЕООД",
-      "intl": false
-    },
-    {
-      "time": "19:45",
-      "from": "Ямбол",
-      "sector": "12-17",
-      "operator": "ВАЛЕРОС ЕООД",
-      "intl": false
-    },
-    {
-      "time": "19:45",
-      "from": "Котел",
-      "sector": "12-17",
-      "operator": "ДОРИС ООД",
-      "intl": false
-    },
-    {
-      "time": "20:10",
-      "from": "Трявна",
-      "sector": "12-17",
-      "operator": "ЮНИОН ИВКОНИ ООД",
-      "intl": false
-    },
-    {
-      "time": "20:18",
-      "from": "Смолян",
-      "sector": "12-17",
-      "operator": "ГРУП ПЛЮС ООД",
-      "intl": false
-    },
-    {
-      "time": "20:25",
-      "from": "Лом",
-      "sector": "12-17",
-      "operator": "ЮНИОН ИВКОНИ ООД",
-      "intl": false
-    },
-    {
-      "time": "20:29",
-      "from": "Огняново",
-      "sector": "12-17",
-      "operator": "ЮНИОН ИВКОНИ ООД",
-      "intl": false
-    },
-    {
-      "time": "20:30",
-      "from": "Ахтопол",
-      "sector": "12-17",
-      "operator": "ЮНИОН ИВКОНИ ООД",
-      "intl": false
-    },
-    {
-      "time": "20:30",
-      "from": "Видин",
-      "sector": "11-17",
-      "operator": "АЛЕКСИЕВ-91-ВД ЕТ",
-      "intl": false
-    },
-    {
-      "time": "20:50",
-      "from": "Кърджали",
-      "sector": "12-17",
-      "operator": "ГРУП ПЛЮС ООД",
-      "intl": false
-    },
-    {
-      "time": "21:00",
-      "from": "Добрич",
-      "sector": "12-17",
-      "operator": "ГРУП ПЛЮС ООД",
-      "intl": false
-    },
-    {
-      "time": "21:20",
-      "from": "Пловдив",
-      "sector": "12-17",
-      "operator": "КАРАТ-С АД",
-      "intl": false
-    },
-    {
-      "time": "21:35",
-      "from": "Русе",
-      "sector": "12-17",
       "operator": "ЮНИОН ИВКОНИ ООД",
       "intl": false
     },
@@ -403,6 +46,27 @@
       "sector": "12-17",
       "operator": "КАРАТ-С АД",
       "intl": false
+    },
+    {
+      "time": "22:45",
+      "from": "Варна",
+      "sector": "12-17",
+      "operator": "Глобал Биомет ЕООД",
+      "intl": false
+    },
+    {
+      "time": "23:05",
+      "from": "Слънчев Бряг",
+      "sector": "12-17",
+      "operator": "ЮНИОН ИВКОНИ ООД",
+      "intl": false
+    },
+    {
+      "time": "23:40",
+      "from": "Скопие",
+      "sector": "12-17",
+      "operator": "КАЛЕЯ ООД",
+      "intl": true
     }
   ]
 }
