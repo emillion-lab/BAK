@@ -1,7 +1,7 @@
 // BakshishApp Service Worker
 // Кешира файловете за офлайн работа
 
-const CACHE_NAME = 'bakshishapp-bak-v119';
+const CACHE_NAME = 'bakshishapp-bak-v120';
 const STATIC_FILES = [
   '/BAK/',
   '/BAK/index.html',
@@ -11,6 +11,7 @@ const STATIC_FILES = [
   '/BAK/manifest.json',
   '/BAK/bak-v3.css',
   '/BAK/bak-guard.js',
+  '/BAK/bak-ui.js',
 ];
 
 // Инсталация — кешира статичните файлове
