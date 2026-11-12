@@ -9,6 +9,10 @@
  *
  * Заключени в демо: полети, събития, трафик, автобуси и влакове.
  * Свободни: карта, зони, време, КАТ индекс, времева линия.
+ *
+ * 12.11.2026: bak-guard.js (в <head>, преди app.js) спира и самите заявки в демо,
+ * за да не се харчат квоти. Затова след вход страницата се презарежда.
+ * Изгледът е като fish.taxi v3: тъмно стъкло и жълт акцент.
  */
 
 (function () {
@@ -124,28 +128,41 @@
     s.id = 'bak-gate-css';
     s.textContent = [
 
-      /* ── входният екран ── */
-      '#bak-gate{position:fixed;inset:0;z-index:99999;background:rgba(8,10,16,.95);',
-      'backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;',
-      'padding:24px;font-family:-apple-system,system-ui,sans-serif}',
-      '#bak-gate .bx{width:100%;max-width:340px;text-align:center;color:#f2f0ea}',
-      '#bak-gate h2{font-size:1.25rem;margin:0 0 8px;font-weight:800;letter-spacing:.5px}',
-      '#bak-gate p{font-size:.92rem;color:#9aa4b2;margin:0 0 20px;line-height:1.55}',
-      '#bak-gate input{width:100%;padding:15px;font-size:1.25rem;text-align:center;',
-      'letter-spacing:.2em;text-transform:uppercase;border-radius:12px;border:2px solid #2c3546;',
-      'background:#141a26;color:#f2f0ea;outline:none;font-family:inherit}',
-      '#bak-gate input:focus{border-color:#22d3ee}',
-      '#bak-gate .go{width:100%;margin-top:12px;padding:15px;border:none;border-radius:12px;',
-      'background:#22d3ee;color:#04121a;font-size:1rem;font-weight:800;font-family:inherit;cursor:pointer}',
-      '#bak-gate .demo{margin-top:14px;background:none;border:none;color:#9aa4b2;',
-      'font-size:.88rem;text-decoration:underline;font-family:inherit;cursor:pointer}',
-      '#bak-gate .er{color:#ff6b6b;font-size:.86rem;min-height:1.2em;margin-top:10px;font-weight:600}',
+      /* ── входният екран (fish.taxi v3) ── */
+      '#bak-gate{position:fixed;inset:0;z-index:99999;background:rgba(10,12,14,.62);',
+      'backdrop-filter:blur(22px) saturate(140%);-webkit-backdrop-filter:blur(22px) saturate(140%);',
+      'display:flex;align-items:center;justify-content:center;padding:24px;',
+      'font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;animation:bakIn .45s cubic-bezier(.2,.9,.25,1)}',
+      '@keyframes bakIn{from{opacity:0}to{opacity:1}}',
+      '@keyframes bakUp{from{opacity:0;transform:translateY(18px) scale(.98)}to{opacity:1;transform:none}}',
+      '#bak-gate .bx{width:100%;max-width:360px;text-align:center;color:#eef0ee;padding:26px 22px 20px;',
+      'border-radius:26px;background:rgba(24,28,32,.42);border:1px solid rgba(255,255,255,.12);',
+      'box-shadow:0 20px 50px rgba(0,0,0,.45);animation:bakUp .5s .05s both cubic-bezier(.2,.9,.25,1)}',
+      '#bak-gate .lk{width:54px;height:54px;margin:0 auto 12px;border-radius:50%;display:grid;place-items:center;',
+      'font-size:24px;background:rgba(230,195,106,.14);border:1px solid rgba(230,195,106,.4)}',
+      '#bak-gate h2{font-size:1.3rem;margin:0 0 6px;font-weight:700;letter-spacing:-.01em}',
+      '#bak-gate p{font-size:.93rem;color:#a3abb1;margin:0 0 18px;line-height:1.5}',
+      '#bak-gate input{width:100%;padding:14px;font-size:1.2rem;text-align:center;',
+      'letter-spacing:.2em;text-transform:uppercase;border-radius:14px;border:1px solid rgba(255,255,255,.14);',
+      'background:rgba(0,0,0,.28);color:#eef0ee;outline:none;font-family:inherit;transition:border-color .2s}',
+      '#bak-gate input:focus{border-color:rgba(230,195,106,.65)}',
+      '#bak-gate .go{width:100%;margin-top:12px;height:50px;border-radius:14px;cursor:pointer;',
+      'background:rgba(230,195,106,.18);border:1px solid rgba(230,195,106,.55);color:#e6c36a;',
+      'font-size:1rem;font-weight:700;font-family:inherit;transition:transform .18s cubic-bezier(.3,1.5,.5,1)}',
+      '#bak-gate .go:active{transform:scale(.96)}',
+      '#bak-gate .demo{margin-top:14px;background:none;border:none;color:#a3abb1;',
+      'font-size:.88rem;font-family:inherit;cursor:pointer;padding:8px}',
+      '#bak-gate .demo u{text-decoration-color:rgba(163,171,177,.5)}',
+      '#bak-gate .er{color:#ef8f86;font-size:.86rem;min-height:1.2em;margin-top:10px;font-weight:600}',
 
       /* ── лентата долу в демо ── */
-      '#bak-demobar{position:fixed;left:0;right:0;bottom:0;z-index:3900;background:#22d3ee;',
-      'color:#04121a;padding:10px 14px;font:700 .85rem -apple-system,system-ui,sans-serif;',
-      'text-align:center;cursor:pointer}',
-      '#bak-demobar b{text-decoration:underline}',
+      '#bak-demobar{position:fixed;left:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 10px);',
+      'z-index:3900;max-width:calc(100% - 84px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;',
+      'background:rgba(24,28,32,.55);border:1px solid rgba(230,195,106,.45);color:#eef0ee;',
+      'backdrop-filter:blur(18px) saturate(160%);-webkit-backdrop-filter:blur(18px) saturate(160%);',
+      'padding:10px 16px;border-radius:999px;box-shadow:0 8px 24px rgba(0,0,0,.4);',
+      'font:600 .85rem -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;text-align:center;cursor:pointer}',
+      '#bak-demobar b{color:#e6c36a}',
 
       /* ── КРЪГОВЕТЕ: черни, наполовина прозрачни ── */
       'body.ft-demo .leaflet-overlay-pane path{',
@@ -160,17 +177,17 @@
       'body.ft-demo .leaflet-popup-content>*{visibility:hidden !important}',
       'body.ft-demo #airport-modal-body::after,body.ft-demo #next90-list::after,',
       'body.ft-demo .leaflet-popup-content::after{',
-      'content:"🔒 НЯМА ДОСТЪП\\A\\A Демо акаунт.\\A Въведи код, за да видиш данните.";',
+      'content:"🔒 Не си влязъл\\A\\A Това е демо без живи данни.\\A Влез с кода си, за да ги видиш.";',
       'white-space:pre-wrap;position:absolute;inset:0;display:flex;flex-direction:column;',
       'align-items:center;justify-content:center;text-align:center;padding:18px;',
-      'font:700 13px/1.6 -apple-system,system-ui,sans-serif;color:#94a3b8;letter-spacing:.3px}',
+      'font:600 13px/1.6 -apple-system,system-ui,sans-serif;color:#a3abb1;letter-spacing:0}',
 
       /* ── тикерът и значката на летището ── */
       'body.ft-demo .ticker-wrap{visibility:hidden}',
       'body.ft-demo .ticker-bar{position:relative}',
-      'body.ft-demo .ticker-bar::after{content:"🔒 живите данни са скрити в демо режим";',
+      'body.ft-demo .ticker-bar::after{content:"🔒 Не си влязъл · живите данни са скрити";',
       'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;',
-      'font:700 11.5px -apple-system,system-ui,sans-serif;color:#94a3b8}',
+      'font:600 11.5px -apple-system,system-ui,sans-serif;color:#a3abb1}',
       'body.ft-demo #airport-badge{filter:blur(5px);opacity:.6}'
 
     ].join('');
@@ -186,13 +203,14 @@
     d.id = 'bak-gate';
     d.innerHTML =
       '<div class="bx">' +
-        '<h2>🚕 БАКШИШ</h2>' +
-        '<p>Въведи кода, който получи по Viber или WhatsApp.</p>' +
+        '<div class="lk">🔒</div>' +
+        '<h2>Не си влязъл</h2>' +
+        '<p>BAK е за шофьорите на fish.taxi. Въведи кода, който получи по Viber или WhatsApp.</p>' +
         '<input id="bak-code" maxlength="9" placeholder="XXXXXXXX" autocomplete="off" ' +
         'autocapitalize="characters" spellcheck="false">' +
         '<div class="er" id="bak-err"></div>' +
         '<button class="go" id="bak-go">Влез</button>' +
-        '<button class="demo" id="bak-demo">Разгледай в демо режим</button>' +
+        '<button class="demo" id="bak-demo"><u>Разгледай демото</u> — без живи данни</button>' +
       '</div>';
     document.body.appendChild(d);
 
@@ -204,6 +222,7 @@
       er.textContent = '';
       redeem(inp.value).then(function (r) {
         if (!r.ok) { er.textContent = r.reason; return; }
+        if (window.BAK_LOCKED) { location.reload(); return; }   // данните са били спрени → зареди наново
         d.remove();
         var bar = document.getElementById('bak-demobar');
         if (bar) bar.remove();
@@ -227,7 +246,7 @@
     if (document.getElementById('bak-demobar')) return;
     var b = document.createElement('div');
     b.id = 'bak-demobar';
-    b.innerHTML = 'Демо · полети, събития и трафик са скрити · <b>въведи код</b>';
+    b.innerHTML = '🔒 Не си влязъл · демо · <b>Влез</b>';
     b.onclick = showGate;
     document.body.appendChild(b);
   }
@@ -235,6 +254,7 @@
   function boot() {
     css();
     check().then(function (r) {
+      if (r.revoked && !window.BAK_LOCKED) { location.reload(); return; }
       applyLevel(r.level, r.driver);
       if (r.level === 'demo') {
         var left = demoLeft();
