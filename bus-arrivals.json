@@ -1,17 +1,10 @@
 {
-  "updated": "2026-11-15T20:37:53.358295+02:00",
+  "updated": "2026-11-16T01:19:58.149551+02:00",
   "source": "centralnaavtogara.bg",
   "window_hours": 8,
-  "count": 11,
-  "intl_count": 1,
+  "count": 20,
+  "intl_count": 3,
   "arrivals": [
-    {
-      "time": "01:05",
-      "from": "Добрич",
-      "sector": "12-17",
-      "operator": "ГРУП ПЛЮС ООД",
-      "intl": false
-    },
     {
       "time": "02:45",
       "from": "Варна",
@@ -27,60 +20,130 @@
       "intl": false
     },
     {
-      "time": "20:50",
-      "from": "Кърджали",
-      "sector": "12-17",
-      "operator": "ГРУП ПЛЮС ООД",
-      "intl": false
-    },
-    {
-      "time": "21:00",
-      "from": "Добрич",
-      "sector": "12-17",
-      "operator": "ГРУП ПЛЮС ООД",
-      "intl": false
-    },
-    {
-      "time": "21:20",
-      "from": "Пловдив",
-      "sector": "12-17",
-      "operator": "КАРАТ-С АД",
-      "intl": false
-    },
-    {
-      "time": "21:35",
-      "from": "Русе",
-      "sector": "12-17",
-      "operator": "ЮНИОН ИВКОНИ ООД",
-      "intl": false
-    },
-    {
-      "time": "22:20",
-      "from": "Пловдив",
-      "sector": "12-17",
-      "operator": "КАРАТ-С АД",
-      "intl": false
-    },
-    {
-      "time": "22:45",
+      "time": "06:15",
       "from": "Варна",
       "sector": "12-17",
       "operator": "Глобал Биомет ЕООД",
       "intl": false
     },
     {
-      "time": "23:05",
-      "from": "Слънчев Бряг",
+      "time": "06:40",
+      "from": "Одеса",
+      "sector": "12-17",
+      "operator": "ГУУД БУС ЕООД",
+      "intl": true
+    },
+    {
+      "time": "07:00",
+      "from": "Каварна",
       "sector": "12-17",
       "operator": "ЮНИОН ИВКОНИ ООД",
       "intl": false
     },
     {
-      "time": "23:40",
-      "from": "Скопие",
+      "time": "07:00",
+      "from": "Кишинев",
       "sector": "12-17",
-      "operator": "КАЛЕЯ ООД",
+      "operator": "САРВАЛТЕХ АВТО ДОО",
       "intl": true
+    },
+    {
+      "time": "07:15",
+      "from": "Бургас",
+      "sector": "11-17",
+      "operator": "ЮНИОН ИВКОНИ ООД",
+      "intl": false
+    },
+    {
+      "time": "07:20",
+      "from": "Одеса",
+      "sector": "12-17",
+      "operator": "ИНТЕРТРАНС",
+      "intl": true
+    },
+    {
+      "time": "07:40",
+      "from": "Берковица",
+      "sector": "12-17",
+      "operator": "ТЕДДИ М ТРАВЕЛ ЕООД",
+      "intl": false
+    },
+    {
+      "time": "08:00",
+      "from": "Свети Влас",
+      "sector": "12-17",
+      "operator": "ЮНИОН ИВКОНИ ООД",
+      "intl": false
+    },
+    {
+      "time": "08:05",
+      "from": "Гоце Делчев",
+      "sector": "12-17",
+      "operator": "КАР-ТРАНС ГД ООД",
+      "intl": false
+    },
+    {
+      "time": "08:10",
+      "from": "Добрич",
+      "sector": "12-17",
+      "operator": "ГРУП ПЛЮС ООД",
+      "intl": false
+    },
+    {
+      "time": "08:15",
+      "from": "Благоевград",
+      "sector": "12-17",
+      "operator": "СТРУМА 11 ООД",
+      "intl": false
+    },
+    {
+      "time": "08:20",
+      "from": "Драгана",
+      "sector": "12-17",
+      "operator": "КАЛИНКА ГЕНОВСКА - 69 ЕТ",
+      "intl": false
+    },
+    {
+      "time": "08:21",
+      "from": "Сливен",
+      "sector": "12-17",
+      "operator": "ДОРИС ООД",
+      "intl": false
+    },
+    {
+      "time": "08:30",
+      "from": "Кърджали",
+      "sector": "12-17",
+      "operator": "МАРИЕТА ООД",
+      "intl": false
+    },
+    {
+      "time": "08:40",
+      "from": "Силистра",
+      "sector": "12-17",
+      "operator": "ГРУП ПЛЮС ООД",
+      "intl": false
+    },
+    {
+      "time": "08:45",
+      "from": "Димитровград",
+      "sector": "12-17",
+      "operator": "ЮНИОН ИВКОНИ ООД",
+      "intl": false
+    },
+    {
+      "time": "08:50",
+      "from": "Пловдив (Аг \"Юг\")",
+      "sector": "12-17",
+      "operator": "МЕРИТРАНС - 2002 ЕООД",
+      "intl": false
+    },
+    {
+      "time": "09:00",
+      "from": "Рибарица",
+      "sector": "12-17",
+      "operator": "РАР - ВАЛЕНСИЯ ЕООД",
+      "intl": false
     }
   ]
 }
